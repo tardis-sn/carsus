@@ -1,4 +1,4 @@
-from .meta import Base, UniqueMixin, DBQuantity
+from .meta import Base, UniqueMixin, QuantityMixin, DBQuantity
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
@@ -77,6 +77,46 @@ class AtomicWeight(AtomicQuantity):
     __mapper_args__ = {
         'polymorphic_identity':'atomic_weight'
     }
+
+
+class Ion(UniqueMixin, Base):
+    __tablename__ = "ion"
+
+    @classmethod
+    def unique_hash(cls, atomic_number, ion_charge, *args, **kwargs):
+        return "ion:{0},{1}".format(atomic_number, ion_charge)
+
+    @classmethod
+    def unique_filter(cls, query, atomic_number, ion_charge, *args, **kwargs):
+        return query.filter(and_(Ion.atomic_number == atomic_number,
+                                 Ion.ion_charge == ion_charge))
+
+    id = Column(Integer, primary_key=True)
+    atomic_number = Column(Integer, ForeignKey('atom.atomic_number'), nullable=False)
+    ion_charge = Column(Integer, nullable=False)
+    ground_shells = Column(String(25))
+    ground_level = Column(String(25))
+
+    ionization_energies = relationship("IonizationEnergy",
+                                       backref='ion',
+                                       cascade="all, delete-orphan")
+
+    atom = relationship("Atom", backref='ions')
+
+    __table_args__ = (UniqueConstraint('atomic_number', 'ion_charge'),)
+
+    def __repr__(self):
+        return "<Ion {0} +{1}>".format(self.atom.symbol, self.ion_charge)
+
+
+class IonizationEnergy(QuantityMixin, Base):
+    __tablename__ = "ionization_energy"
+
+    ion_id = Column(Integer, ForeignKey('ion.id'), nullable=False)
+    unit = u.eV
+    method = Column(String(15))
+
+    __table_args__ = (UniqueConstraint('ion_id', 'data_source_id'),)
 
 
 class DataSource(UniqueMixin, Base):

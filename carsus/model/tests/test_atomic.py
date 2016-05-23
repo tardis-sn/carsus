@@ -1,10 +1,11 @@
 import pytest
-from carsus.model import Atom, AtomicWeight, DataSource
+from carsus.model import Atom, AtomicWeight, DataSource, Ion, IonizationEnergy
 from astropy import units as u
 from astropy.units import UnitsError, UnitConversionError
 from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from numpy.testing import assert_allclose, assert_almost_equal
+
 
 def test_atom_count(foo_session):
     assert foo_session.query(Atom).count() == 2
@@ -59,13 +60,13 @@ def test_atomic_weights_atom_relationship(foo_session, nist):
 
 def test_atomic_weights_convert_to(foo_session):
     q = foo_session.query(AtomicWeight.quantity.to(u.solMass).value)
-    values = [_[0] for _ in q]
+    values = [val for val, in q]
     assert_allclose(values, [8.41364096027349e-58, 8.415894971881755e-58])
 
 
 def test_atomic_weights_add_same_units(foo_session):
     q = foo_session.query((AtomicWeight.quantity + 1*u.u).value)
-    values = [_[0] for _ in q]
+    values = [val for val, in q]
     assert_allclose(values, [2.00784, 2.00811])
 
 
@@ -119,3 +120,45 @@ def test_atomic_quantity_compare_uncompatible_units(foo_session):
 def test_atomic_quantity_compare_with_zero(foo_session):
     res = foo_session.query(AtomicWeight).filter(AtomicWeight.quantity > 0).count()
     assert res == 2
+
+
+def test_ion_count(foo_session):
+    assert foo_session.query(Ion).count() == 3
+
+
+def test_ion_as_unique(foo_session):
+    H_0 = Ion.as_unique(foo_session, atomic_number=1, ion_charge=0)
+    H_02 = foo_session.query(Ion).filter(and_(Ion.atomic_number==1,
+                                              Ion.ion_charge==0)).one()
+    assert H_0 is H_02
+
+
+def test_ion_unique_constraint(foo_session):
+    duplicate = Ion(atomic_number=8, ion_charge=1)
+    foo_session.add(duplicate)
+    with pytest.raises(IntegrityError):
+        foo_session.commit()
+
+
+def test_ionization_energies_values(foo_session, O_1):
+    q = foo_session.query(IonizationEnergy.quantity.value).\
+        filter(IonizationEnergy.ion == O_1).\
+        order_by(IonizationEnergy.quantity.value)
+    values = [val for val, in q]
+    assert_allclose(values, [35.121110, 35.121313])
+
+
+def test_ionization_energies_convert_to(foo_session, O_1):
+    q = foo_session.query(IonizationEnergy.quantity.to(u.Unit("cm-1"), equivalencies=u.spectral()).value). \
+        filter(IonizationEnergy.ion == O_1). \
+        order_by(IonizationEnergy.quantity.value)
+    values = [val for val, in q]
+    assert_allclose(values, [283270.868429, 283272.505735])
+
+
+def test_ionization_energies_unique_constraint(foo_session, O_1, nist):
+    O_1.ionization_energies.append(
+        IonizationEnergy(quantity=35.1212323*u.eV, data_source=nist, std_dev=2e-5)
+    )
+    with pytest.raises(IntegrityError):
+        foo_session.commit()

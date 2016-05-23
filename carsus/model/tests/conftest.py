@@ -3,7 +3,7 @@ import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from carsus.model import Base, Atom, DataSource, AtomicWeight
+from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, IonizationEnergy
 from astropy import units as u
 
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -42,7 +42,24 @@ def foo_engine():
         AtomicWeight(quantity=1.00811*u.u, data_source=ku, std_dev=4e-3),
     ]
 
-    session.add_all([H, O, nist, ku])
+    # ions
+    H_0 = Ion(atom=H, ion_charge=0, ground_shells="1s", ground_level="2S<1/2>")
+    O_0 = Ion(atom=O, ion_charge=0, ground_shells="1s2.2s2.2p4", ground_level="3P<2>")
+    O_1 = Ion(atom=O, ion_charge=1, ground_shells="1s2.2s2.2p3", ground_level="4S*<3/2>")
+
+    # ionization energies
+    H_0.ionization_energies = [
+        IonizationEnergy(quantity=13.598434*u.eV, data_source=nist, std_dev=4e-5)
+    ]
+    O_0.ionization_energies = [
+        IonizationEnergy(quantity=13.6180540*u.eV, data_source=nist, std_dev=6e-6)
+    ]
+    O_1.ionization_energies = [
+        IonizationEnergy(quantity=35.121110*u.eV, data_source=nist, std_dev=2e-5),
+        IonizationEnergy(quantity=35.121313*u.eV, data_source=ku, std_dev=3e-5)
+    ]
+
+    session.add_all([H, O, nist, ku, H_0, O_0, O_1])
     session.commit()
     session.close()
     return engine
@@ -75,9 +92,13 @@ def foo_session(foo_engine, request):
 
 @pytest.fixture
 def H(foo_session):
-    return foo_session.query(Atom).filter(Atom.atomic_number==1).one()
+    return foo_session.query(Atom).get(1)
 
 
 @pytest.fixture
 def nist(foo_session):
     return DataSource.as_unique(foo_session, short_name="nist")
+
+@pytest.fixture
+def O_1(foo_session):
+    return Ion.as_unique(foo_session, atomic_number=8, ion_charge=1)
