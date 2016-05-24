@@ -1,5 +1,5 @@
 import pytest
-from carsus.model import Atom, AtomicWeight, DataSource
+from carsus.model import Atom, AtomicWeight, DataSource, Ion, Level, LevelEnergy, LevelData
 from astropy import units as u
 from astropy.units import UnitsError, UnitConversionError
 from sqlalchemy import and_
@@ -31,7 +31,7 @@ def test_data_source_as_unique(memory_session):
 
 
 def test_data_sources_count(foo_session):
-    assert foo_session.query(DataSource).count() == 2
+    assert foo_session.query(DataSource).count() == 3
 
 
 def test_data_sources_unique_constraint(foo_session):
@@ -119,3 +119,32 @@ def test_atomic_quantity_compare_uncompatible_units(foo_session):
 def test_atomic_quantity_compare_with_zero(foo_session):
     res = foo_session.query(AtomicWeight).filter(AtomicWeight.quantity > 0).count()
     assert res == 2
+
+
+def test_levels_count(foo_session):
+    res = foo_session.query(Level).count()
+    assert res == 3
+
+
+def test_levels_count(foo_session):
+    res = foo_session.query(Level).count()
+    assert res == 3
+
+
+def test_levels_as_unique_existing(foo_session):
+    si_2 = Ion.as_unique(foo_session, atomic_number=14, ion_charge=1)
+    si_2_lvl0_1 = foo_session.query(Level).filter(and_(
+                                Level.ion == si_2,
+                                Level.configuration == "3s2.3p",
+                                Level.term == "2P*",
+                                Level.J == 0.5)).one()
+    si_2_lvl0_2 = Level.as_unique(foo_session, ion=si_2, configuration="3s2.3p", term="2P*", J=0.5)
+    assert si_2_lvl0_1 is si_2_lvl0_2
+
+
+def test_levels_as_unique_new(foo_session):
+    si_2 = Ion.as_unique(foo_session, atomic_number=14, ion_charge=1)
+    si_2_lvl3 = Level.as_unique(foo_session, ion=si_2, configuration="3s.3p2", term="2P*", J=1.5)
+    res = foo_session.query(Level).count()
+    import pdb; pdb.set_trace()
+    assert res == 4
