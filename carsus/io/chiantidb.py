@@ -72,7 +72,7 @@ class ChiantiReader(object):
             raise ValueError('Level 0 energy is not 0.0')
 
         levels_df = pd.DataFrame(levels_dict)
-        levels_df.replace(r'\s+', np.nan, regex=True, inplace=True)  # Replace space with NaN
+        # levels_df["label"].replace(r'\s+', np.nan, regex=True, inplace=True)  # Replace space with NaN
         levels_df["atomic_number"] = ion.Z
         levels_df["ionization_stage"] = ion.Ion
         levels_df.set_index(["atomic_number", "ionization_stage", "level_index"], inplace=True)
@@ -90,13 +90,7 @@ class ChiantiReader(object):
         return levels_df
 
 
-def get_level_term(spin_mult, L, conf):
-    # ToDo: determine parity from configuration
-    term = str(spin_mult) + L;
-    return term
-
-
-class ChiantiIngestor(object):
+class ChiantiIngester(object):
 
     def __init__(self, session, ds_short_name="ch_v8.0"):
         self.session = session
@@ -104,20 +98,28 @@ class ChiantiIngestor(object):
 
     def ingest_levels(self, levels_df):
 
-        for index, row in levels_df.iterrows():
-            atomic_number, ioniz_stage, level_index = index
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ioniz_stage-1)
+        for index, ion_df in levels_df.groupby(level=["atomic_number", "ionization_stage"]):
+            atomic_number, ionization_stage = index
+            # ToDo: check if ion already exists;
+            ion = Ion(atomic_number=atomic_number, ion_charge=ionization_stage-1)
+            self.session.add(ion)
             self.session.commit()
-            term = get_level_term(row["spin_mult"], row["L"], row["configuration"])
-            level = Level.as_unique(self.session, ion=ion, configuration=row["configuration"],
-                                        term=term, J=row["J"])
-            self.session.commit()
-            # ToDo: check if data from this source already exists; update it in this case
-            level_data = LevelChiantiData(
-                level=level, data_source=self.ds, ch_index=level_index, ch_label=row["label"],
-                energies=[
-                    LevelEnergy(quantity=row["energy"]*u.eV, method="m"),
-                    LevelEnergy(quantity=row["energy_theoretical"]*u.eV, method="th")
-                ]
-            )
-            self.session.add(level_data)
+            ion_df.reset_index(inplace=True)
+
+            for _, row in ion_df.iterrows():
+
+                # ToDo: check if level already exists;
+                # ToDo: determine parity from configuration
+                level = Level(ion=ion, configuration=row["configuration"],
+                                L=row["L"], J=row["J"], spin_mult=row["spin_mult"], parity=0)
+                self.session.add(level)
+                self.session.commit()
+                # ToDo: check if data from this source already exists; update it in this case
+                level_data = LevelChiantiData(
+                    level=level, data_source=self.ds, ch_index=row["level_index"], ch_label=row["label"],
+                    energies=[
+                        LevelEnergy(quantity=row["energy"]*u.eV, method="m"),
+                        LevelEnergy(quantity=row["energy_theoretical"]*u.eV, method="th")
+                    ]
+                )
+                self.session.add(level_data)
