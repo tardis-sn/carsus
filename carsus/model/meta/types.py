@@ -1,10 +1,22 @@
 """Types and SQL constructs specific to carsus"""
 
+import numpy as np
 from sqlalchemy.sql.expression import ClauseElement
+from sqlalchemy.types import Integer, TypeDecorator
 from sqlalchemy.orm.attributes import QueryableAttribute
 from astropy.units import Quantity, Unit, dimensionless_unscaled, UnitsError
 from astropy.units.quantity_helper import helper_twoarg_comparison, UFUNC_HELPERS
-import numpy as np
+from decimal import Decimal
+
+
+class Decimal10(TypeDecorator):
+    impl = Integer
+
+    def process_bind_param(self, value, dialect):
+        return int(value*10)
+
+    def process_result_value(self, value, dialect):
+        return Decimal(value)/Decimal('10')
 
 
 class DBQuantity(Quantity):
