@@ -1,4 +1,4 @@
-from .meta import Base, UniqueMixin, DBQuantity
+from .meta import Base, UniqueMixin, DBQuantity, QuantityMixin
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
@@ -78,6 +78,82 @@ class AtomicWeight(AtomicQuantity):
         'polymorphic_identity':'atomic_weight'
     }
 
+
+class Ion(UniqueMixin, Base):
+    __tablename__ = "ion"
+
+    @classmethod
+    def unique_hash(cls, atomic_number, ion_charge, *args, **kwargs):
+        return "i{0}_{1}".format(atomic_number, ion_charge)
+
+    @classmethod
+    def unique_filter(cls, query, atomic_number, ion_charge, *args, **kwargs):
+        return query.filter(and_(Ion.atomic_number == atomic_number,
+                                 Ion.ion_charge == ion_charge))
+
+    id = Column(Integer, primary_key=True)
+    atomic_number = Column(Integer, ForeignKey('atom.atomic_number'), nullable=False)
+    ion_charge = Column(Integer, nullable=False)
+
+    levels = relationship("Level",
+                          backref='ion',
+                          cascade="all, delete-orphan")
+
+    atom = relationship("Atom", backref='ions')
+
+    __table_args__ = (UniqueConstraint('atomic_number', 'ion_charge'),)
+
+    def __repr__(self):
+        return "<Ion z={0} +{1}>".format(self.atomic_number, self.ion_charge)
+
+
+class Level(Base):
+    __tablename__ = "level"
+
+    id = Column(Integer, primary_key=True)
+    ion_id = Column(Integer, ForeignKey('ion.id'), nullable=False)
+    data_source_id = Column(Integer, ForeignKey('data_source.id'))
+    type = Column(String(20))
+    configuration = Column(String(50))
+    L = Column(String(2))  # total orbital angular momentum
+    J = Column(Float)  # total angular momentum
+    spin_multiplicity = Column(Integer)  # 2*S + 1, where S is total spin
+    parity = Column(Integer)  # 0 - even, 1 - odd
+    # ToDo I think that term column can be derived from L, S, parity and configuration
+    term = Column(String(20))
+
+    energies = relationship("LevelEnergy",
+                            backref="level",
+                            cascade="all, delete-orphan")
+
+    data_source = relationship("DataSource", backref="level_data")
+
+    __table_args__ = (UniqueConstraint('id', 'ion_id', 'data_source_id'),)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'level',
+        'polymorphic_on': type
+    }
+
+
+class ChiantiLevel(Level):
+    __tablename__ = "chianti"
+
+    id = Column(Integer, ForeignKey('level.id'), primary_key=True)
+    ch_index = Column(Integer)
+    ch_label = Column(String(10))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'chianti'
+    }
+
+
+class LevelEnergy(QuantityMixin, Base):
+    __tablename__ = "level_energy"
+
+    level_id = Column(Integer, ForeignKey('level.id'), nullable=False)
+    unit = u.eV
+    equivalencies = u.spectral()
 
 class DataSource(UniqueMixin, Base):
     __tablename__ = "data_source"

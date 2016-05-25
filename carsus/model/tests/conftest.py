@@ -3,14 +3,14 @@ import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from carsus.model import Base, Atom, DataSource, AtomicWeight
+from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, LevelEnergy, ChiantiLevel
 from astropy import units as u
 
-data_dir = os.path.join(os.path.dirname(__file__), 'data')
-if not os.path.exists(data_dir):
-    os.makedirs(data_dir)
-
-foo_db_url = 'sqlite:///' + os.path.join(data_dir, 'foo.db')
+# data_dir = os.path.join(os.path.dirname(__file__), 'data')
+# if not os.path.exists(data_dir):
+#     os.makedirs(data_dir)
+#
+# foo_db_url = 'sqlite:///' + os.path.join(data_dir, 'foo.db')
 
 
 @pytest.fixture
@@ -23,18 +23,19 @@ def memory_session():
 
 @pytest.fixture(scope="session")
 def foo_engine():
-    engine = create_engine(foo_db_url)
+    engine = create_engine("sqlite://")
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     session = Session(bind=engine)
 
     # atoms
     H = Atom(atomic_number=1, symbol='H')
-    O = Atom(atomic_number=8, symbol='O')
+    Ne = Atom(atomic_number=10, symbol='Ne')
 
     # data sources
     nist = DataSource(short_name='nist')
     ku = DataSource(short_name='ku')
+    ch = DataSource(short_name='ch_v8.0.2')
 
     # atomic weights
     H.quantities = [
@@ -42,7 +43,31 @@ def foo_engine():
         AtomicWeight(quantity=1.00811*u.u, data_source=ku, std_dev=4e-3),
     ]
 
-    session.add_all([H, O, nist, ku])
+    session.add_all([H, Ne, nist, ku, ch])
+    session.commit()
+
+    # ions
+    ne_0 = Ion(atom=Ne, ion_charge=1)
+    ne_1 = Ion(atom=Ne, ion_charge=2)
+
+    # levels
+    ne_1_lvl0 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2.2p5", term="2P1.5", L="P", J=1.5,
+                             spin_multiplicity=2, parity=1, ch_index=1,
+                             energies=[
+                                 LevelEnergy(quantity=0, method="m"),
+                                 LevelEnergy(quantity=0, method="th")
+                             ])
+
+    ne_1_lvl1 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2.2p5", term="2P0.5", L="P", J=0.5,
+                             spin_multiplicity=2, parity=1, ch_index=2,
+                             energies=[
+                                 LevelEnergy(quantity=780.4*u.Unit("cm-1"), method="m"),
+                                 LevelEnergy(quantity=780.0*u.Unit("cm-1"), method="th")
+                             ])
+
+    session.add_all([ne_1, ne_0, ne_1_lvl0, ne_1_lvl1])
     session.commit()
     session.close()
     return engine
@@ -81,3 +106,5 @@ def H(foo_session):
 @pytest.fixture
 def nist(foo_session):
     return DataSource.as_unique(foo_session, short_name="nist")
+
+
