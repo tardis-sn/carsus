@@ -126,7 +126,8 @@ class Level(Base):
                             backref="level",
                             cascade="all, delete-orphan")
 
-    data_source = relationship("DataSource", backref="level_data")
+    data_source = relationship("DataSource", backref="levels")
+    ion = relationship("Ion", backref="ion")
 
     __table_args__ = (UniqueConstraint('id', 'ion_id', 'data_source_id'),)
 
