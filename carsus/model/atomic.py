@@ -18,6 +18,8 @@ class Atom(Base):
                     backref='atom',
                     cascade='all, delete-orphan')
 
+    ions = relationship("Ion", back_populates="atom")
+
     def __repr__(self):
         return "<Atom {0}, Z={1}>".format(self.symbol, self.atomic_number)
 
@@ -95,11 +97,8 @@ class Ion(UniqueMixin, Base):
     atomic_number = Column(Integer, ForeignKey('atom.atomic_number'), nullable=False)
     ion_charge = Column(Integer, nullable=False)
 
-    levels = relationship("Level",
-                          backref='ion',
-                          cascade="all, delete-orphan")
-
-    atom = relationship("Atom", backref='ions')
+    levels = relationship("Level", back_populates='ion')
+    atom = relationship("Atom", back_populates='ions')
 
     __table_args__ = (UniqueConstraint('atomic_number', 'ion_charge'),)
 
@@ -122,13 +121,11 @@ class Level(Base):
     # ToDo I think that term column can be derived from L, S, parity and configuration
     term = Column(String(20))
 
-    energies = relationship("LevelEnergy",
-                            backref="level",
-                            cascade="all, delete-orphan")
+    energies = relationship("LevelEnergy", back_populates="level")
+    ion = relationship("Ion", back_populates="levels")
 
     data_source = relationship("DataSource", backref="levels")
-    ion = relationship("Ion", backref="ion")
-
+    
     __table_args__ = (UniqueConstraint('id', 'ion_id', 'data_source_id'),)
 
     __mapper_args__ = {
@@ -155,6 +152,8 @@ class LevelEnergy(QuantityMixin, Base):
     level_id = Column(Integer, ForeignKey('level.id'), nullable=False)
     unit = u.eV
     equivalencies = u.spectral()
+
+    level = relationship("Level", back_populates="energies")
 
 class DataSource(UniqueMixin, Base):
     __tablename__ = "data_source"
