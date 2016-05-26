@@ -74,9 +74,7 @@ class ChiantiReader(object):
         levels_df["label"].replace(r'\s+', np.nan, regex=True, inplace=True)
 
         # Extract configuration and term from the "pretty" column
-        term_conf_df = levels_df["pretty"].str.\
-            extract("(?P<configuration>(\d[a-z]\d?[\s,.]?)+)\s(?P<term>\d+[A-Z][\d,.]+)")
-        levels_df[["term", "configuration"]] = term_conf_df[["term", "configuration"]]
+        levels_df[["term", "configuration"]] = levels_df["pretty"].str.rsplit(' ', expand=True, n=1)
         levels_df.drop("pretty", axis=1, inplace=True)
 
         levels_df["atomic_number"] = ion.Z
