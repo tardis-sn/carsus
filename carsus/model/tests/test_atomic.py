@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
-from carsus.model import Atom, AtomicWeight, DataSource, Ion, LevelEnergy, Level
+from carsus.model import Atom, AtomicWeight, DataSource, Ion, LevelEnergy,\
+    Level, Line, LineGFValue, LineWavelength, LineAValue
 from astropy import units as u
 from astropy.units import UnitsError, UnitConversionError
 from sqlalchemy import and_
@@ -134,13 +135,18 @@ def test_ions_count(foo_session):
 ])
 def test_levels_measured_energies(foo_session, method, expected):
     levels_w_eth = foo_session.query(Level, LevelEnergy).\
-        join(Level.energies).filter(LevelEnergy.method == method).all()
+        join(Level.energies).filter(LevelEnergy.method == method).limit(2)
     energies = [en.quantity for lvl, en in levels_w_eth]
     with u.set_enabled_equivalencies(u.spectral()):
         assert_quantity_allclose(energies, expected)
 
 
 def test_levels_chianiti_index(foo_session):
-    levels = foo_session.query(Level).all()
+    levels = foo_session.query(Level).limit(2)
     indices = {lvl.ch_index for lvl in levels}
     assert indices == set([1, 2])
+
+
+def test_lines_chianti(foo_session):
+    line0, line1 = foo_session.query(Line).all()
+    import pdb; pdb.set_trace()

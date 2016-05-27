@@ -3,7 +3,8 @@ import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, LevelEnergy, ChiantiLevel
+from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, \
+    LevelEnergy, ChiantiLevel, Line, LineWavelength, LineAValue, LineGFValue
 from astropy import units as u
 
 # data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -66,8 +67,44 @@ def foo_engine():
                                  LevelEnergy(quantity=780.4*u.Unit("cm-1"), method="m"),
                                  LevelEnergy(quantity=780.0*u.Unit("cm-1"), method="th")
                              ])
+    # 2s2p6 2S0.5
+    ne_1_lvl2 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2p6", term="2S0.5", L="S", J=0.5,
+                             spin_multiplicity=2, parity=0, ch_index=3,
+                             energies=[
+                                 LevelEnergy(quantity=217047.594*u.Unit("cm-1"), method="m"),
+                                 LevelEnergy(quantity=217048*u.Unit("cm-1"), method="th")
+                             ])
 
-    session.add_all([ne_1, ne_0, ne_1_lvl0, ne_1_lvl1])
+    # lines
+    ne_1_line0 = Line(
+        ion=ne_1,
+        source_level=ne_1_lvl0,
+        target_level=ne_1_lvl1,
+        data_source=ch,
+        wavelengths=[
+            LineWavelength(quantity=1*u.AA)
+        ],
+        a_values=[
+            LineAValue(quantity=48*u.Unit("s-1"))
+        ],
+        gf_values=[
+            LineGFValue(quantity=23)
+        ]
+    )
+
+    ne_1_line1 = Line(
+        ion=ne_1,
+        source_level=ne_1_lvl0,
+        target_level=ne_1_lvl2,
+        data_source=ch)
+
+    lw1 = LineWavelength(quantity=10*u.AA,
+                         line=ne_1_line1)
+
+    session.add_all([ne_1, ne_0,
+                     ne_1_lvl0, ne_1_lvl1, ne_1_lvl2,
+                     ne_1_line0, ne_1_lvl1])
     session.commit()
     session.close()
     return engine

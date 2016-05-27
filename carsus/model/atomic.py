@@ -98,6 +98,7 @@ class Ion(UniqueMixin, Base):
     ion_charge = Column(Integer, nullable=False)
 
     levels = relationship("Level", back_populates='ion')
+    lines = relationship("Line", back_populates='ion')
     atom = relationship("Atom", back_populates='ions')
 
     __table_args__ = (UniqueConstraint('atomic_number', 'ion_charge'),)
@@ -123,9 +124,8 @@ class Level(Base):
 
     energies = relationship("LevelEnergy", back_populates="level")
     ion = relationship("Ion", back_populates="levels")
-
     data_source = relationship("DataSource", backref="levels")
-    
+
     __table_args__ = (UniqueConstraint('id', 'ion_id', 'data_source_id'),)
 
     __mapper_args__ = {
@@ -135,7 +135,7 @@ class Level(Base):
 
 
 class ChiantiLevel(Level):
-    __tablename__ = "chianti"
+    __tablename__ = "chianti_level"
 
     id = Column(Integer, ForeignKey('level.id'), primary_key=True)
     ch_index = Column(Integer)
@@ -154,6 +154,86 @@ class LevelEnergy(QuantityMixin, Base):
     equivalencies = u.spectral()
 
     level = relationship("Level", back_populates="energies")
+
+
+class Transition(Base):
+    __tablename__ = "transition"
+
+    id = Column(Integer, primary_key=True)
+    type = Column(String(50))
+
+    ion_id = Column(Integer, ForeignKey('ion.id'), nullable=False)
+    source_level_id = Column(Integer, ForeignKey('level.id'), nullable=False)
+    target_level_id = Column(Integer, ForeignKey('level.id'), nullable=False)
+    data_source_id = Column(Integer, ForeignKey('data_source.id'), nullable=False)
+
+    source_level = relationship("Level",
+                                primaryjoin=(Level.id == source_level_id))
+    target_level = relationship("Level",
+                                primaryjoin=(Level.id == target_level_id))
+
+
+    data_source = relationship("DataSource", backref="transitions")
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'transition',
+        'polymorphic_on': type
+    }
+
+
+class Line(Transition):
+    __tablename__ = "line"
+
+    id = Column(Integer, ForeignKey('transition.id'), primary_key=True)
+
+    ion = relationship("Ion", back_populates="lines")
+    wavelengths = relationship("LineWavelength", backref="line")
+    a_values = relationship("LineAValue", backref="line")
+    gf_values = relationship("LineGFValue", backref="line")
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'line'
+    }
+
+
+class LineQuantity(QuantityMixin, Base):
+    __tablename__ = "line_quantity"
+
+    line_id = Column(Integer, ForeignKey("line.id"))
+    type = Column(String(20))
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'line_quantity',
+        'polymorphic_on': type
+    }
+
+
+class LineWavelength(LineQuantity):
+
+    unit = u.Angstrom
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'wavelength'
+    }
+
+
+class LineAValue(LineQuantity):
+
+    unit = u.Unit("s-1")
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'a_value'
+    }
+
+
+class LineGFValue(LineQuantity):
+
+    unit = u.dimensionless_unscaled
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'gf_value'
+    }
+
 
 class DataSource(UniqueMixin, Base):
     __tablename__ = "data_source"

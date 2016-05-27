@@ -11,6 +11,7 @@ class QuantityMixin(object):
     _value = Column(Float, nullable=False)
     uncert = Column(Float)
     method = Column(String(15))
+    reference = Column(String(50))
 
     unit = dimensionless_unscaled
     equivalencies = None
