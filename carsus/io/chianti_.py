@@ -28,22 +28,11 @@ else:
     masterlist_ions = list()
 
 
-class ChiantiReader(object):
+class ReaderError(ValueError):
+    pass
 
-    def __init__(self, ions_list):
-        # ToDo write a parser for Spectral Notation
-        self.ions_list = list()
-        for ion in ions_list:
-            if ion in self.masterlist_ions:
-                self.ions_list.append(ion)
-            else:
-                print("Ion {0} is not available".format(ion))
 
-    @property
-    def ions(self):
-        return [ch.ion(_) for _ in self.ions_list]
-
-    masterlist_ions = masterlist_ions
+class ChiantiIonReader(object):
 
     elvlc_dict = {
         'lvl': 'level_index',
@@ -59,21 +48,74 @@ class ChiantiReader(object):
     wgfa_dict = {
         'avalue': 'a_value',
         'gf': 'gf_value',
-        'lvl1': 'source_level_index',
-        'lvl2': 'target_level_index',
+        'lvl1': 'lower_level_index',
+        'lvl2': 'upper_level_index',
         'wvl': 'wavelength'
     }
 
-    def _read_ion_levels(self, ion):
+    scups_dict = {
+        'btemp': 'temperatures',
+        'bscups': 'collision_strengths',
+        'gf': 'gf_value',
+        'de': 'energy',  # Rydberg
+        'lvl1': 'lower_level_index',
+        'lvl2': 'upper_level_index',
+        'ttype': 'transition_type',
+        'cups': 'scaling_param'
+    }
 
-        if not hasattr(ion, 'Elvlc'):
-            print("No levels data is available for ion {}".format(ion))
-            return None
+    def __init__(self, ion_name):
+
+        self.ion = ch.ion(ion_name)
+        self._levels_df = None
+        self._lines_df = None
+        self._collisions_df = None
+
+    @property
+    def levels_df(self):
+        if self._levels_df is None:
+            self._read_levels()
+        return self._levels_df
+
+    @property
+    def lines_df(self):
+        if self._lines_df is None:
+            self._read_lines()
+        return self._lines_df
+
+    @property
+    def collisions_df(self):
+        if self._collisions_df is None:
+            self._read_collisions()
+        return self._collisions_df
+
+    @property
+    def last_bound_level(self):
+        ionization_potential = u.eV.to(u.Unit("cm-1"), value=self.ion.Ip, equivalencies=u.spectral())
+        last_row = self.levels_df.loc[self.levels_df['energy'] < ionization_potential].tail(1)
+        return last_row.index[0]
+
+    @property
+    def bound_levels_df(self):
+        return self.levels_df.loc[:self.last_bound_level]
+
+    @property
+    def bound_lines_df(self):
+        return self.lines_df.loc[(slice(None), slice(1, self.last_bound_level)), :]
+
+    @property
+    def bound_collisions_df(self):
+        return self.collisions_df.loc[(slice(None), slice(1, self.last_bound_level)), :]
+
+    def _read_levels(self):
+
+        if not hasattr(self.ion, 'Elvlc'):
+            raise ReaderError("No levels data is available for ion {}".format(self.ion.Spectroscopic))
 
         levels_dict = {}
 
         for key, col_name in self.elvlc_dict.iteritems():
-            levels_dict[col_name] = ion.Elvlc.get(key)
+            levels_dict[col_name] = self.ion.Elvlc.get(key)
 
         # Check that ground level energy is 0
         try:
@@ -82,40 +124,32 @@ class ChiantiReader(object):
         except AssertionError:
             raise ValueError('Level 0 energy is not 0.0')
 
-        levels_df = pd.DataFrame(levels_dict)
+        self._levels_df = pd.DataFrame(levels_dict)
 
         # Replace empty labels with NaN
-        levels_df["label"].replace(r'\s+', np.nan, regex=True, inplace=True)
+        self._levels_df["label"].replace(r'\s+', np.nan, regex=True, inplace=True)
 
         # Extract configuration and term from the "pretty" column
-        levels_df[["term", "configuration"]] = levels_df["pretty"].str.rsplit(' ', expand=True, n=1)
-        levels_df.drop("pretty", axis=1, inplace=True)
+        self._levels_df[["term", "configuration"]] = self._levels_df["pretty"].str.rsplit(' ', expand=True, n=1)
+        self._levels_df.drop("pretty", axis=1, inplace=True)
 
-        levels_df["atomic_number"] = ion.Z
-        levels_df["ion_charge"] = ion.Ion - 1
-        levels_df.set_index(["atomic_number", "ion_charge", "level_index"], inplace=True)
+        self._levels_df.set_index("level_index", inplace=True)
+        self._levels_df.sort_index(inplace=True)
 
-        # Keep only bound levels ?
-        # ip = u.eV.to(u.Unit("cm-1"), value=ion.Ip, equivalencies=u.spectral())
-        # levels_df = levels_df[levels_df['energy'] < ion.Ip]
+    def _read_lines(self):
 
-        return levels_df
-
-    def _read_ion_lines(self, ion):
-
-        if not hasattr(ion, 'Wgfa'):
-            print("No lines data is available for ion {}".format(ion))
-            return None
+        if not hasattr(self.ion, 'Wgfa'):
+            raise ReaderError("No lines data is available for ion {}".format(self.ion.Spectroscopic))
 
         lines_dict = {}
 
         for key, col_name in self.wgfa_dict.iteritems():
-            lines_dict[col_name] = ion.Wgfa.get(key)
+            lines_dict[col_name] = self.ion.Wgfa.get(key)
 
-        lines_df = pd.DataFrame(lines_dict)
+        self._lines_df = pd.DataFrame(lines_dict)
 
         # two-photon transitions are given a zero wavelength and we ignore them for now
-        lines_df = lines_df.loc[~(lines_df["wavelength"] == 0)]
+        self._lines_df = self._lines_df.loc[~(self._lines_df["wavelength"] == 0)]
 
         # theoretical wavelengths have negative values
         def parse_wavelength(row):
@@ -127,28 +161,69 @@ class ChiantiReader(object):
                 method = "m"
             return pd.Series([wvl, method])
 
-        lines_df[["wavelength", "method"]] = lines_df.apply(parse_wavelength, axis=1)
+        self._lines_df[["wavelength", "method"]] = self._lines_df.apply(parse_wavelength, axis=1)
 
-        lines_df["atomic_number"] = ion.Z
-        lines_df["ion_charge"] = ion.Ion - 1
+        self._lines_df.set_index(["lower_level_index", "upper_level_index"], inplace=True)
+        self._lines_df.sort_index(inplace=True)
 
-        lines_df.set_index(["atomic_number", "ion_charge",
-                            "source_level_index", "target_level_index"], inplace=True)
+    def _read_collisions(self):
 
-        return lines_df
+        if not hasattr(self.ion, 'Scups'):
+            raise("No collision data is available for ion {}".format(self.ion.Spectroscopic))
+
+        collisions_dict = {}
+
+        for key, col_name in self.scups_dict.iteritems():
+            collisions_dict[col_name] = self.ion.Scups.get(key)
+
+        self._collisions_df = pd.DataFrame(collisions_dict)
+
+        self._collisions_df.set_index(["lower_level_index", "upper_level_index"], inplace=True)
+        self._collisions_df.sort_index(inplace=True)
+
+
+class ChiantiReader(object):
+
+    masterlist_ions = masterlist_ions
+
+    def __init__(self, ions_list):
+        # ToDo write a parser for Spectral Notation
+        self.ion_readers = list()
+        for ion in ions_list:
+            if ion in self.masterlist_ions:
+                self.ion_readers.append(ChiantiIonReader(ion))
+            else:
+                print("Ion {0} is not available".format(ion))
 
     def read_levels(self):
         levels_df = pd.DataFrame()
-        for ion in self.ions:
-            df = self._read_ion_levels(ion)
-            levels_df = levels_df.append(df)  # None is treated as an empty dataframe
+        for rdr in self.ion_readers:
+            try:
+                ion_levels_df = rdr.bound_levels_df
+                ion_levels_df["atomic_number"] = rdr.ion.Z
+                ion_levels_df["ion_charge"] = rdr.ion.Ion - 1
+                ion_levels_df.reset_index(inplace=True)
+                ion_levels_df.set_index(["atomic_number", "ion_charge", "level_index"], inplace=True)
+                levels_df = levels_df.append(ion_levels_df)
+            except ReaderError as e:
+                print e
+
         return levels_df
 
     def read_lines(self):
         lines_df = pd.DataFrame()
-        for ion in self.ions:
-            df = self._read_ion_lines(ion)
-            lines_df = lines_df.append(df)  # None is treated as an empty dataframe
+        for rdr in self.ion_readers:
+            try:
+                ion_lines_df = rdr.bound_lines_df
+                ion_lines_df["atomic_number"] = rdr.ion.Z
+                ion_lines_df["ion_charge"] = rdr.ion.Ion - 1
+                ion_lines_df.reset_index(inplace=True)
+                ion_lines_df.set_index(["atomic_number", "ion_charge",
+                                        "lower_level_index", "upper_level_index"], inplace=True)
+                lines_df = lines_df.append(ion_lines_df)
+            except ReaderError as e:
+                print e
+
         return lines_df
 
 
@@ -167,7 +242,6 @@ class ChiantiIngester(object):
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
             # ToDo: Determine parity from configuration
-            # ToDo: Check if the level from this source already exists and update it then
 
             for index, row in ion_df.iterrows():
 
