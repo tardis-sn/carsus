@@ -10,7 +10,8 @@ from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from carsus.io.base import IngesterError
 from carsus.model import DataSource, Ion, ChiantiLevel, LevelEnergy, \
-    Line, LineWavelength, LineAValue, LineGFValue
+    Line, LineWavelength, LineAValue, LineGFValue, ECollision, ECollisionTemp, ECollisionStrength, \
+    ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 
 if os.getenv('XUVTOP'):
     masterlist_ions_path = os.path.join(
@@ -60,8 +61,8 @@ class ChiantiIonReader(object):
         'de': 'energy',  # Rydberg
         'lvl1': 'lower_level_index',
         'lvl2': 'upper_level_index',
-        'ttype': 'transition_type',
-        'cups': 'scaling_param'
+        'ttype': 'ttype',  # BT92 Transition type
+        'cups': 'cups'  # BT92 scaling parameter
     }
 
     def __init__(self, ion_name):
@@ -182,11 +183,11 @@ class ChiantiIonReader(object):
         self._collisions_df.sort_index(inplace=True)
 
 
-class ChiantiReader(object):
-
+class ChiantiIngester(object):
     masterlist_ions = masterlist_ions
 
-    def __init__(self, ions_list):
+    def __init__(self, session, ions_list=masterlist_ions, ds_short_name="chianti_v8.0.2"):
+        self.session = session
         # ToDo write a parser for Spectral Notation
         self.ion_readers = list()
         for ion in ions_list:
@@ -194,59 +195,22 @@ class ChiantiReader(object):
                 self.ion_readers.append(ChiantiIonReader(ion))
             else:
                 print("Ion {0} is not available".format(ion))
-
-    def read_levels(self):
-        levels_df = pd.DataFrame()
-        for rdr in self.ion_readers:
-            try:
-                ion_levels_df = rdr.bound_levels_df
-                ion_levels_df["atomic_number"] = rdr.ion.Z
-                ion_levels_df["ion_charge"] = rdr.ion.Ion - 1
-                ion_levels_df.reset_index(inplace=True)
-                ion_levels_df.set_index(["atomic_number", "ion_charge", "level_index"], inplace=True)
-                levels_df = levels_df.append(ion_levels_df)
-            except ReaderError as e:
-                print e
-
-        return levels_df
-
-    def read_lines(self):
-        lines_df = pd.DataFrame()
-        for rdr in self.ion_readers:
-            try:
-                ion_lines_df = rdr.bound_lines_df
-                ion_lines_df["atomic_number"] = rdr.ion.Z
-                ion_lines_df["ion_charge"] = rdr.ion.Ion - 1
-                ion_lines_df.reset_index(inplace=True)
-                ion_lines_df.set_index(["atomic_number", "ion_charge",
-                                        "lower_level_index", "upper_level_index"], inplace=True)
-                lines_df = lines_df.append(ion_lines_df)
-            except ReaderError as e:
-                print e
-
-        return lines_df
-
-
-class ChiantiIngester(object):
-
-    def __init__(self, session, ions_list=masterlist_ions, ds_short_name="chianti_v8.0.2"):
-        self.session = session
-        self.reader = ChiantiReader(ions_list=ions_list)
         self.ds = DataSource.as_unique(self.session, short_name=ds_short_name)
 
-    def _ingest_levels(self, levels_df):
+    def ingest_levels(self):
 
-        for ion_index, ion_df in levels_df.groupby(level=["atomic_number", "ion_charge"]):
+        for rdr in self.ion_readers:
 
-            atomic_number, ion_charge = ion_index
+            atomic_number = rdr.ion.Z
+            ion_charge = rdr.ion.Ion -1
+
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
             # ToDo: Determine parity from configuration
 
-            for index, row in ion_df.iterrows():
+            for index, row in rdr.bound_levels_df.iterrows():
 
-                ch_index = index[2]  # (atomic_number, ion_charge, chianti_index)
-                level = ChiantiLevel(ion=ion, data_source=self.ds, ch_index=ch_index, ch_label=row["label"],
+                level = ChiantiLevel(ion=ion, data_source=self.ds, ch_index=index, ch_label=row["label"],
                                      configuration=row["configuration"], term=row["term"],
                                      L=row["L"], J=row["J"], spin_multiplicity=row["spin_multiplicity"])
 
@@ -258,18 +222,19 @@ class ChiantiIngester(object):
                         )
                 self.session.add(level)
 
-    def _ingest_lines(self, lines_df):
+    def ingest_lines(self):
 
-        for ion_index, ion_df in lines_df.groupby(level=["atomic_number", "ion_charge"]):
-            atomic_number, ion_charge = ion_index
+        for rdr in self.ion_readers:
+
+            atomic_number = rdr.ion.Z
+            ion_charge = rdr.ion.Ion - 1
+
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            # ToDo: Check which lines from this source already exist and update them
+            for index, row in rdr.bound_lines_df.iterrows():
 
-            for index, row in ion_df.iterrows():
-
-                # index: (atomic_number, ion_charge, source_level_index, target_level_index)
-                source_level_index, target_level_index = index[2:]
+                # index: (source_level_index, target_level_index)
+                source_level_index, target_level_index = index
 
                 try:
                     source_level = self.session.query(ChiantiLevel).\
@@ -286,7 +251,6 @@ class ChiantiIngester(object):
 
                 # Create a new line
                 line = Line(
-                    ion=ion,
                     source_level=source_level,
                     target_level=target_level,
                     data_source=self.ds,
@@ -303,14 +267,64 @@ class ChiantiIngester(object):
 
                 self.session.add(line)
 
-    def ingest(self, levels=True, lines=True):
+    def ingest_collisions(self):
+
+        for rdr in self.ion_readers:
+
+            atomic_number = rdr.ion.Z
+            ion_charge = rdr.ion.Ion - 1
+            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+
+            for index, row in rdr.bound_collisions_df.iterrows():
+
+                # index: (source_level_index, target_level_index)
+                source_level_index, target_level_index = index
+
+                try:
+                    source_level = self.session.query(ChiantiLevel). \
+                        filter(and_(ChiantiLevel.ion == ion,
+                                    ChiantiLevel.data_source == self.ds,
+                                    ChiantiLevel.ch_index == source_level_index)).one()
+                    target_level = self.session.query(ChiantiLevel). \
+                        filter(and_(ChiantiLevel.ion == ion,
+                                    ChiantiLevel.data_source == self.ds,
+                                    ChiantiLevel.ch_index == target_level_index)).one()
+                except NoResultFound:
+                    raise IngesterError("Levels from this source have not been found."
+                                        "You must ingest levels before transitions")
+
+                # Create a new electron collision
+                e_col = ECollision(
+                    source_level=source_level,
+                    target_level=target_level,
+                    data_source=self.ds,
+                    bt92_ttype=row["ttype"],
+                    bt92_cups=row["cups"],
+                    energies=[
+                        ECollisionEnergy(quantity=row["energy"]*u.rydberg)
+                    ],
+                    gf_values=[
+                        ECollisionGFValue(quantity=row["gf_value"])
+                    ]
+                )
+
+                e_col.temp_strengths_tuple = [
+                    (ECollisionTemp(quantity=temp), ECollisionStrength(quantity=strength))
+                    for temp, strength in zip(row["temperatures"], row["collision_strengths"])
+                ]
+
+                self.session.add(e_col)
+
+    def ingest(self, levels=True, lines=False, collisions=False):
 
         if levels:
-            levels_df = self.reader.read_levels()
-            self._ingest_levels(levels_df)
-        self.session.commit()
+            self.ingest_levels()
+            self.session.commit()
 
         if lines:
-            lines_df = self.reader.read_lines()
-            self._ingest_lines(lines_df)
-        self.session.commit()
+            self.ingest_lines()
+            self.session.commit()
+
+        if collisions:
+            self.ingest_collisions()
+            self.session.commit()

@@ -167,9 +167,11 @@ class Transition(Base):
     data_source_id = Column(Integer, ForeignKey('data_source.id'), nullable=False)
 
     source_level = relationship("Level",
-                                primaryjoin=(Level.id == source_level_id))
+                                primaryjoin=(Level.id == source_level_id),
+                                backref="source_transitions")
     target_level = relationship("Level",
-                                primaryjoin=(Level.id == target_level_id))
+                                primaryjoin=(Level.id == target_level_id),
+                                backref="target_transitions")
 
 
     data_source = relationship("DataSource", backref="transitions")
