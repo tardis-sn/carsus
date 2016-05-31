@@ -1,10 +1,15 @@
 import pytest
-from carsus.model import Atom, AtomicWeight, DataSource
+import numpy as np
+from carsus.model import Atom, AtomicWeight, DataSource, Ion, LevelEnergy,\
+    Level, Line, LineGFValue, LineWavelength, LineAValue, ECollision,\
+    ECollisionTemp, ECollisionStrength, \
+    ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 from astropy import units as u
 from astropy.units import UnitsError, UnitConversionError
 from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from numpy.testing import assert_allclose, assert_almost_equal
+from astropy.tests.helper import assert_quantity_allclose
 
 def test_atom_count(foo_session):
     assert foo_session.query(Atom).count() == 2
@@ -31,7 +36,7 @@ def test_data_source_as_unique(memory_session):
 
 
 def test_data_sources_count(foo_session):
-    assert foo_session.query(DataSource).count() == 2
+    assert foo_session.query(DataSource).count() == 3
 
 
 def test_data_sources_unique_constraint(foo_session):
@@ -119,3 +124,43 @@ def test_atomic_quantity_compare_uncompatible_units(foo_session):
 def test_atomic_quantity_compare_with_zero(foo_session):
     res = foo_session.query(AtomicWeight).filter(AtomicWeight.quantity > 0).count()
     assert res == 2
+
+
+def test_ions_count(foo_session):
+    res = foo_session.query(Ion).count()
+    assert res == 2
+
+
+@pytest.mark.parametrize("method, expected",[
+    ("th", [0, 780.0]*u.Unit("cm-1")),
+    ("m", [0, 780.4]*u.Unit("cm-1"))
+])
+def test_levels_measured_energies(foo_session, method, expected):
+    levels_w_eth = foo_session.query(Level, LevelEnergy).\
+        join(Level.energies).filter(LevelEnergy.method == method).limit(2)
+    energies = [en.quantity for lvl, en in levels_w_eth]
+    with u.set_enabled_equivalencies(u.spectral()):
+        assert_quantity_allclose(energies, expected)
+
+
+def test_levels_chianiti_index(foo_session):
+    levels = foo_session.query(Level).limit(2)
+    indices = {lvl.ch_index for lvl in levels}
+    assert indices == set([1, 2])
+
+
+def test_lines_chianti(foo_session):
+    line0, line1 = foo_session.query(Line).all()
+
+
+@pytest.mark.parametrize("tuple_index, expected_temp_strength",[
+    (0, [0.0, 0.255]),
+    (1, [0.07394, 0.266])
+])
+def test_e_collisions_chianti(foo_session, tuple_index, expected_temp_strength):
+    e_col = foo_session.query(ECollision).first()
+    temp, strength = e_col.temp_strengths_tuple[tuple_index]
+    assert_quantity_allclose(
+        [temp.quantity, strength.quantity],
+        expected_temp_strength
+    )
