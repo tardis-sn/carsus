@@ -2,19 +2,18 @@ import pytest
 from ..chianti_ import ChiantiIonReader, ChiantiIngester
 from carsus.model import Level, LevelEnergy, Ion, ChiantiLevel,\
     Line, LineWavelength, LineAValue, LineGFValue, \
-    ECollision, ECollisionTemp, ECollisionStrength, \
-    ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
+    ECollision,ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 from numpy.testing import assert_almost_equal
 
 
 @pytest.fixture(scope="module")
 def ch_ion_reader():
-    return ChiantiIonReader("ne_6")
+    return ChiantiIonReader("ne_2")
 
 
 @pytest.fixture
 def ch_ingester(test_session):
-    ions_list = ['ne_2', 'cl_4', 'ne_6']
+    ions_list = ['ne_2']
     ingester = ChiantiIngester(test_session, ions_list=ions_list)
     return ingester
 
@@ -39,27 +38,27 @@ def test_chianti_reader_read_lines(ch_ion_reader, level_index, wavelength, metho
     assert row['method'] == method
 
 
-# @pytest.mark.parametrize("atomic_number, ion_charge, levels_count",[
-#     (10, 1, 138),
-#     (10, 5, 204),
-#     (17, 3, 5)
-# ])
-# def test_chianti_ingest_levels_count(test_session, ch_ingester, atomic_number, ion_charge, levels_count):
-#     ch_ingester.ingest(levels=True, lines=False)
-#     test_session.commit()
-#     ne_1 = Ion.as_unique(test_session, atomic_number=atomic_number, ion_charge=ion_charge)
-#     assert len(ne_1.levels) == levels_count
-#
-#
-# @pytest.mark.parametrize("atomic_number, ion_charge, lines_count",[
-#     (10, 1, 1999)
-# ])
-# def test_chianti_ingest_lines_count(test_session, ch_ingester, atomic_number, ion_charge, lines_count):
-#     ch_ingester.ingest(levels=True, lines=True)
-#     ne_1 = Ion.as_unique(test_session, atomic_number=atomic_number, ion_charge=ion_charge)
-#     cnt = test_session.query(Level).filter(Level.ion == ne_1).\
-#         join(Level.source_transitions.of_type(Line)).count()
-#     assert cnt == lines_count
+@pytest.mark.parametrize("atomic_number, ion_charge, levels_count",[
+    (10, 1, 138),
+    (10, 5, 204),
+    (17, 3, 5)
+])
+def test_chianti_ingest_levels_count(test_session, ch_ingester, atomic_number, ion_charge, levels_count):
+    ch_ingester.ingest(levels=True, lines=False)
+    test_session.commit()
+    ne_1 = Ion.as_unique(test_session, atomic_number=atomic_number, ion_charge=ion_charge)
+    assert len(ne_1.levels) == levels_count
+
+
+@pytest.mark.parametrize("atomic_number, ion_charge, lines_count",[
+    (10, 1, 1999)
+])
+def test_chianti_ingest_lines_count(test_session, ch_ingester, atomic_number, ion_charge, lines_count):
+    ch_ingester.ingest(levels=True, lines=True)
+    ne_1 = Ion.as_unique(test_session, atomic_number=atomic_number, ion_charge=ion_charge)
+    cnt = test_session.query(Level).filter(Level.ion == ne_1).\
+        join(Level.source_transitions.of_type(Line)).count()
+    assert cnt == lines_count
 
 
 @pytest.mark.parametrize("atomic_number, ion_charge, e_col_count",[

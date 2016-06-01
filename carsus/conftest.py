@@ -34,16 +34,20 @@ from sqlalchemy.orm import Session
 # except NameError:   # Needed to support Astropy <= 1.0.0
 #     pass
 
-# data_dir = os.path.join(os.path.dirname(__file__), 'tests', 'data')
-# if not os.path.exists(data_dir):
-#     os.makedirs(data_dir)
-#
-# test_db_url = 'sqlite:///' + os.path.join(data_dir, 'test.db')
+
+@pytest.fixture(scope="session")
+def test_db_url():
+    data_dir = os.path.join(os.path.dirname(__file__), 'tests', 'data')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    test_db_path = os.path.join(data_dir, 'test.db')
+    open(test_db_path, "w").close()
+    return 'sqlite:///' + test_db_path
 
 
 @pytest.fixture(scope="session")
-def test_engine():
-    session = init_db("sqlite://")
+def test_engine(test_db_url):
+    session = init_db(test_db_url)
     session.commit()
     session.close()
     return session.get_bind()

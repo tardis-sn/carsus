@@ -4,13 +4,14 @@ import numpy as np
 import pickle
 import os
 import re
+from pandas import read_sql_query
 from numpy.testing import assert_almost_equal
 from astropy import units as u
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from carsus.io.base import IngesterError
-from carsus.model import DataSource, Ion, ChiantiLevel, LevelEnergy, \
-    Line, LineWavelength, LineAValue, LineGFValue, ECollision, ECollisionTemp, ECollisionStrength, \
+from carsus.model import DataSource, Ion, Level, ChiantiLevel, LevelEnergy, \
+    Line, LineWavelength, LineAValue, LineGFValue, ECollision, \
     ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 
 if os.getenv('XUVTOP'):
@@ -231,28 +232,33 @@ class ChiantiIngester(object):
 
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
+            # Should this be done with a VIEW?
+            # Select all levels from this ion
+            q_ion_lvls = self.session.query(ChiantiLevel.id.label("id"),
+                                            ChiantiLevel.ch_index.label("index")). \
+                filter(and_(ChiantiLevel.ion == ion,
+                            ChiantiLevel.data_source == self.ds))
+
+            # Create a DataFrame that maps levels indexes to ids
+            lvl_ind2id_df = read_sql_query(q_ion_lvls.selectable, self.session.bind,
+                                           index_col="index")
+
             for index, row in rdr.bound_lines_df.iterrows():
 
                 # index: (source_level_index, target_level_index)
                 source_level_index, target_level_index = index
 
                 try:
-                    source_level = self.session.query(ChiantiLevel).\
-                        filter(and_(ChiantiLevel.ion == ion,
-                                    ChiantiLevel.data_source == self.ds,
-                                    ChiantiLevel.ch_index == source_level_index)).one()
-                    target_level = self.session.query(ChiantiLevel). \
-                        filter(and_(ChiantiLevel.ion == ion,
-                                    ChiantiLevel.data_source == self.ds,
-                                    ChiantiLevel.ch_index == target_level_index)).one()
-                except NoResultFound:
+                    source_level_id = int(lvl_ind2id_df.loc[source_level_index])
+                    target_level_id = int(lvl_ind2id_df.loc[target_level_index])
+                except KeyError:
                     raise IngesterError("Levels from this source have not been found."
                                         "You must ingest levels before transitions")
 
                 # Create a new line
                 line = Line(
-                    source_level=source_level,
-                    target_level=target_level,
+                    source_level_id=source_level_id,
+                    target_level_id=target_level_id,
                     data_source=self.ds,
                     wavelengths=[
                         LineWavelength(quantity=row["wavelength"]*u.AA, method=row["method"])
@@ -275,28 +281,33 @@ class ChiantiIngester(object):
             ion_charge = rdr.ion.Ion - 1
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
+            # Should this be done with a VIEW?
+            # Select all levels from this ion
+            q_ion_lvls = self.session.query(ChiantiLevel.id.label("id"),
+                                            ChiantiLevel.ch_index.label("index")).\
+                                            filter(and_(ChiantiLevel.ion == ion,
+                                            ChiantiLevel.data_source == self.ds))
+
+            # Create a DataFrame that maps levels indexes to ids
+            lvl_ind2id_df = read_sql_query(q_ion_lvls.selectable, self.session.bind,
+                                           index_col="index")
+
             for index, row in rdr.bound_collisions_df.iterrows():
 
                 # index: (source_level_index, target_level_index)
                 source_level_index, target_level_index = index
 
                 try:
-                    source_level = self.session.query(ChiantiLevel). \
-                        filter(and_(ChiantiLevel.ion == ion,
-                                    ChiantiLevel.data_source == self.ds,
-                                    ChiantiLevel.ch_index == source_level_index)).one()
-                    target_level = self.session.query(ChiantiLevel). \
-                        filter(and_(ChiantiLevel.ion == ion,
-                                    ChiantiLevel.data_source == self.ds,
-                                    ChiantiLevel.ch_index == target_level_index)).one()
-                except NoResultFound:
+                    source_level_id = int(lvl_ind2id_df.loc[source_level_index])
+                    target_level_id = int(lvl_ind2id_df.loc[target_level_index])
+                except KeyError:
                     raise IngesterError("Levels from this source have not been found."
                                         "You must ingest levels before transitions")
 
                 # Create a new electron collision
                 e_col = ECollision(
-                    source_level=source_level,
-                    target_level=target_level,
+                    source_level_id=source_level_id,
+                    target_level_id=target_level_id,
                     data_source=self.ds,
                     bt92_ttype=row["ttype"],
                     bt92_cups=row["cups"],
@@ -308,8 +319,8 @@ class ChiantiIngester(object):
                     ]
                 )
 
-                e_col.temp_strengths_tuple = [
-                    (ECollisionTemp(quantity=temp), ECollisionStrength(quantity=strength))
+                e_col.temp_strengths = [
+                    ECollisionTempStrength(temp=temp, strength=strength)
                     for temp, strength in zip(row["temperatures"], row["collision_strengths"])
                 ]
 

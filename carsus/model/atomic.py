@@ -276,25 +276,6 @@ class ECollisionEnergy(ECollisionQuantity):
         'polymorphic_identity': 'energy'
     }
 
-
-class ECollisionTemp(ECollisionQuantity):
-
-    unit = u.dimensionless_unscaled
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'temp'
-    }
-
-
-class ECollisionStrength(ECollisionQuantity):  # Scaled effective collision strengths
-
-    unit = u.dimensionless_unscaled
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'strength'
-    }
-
-
 class ECollisionGFValue(ECollisionQuantity):
 
     unit = u.dimensionless_unscaled
@@ -307,19 +288,17 @@ class ECollisionGFValue(ECollisionQuantity):
 class ECollisionTempStrength(Base):
     __tablename__ = "e_collision_temp_strength"
 
-    temp_id = Column(Integer, ForeignKey("e_collision_qty.id"), primary_key=True)
-    strength_id = Column(Integer, ForeignKey("e_collision_qty.id"), primary_key=True)
+    temp_strength_id = Column(Integer, primary_key=True)
+    temp = Column(Float)
+    strength = Column(Float)
     e_collision_id = Column(Integer, ForeignKey("e_collision.id"))
-
-    temp = relationship("ECollisionTemp", foreign_keys=[temp_id])
-    strength = relationship("ECollisionStrength", foreign_keys=[strength_id])
-
-    def __init__(self, tup):
-        self.temp, self.strength = tup
 
     @property
     def as_tuple(self):
         return self.temp, self.strength
+
+    def __repr__(self):
+        return "<Temp: {}, Strength: {}>".format(self.temp, self.strength)
 
 
 class DataSource(UniqueMixin, Base):

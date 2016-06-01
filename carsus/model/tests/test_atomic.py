@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 from carsus.model import Atom, AtomicWeight, DataSource, Ion, LevelEnergy,\
     Level, Line, LineGFValue, LineWavelength, LineAValue, ECollision,\
-    ECollisionTemp, ECollisionStrength, \
     ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 from astropy import units as u
 from astropy.units import UnitsError, UnitConversionError
@@ -160,7 +159,4 @@ def test_lines_chianti(foo_session):
 def test_e_collisions_chianti(foo_session, tuple_index, expected_temp_strength):
     e_col = foo_session.query(ECollision).first()
     temp, strength = e_col.temp_strengths_tuple[tuple_index]
-    assert_quantity_allclose(
-        [temp.quantity, strength.quantity],
-        expected_temp_strength
-    )
+    assert_allclose([temp, strength], expected_temp_strength)

@@ -5,8 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, \
     LevelEnergy, ChiantiLevel, Line, LineWavelength, LineAValue, LineGFValue, \
-    ECollision, ECollisionTemp, ECollisionStrength, \
-    ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
+    ECollision, ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 from astropy import units as u
 
 # data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -112,9 +111,9 @@ def foo_engine():
         energies=[
             ECollisionEnergy(quantity=0.007108*u.rydberg)
         ],
-        temp_strengths_tuple=[
-            (ECollisionTemp(quantity=0.0), ECollisionStrength(quantity=0.255)),
-            (ECollisionTemp(quantity=0.07394), ECollisionStrength(quantity=0.266))
+        temp_strengths=[
+            (ECollisionTempStrength(temp=0.0, strength=0.255)),
+            (ECollisionTempStrength(temp=0.07394, strength=0.266))
         ]
     )
 
