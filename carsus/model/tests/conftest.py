@@ -3,14 +3,16 @@ import pytest
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from carsus.model import Base, Atom, DataSource, AtomicWeight
+from carsus.model import Base, Atom, DataSource, AtomicWeight, Ion, \
+    LevelEnergy, ChiantiLevel, Line, LineWavelength, LineAValue, LineGFValue, \
+    ECollision, ECollisionGFValue, ECollisionTempStrength, ECollisionEnergy
 from astropy import units as u
 
-data_dir = os.path.join(os.path.dirname(__file__), 'data')
-if not os.path.exists(data_dir):
-    os.makedirs(data_dir)
-
-foo_db_url = 'sqlite:///' + os.path.join(data_dir, 'foo.db')
+# data_dir = os.path.join(os.path.dirname(__file__), 'data')
+# if not os.path.exists(data_dir):
+#     os.makedirs(data_dir)
+#
+# foo_db_url = 'sqlite:///' + os.path.join(data_dir, 'foo.db')
 
 
 @pytest.fixture
@@ -23,18 +25,19 @@ def memory_session():
 
 @pytest.fixture(scope="session")
 def foo_engine():
-    engine = create_engine(foo_db_url)
+    engine = create_engine("sqlite://")
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     session = Session(bind=engine)
 
     # atoms
     H = Atom(atomic_number=1, symbol='H')
-    O = Atom(atomic_number=8, symbol='O')
+    Ne = Atom(atomic_number=10, symbol='Ne')
 
     # data sources
     nist = DataSource(short_name='nist')
     ku = DataSource(short_name='ku')
+    ch = DataSource(short_name='ch_v8.0.2')
 
     # atomic weights
     H.quantities = [
@@ -42,7 +45,81 @@ def foo_engine():
         AtomicWeight(quantity=1.00811*u.u, data_source=ku, std_dev=4e-3),
     ]
 
-    session.add_all([H, O, nist, ku])
+    session.add_all([H, Ne, nist, ku, ch])
+    session.commit()
+
+    # ions
+    ne_0 = Ion(atom=Ne, ion_charge=1)
+    ne_1 = Ion(atom=Ne, ion_charge=2)
+
+    # levels
+    ne_1_lvl0 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2.2p5", term="2P1.5", L="P", J=1.5,
+                             spin_multiplicity=2, parity=1, ch_index=1,
+                             energies=[
+                                 LevelEnergy(quantity=0, method="m"),
+                                 LevelEnergy(quantity=0, method="th")
+                             ])
+
+    ne_1_lvl1 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2.2p5", term="2P0.5", L="P", J=0.5,
+                             spin_multiplicity=2, parity=1, ch_index=2,
+                             energies=[
+                                 LevelEnergy(quantity=780.4*u.Unit("cm-1"), method="m"),
+                                 LevelEnergy(quantity=780.0*u.Unit("cm-1"), method="th")
+                             ])
+    # 2s2p6 2S0.5
+    ne_1_lvl2 = ChiantiLevel(ion=ne_1, data_source=ch,
+                             configuration="2s2p6", term="2S0.5", L="S", J=0.5,
+                             spin_multiplicity=2, parity=0, ch_index=3,
+                             energies=[
+                                 LevelEnergy(quantity=217047.594*u.Unit("cm-1"), method="m"),
+                                 LevelEnergy(quantity=217048*u.Unit("cm-1"), method="th")
+                             ])
+
+    # lines
+    ne_1_line0 = Line(
+        source_level=ne_1_lvl0,
+        target_level=ne_1_lvl1,
+        data_source=ch,
+        wavelengths=[
+            LineWavelength(quantity=1*u.AA)
+        ],
+        a_values=[
+            LineAValue(quantity=48*u.Unit("s-1"))
+        ],
+        gf_values=[
+            LineGFValue(quantity=23)
+        ]
+    )
+
+    ne_1_line1 = Line(
+        source_level=ne_1_lvl0,
+        target_level=ne_1_lvl2,
+        data_source=ch)
+
+    lw1 = LineWavelength(quantity=10*u.AA,
+                         line=ne_1_line1)
+
+    # electron collisions
+    ne_1_col = ECollision(
+        source_level=ne_1_lvl0,
+        target_level=ne_1_lvl1,
+        data_source=ch,
+        bt92_ttype=2,
+        bt92_cups=11.16,
+        energies=[
+            ECollisionEnergy(quantity=0.007108*u.rydberg)
+        ],
+        temp_strengths=[
+            (ECollisionTempStrength(temp=0.0, strength=0.255)),
+            (ECollisionTempStrength(temp=0.07394, strength=0.266))
+        ]
+    )
+
+    session.add_all([ne_1, ne_0,
+                     ne_1_lvl0, ne_1_lvl1, ne_1_lvl2,
+                     ne_1_line0, ne_1_lvl1, ne_1_col])
     session.commit()
     session.close()
     return engine
@@ -81,3 +158,5 @@ def H(foo_session):
 @pytest.fixture
 def nist(foo_session):
     return DataSource.as_unique(foo_session, short_name="nist")
+
+
