@@ -167,9 +167,12 @@ class NISTWeightsCompIngester(BaseIngester):
 
         atom_weights_list = []
 
+        # ToDo: use to_dict method instead of iteration
         for atomic_number, row in atomic_df.iterrows():
-            atom_weight = AtomWeight(atomic_number=atomic_number,
-                                     data_source=self.data_source,
-                                     quantity=row[AW_VAL_COL]*u.u,
-                                     uncert=row[AW_SD_COL])
-            self.session.add(atom_weight)
+            atom_weights_list.append({"atomic_number": atomic_number,
+                                      "type": "weight",
+                                      "_value": row[AW_VAL_COL],  # unit u.u
+                                      "uncert": row[AW_SD_COL],
+                                      "data_source_id": self.data_source.data_source_id})
+
+        result = self.session.execute(AtomQuantity.__table__.insert(), atom_weights_list)
