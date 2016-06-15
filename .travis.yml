@@ -53,7 +53,6 @@ before_install:
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH=$HOME/miniconda/bin:$PATH
     # install the CHIANTI database
-    - mkdir $HOME/chianti
     - wget $CHIANTI_DATA_URL -O $HOME/chianti/CHIANTI_8.0.2_data.tar.gz
     - tar -zxvf $HOME/chianti/CHIANTI_8.0.2_data.tar.gz -C $HOME/chianti
     - export XUVTOP=$HOME/chianti
