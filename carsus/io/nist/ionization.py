@@ -176,23 +176,29 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         data = self.downloader(spectra=spectra)
         self.parser(data)
 
-    def ingest(self):
-        """ *Only* ingests ions and ionization energies *for now* """
-        print "Ingesting ionization energies data"
+    def ingest_ionization_energies(self):
+        print("Ingesting ionization energies from {}".format(self.data_source.short_name))
+
         ioniz_energies_df = self.parser.prepare_ioniz_energies_df()
 
         for index, row in ioniz_energies_df.iterrows():
-
             atomic_number, ion_charge = index
             # Query for an existing ion; create if doesn't exists
             ion = Ion.as_unique(self.session,
                                 atomic_number=atomic_number, ion_charge=ion_charge)
             ion.energies = [
-               IonizationEnergy(ion=ion,
-                                data_source=self.data_source,
-                                quantity=row['ionization_energy_value']*u.eV,
-                                uncert=row['ionization_energy_uncert'],
-                                method=row['ionization_energy_method'])
+                IonizationEnergy(ion=ion,
+                                 data_source=self.data_source,
+                                 quantity=row['ionization_energy_value'] * u.eV,
+                                 uncert=row['ionization_energy_uncert'],
+                                 method=row['ionization_energy_method'])
             ]
             # No need to add ion to the session, because
             # that was done in `as_unique`
+
+    def ingest(self, ionization_energies=True):
+
+        print("Ingesting data from {}".format(self.data_source.short_name))
+
+        if ionization_energies:
+            self.ingest_ionization_energies()
