@@ -14,7 +14,7 @@ decimal  ::= digit+
 digit    ::= "0"..."9"
 """
 
-from pyparsing import Word, Literal, Suppress, Group, Dict, Optional, delimitedList, oneOf, nums, srange
+from pyparsing import Word, Literal, Suppress, Group, Optional, nums, srange
 
 
 LPAREN, RPAREN = map(Suppress, "()")
