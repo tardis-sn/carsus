@@ -129,6 +129,7 @@ class NISTIonizationEnergiesParser(BaseParser):
                     lvl["parity"] = lvl_tokens["ls_term"]["parity"]
                 elif "jj_term" in lvl_tokens:
                     lvl["term"] = "".join([str(_) for _ in lvl_tokens["jj_term"]])
+                    lvl["parity"] = lvl_tokens["jj_term"]["parity"]
             return lvl
 
         ground_levels_df[["term", "spin_multiplicity",
