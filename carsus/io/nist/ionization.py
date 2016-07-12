@@ -9,8 +9,10 @@ from bs4 import BeautifulSoup
 from StringIO import StringIO
 from astropy import units as u
 from uncertainties import ufloat_fromstr
+from pyparsing import ParseException
 from carsus.model import DataSource, Ion, IonizationEnergy
 from carsus.io.base import BaseParser, BaseIngester
+from carsus.io.nist.ionization_grammar import level
 
 IONIZATION_ENERGIES_URL = 'http://physics.nist.gov/cgi-bin/ASD/ie.pl'
 
@@ -103,6 +105,39 @@ class NISTIonizationEnergiesParser(BaseParser):
         ioniz_energies_df = ioniz_energies_df[pd.notnull(ioniz_energies_df["ionization_energy_value"])]
 
         return ioniz_energies_df
+
+    def prepare_ground_levels_df(self):
+        """ Returns a new dataframe created from `base_df` that contains the ground levels data """
+
+        ground_levels_df = self.base_df.loc[:,["atomic_number", "ion_charge",
+                                             "ground_shells", "ground_level"]].copy()
+
+        def parse_ground_level(row):
+            ground_level = row["ground_level"]
+            lvl = pd.Series(index=["term", "spin_multiplicity", "L", "parity", "J"])
+            try:
+                lvl_tokens = level.parseString(ground_level)
+            except ParseException:
+                # For some ions the ground level is not given
+                pass
+            else:
+                lvl["J"] = lvl_tokens["J"]
+                if "ls_term" in lvl_tokens:
+                    lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
+                    lvl["spin_multiplicity"] = lvl_tokens["ls_term"]["mult"]
+                    lvl["L"] = lvl_tokens["ls_term"]["L"]
+                    lvl["parity"] = lvl_tokens["ls_term"]["parity"]
+                elif "jj_term" in lvl_tokens:
+                    lvl["term"] = "".join([str(_) for _ in lvl_tokens["jj_term"]])
+            return lvl
+
+        ground_levels_df[["term", "spin_multiplicity",
+                          "L", "parity", "J"]] = ground_levels_df.apply(parse_ground_level, axis=1)
+
+        ground_levels_df.rename(columns={"ground_shells": "configuration"}, inplace=True)
+        ground_levels_df.set_index(['atomic_number', 'ion_charge'], inplace=True)
+
+        return ground_levels_df
 
 
 class NISTIonizationEnergiesIngester(BaseIngester):
