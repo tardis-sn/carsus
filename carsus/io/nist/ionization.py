@@ -199,7 +199,9 @@ class NISTIonizationEnergiesIngester(BaseIngester):
     def ingest_ground_levels(self):
         print("Ingesting ground levels from {}".format(self.data_source.short_name))
 
-        for index, row in self.ground_levels_df.iterrows():
+        ground_levels_df = self.parser.prepare_ground_levels_df()
+
+        for index, row in ground_levels_df.iterrows():
             atomic_number, ion_charge = index
 
             # Replace nan with None
