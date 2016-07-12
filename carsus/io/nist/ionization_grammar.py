@@ -4,7 +4,7 @@ BNF grammar for parsing Ground Levels
 level  ::= [ ls_term | jj_term ] + (J | <J>)
 
 ls_term  ::= mult + L + ["*"]
-jj_term  ::= "(" + J + "," + J + ")"
+jj_term  ::= "(" + J + "," + J + ")" ["*"]
 
 mult   ::= decimal
 L      ::= "A" .. "Z"
@@ -49,17 +49,19 @@ L = Word(srange("[A-Z]"))
 ls_term = mult.setResultsName("mult") + L.setResultsName("L") + Optional("*")
 
 
-def parse_ls_term(tokens):
+def parse_parity(tokens):
     if "*" in tokens.asList():
         tokens["parity"] = 1
     else:
         tokens["parity"] = 0
 
-ls_term.setParseAction(parse_ls_term)
+ls_term.setParseAction(parse_parity)
 
 # jj_term  ::= "(" + J + "," + J + ")"
 jj_term = Literal("(") + J.setResultsName("first_J") + "," + \
-          J.setResultsName("second_J") + Literal(")")
+          J.setResultsName("second_J") + Literal(")") + Optional("*")
+
+jj_term.setParseAction(parse_parity)
 
 # level  ::= [ ls_term | jj_term ] + (J | <J>)
 level = Optional(

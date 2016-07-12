@@ -49,15 +49,16 @@ def test_level_w_ls_term(test_input, exp_mult, exp_l, exp_parity, exp_j):
     assert_almost_equal(tkns["J"], exp_j)
 
 
-@pytest.mark.parametrize("test_input, exp_first_j, exp_second_j, exp_j",[
-    ("(0,1/2)0", 0.0, 0.5, 0.0),
-    ("(3/2,5/2)<1/2>", 1.5, 2.5, 0.5),
-    ("(1/2, 2)<2>", 0.5, 2.0, 2.0)
+@pytest.mark.parametrize("test_input, exp_first_j, exp_second_j, exp_parity, exp_j",[
+    ("(0,1/2)0", 0.0, 0.5, 0, 0.0),
+    ("(3/2,5/2)<1/2>", 1.5, 2.5, 0, 0.5),
+    ("(1/2, 2)*<2>", 0.5, 2.0, 1, 2.0)
 ])
-def test_level_w_jj_term(test_input, exp_first_j, exp_second_j, exp_j):
+def test_level_w_jj_term(test_input, exp_first_j, exp_second_j, exp_parity, exp_j):
     tkns = level.parseString(test_input)
     assert tkns["jj_term"]["first_J"] == exp_first_j
     assert tkns["jj_term"]["second_J"] == exp_second_j
+    assert tkns["jj_term"]["parity"] == exp_parity
     assert_almost_equal(tkns["J"], exp_j)
 
 
