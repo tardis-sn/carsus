@@ -9,8 +9,10 @@ from bs4 import BeautifulSoup
 from StringIO import StringIO
 from astropy import units as u
 from uncertainties import ufloat_fromstr
-from carsus.model import DataSource, Ion, IonizationEnergy
+from pyparsing import ParseException
+from carsus.model import DataSource, Ion, IonizationEnergy, Level, LevelEnergy
 from carsus.io.base import BaseParser, BaseIngester
+from carsus.io.nist.ionization_grammar import level
 
 IONIZATION_ENERGIES_URL = 'http://physics.nist.gov/cgi-bin/ASD/ie.pl'
 
@@ -104,6 +106,52 @@ class NISTIonizationEnergiesParser(BaseParser):
 
         return ioniz_energies_df
 
+    def prepare_ground_levels_df(self):
+        """ Returns a new dataframe created from `base_df` that contains the ground levels data """
+
+        ground_levels_df = self.base_df.loc[:,["atomic_number", "ion_charge",
+                                             "ground_shells", "ground_level"]].copy()
+
+        def parse_ground_level(row):
+            ground_level = row["ground_level"]
+            lvl = pd.Series(index=["term", "spin_multiplicity", "L", "parity", "J"])
+
+            try:
+                lvl_tokens = level.parseString(ground_level)
+            except ParseException:
+                raise
+
+            lvl["parity"] = lvl_tokens["parity"]
+
+            try:
+                lvl["J"] = lvl_tokens["J"]
+            except KeyError:
+                pass
+
+            try:
+                lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
+                lvl["spin_multiplicity"] = lvl_tokens["ls_term"]["mult"]
+                lvl["L"] = lvl_tokens["ls_term"]["L"]
+            except KeyError:
+                # The term is not LS
+                pass
+
+            try:
+                lvl["term"] = "".join([str(_) for _ in lvl_tokens["jj_term"]])
+            except KeyError:
+                # The term is not JJ
+                pass
+
+            return lvl
+
+        ground_levels_df[["term", "spin_multiplicity",
+                          "L", "parity", "J"]] = ground_levels_df.apply(parse_ground_level, axis=1)
+
+        ground_levels_df.rename(columns={"ground_shells": "configuration"}, inplace=True)
+        ground_levels_df.set_index(['atomic_number', 'ion_charge'], inplace=True)
+
+        return ground_levels_df
+
 
 class NISTIonizationEnergiesIngester(BaseIngester):
     """
@@ -141,23 +189,62 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         data = self.downloader(spectra=spectra)
         self.parser(data)
 
-    def ingest(self):
-        """ *Only* ingests ions and ionization energies *for now* """
-        print "Ingesting ionization energies data"
+    def ingest_ionization_energies(self):
+        print("Ingesting ionization energies from {}".format(self.data_source.short_name))
+
         ioniz_energies_df = self.parser.prepare_ioniz_energies_df()
 
         for index, row in ioniz_energies_df.iterrows():
-
             atomic_number, ion_charge = index
             # Query for an existing ion; create if doesn't exists
             ion = Ion.as_unique(self.session,
                                 atomic_number=atomic_number, ion_charge=ion_charge)
             ion.energies = [
-               IonizationEnergy(ion=ion,
-                                data_source=self.data_source,
-                                quantity=row['ionization_energy_value']*u.eV,
-                                uncert=row['ionization_energy_uncert'],
-                                method=row['ionization_energy_method'])
+                IonizationEnergy(ion=ion,
+                                 data_source=self.data_source,
+                                 quantity=row['ionization_energy_value'] * u.eV,
+                                 uncert=row['ionization_energy_uncert'],
+                                 method=row['ionization_energy_method'])
             ]
             # No need to add ion to the session, because
             # that was done in `as_unique`
+
+    def ingest_ground_levels(self):
+        print("Ingesting ground levels from {}".format(self.data_source.short_name))
+
+        ground_levels_df = self.parser.prepare_ground_levels_df()
+
+        for index, row in ground_levels_df.iterrows():
+            atomic_number, ion_charge = index
+
+            # Replace nan with None
+            row = row.where(pd.notnull(row), None)
+
+            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+
+            spin_multiplicity = int(row["spin_multiplicity"]) if row["spin_multiplicity"] is not None else None
+            parity = int(row["parity"]) if row["parity"] is not None else None
+
+            ion.levels.append(
+                Level(data_source=self.data_source,
+                      configuration=row["configuration"],
+                      term=row["term"],
+                      L=row["L"],
+                      spin_multiplicity=spin_multiplicity,
+                      parity=parity,
+                      J=row["J"],
+                      ground=True,
+                      energies=[
+                            LevelEnergy(quantity=0, data_source=self.data_source)
+                      ])
+            )
+
+    def ingest(self, ionization_energies=True, ground_levels=True):
+
+        print("Ingesting data from {}".format(self.data_source.short_name))
+
+        if ionization_energies:
+            self.ingest_ionization_energies()
+
+        if ground_levels:
+            self.ingest_ground_levels()

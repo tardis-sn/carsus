@@ -227,3 +227,14 @@ def test_e_collision_quantities_query(foo_session, atomic_number, ion_charge, ds
     for temp_strength, expected_temp_strength in zip(e_col.temp_strengths_tuple, expected_temp_strengths):
         assert_allclose(temp_strength, expected_temp_strength)
 
+
+@pytest.mark.parametrize("atomic_number, ion_charge, ds_short_name, expected_energy, expected_J", [
+    (10, 2, "nist", 0.0, 1.5),
+])
+def test_ion_ground_levels(foo_session, atomic_number, ion_charge, ds_short_name, expected_energy, expected_J):
+    data_source = DataSource.as_unique(foo_session, short_name=ds_short_name)
+    ion = Ion.as_unique(foo_session, atomic_number=atomic_number, ion_charge=ion_charge)
+    ground_lvl = ion.ground_levels[0]
+    assert ground_lvl.data_source_id == data_source.data_source_id
+    assert_almost_equal(ground_lvl.energies[0].quantity.value, expected_energy)
+    assert_almost_equal(ground_lvl.J, expected_J)
