@@ -13,16 +13,15 @@ def test_j(test_input, exp_j):
     assert_almost_equal(tkns[0], exp_j)
 
 
-@pytest.mark.parametrize("test_input, exp_mult, exp_l, exp_parity",[
-    ("1S", 1, "S", 0),
-    ("2P", 2, "P", 0),
-    ("1S*", 1, "S", 1)
+@pytest.mark.parametrize("test_input, exp_mult, exp_l",[
+    ("1S", 1, "S"),
+    ("2P", 2, "P"),
+    ("1S", 1, "S")
 ])
-def test_ls_term(test_input, exp_mult, exp_l, exp_parity):
+def test_ls_term(test_input, exp_mult, exp_l):
     tkns = ls_term.parseString(test_input)
     assert tkns["mult"] == exp_mult
     assert tkns["L"] == exp_l
-    assert tkns["parity"] == exp_parity
 
 
 @pytest.mark.parametrize("test_input, exp_first_j, exp_second_j",[
@@ -45,7 +44,7 @@ def test_level_w_ls_term(test_input, exp_mult, exp_l, exp_parity, exp_j):
     tkns = level.parseString(test_input)
     assert tkns["ls_term"]["mult"] == exp_mult
     assert tkns["ls_term"]["L"] == exp_l
-    assert tkns["ls_term"]["parity"] == exp_parity
+    assert tkns["parity"] == exp_parity
     assert_almost_equal(tkns["J"], exp_j)
 
 
@@ -58,17 +57,25 @@ def test_level_w_jj_term(test_input, exp_first_j, exp_second_j, exp_parity, exp_
     tkns = level.parseString(test_input)
     assert tkns["jj_term"]["first_J"] == exp_first_j
     assert tkns["jj_term"]["second_J"] == exp_second_j
-    assert tkns["jj_term"]["parity"] == exp_parity
+    assert tkns["parity"] == exp_parity
     assert_almost_equal(tkns["J"], exp_j)
 
 
-@pytest.mark.parametrize("test_input, exp_j",[
-    ("0", 0.0),
-    ("<1/2>",  0.5),
-    ("<2>",  2.0)
+@pytest.mark.parametrize("test_input, exp_parity, exp_j",[
+    ("0", 0, 0.0),
+    ("<1/2>", 0,  0.5),
+    ("*<2>", 1, 2.0)
 ])
-def test_level_wo_term(test_input, exp_j):
+def test_level_wo_term(test_input, exp_parity, exp_j):
     tkns = level.parseString(test_input)
-    assert "ls_term" not in tkns
-    assert "jj_term" not in tkns
+    assert tkns["parity"] == exp_parity
     assert_almost_equal(tkns["J"], exp_j)
+
+
+@pytest.mark.parametrize("test_input, exp_parity",[
+    ("", 0),
+    ("*", 1)
+])
+def test_level_wo_term_and_j(test_input, exp_parity):
+    tkns = level.parseString(test_input)
+    assert tkns["parity"] == exp_parity
