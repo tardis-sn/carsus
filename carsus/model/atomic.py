@@ -2,7 +2,7 @@ from .meta import Base, UniqueMixin, QuantityMixin, DataSourceMixin
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Column, Integer, String, Float, ForeignKey,\
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey,\
     UniqueConstraint, ForeignKeyConstraint, and_, cast
 from sqlalchemy.ext.associationproxy import association_proxy
 from astropy import units as u
@@ -65,6 +65,9 @@ class Ion(UniqueMixin, Base):
     ionization_energies = relationship("IonizationEnergy",
                                        back_populates='ion')
     levels = relationship("Level", back_populates="ion")
+    ground_levels = relationship("Level", primaryjoin="and_(Ion.atomic_number==Level.atomic_number,"
+                                                           "Ion.ion_charge==Level.ion_charge,"
+                                                           "Level.ground)")
     atom = relationship("Atom", back_populates='ions')
 
     def __repr__(self):
@@ -115,6 +118,7 @@ class Level(Base):
     parity = Column(Integer)  # 0 - even, 1 - odd
     # ToDo I think that term column can be derived from L, S, parity and configuration
     term = Column(String(20))
+    ground = Column(Boolean, default=False)
 
     energies = relationship("LevelEnergy", back_populates="level")
     ion = relationship("Ion", back_populates="levels")
