@@ -79,6 +79,13 @@ def foo_engine():
             LevelEnergy(quantity=0, data_source=ku, method="th")
         ])
 
+    ne2_lvl0_nist = Level(
+        ion=ne2, data_source=nist, level_index=1, configuration="2s2.2p5",
+        term="2P1.5", L="P", J=1.5, spin_multiplicity=2, parity=1, ground=True,
+        energies=[
+            LevelEnergy(quantity=0, data_source=nist)
+        ])
+
     ne2_lvl1_ku = Level(
         ion=ne2, data_source=ku, level_index=2,
         configuration="2s2.2p5", term="2P0.5", L="P", J=0.5, spin_multiplicity=2, parity=1,
@@ -127,7 +134,7 @@ def foo_engine():
     )
 
     session.add_all([h, ne, nist, ku, ch, h0, ne1,
-                     ne2_lvl1_ch, ne2_lvl0_ku, ne2_lvl1_ku,
+                     ne2_lvl1_ch, ne2_lvl0_ku, ne2_lvl1_ku, ne2_lvl0_nist,
                      ne2_line0_ku, ne2_e_col0_ku])
     session.commit()
     session.close()
