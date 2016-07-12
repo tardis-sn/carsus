@@ -17,8 +17,8 @@ test_data = """
 At. num | Ion Charge | Ground Shells | Ground Level |      Ionization Energy (a) (eV)      |
 --------|------------|---------------|--------------|--------------------------------------|
       4 |          0 | 1s2.2s2       | 1S0          |                 9.3226990(70)        |
-      4 |         +1 | 1s2.2s        | 2S<1/2>      |                18.211153(40)         |
-      4 |         +2 | 1s2           | 1S0          |   <a class=bal>[</a>153.8961980(40)<a class=bal>]</a>       |
+      4 |         +1 | 1s2.2s        | 2S*<1/2>      |                18.211153(40)         |
+      4 |         +2 | 1s2           | (1,3/2)<2>          |   <a class=bal>[</a>153.8961980(40)<a class=bal>]</a>       |
       4 |         +3 | 1s            | 2S<1/2>      |   <a class=bal>(</a>217.7185766(10)<a class=bal>)</a>       |
 --------------------------------------------------------------------------------------------
 </pre>
@@ -35,8 +35,10 @@ expected_ground_shells = ('ground_shells',
                           )
 
 expected_ground_level = ('ground_level',
-                         ['1S0', '2S<1/2>', '1S0', '2S<1/2>']
+                         ['1S0', '2S*<1/2>', '(1,3/2)<2>', '2S<1/2>']
                          )
+
+expected_j = ('J', [0.0, 0.5, 2.0, 0.5])
 
 expected_ioniz_energy_value = ('ionization_energy_value',
                                [9.3226990, 18.211153, 153.8961980, 217.7185766]
@@ -63,6 +65,11 @@ def ioniz_energies_df(ioniz_energies_parser):
 
 
 @pytest.fixture
+def ground_levels_df(ioniz_energies_parser):
+    return ioniz_energies_parser.prepare_ground_levels_df()
+
+
+@pytest.fixture
 def ioniz_energies_ingester(memory_session):
     ingester = NISTIonizationEnergiesIngester(memory_session)
     ingester.parser(test_data)
@@ -71,7 +78,15 @@ def ioniz_energies_ingester(memory_session):
 @pytest.fixture(params=[expected_ground_shells,
                         expected_ground_level, expected_ioniz_energy_value,
                         expected_ioniz_energy_uncert, expected_ioniz_energy_method])
-def expected_series(request):
+def expected_series_ioniz_energies(request):
+    index = pd.MultiIndex.from_tuples(tuples=expected_indices,
+                                       names=['atomic_number', 'ion_charge'])
+    name, data = request.param
+    return pd.Series(data=data, name=name, index=index)
+
+
+@pytest.fixture(params=[expected_j])
+def expected_series_ground_levels(request):
     index = pd.MultiIndex.from_tuples(tuples=expected_indices,
                                        names=['atomic_number', 'ion_charge'])
     name, data = request.param
@@ -82,10 +97,14 @@ def test_prepare_ioniz_energies_df_null_values(ioniz_energies_df):
     assert all(pd.notnull(ioniz_energies_df["ionization_energy_value"]))
 
 
-def test_prepare_ioniz_energies_df(ioniz_energies_df, expected_series):
-    series = ioniz_energies_df[expected_series.name]
-    assert_series_equal(series, expected_series)
+def test_prepare_ioniz_energies_df(ioniz_energies_df, expected_series_ioniz_energies):
+    series = ioniz_energies_df[expected_series_ioniz_energies.name]
+    assert_series_equal(series, expected_series_ioniz_energies)
 
+
+def test_prepare_ground_levels_df(ground_levels_df, expected_series_ground_levels):
+    series = ground_levels_df[expected_series_ground_levels.name]
+    assert_series_equal(series, expected_series_ground_levels)
 
 @pytest.mark.parametrize("index, value, uncert",
                          zip(expected_indices,
