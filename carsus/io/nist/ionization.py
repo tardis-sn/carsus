@@ -209,13 +209,16 @@ class NISTIonizationEnergiesIngester(BaseIngester):
 
             ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
+            spin_multiplicity = int(row["spin_multiplicity"]) if row["spin_multiplicity"] is not None else None
+            parity = int(row["parity"]) if row["parity"] is not None else None
+
             ion.levels.append(
                 Level(data_source=self.data_source,
                       configuration=row["configuration"],
                       term=row["term"],
                       L=row["L"],
-                      spin_multiplicity=row["spin_multiplicity"],
-                      parity=row["parity"],
+                      spin_multiplicity=spin_multiplicity,
+                      parity=parity,
                       J=row["J"],
                       ground=True,
                       energies=[
