@@ -115,21 +115,33 @@ class NISTIonizationEnergiesParser(BaseParser):
         def parse_ground_level(row):
             ground_level = row["ground_level"]
             lvl = pd.Series(index=["term", "spin_multiplicity", "L", "parity", "J"])
+
             try:
                 lvl_tokens = level.parseString(ground_level)
             except ParseException:
-                # For some ions the ground level is not given
-                pass
-            else:
+                raise
+
+            lvl["parity"] = lvl_tokens["parity"]
+
+            try:
                 lvl["J"] = lvl_tokens["J"]
-                if "ls_term" in lvl_tokens:
-                    lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
-                    lvl["spin_multiplicity"] = lvl_tokens["ls_term"]["mult"]
-                    lvl["L"] = lvl_tokens["ls_term"]["L"]
-                    lvl["parity"] = lvl_tokens["ls_term"]["parity"]
-                elif "jj_term" in lvl_tokens:
-                    lvl["term"] = "".join([str(_) for _ in lvl_tokens["jj_term"]])
-                    lvl["parity"] = lvl_tokens["jj_term"]["parity"]
+            except KeyError:
+                pass
+
+            try:
+                lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
+                lvl["spin_multiplicity"] = lvl_tokens["ls_term"]["mult"]
+                lvl["L"] = lvl_tokens["ls_term"]["L"]
+            except KeyError:
+                # The term is not LS
+                pass
+
+            try:
+                lvl["term"] = "".join([str(_) for _ in lvl_tokens["jj_term"]])
+            except KeyError:
+                # The term is not JJ
+                pass
+
             return lvl
 
         ground_levels_df[["term", "spin_multiplicity",
