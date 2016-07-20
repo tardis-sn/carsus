@@ -150,6 +150,11 @@ class GFALLReader(object):
         gfall_df["label_lower"] = gfall_df["label_lower"].str.strip()
         gfall_df["label_upper"] = gfall_df["label_upper"].str.strip()
 
+        # Ignore lines with the labels "AVARAGE ENERGIES" and "CONTINUUM"
+        ignored_labels = ["AVERAGE", "ENERGIES", "CONTINUUM"]
+        gfall_df = gfall_df.loc[(gfall_df["label_lower"].isin(ignored_labels)) |
+                                (gfall_df["label_upper"].isin(ignored_labels))].copy()
+
         gfall_df['e_lower_predicted'] = gfall_df["e_lower"] < 0
         gfall_df["e_lower"] = gfall_df["e_lower"].abs()
         gfall_df['e_upper_predicted'] = gfall_df["e_upper"] < 0
