@@ -150,6 +150,11 @@ class GFALLReader(object):
         gfall_df["label_lower"] = gfall_df["label_lower"].str.strip()
         gfall_df["label_upper"] = gfall_df["label_upper"].str.strip()
 
+        # Ignore lines with the labels "AVARAGE ENERGIES" and "CONTINUUM"
+        ignored_labels = ["AVERAGE", "ENERGIES", "CONTINUUM"]
+        gfall_df = gfall_df.loc[(gfall_df["label_lower"].isin(ignored_labels)) |
+                                (gfall_df["label_upper"].isin(ignored_labels))].copy()
+
         gfall_df['e_lower_predicted'] = gfall_df["e_lower"] < 0
         gfall_df["e_lower"] = gfall_df["e_lower"].abs()
         gfall_df['e_upper_predicted'] = gfall_df["e_upper"] < 0
@@ -201,7 +206,7 @@ class GFALLReader(object):
         levels = pd.concat([e_lower_levels[selected_columns],
                             e_upper_levels[selected_columns]])
 
-        levels = levels.drop_duplicates(['atomic_number', 'ion_charge', 'energy', 'j', 'label']). \
+        levels = levels.drop_duplicates(['atomic_number', 'ion_charge', 'energy', 'j']). \
             sort_values(['atomic_number', 'ion_charge', 'energy', 'j'])
 
         levels["method"] = levels["theoretical"].\
