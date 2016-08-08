@@ -7,7 +7,8 @@ import pickle
 from pandas import HDFStore
 from carsus.model import Atom, Ion, Line, Level, DataSource, ECollision
 from carsus.model.meta import yield_limit, Base, IonListMixin
-from carsus.util import data_path, convert_camel2snake, convert_wavelength_air2vacuum
+from carsus.util import data_path, convert_camel2snake, \
+    convert_wavelength_air2vacuum, atomic_number2symbol
 from sqlalchemy import and_, case, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import joinedload, aliased
@@ -290,8 +291,12 @@ class AtomData(object):
 
         atom_masses = list()
         for atom in atom_masses_q.options(joinedload(Atom.weights)):
-            weight = atom.weights[0].quantity.value if atom.weights else None  # Get the first weight from the collection
-            atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight))
+            try:
+                weight = atom.weights[0].quantity
+            except IndexError:
+                print "No weight is available for atom {0}".format(atomic_number2symbol(atom.atomic_number))
+                continue
+            atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight.value))
 
         atom_masses_dtype = [("atomic_number", np.int), ("symbol", "|S5"), ("name", "|S150"), ("mass", np.float)]
         atom_masses = np.array(atom_masses, dtype=atom_masses_dtype)
@@ -344,8 +349,14 @@ class AtomData(object):
 
         ionization_energies = list()
         for ion in ionization_energies_q.options(joinedload(Ion.ionization_energies)):
-            ionization_energy = ion.ionization_energies[0].quantity.value if ion.ionization_energies else None
-            ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy))
+            try:
+                ionization_energy = ion.ionization_energies[0].quantity
+            except IndexError:
+                print "No ionization energy is available for ion {0} {1}".format(
+                    atomic_number2symbol(ion.atomic_number), ion.ion_charge
+                )
+                continue
+            ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy.value))
 
         ionization_dtype = [("atomic_number", np.int), ("ion_number", np.int), ("ionization_energy", np.float)]
         ionization_energies = np.array(ionization_energies, dtype=ionization_dtype)
