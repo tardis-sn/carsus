@@ -8,7 +8,7 @@ from pandas import HDFStore
 from carsus.model import Atom, Ion, Line, Level, DataSource, ECollision
 from carsus.model.meta import yield_limit, Base, IonListMixin
 from carsus.util import data_path, convert_camel2snake, convert_wavelength_air2vacuum
-from sqlalchemy import and_, case
+from sqlalchemy import and_, case, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy.orm.exc import NoResultFound
@@ -166,6 +166,7 @@ class AtomData(object):
             self.chianti_ions = list()
 
         self._ions_table = None
+        self._atoms_table = None
         self._chianti_ions_table = None
 
         # Query the data sources
@@ -226,6 +227,12 @@ class AtomData(object):
         return self._ions_table
 
     @property
+    def atoms_table(self):
+        if self._atoms_table is None:
+            self._atoms_table =  select([self.ions_table.c.atomic_number], distinct=True).alias()
+        return self._atoms_table
+
+    @property
     def chianti_ions_table(self):
 
         if self._chianti_ions_table is None:
@@ -275,7 +282,9 @@ class AtomData(object):
                 index: none;
                 columns: atom_masses, symbol, name, mass[u].
         """
+
         atom_masses_q = self.session.query(Atom). \
+            join(self.atoms_table, Atom.atomic_number == self.atoms_table.c.atomic_number).\
             order_by(Atom.atomic_number)
 
         atom_masses = list()
