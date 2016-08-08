@@ -82,6 +82,7 @@ class AtomData(object):
     chianti_ions: list of tuples (atomic_number, ion_charge)
 
     ions_sel: sqlalchemy.sql.schema.Table
+    atoms_sel: sqlalchemy.sql.selectable.Alias
     chianti_ions_sel: sqlalchemy.sql.schema.Table
 
     ku_ds: carsus.model.atomic.DataSource instance
