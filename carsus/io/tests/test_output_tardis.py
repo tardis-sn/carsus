@@ -162,13 +162,6 @@ def test_create_atom_masses(atom_masses, atomic_number, exp_mass):
 
 
 @with_test_db
-def test_create_atom_masses_max_atomic_number(test_session):
-    atom_data = AtomData(test_session, ions=[], atom_masses_max_atomic_number=15)
-    atom_masses = atom_data.atom_masses
-    assert atom_masses["atomic_number"].max() == 15
-
-
-@with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, exp_ioniz_energy", [
     (2, 1,  54.41776311 * u.eV),
     (4, 2, 153.896198 * u.eV),

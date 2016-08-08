@@ -131,16 +131,13 @@ class AtomData(object):
 
     def __init__(self, session, ions, chianti_ions=None,
                  kurucz_short_name="ku_latest", chianti_short_name="chianti_v8.0.2", nist_short_name="nist-asd",
-                 atom_masses_max_atomic_number=30, lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3,
+                 lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3,
                  collisions_temperatures=None,
                  zeta_datafile=ZETA_DATAFILE):
 
         self.session = session
 
-        # Set the parameters for the dataframes
-        self.atom_masses_param = {
-            "max_atomic_number": atom_masses_max_atomic_number
-        }
+        # Set the parameters for the dataframes}
 
         self.levels_lines_param = {
             "levels_metastable_loggf_threshold": levels_metastable_loggf_threshold,
@@ -258,7 +255,7 @@ class AtomData(object):
     @property
     def atom_masses(self):
         if self._atom_masses is None:
-            self._atom_masses = self.create_atom_masses(**self.atom_masses_param)
+            self._atom_masses = self.create_atom_masses()
         return self._atom_masses
 
     def create_atom_masses(self, max_atomic_number=30):
@@ -279,7 +276,6 @@ class AtomData(object):
                 columns: atom_masses, symbol, name, mass[u].
         """
         atom_masses_q = self.session.query(Atom). \
-            filter(Atom.atomic_number <= max_atomic_number).\
             order_by(Atom.atomic_number)
 
         atom_masses = list()
