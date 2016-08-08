@@ -108,7 +108,7 @@ def test_atom_data_chianti_ions_subset(memory_session):
 
 def test_atom_data_wo_chianti_ions_attributes(atom_data_only_be2, test_session):
     assert atom_data_only_be2.chianti_ions == list()
-    assert test_session.query(atom_data_only_be2.chianti_ions_table).count() == 0
+    assert test_session.query(atom_data_only_be2.chianti_ions_sel).count() == 0
 
 
 def test_atom_data_wo_chianti_ions_levels(atom_data_only_be2):
@@ -120,10 +120,10 @@ def test_atom_data_wo_chianti_ions_levels(atom_data_only_be2):
 
 
 @with_test_db
-def test_atom_data_join_on_chianti_ions_table(test_session, atom_data):
-    chiatni_ions_q = test_session.query(Ion).join(atom_data.chianti_ions_table,
-                                     and_(Ion.atomic_number == atom_data.chianti_ions_table.c.atomic_number,
-                                          Ion.ion_charge == atom_data.chianti_ions_table.c.ion_charge)).\
+def test_atom_data_join_on_chianti_ions_sel(test_session, atom_data):
+    chiatni_ions_q = test_session.query(Ion).join(atom_data.chianti_ions_sel,
+                                     and_(Ion.atomic_number == atom_data.chianti_ions_sel.c.atomic_number,
+                                          Ion.ion_charge == atom_data.chianti_ions_sel.c.ion_charge)).\
         order_by(Ion.atomic_number, Ion.ion_charge)
     chianti_ions = [(ion.atomic_number, ion.ion_charge) for ion in chiatni_ions_q]
     assert set(chianti_ions) == set([(2,1), (7,5)])
@@ -138,10 +138,10 @@ def test_atom_data_two_instances_same_session(test_session):
     atom_data2 = AtomData(test_session,
                          ions=["He II", "Be III", "B IV", "N VI", "Zn XX"],
                          chianti_ions=["He II", "N VI"])
-    atom_data1.ions_table
-    atom_data2.ions_table
-    atom_data1.chianti_ions_table
-    atom_data2.chianti_ions_table
+    atom_data1.ions_sel
+    atom_data2.ions_sel
+    atom_data1.chianti_ions_sel
+    atom_data2.chianti_ions_sel
 
 
 @with_test_db
@@ -161,11 +161,9 @@ def test_create_atom_masses(atom_masses, atomic_number, exp_mass):
     )
 
 
-@with_test_db
-def test_create_atom_masses_max_atomic_number(test_session):
-    atom_data = AtomData(test_session, ions=[], atom_masses_max_atomic_number=15)
-    atom_masses = atom_data.atom_masses
-    assert atom_masses["atomic_number"].max() == 15
+def test_create_atom_masses_distinct_atomic_numbers(test_session):
+    atom_data = AtomData(test_session, ions=["He II",  "N VI", "Si II", "Si III"])
+    assert atom_data.atom_masses["atomic_number"].values.tolist() == [2, 7, 14]
 
 
 @with_test_db

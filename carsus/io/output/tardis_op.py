@@ -7,8 +7,9 @@ import pickle
 from pandas import HDFStore
 from carsus.model import Atom, Ion, Line, Level, DataSource, ECollision
 from carsus.model.meta import yield_limit, Base, IonListMixin
-from carsus.util import data_path, convert_camel2snake, convert_wavelength_air2vacuum
-from sqlalchemy import and_, case
+from carsus.util import data_path, convert_camel2snake, \
+    convert_wavelength_air2vacuum, atomic_number2symbol
+from sqlalchemy import and_, case, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy.orm.exc import NoResultFound
@@ -81,8 +82,9 @@ class AtomData(object):
     ions: list of tuples (atomic_number, ion_charge)
     chianti_ions: list of tuples (atomic_number, ion_charge)
 
-    ions_table: sqlalchemy.sql.schema.Table
-    chianti_ions_table: sqlalchemy.sql.schema.Table
+    ions_sel: sqlalchemy.sql.schema.Table
+    atoms_sel: sqlalchemy.sql.selectable.Alias
+    chianti_ions_sel: sqlalchemy.sql.schema.Table
 
     ku_ds: carsus.model.atomic.DataSource instance
         The Kurucz datasource
@@ -131,16 +133,13 @@ class AtomData(object):
 
     def __init__(self, session, ions, chianti_ions=None,
                  kurucz_short_name="ku_latest", chianti_short_name="chianti_v8.0.2", nist_short_name="nist-asd",
-                 atom_masses_max_atomic_number=30, lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3,
+                 lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3,
                  collisions_temperatures=None,
                  zeta_datafile=ZETA_DATAFILE):
 
         self.session = session
 
-        # Set the parameters for the dataframes
-        self.atom_masses_param = {
-            "max_atomic_number": atom_masses_max_atomic_number
-        }
+        # Set the parameters for the dataframes}
 
         self.levels_lines_param = {
             "levels_metastable_loggf_threshold": levels_metastable_loggf_threshold,
@@ -168,8 +167,9 @@ class AtomData(object):
         else:
             self.chianti_ions = list()
 
-        self._ions_table = None
-        self._chianti_ions_table = None
+        self._ions_sel = None
+        self._atoms_sel = None
+        self._chianti_ions_sel = None
 
         # Query the data sources
         self.ku_ds = None
@@ -204,61 +204,67 @@ class AtomData(object):
         self._zeta_data = None
 
     @property
-    def ions_table(self):
-        if self._ions_table is None:
+    def ions_sel(self):
+        if self._ions_sel is None:
 
-            ions_table_name = "MainIonList" + str(hash(frozenset(self.ions)))
+            ions_sel_name = "MainIonList" + str(hash(frozenset(self.ions)))
 
             try:
-                ions_table = Base.metadata.tables[convert_camel2snake(ions_table_name)]
+                ions_sel = Base.metadata.tables[convert_camel2snake(ions_sel_name)]
             except KeyError:
-                ions_table = type(ions_table_name,(Base, IonListMixin), dict()).__table__
+                ions_sel = type(ions_sel_name,(Base, IonListMixin), dict()).__table__
 
             try:
                 # To create the temporary table use the session's current transaction-bound connection
-                ions_table.create(self.session.connection())
+                ions_sel.create(self.session.connection())
             except OperationalError:  # Raised if the table already exists
                 pass
             else:
                 # Insert values from `ions` into the table
-                self.session.execute(ions_table.insert(),
+                self.session.execute(ions_sel.insert(),
                     [{"atomic_number": atomic_number, "ion_charge": ion_charge}
                      for atomic_number, ion_charge in self.ions])
 
-            self._ions_table = ions_table
-        return self._ions_table
+            self._ions_sel = ions_sel
+        return self._ions_sel
 
     @property
-    def chianti_ions_table(self):
+    def atoms_sel(self):
+        if self._atoms_sel is None:
+            self._atoms_sel = select([self.ions_sel.c.atomic_number], distinct=True).alias()
+        return self._atoms_sel
 
-        if self._chianti_ions_table is None:
+    @property
+    def chianti_ions_sel(self):
 
-            chianti_ions_table_name = "ChiantiIonList" + str(hash(frozenset(self.chianti_ions)))
+        if self._chianti_ions_sel is None:
+
+            chianti_ions_sel_name = "ChiantiIonList" + str(hash(frozenset(self.chianti_ions)))
 
             try:
-                chianti_ions_table = Base.metadata.tables[convert_camel2snake(chianti_ions_table_name)]
+                chianti_ions_sel = Base.metadata.tables[convert_camel2snake(chianti_ions_sel_name)]
             except KeyError:
-                chianti_ions_table = type(chianti_ions_table_name, (Base, IonListMixin), dict()).__table__
+                chianti_ions_sel = type(chianti_ions_sel_name, (Base, IonListMixin), dict()).__table__
 
             try:
                 # To create the temporary table use the session's current transaction-bound connection
-                chianti_ions_table.create(self.session.connection())
+                chianti_ions_sel.create(self.session.connection())
             except OperationalError:  # Raised if the table already exists
                 pass
             else:
                 # Insert values from `ions` into the table
                 if self.chianti_ions:
-                    self.session.execute(chianti_ions_table.insert(),
+                    self.session.execute(chianti_ions_sel.insert(),
                                          [{"atomic_number": atomic_number, "ion_charge": ion_charge}
                                           for atomic_number, ion_charge in self.chianti_ions])
 
-            self._chianti_ions_table = chianti_ions_table
-        return self._chianti_ions_table
+            self._chianti_ions_sel = chianti_ions_sel
+        return self._chianti_ions_sel
 
     @property
     def atom_masses(self):
         if self._atom_masses is None:
-            self._atom_masses = self.create_atom_masses(**self.atom_masses_param)
+            self._atom_masses = self.create_atom_masses()
         return self._atom_masses
 
     def create_atom_masses(self, max_atomic_number=30):
@@ -278,14 +284,19 @@ class AtomData(object):
                 index: none;
                 columns: atom_masses, symbol, name, mass[u].
         """
+
         atom_masses_q = self.session.query(Atom). \
-            filter(Atom.atomic_number <= max_atomic_number).\
+            join(self.atoms_sel, Atom.atomic_number == self.atoms_sel.c.atomic_number).\
             order_by(Atom.atomic_number)
 
         atom_masses = list()
         for atom in atom_masses_q.options(joinedload(Atom.weights)):
-            weight = atom.weights[0].quantity.value if atom.weights else None  # Get the first weight from the collection
-            atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight))
+            try:
+                weight = atom.weights[0].quantity
+            except IndexError:
+                print "No weight is available for atom {0}".format(atomic_number2symbol(atom.atomic_number))
+                continue
+            atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight.value))
 
         atom_masses_dtype = [("atomic_number", np.int), ("symbol", "|S5"), ("name", "|S150"), ("mass", np.float)]
         atom_masses = np.array(atom_masses, dtype=atom_masses_dtype)
@@ -331,12 +342,21 @@ class AtomData(object):
                 columns: atomic_number, ion_number, ionization_energy[eV]
         """
         ionization_energies_q = self.session.query(Ion).\
+            join(self.ions_sel,
+                 and_(Ion.atomic_number == self.ions_sel.c.atomic_number,
+                      Ion.ion_charge == self.ions_sel.c.ion_charge)).\
             order_by(Ion.atomic_number, Ion.ion_charge)
 
         ionization_energies = list()
         for ion in ionization_energies_q.options(joinedload(Ion.ionization_energies)):
-            ionization_energy = ion.ionization_energies[0].quantity.value if ion.ionization_energies else None
-            ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy))
+            try:
+                ionization_energy = ion.ionization_energies[0].quantity
+            except IndexError:
+                print "No ionization energy is available for ion {0} {1}".format(
+                    atomic_number2symbol(ion.atomic_number), ion.ion_charge
+                )
+                continue
+            ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy.value))
 
         ionization_dtype = [("atomic_number", np.int), ("ion_number", np.int), ("ionization_energy", np.float)]
         ionization_energies = np.array(ionization_energies, dtype=ionization_dtype)
@@ -399,9 +419,9 @@ class AtomData(object):
             #    the chianti source in the database, then select from the chianti source
             whens.append(
                  (self.session.query(lvl_alias). \
-                 join(self.chianti_ions_table,
-                      and_(lvl_alias.atomic_number == self.chianti_ions_table.c.atomic_number,
-                           lvl_alias.ion_charge == self.chianti_ions_table.c.ion_charge)). \
+                 join(self.chianti_ions_sel,
+                      and_(lvl_alias.atomic_number == self.chianti_ions_sel.c.atomic_number,
+                           lvl_alias.ion_charge == self.chianti_ions_sel.c.ion_charge)). \
                  filter(and_(lvl_alias.atomic_number == Level.atomic_number,
                              lvl_alias.ion_charge == Level.ion_charge),
                         lvl_alias.data_source == self.ch_ds).exists(), self.ch_ds.data_source_id)
@@ -417,9 +437,9 @@ class AtomData(object):
         case_stmt = case(whens=whens, else_=self.nist_ds.data_source_id)
 
         levels_q = self.session.query(Level).\
-            join(self.ions_table,
-                 and_(Level.atomic_number == self.ions_table.c.atomic_number,
-                      Level.ion_charge == self.ions_table.c.ion_charge)).\
+            join(self.ions_sel,
+                 and_(Level.atomic_number == self.ions_sel.c.atomic_number,
+                      Level.ion_charge == self.ions_sel.c.ion_charge)).\
             filter(Level.data_source_id == case_stmt)
 
         return levels_q
