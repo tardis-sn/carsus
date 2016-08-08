@@ -161,6 +161,11 @@ def test_create_atom_masses(atom_masses, atomic_number, exp_mass):
     )
 
 
+def test_create_atom_masses_distinct_atomic_numbers(test_session):
+    atom_data = AtomData(test_session, ions=["He II",  "N VI", "Si II", "Si III"])
+    assert atom_data.atom_masses["atomic_number"].values.tolist() == [2, 7, 14]
+
+
 @with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, exp_ioniz_energy", [
     (2, 1,  54.41776311 * u.eV),
