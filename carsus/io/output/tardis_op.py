@@ -331,6 +331,9 @@ class AtomData(object):
                 columns: atomic_number, ion_number, ionization_energy[eV]
         """
         ionization_energies_q = self.session.query(Ion).\
+            join(self.ions_table,
+                 and_(Ion.atomic_number == self.ions_table.c.atomic_number,
+                      Ion.ion_charge == self.ions_table.c.ion_charge)).\
             order_by(Ion.atomic_number, Ion.ion_charge)
 
         ionization_energies = list()
