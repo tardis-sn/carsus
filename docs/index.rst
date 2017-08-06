@@ -20,4 +20,4 @@ Contents:
     notebooks/quickstart.ipynb
     notebooks/nist_weights_comp.ipynb
     api
-    
+    model

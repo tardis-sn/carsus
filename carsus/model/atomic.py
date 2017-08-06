@@ -1,3 +1,39 @@
+'''
+DataBase Models in carsus
+==========================
+
+Introduction
+~~~~~~~~~~~~~
+
+`Carsus` uses sqlalchemy to link database rows to python objects. This makes it
+very easy to query for a filtered subset of data.
+
+classes define objects. each class is mapped to a database table and instances
+of a class are mapped to rows of that table.  all classes inherit from Base
+which is a declarative_base from sqlalchemy.  Each class has a "Primary Key"
+which has to be unique for each object. Typically this is an integer starting
+at 1. The primary key should be called 'id'.  Attributes of instances are
+declared as special class attributes. To map an attribute to a database column
+it has to be a Column object.  It is possible to define relationships with the
+relationship function. This links two instances of an object together based on
+one column, usually the primary key.
+
+each class own column (share columns inheritance?)
+
+operations mostly done on the database and not python -> fast
+
+There are several types of classes describing the atomic data for us. First, we
+have general models, like `Atom` and `Ion`. These are universal and independent
+of the source of the data. They serve as anchors for datasource dependent
+objects to be linked against.  Next is Data that is not universal but comes
+from a source, for example IonizationEnergy. We are using data which is
+provided by NIST but there are other sources aswell. To easily allow the same
+data from different sources in the database, we link them to a source. This is
+very important because when we extract the data, we always have to specify the
+source of the data we want to extract.
+
+In carsus we create This file contains all models linked to database tables.
+'''
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,10 +48,45 @@ from carsus.model.meta import Base, UniqueMixin, QuantityMixin
 MEDIUM_VACUUM = 0
 MEDIUM_AIR = 1
 
+__all__ = [
+        'Atom',
+        'AtomQuantity',
+        'AtomWeight',
+
+        'Ion',
+        'IonQuantity',
+        'IonizationEnergy',
+
+        'Level',
+        'LevelQuantity',
+        'LevelEnergy',
+
+        'Transition',
+        'Line',
+        'LineQuantity',
+        'LineWavelength',
+        'LineAValue',
+        'LineGFValue',
+
+        'ECollision',
+        'ECollisionQuantity',
+        'ECollisionEnergy',
+        'ECollisionGFValue',
+        'ECollisionTempStrength',
+
+        'DataSource',
+        ]
+
 
 class Atom(Base):
+    '''
+    Model describing a simple Atom.
+    '''
+
     __tablename__ = "atom"
     atomic_number = Column(Integer, primary_key=True)
+    '''Atomic number of the Atom'''
+
     symbol = Column(String(5), nullable=False)
     name = Column(String(150))
     group = Column(Integer)
@@ -29,10 +100,20 @@ class Atom(Base):
 
 
 class AtomQuantity(QuantityMixin, Base):
+    '''
+    Base class for all quantities of an :py:class:`~carsus.atomic.Atom`. Mixes in the QuantityMixin to
+    expose the auantity interface.
+    '''
+
     __tablename__ = "atom_quantity"
 
+    #: Primary Key
     atom_qty_id = Column(Integer, primary_key=True)
-    atomic_number= Column(Integer, ForeignKey("atom.atomic_number"), nullable=False)
+
+    #: ForeignKey linking a AtomQuantity to an Atom
+    atomic_number = Column(
+            Integer,
+            ForeignKey("atom.atomic_number"), nullable=False)
     type = Column(String(20))
 
     # __table_args__ = (UniqueConstraint('data_source_id', 'atomic_number', 'type', 'method'),)
@@ -43,6 +124,9 @@ class AtomQuantity(QuantityMixin, Base):
 
 
 class AtomWeight(AtomQuantity):
+    '''
+    Weight of an Atom in atomic units ['u'].
+    '''
 
     unit = u.u
     atom = relationship("Atom", back_populates='weights')
@@ -53,6 +137,10 @@ class AtomWeight(AtomQuantity):
 
 
 class Ion(UniqueMixin, Base):
+    '''
+    Model describing an Ion. Inherits the UniqueMixin to guarantee no
+    duplicates.
+    '''
     __tablename__ = "ion"
 
     @classmethod
@@ -64,12 +152,19 @@ class Ion(UniqueMixin, Base):
         return query.filter(and_(Ion.atomic_number == atomic_number,
                                  Ion.ion_charge == ion_charge))
 
-    atomic_number = Column(Integer, ForeignKey('atom.atomic_number'), primary_key=True)
+    #: ForeignKey linking an Ion to an Atom
+    atomic_number = Column(
+            Integer,
+            ForeignKey('atom.atomic_number'), primary_key=True)
+    #: Charge of the ion
     ion_charge = Column(Integer, primary_key=True)
 
+    #: Relationship to IonizationEnergy
     ionization_energies = relationship("IonizationEnergy",
                                        back_populates='ion')
+    #: Relationship to Level
     levels = relationship("Level", back_populates="ion")
+    #: Relationship to Atom
     atom = relationship("Atom", back_populates='ions')
 
     def __repr__(self):
@@ -77,10 +172,17 @@ class Ion(UniqueMixin, Base):
 
 
 class IonQuantity(QuantityMixin, Base):
+    '''
+    Base class for all quantities of an Ion. Mixes in the QuantityMixin to
+    expose the auantity interface.
+    '''
     __tablename__ = "ion_quantity"
 
+    #: Primary Key
     ion_qty_id = Column(Integer, primary_key=True)
+    #: ForeignKeyConstraint linking to an Ion
     atomic_number= Column(Integer, nullable=False)
+    #: ForeignKeyConstraint linking to an Ion
     ion_charge = Column(Integer, nullable=False)
     type = Column(String(20))
 
@@ -93,6 +195,9 @@ class IonQuantity(QuantityMixin, Base):
 
 
 class IonizationEnergy(IonQuantity):
+    '''
+    Ionization energy of an Ion in electron volt [eV].
+    '''
 
     unit = u.eV
     ion = relationship("Ion", back_populates='ionization_energies')
@@ -103,21 +208,31 @@ class IonizationEnergy(IonQuantity):
 
 
 class Level(Base):
+    '''
+    Level of an Ion.
+    '''
     __tablename__ = "level"
 
+    #: Primary Key
     level_id = Column(Integer, primary_key=True)
 
     # Ion CFK
+    #: ForeignKeyConstraint linking to an Ion
     atomic_number = Column(Integer, nullable=False)
+    #: ForeignKeyConstraint linking to an Ion
     ion_charge = Column(Integer, nullable=False)
 
+    #: Id of the datasource of this level
     data_source_id = Column(Integer, ForeignKey('data_source.data_source_id'), nullable=False)
-    level_index = Column(Integer)  # Index of this level from its data source
+    #: Index of this level from its data source
+    level_index = Column(Integer)
+    #: Configuration of the level
     configuration = Column(String(50))
-    L = Column(String(2))  # total orbital angular momentum
-    J = Column(Float)  # total angular momentum
-    spin_multiplicity = Column(Integer)  # 2*S+1, where S is total spin
-    parity = Column(Integer)  # 0 - even, 1 - odd
+    L = Column(String(2))  #: total orbital angular momentum
+    J = Column(Float)  #: total angular momentum
+    #: spin_multiplicity 2*S+1, where S is total spin
+    spin_multiplicity = Column(Integer)
+    parity = Column(Integer)  #: Parity 0 - even, 1 - odd
     # ToDo I think that term column can be derived from L, S, parity and configuration
     term = Column(String(20))
 
@@ -138,6 +253,10 @@ class Level(Base):
 
 
 class LevelQuantity(QuantityMixin, Base):
+    '''
+    Base class for all quantities of a level. Mixes in the QuantityMixin to
+    expose the auantity interface.
+    '''
     __tablename__ = "level_quantity"
 
     level_qty_id = Column(Integer, primary_key=True)
@@ -198,6 +317,10 @@ class Line(Transition):
 
 
 class LineQuantity(QuantityMixin, Base):
+    '''
+    Base class for all quantities of a line. Mixes in the QuantityMixin to
+    expose the auantity interface.
+    '''
     __tablename__ = "line_quantity"
 
     line_qty_id = Column(Integer, primary_key=True)
@@ -263,6 +386,10 @@ class ECollision(Transition):
 
 
 class ECollisionQuantity(QuantityMixin, Base):
+    '''
+    Base class for all quantities of an electron collision. Mixes in the
+    QuantityMixin to expose the auantity interface.
+    '''
     __tablename__ = "e_collision_qty"
 
     e_col_qty_id = Column(Integer, primary_key=Transition)
