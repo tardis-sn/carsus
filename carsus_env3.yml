@@ -1,0 +1,31 @@
+name: carsus
+
+channels:
+    - conda-forge
+    - default
+
+dependencies:
+- python=3
+- numpy=1.15
+- pandas=0.24
+- astropy=3
+- numexpr
+# - tardis
+
+# I/O
+- beautifulsoup4
+- pyparsing
+- html5lib
+- SQLAlchemy
+- PyYAMl
+- pytables
+
+# Analysis
+- jupyter
+
+# Documentation
+
+
+#Test/Coverage requirements
+- pytest
+- requests
