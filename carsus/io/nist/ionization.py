@@ -7,7 +7,7 @@ import requests
 import pandas as pd
 
 from bs4 import BeautifulSoup
-from StringIO import StringIO
+from io import StringIO
 from astropy import units as u
 from uncertainties import ufloat_fromstr
 from pyparsing import ParseException
@@ -54,7 +54,7 @@ def download_ionization_energies(
 
     data = {k: v for k, v in data.iteritems() if v is not False}
 
-    print "Downloading ionization energies from the NIST Atomic Spectra Database"
+    print("Downloading ionization energies from the NIST Atomic Spectra Database")
     r = requests.post(IONIZATION_ENERGIES_URL, data=data)
     return r.text
 

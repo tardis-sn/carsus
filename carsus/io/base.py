@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from util import to_flat_dict
+from carsus.io.util import to_flat_dict
 from abc import ABCMeta, abstractmethod
 from carsus.model import DataSource
 

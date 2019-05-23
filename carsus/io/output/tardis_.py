@@ -271,7 +271,7 @@ class AtomData(object):
             try:
                 weight = atom.weights[0].quantity
             except IndexError:
-                print "No weight is available for atom {0}".format(atom.symbol)
+                print("No weight is available for atom {0}".format(atom.symbol))
                 continue
             atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight.value))
 
@@ -324,9 +324,9 @@ class AtomData(object):
             try:
                 ionization_energy = ion.ionization_energies[0].quantity
             except IndexError:
-                print "No ionization energy is available for ion {0} {1}".format(
+                print("No ionization energy is available for ion {0} {1}".format(
                     convert_atomic_number2symbol(ion.atomic_number), ion.ion_charge
-                )
+                ))
                 continue
             ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy.value))
 
@@ -808,7 +808,7 @@ class AtomData(object):
             try:
                 gf = e_col.gf_values[0].quantity
             except IndexError:
-                print "No gf is available for electron collision {0}".format(e_col.e_col_id)
+                print("No gf is available for electron collision {0}".format(e_col.e_col_id))
                 continue
 
             btemp, bscups = (list(ts) for ts in zip(*e_col.temp_strengths_tuple))

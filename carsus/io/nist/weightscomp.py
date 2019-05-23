@@ -40,7 +40,7 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
         Preformatted text data
 
     """
-    print "Downloading data from the NIST Atomic Weights and Isotopic Compositions database."
+    print("Downloading data from the NIST Atomic Weights and Isotopic Compositions database.")
     r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype})
     soup = BeautifulSoup(r.text, 'html5lib')
     pre_text_data = soup.pre.get_text()
@@ -165,7 +165,7 @@ class NISTWeightsCompIngester(BaseIngester):
         if atomic_weights is None:
             atomic_weights = self.parser.prepare_atomic_dataframe()
 
-        print "Ingesting atomic weights from {}".format(self.data_source.short_name)
+        print("Ingesting atomic weights from {}".format(self.data_source.short_name))
 
         for atomic_number, row in atomic_weights.iterrows():
             weight = AtomWeight(atomic_number=atomic_number,
