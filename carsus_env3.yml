@@ -9,8 +9,11 @@ dependencies:
 - numpy=1.15
 - pandas=0.24
 - astropy=3
+- Cython=0.29  # TARDIS dep
 - numexpr
-# - tardis
+- ipyparallel
+- uncertainties
+- pip
 
 # I/O
 - beautifulsoup4
@@ -18,14 +21,33 @@ dependencies:
 - html5lib
 - SQLAlchemy
 - PyYAMl
+- h5py
 - pytables
+- pyne=0.5     # TARDIS dep
 
 # Analysis
 - jupyter
+- matplotlib
 
 # Documentation
+- sphinx=1.6
+- numpydoc
+- docutils
 
-
-#Test/Coverage requirements
+# Test/Coverage requirements
+- coverage
+- coveralls
 - pytest
+- pytest-cov
+- pytest-astropy
 - requests
+
+# Pip
+- pip:
+  - git+https://github.com/tardis-sn/tardis
+  - sphinx_bootstrap_theme
+  - sphinxcontrib-bibtex
+  - sphinxcontrib-tikz
+  - nbsphinx
+  - chiantipy
+  - tqdm
