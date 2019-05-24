@@ -30,7 +30,7 @@ dependencies:
 - matplotlib
 
 # Documentation
-- sphinx=1.6
+- sphinx
 - numpydoc
 - docutils
 
