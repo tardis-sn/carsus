@@ -2,11 +2,7 @@
 # by importing them here in conftest.py they are discoverable by py.test
 # no matter how it is invoked within the source tree.
 
-from astropy.tests.pytest_plugins import *
-from astropy.tests.pytest_plugins import (
-        pytest_addoption as _pytest_add_option
-    )
-
+from astropy.tests.plugins.config import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
@@ -40,7 +36,6 @@ from carsus import init_db
 #     pass
 
 def pytest_addoption(parser):
-    _pytest_add_option(parser)
     parser.addoption("--runslow", action="store_true",
                      help="include running slow tests during run")
     parser.addoption("--test-db", dest='test-db', default=None,
