@@ -8,12 +8,16 @@ python:
 cache:
   apt: true
 
-sudo: false
+sudo: true
 
+addons:
+  apt:
+    packages:
+    - clang
 
 env:
     global:
-        - COMPILER=gcc
+        - COMPILER=clang
         - PANDAS_VERSION=0.24
         - ASTROPY_USE_SYSTEM_PYTEST=1
         - SETUP_CMD='test'
