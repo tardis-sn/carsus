@@ -1,5 +1,6 @@
 os:
   - linux
+
 language: python
 
 python:
@@ -10,14 +11,8 @@ cache:
 
 sudo: true
 
-addons:
-  apt:
-    packages:
-    - clang
-
 env:
     global:
-        - COMPILER=clang
         - PANDAS_VERSION=0.24
         - ASTROPY_USE_SYSTEM_PYTEST=1
         - SETUP_CMD='test'
@@ -25,7 +20,6 @@ env:
         - MINICONDA_URL='http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
         - CHIANTI_DATA_URL='http://www.chiantidatabase.org/download/CHIANTI_8.0.2_data.tar.gz'
         - CARSUS_DB_URL='https://github.com/tardis-sn/carsus-db.git'
-
 
 matrix:
     include:
@@ -84,8 +78,8 @@ install:
 
 script:
     - cd $TRAVIS_BUILD_DIR
-    - echo CC=$COMPILER python setup.py $SETUP_CMD
-    - CC=$COMPILER python setup.py $SETUP_CMD
+    - echo python setup.py $SETUP_CMD
+    - python setup.py $SETUP_CMD
 
 after_success:
     - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls; fi
