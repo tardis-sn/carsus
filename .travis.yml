@@ -6,7 +6,7 @@ dist: xenial
 language: python
 
 python:
-    - 3.7
+    - 3.6
 
 cache:
   apt: true
@@ -26,33 +26,36 @@ env:
 matrix:
     include:
 
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test'
 
         # Test with remote data
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test --remote-data'
 
         # Test with slow tests
-        - python: 3.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--runslow"'
             - INSTALL_CHIANTI=true
 
         # Test with the test database
-        - python: 3.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
             - TEST_MODE='with_test_db'
 
         # Do a coverage test in Python 3.
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test --coverage'
 
+git:
+    submodules: false
 
 before_install:
 
-    # We do this to make sure we get the dependencies so pip works below
+    # We do this to make sure we get the dependencies so pip works belo
+    - git submodule update --init --recursive
     - export PYTHONIOENCODING=UTF8
     - wget $MINICONDA_URL -O miniconda.sh
     - chmod +x miniconda.sh
@@ -60,7 +63,6 @@ before_install:
     - export PATH=$HOME/miniconda/bin:$PATH
     - hash -r
     - conda update --yes conda
-
 
 install:
 
