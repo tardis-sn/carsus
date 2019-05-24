@@ -3,7 +3,7 @@ os:
 language: python
 
 python:
-    - 2.7
+    - 3.6
 
 virtualenv:
   system_site_packages: true
@@ -17,7 +17,7 @@ sudo: false
 env:
     global:
         - COMPILER=gcc
-        - PANDAS_VERSION=0.16
+        - PANDAS_VERSION=0.24
         - ASTROPY_USE_SYSTEM_PYTEST=1
         - SETUP_CMD='test'
         - TEST_MODE='normal'
@@ -29,27 +29,27 @@ env:
 matrix:
     include:
 
-        - python: 2.7
+        - python: 3.6
           env: SETUP_CMD='test'
 
         # Test with remote data
-        - python: 2.7
+        - python: 3.6
           env: SETUP_CMD='test --remote-data'
 
         # Test with slow tests
-        - python: 2.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--runslow"'
             - INSTALL_CHIANTI=true
 
         # Test with the test database
-        - python: 2.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
             - TEST_MODE='with_test_db'
 
-        # Do a coverage test in Python 2.
-        - python: 2.7
+        # Do a coverage test in Python 3.
+        - python: 3.6
           env: SETUP_CMD='test --coverage'
 
 
@@ -67,8 +67,8 @@ before_install:
 
 install:
 
-    - conda env create -f carsus_ci/carsus_ci_env27.yml
-    - source activate carsus-ci
+    - conda env create -f carsus_env3.yml
+    - source activate carsus
     # install the CHIANTI database
     - mkdir $HOME/chianti
     - wget $CHIANTI_DATA_URL -O $HOME/chianti/CHIANTI_8.0.2_data.tar.gz
