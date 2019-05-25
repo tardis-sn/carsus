@@ -184,7 +184,7 @@ isotope = Dict( Group(column_name + EQ + atomic_number) ) + \
 
 
 def remove_empty_keys(tokens):
-    for key, item in tokens.items():
+    for key, item in list(tokens.items()):
         if item == '':
             del tokens[key]
     return tokens
