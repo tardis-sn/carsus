@@ -12,7 +12,7 @@ def get_data_path(fname):
     )
 
 ATOMIC_SYMBOLS_DATA = np.recfromtxt(get_data_path('basic_atomic_data.csv'), skip_header=1,
-                                    delimiter=',', usecols=(0, 1), names=['atomic_number', 'symbol'])
+                                    delimiter=',', usecols=(0, 1), names=['atomic_number', 'symbol'], encoding='utf-8')
 
 SYMBOL2ATOMIC_NUMBER = OrderedDict(zip(ATOMIC_SYMBOLS_DATA['symbol'],
                                        ATOMIC_SYMBOLS_DATA['atomic_number']))
