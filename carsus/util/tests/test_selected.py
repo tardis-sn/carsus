@@ -18,7 +18,7 @@ def test_element(test_input, exp_atomic_number):
 
 @pytest.mark.parametrize("test_input, exp_atomic_numbers",[
     ("H-Li", [1, 2, 3]),
-    ("H-Zn", range(1,31)),
+    ("H-Zn", list(range(1,31))),
     ("si-s", [14, 15, 16])
 ])
 def test_element_range(test_input, exp_atomic_numbers):
@@ -28,7 +28,7 @@ def test_element_range(test_input, exp_atomic_numbers):
 
 @pytest.mark.parametrize("test_input, exp_atomic_numbers",[
     ("H", [1,]),
-    ("H-Zn", range(1,31)),
+    ("H-Zn", list(range(1,31))),
     ("h, si-s", [1, 14, 15, 16]),
     ('he, h-li', [1, 2, 3])
 ])
