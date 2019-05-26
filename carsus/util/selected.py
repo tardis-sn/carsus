@@ -36,7 +36,7 @@ def parse_element(tokens):
 element.setParseAction(parse_element)
 
 element_range = element + hyphen + element
-element_range.setParseAction(lambda x: range(x[0], x[1] + 1))
+element_range.setParseAction(lambda x: list(range(x[0], x[1] + 1)))
 
 atom_entry = element ^ element_range
 selected_atoms = delimitedList(atom_entry)
@@ -47,7 +47,7 @@ ion_number = Word(nums)
 ion_number.setParseAction(lambda x: int(x[0]))
 
 ion_number_range = ion_number + hyphen + ion_number
-ion_number_range.setParseAction(lambda x: range(x[0], x[1] + 1))
+ion_number_range.setParseAction(lambda x: list(range(x[0], x[1] + 1)))
 
 ion_numbers = delimitedList(ion_number ^ ion_number_range)
 ion_numbers.setParseAction(lambda x: sorted(set(x)))
