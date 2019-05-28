@@ -46,8 +46,8 @@ def test_level_w_ls_term(test_input, exp_mult, exp_l, exp_parity, exp_j):
     assert tkns["ls_term"]["mult"] == exp_mult
     assert tkns["ls_term"]["L"] == exp_l
     assert tkns["parity"] == exp_parity
-    assert_almost_equal(tkns["J"], exp_j)
-
+    assert_almost_equal(tkns["J"], exp_j)  # This assertion fails because tkns["J"] is a list and exp_j and integer. e.g. [2] == 2
+                                           # Same thing on lines 62 and 73.
 
 @pytest.mark.parametrize("test_input, exp_first_j, exp_second_j, exp_parity, exp_j",[
     ("(0,1/2)0", 0.0, 0.5, 0, 0.0),
