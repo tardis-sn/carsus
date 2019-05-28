@@ -110,7 +110,7 @@ class NISTIonizationEnergiesParser(BaseParser):
                 return None
             if ioniz_energy_str.startswith('('):
                 method = 'theor' # theoretical
-                ioniz_energy_str = ioniz_energy_str.strip('()')
+                ioniz_energy_str = ioniz_energy_str[1:-1]  # .strip('()') wasn't working for '(217.7185766(10))' 
                 #.replace('))', ')') - not clear why that exists
             elif ioniz_energy_str.startswith('['):
                 method = 'intrpl' # interpolated
