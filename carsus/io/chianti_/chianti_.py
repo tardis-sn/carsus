@@ -175,7 +175,7 @@ class ChiantiIonReader(object):
 
         levels_dict = {}
 
-        for key, col_name in self.elvlc_dict.iteritems():
+        for key, col_name in self.elvlc_dict.items():
             levels_dict[col_name] = elvlc.get(key)
 
         # Check that ground level energy is 0
@@ -208,7 +208,7 @@ class ChiantiIonReader(object):
 
         lines_dict = {}
 
-        for key, col_name in self.wgfa_dict.iteritems():
+        for key, col_name in self.wgfa_dict.items():
             lines_dict[col_name] = wgfa.get(key)
 
         lines = pd.DataFrame(lines_dict)
@@ -242,7 +242,7 @@ class ChiantiIonReader(object):
 
         collisions_dict = {}
 
-        for key, col_name in self.scups_dict.iteritems():
+        for key, col_name in self.scups_dict.items():
             collisions_dict[col_name] = scups.get(key)
 
         collisions = pd.DataFrame(collisions_dict)
