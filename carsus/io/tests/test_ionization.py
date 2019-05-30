@@ -26,7 +26,7 @@ expected_at_num = [4, 4, 4, 4]
 
 expected_ion_charge = [0, 1, 2, 3]
 
-expected_indices = zip(expected_at_num, expected_ion_charge)
+expected_indices = list(zip(expected_at_num, expected_ion_charge))
 
 expected_ground_shells = ('ground_shells',
                           ['1s2.2s2', '1s2.2s', '1s2', '1s']
