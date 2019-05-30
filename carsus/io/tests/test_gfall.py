@@ -49,20 +49,20 @@ def test_grall_reader_gfall_raw(gfall_raw, index, wavelength, element_code, e_fi
 
 
 @pytest.mark.parametrize("index, wavelength, atomic_number, ion_charge, "
-                         "e_lower, e_upper, e_lower_predicted, e_upper_predicted",[
+                         "energy_lower, energy_upper, energy_lower_predicted, energy_upper_predicted",[
     (12, 67.5615, 4, 2, 983369.8, 1131383.0, False, False),
     (17, 74.6230, 4, 2, 997455.000, 1131462.0, False, False),
     (41, 16.1220, 7, 5, 3385890.000, 4006160.0, False, True)
 ])
 def test_gfall_reader_gfall(gfall, index, wavelength, atomic_number, ion_charge,
-                               e_lower, e_upper, e_lower_predicted, e_upper_predicted):
+                               energy_lower, energy_upper, energy_lower_predicted, energy_upper_predicted):
     row = gfall.loc[index]
     assert row["atomic_number"] == atomic_number
     assert row["ion_charge"] == ion_charge
-    assert_allclose([row["wavelength"], row["e_lower"], row["e_upper"]],
-                    [wavelength, e_lower, e_upper])
-    assert row["e_lower_predicted"] == e_lower_predicted
-    assert row["e_upper_predicted"] == e_upper_predicted
+    assert_allclose([row["wavelength"], row["energy_lower"], row["energy_upper"]],
+                    [wavelength, energy_lower, energy_upper])
+    assert row["energy_lower_predicted"] == energy_lower_predicted
+    assert row["energy_upper_predicted"] == energy_upper_predicted
 
 
 def test_gfall_reader_gfall_ignore_labels(gfall):
