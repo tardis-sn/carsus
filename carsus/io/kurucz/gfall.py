@@ -132,7 +132,7 @@ class GFALLReader(object):
         gfall = pd.read_fwf(fname, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
         #remove empty lines
-        gfall = gfall[~gfall.isnull().all(axis=1)]
+        gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
 
         return gfall
 
