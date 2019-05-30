@@ -17,7 +17,7 @@ dependencies:
 
 # I/O
 - beautifulsoup4
-- pyparsing
+- pyparsing=2.1.10
 - html5lib
 - SQLAlchemy
 - PyYAMl
