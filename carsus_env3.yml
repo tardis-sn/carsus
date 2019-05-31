@@ -49,5 +49,5 @@ dependencies:
   #- sphinxcontrib-bibtex
   #- sphinxcontrib-tikz
   #- nbsphinx
-  - chiantipy==0.8.3
+  - chiantipy==0.8.4
   - tqdm
