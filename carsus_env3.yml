@@ -37,7 +37,7 @@ dependencies:
 # Test/Coverage requirements
 - coverage
 - coveralls
-- pytest
+- pytest=4.5.0
 - pytest-cov
 - pytest-astropy
 - requests
