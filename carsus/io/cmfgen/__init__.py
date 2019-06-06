@@ -1,0 +1,1 @@
+from carsus.io.cmfgen.cmfgen_ import CMFGENOscillatorStrengthsParser
