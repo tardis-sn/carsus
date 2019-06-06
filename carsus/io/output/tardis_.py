@@ -446,7 +446,8 @@ class AtomData(object):
                 filter(Level.data_source_id == self.data_source_case)
                 )
 
-        return levels_q.subquery()
+        return levels_q.subquery()  # This subquery returns an empty list for atom_data fixture,
+                                    # then all test fails for this module.
 
     def _get_all_levels_data(self):
         """
