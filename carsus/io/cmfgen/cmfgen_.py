@@ -30,6 +30,67 @@ def find_row(fname, string1, string2='', how='both', num_row=False):
     return line
 
 
+class CMFGENEnergyLevelsParser(BaseParser):
+    """
+        Description
+        ----------
+        base : pandas.DataFrame
+        columns : list of str
+            (default value = COLUMNS)
+            
+        Methods
+        -------
+        load(fname)
+            Parses the input data and stores the results in the `base` attribute
+        to_hdf(fname, key)
+            Saves `base` attribute to HDF5 file.
+    """
+
+    def load(self, fname):
+        args = {}
+        args['header'] = None
+        args['index_col'] = False
+        args['sep'] = '\s+'
+        args['skiprows'] = find_row(fname, "Number of transitions", num_row=True)
+    
+        n = find_row(fname, "Number of energy levels").split()[0]
+        args['nrows'] = int(n)
+        
+        try:
+            df = pd.read_csv(fname, **args)
+    
+        except pd.errors.EmptyDataError:
+            df = pd.DataFrame(columns=columns)
+            warnings.warn('Empty table')
+
+        # Assign column names by file content
+        if df.shape[1] == 10:
+            columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
+            columns = list(filter(lambda x: x != '', columns))
+            columns = ['Configuration'] + columns
+            df.columns = columns
+
+        elif df.shape[1] == 7:
+            df.columns =   ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', '#']
+            df = df.drop(columns=['#'])
+
+        elif df.shape[1] == 6:
+            df.columns = range(6)  # FIXME: These files don't have column names
+
+        elif df.shape[1] == 5:
+            df.columns =   ['Configuration', 'g', 'E(cm^-1)', 'eV', '#']
+            df = df.drop(columns=['#'])
+    
+        else:
+            warnings.warn('Inconsistent number of columns')
+
+        self.base = df
+
+
+    def to_hdf(self, fname, key):
+        self.base.to_hdf(fname, key)
+
+
 class CMFGENOscillatorStrengthsParser(BaseParser):
     """
         Description
