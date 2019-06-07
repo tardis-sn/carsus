@@ -1,1 +1,1 @@
-from carsus.io.cmfgen.cmfgen_ import CMFGENOscillatorStrengthsParser
+from carsus.io.cmfgen.cmfgen_ import CMFGENOscillatorStrengthsParser, CMFGENEnergyLevelsParser
