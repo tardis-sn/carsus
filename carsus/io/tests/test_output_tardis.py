@@ -14,7 +14,7 @@ with_test_db = pytest.mark.skipif(
     reason="--testing database was not specified"
 )
 
-pytestmark = pytest.mark.skipif(0 == 0, reason="Tests are failing due to empty DataFrames (traced to atom_data fixture)")
+pytestmark = pytest.mark.skip(reason="Tests are failing due to empty DataFrames (traced to atom_data fixture)")
 
 
 @pytest.fixture
