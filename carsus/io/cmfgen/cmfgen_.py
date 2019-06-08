@@ -55,6 +55,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
     
         n = find_row(fname, "Number of energy levels").split()[0]
         args['nrows'] = int(n)
+
+        columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
         
         try:
             df = pd.read_csv(fname, **args)
@@ -71,14 +73,14 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df.columns = columns
 
         elif df.shape[1] == 7:
-            df.columns =   ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', '#']
+            df.columns = columns + ['#']
             df = df.drop(columns=['#'])
 
         elif df.shape[1] == 6:
             df.columns = range(6)  # FIXME: These files don't have column names
 
         elif df.shape[1] == 5:
-            df.columns =   ['Configuration', 'g', 'E(cm^-1)', 'eV', '#']
+            df.columns = columns[:-2] + ['#']
             df = df.drop(columns=['#'])
     
         else:
