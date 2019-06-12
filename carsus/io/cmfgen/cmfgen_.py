@@ -148,3 +148,51 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
         self.base = df
         self.columns = df.columns.tolist()
+
+
+class CMFGENCollitionalDataParser(BaseParser):
+    """
+        Description
+        ----------
+        base : pandas.DataFrame
+        columns : list of str
+            (default value = COLUMNS)
+            
+        Methods
+        -------
+        load(fname)
+            Parses the input data and stores the results in the `base` attribute
+    """
+
+    def load(self, fname):
+    
+        args = {}
+        args['header'] = None
+        args['index_col'] = False
+        args['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'  # FIXME: This is the same regex used in OSC files, change it
+        args['skiprows'] = find_row(fname, "ransition\T", num_row=True)
+
+        try:
+            n = find_row(fname, "Number of transitions").split()[0]
+            args['nrows'] = int(n)
+    
+        except AttributeError:
+            pass
+    
+        try:
+            names = find_row(fname, 'ransition\T').split()
+            args['names'] = ['State A', 'State B'] + names[1:]
+
+        except AttributeError:
+            warnings.warn('No column names')  # Some files have no column names nor header
+    
+        try:
+            df = pd.read_csv(fname, **args, engine='python')
+            df.iloc[:,2:] = df.iloc[:,2:].multiply(10**4)  # FIXME: this apply for all COL files?
+    
+        except pd.errors.EmptyDataError:
+            df = pd.DataFrame()
+            warnings.warn('Empty table')
+
+        self.base = df
+        self.columns = df.columns.tolist()
