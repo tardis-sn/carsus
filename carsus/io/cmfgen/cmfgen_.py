@@ -191,7 +191,7 @@ class CMFGENCollisionalDataParser(BaseParser):
     
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
-            df.iloc[:,2:] = df.iloc[:,2:].multiply(10**4)  # FIXME: this apply for all COL files?
+            df.iloc[:,2:] = df.iloc[:,2:].multiply(1e+04)  # FIXME: this apply for all COL files?
     
         except pd.errors.EmptyDataError:
             df = pd.DataFrame()
