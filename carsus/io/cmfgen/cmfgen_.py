@@ -45,8 +45,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         -------
         load(fname)
             Parses the input data and stores the results in the `base` attribute
-        to_hdf(fname, key)
-            Saves `base` attribute to HDF5 file.
     """
 
     def load(self, fname):
@@ -90,10 +88,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             warnings.warn('Inconsistent number of columns')
 
         self.base = df
-
-
-    def to_hdf(self, fname, key):
-        self.base.to_hdf(fname, key)
+        self.columns = df.columns.tolist()
 
 
 class CMFGENOscillatorStrengthsParser(BaseParser):
@@ -108,8 +103,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         -------
         load(fname)
             Parses the input data and stores the results in the `base` attribute
-        to_hdf(fname, key)
-            Saves `base` attribute to HDF5 file.
     """
 
     def load(self, fname):
@@ -154,7 +147,4 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['A'] = df['A'].map(to_float)
 
         self.base = df
-
-
-    def to_hdf(self, fname, key):
-        self.base.to_hdf(fname, key)
+        self.columns = df.columns.tolist()
