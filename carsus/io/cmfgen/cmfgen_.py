@@ -30,7 +30,9 @@ def find_row(fname, string1, string2='', how='both', num_row=False):
     return line
 
 
-to_float = lambda x: float(x.replace('D', 'E'))  # string to float, taking care of Fortran 'D' values
+def to_float(string):
+    """ String to float, taking care of Fortran 'D' values """
+    return float(string.replace('D', 'E'))
 
 
 class CMFGENEnergyLevelsParser(BaseParser):
@@ -48,19 +50,19 @@ class CMFGENEnergyLevelsParser(BaseParser):
     """
 
     def load(self, fname):
-        args = {}
-        args['header'] = None
-        args['index_col'] = False
-        args['sep'] = '\s+'
-        args['skiprows'] = find_row(fname, "Number of transitions", num_row=True)
+        kwargs = {}
+        kwargs['header'] = None
+        kwargs['index_col'] = False
+        kwargs['sep'] = '\s+'
+        kwargs['skiprows'] = find_row(fname, "Number of transitions", num_row=True)
     
         n = find_row(fname, "Number of energy levels").split()[0]
-        args['nrows'] = int(n)
+        kwargs['nrows'] = int(n)
 
         columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
         
         try:
-            df = pd.read_csv(fname, **args, engine='python')
+            df = pd.read_csv(fname, **kwargs, engine='python')
     
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
@@ -106,19 +108,19 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
-        args = {}
-        args['header'] = None
-        args['index_col'] = False
-        args['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'
-        args['skiprows'] = find_row(fname, "Transition", "Lam", num_row=True) +1
+        kwargs = {}
+        kwargs['header'] = None
+        kwargs['index_col'] = False
+        kwargs['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'
+        kwargs['skiprows'] = find_row(fname, "Transition", "Lam", num_row=True) +1
     
         n = find_row(fname, "Number of transitions").split()[0]
-        args['nrows'] = int(n)
+        kwargs['nrows'] = int(n)
 
         columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     
         try:
-            df = pd.read_csv(fname, **args, engine='python')
+            df = pd.read_csv(fname, **kwargs, engine='python')
     
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
@@ -166,15 +168,15 @@ class CMFGENCollitionalDataParser(BaseParser):
 
     def load(self, fname):
     
-        args = {}
-        args['header'] = None
-        args['index_col'] = False
-        args['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'  # FIXME: This is the same regex used in OSC files, change it
-        args['skiprows'] = find_row(fname, "ransition\T", num_row=True)
+        kwargs = {}
+        kwargs['header'] = None
+        kwargs['index_col'] = False
+        kwargs['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'  # FIXME: This is the same regex used in OSC files, change it
+        kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
 
         try:
             n = find_row(fname, "Number of transitions").split()[0]
-            args['nrows'] = int(n)
+            kwargs['nrows'] = int(n)
     
         except AttributeError:
             pass
@@ -182,13 +184,13 @@ class CMFGENCollitionalDataParser(BaseParser):
         try:
             names = find_row(fname, 'ransition\T').split()
             names = [ n.replace('D', 'E') for n in names ]
-            args['names'] = ['State A', 'State B'] + names[1:]
+            kwargs['names'] = ['State A', 'State B'] + names[1:]
 
         except AttributeError:
             warnings.warn('No column names')  # Some files have no column names nor header
     
         try:
-            df = pd.read_csv(fname, **args, engine='python')
+            df = pd.read_csv(fname, **kwargs, engine='python')
             df.iloc[:,2:] = df.iloc[:,2:].multiply(10**4)  # FIXME: this apply for all COL files?
     
         except pd.errors.EmptyDataError:
