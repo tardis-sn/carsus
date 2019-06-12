@@ -181,6 +181,7 @@ class CMFGENCollitionalDataParser(BaseParser):
     
         try:
             names = find_row(fname, 'ransition\T').split()
+            names = [ n.replace('D', 'E') for n in names ]
             args['names'] = ['State A', 'State B'] + names[1:]
 
         except AttributeError:
