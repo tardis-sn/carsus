@@ -30,6 +30,9 @@ def find_row(fname, string1, string2='', how='both', num_row=False):
     return line
 
 
+to_float = lambda x: float(x.replace('D', 'E'))  # string to float, taking care of Fortran 'D' values
+
+
 class CMFGENEnergyLevelsParser(BaseParser):
     """
         Description
@@ -59,7 +62,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
         
         try:
-            df = pd.read_csv(fname, **args)
+            df = pd.read_csv(fname, **args, engine='python')
     
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
@@ -147,8 +150,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     
         # Fix for Fortran float type 'D'
         if df.shape[0] > 0 and 'D' in str(df['f'][0]):
-            df['f'] = df['f'].str.replace('D', 'E').map(np.float)
-            df['A'] = df['A'].str.replace('D', 'E').map(np.float)
+            df['f'] = df['f'].map(to_float)
+            df['A'] = df['A'].map(to_float)
 
         self.base = df
 
