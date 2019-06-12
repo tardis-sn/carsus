@@ -187,7 +187,7 @@ class CMFGENCollisionalDataParser(BaseParser):
             kwargs['names'] = ['State A', 'State B'] + names[1:]
 
         except AttributeError:
-            warnings.warn('No column names')  # Some files have no column names nor header
+            warnings.warn('No column names')  # TODO: some files have no column names nor header
     
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
