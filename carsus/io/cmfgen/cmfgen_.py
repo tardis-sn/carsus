@@ -152,7 +152,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         self.columns = df.columns.tolist()
 
 
-class CMFGENCollitionalDataParser(BaseParser):
+class CMFGENCollisionalDataParser(BaseParser):
     """
         Description
         ----------
