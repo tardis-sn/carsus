@@ -37,7 +37,7 @@ def to_float(string):
     
     except:
         
-        if string == '1-.00':  # Bad value at MG/VIII/23oct02/phot_sm_3000 line 23340
+        if string == '1-.00':      # Bad value at MG/VIII/23oct02/phot_sm_3000 line 23340
             value = 10.00
         
         if string == '*********':  # Bad values at SUL/V/08jul99/phot_op.big lines 9255-9257
@@ -213,7 +213,17 @@ class CMFGENCollisionalDataParser(BaseParser):
 
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
-
+    """
+        Description
+        ----------
+        base : list of pandas.DataFrame 's
+        columns : dictionary with photoionization cross-section file metadata
+            
+        Methods
+        -------
+        load(fname)
+            Parses the input data and stores the results in the `base` attribute
+    """
     keys = ['!Date',  # Metadata to parse from header
             '!Number of energy levels', 
             '!Number of photoionization routes', 
