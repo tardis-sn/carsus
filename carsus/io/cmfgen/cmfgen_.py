@@ -32,7 +32,18 @@ def find_row(fname, string1, string2='', how='both', num_row=False):
 
 def to_float(string):
     """ String to float, taking care of Fortran 'D' values """
-    return float(string.replace('D', 'E'))
+    try:
+        value = float(string.replace('D', 'E'))
+    
+    except:
+        
+        if string == '1-.00':  # Bad value at MG/VIII/23oct02/phot_sm_3000 line 23340
+            value = 10.00
+        
+        if string == '*********':  # Bad values at SUL/V/08jul99/phot_op.big lines 9255-9257
+            value = np.nan
+            
+    return value
 
 
 class CMFGENEnergyLevelsParser(BaseParser):
@@ -199,3 +210,109 @@ class CMFGENCollisionalDataParser(BaseParser):
 
         self.base = df
         self.columns = df.columns.tolist()
+
+
+class CMFGENPhotoionizationCrossSectionParser(BaseParser):
+
+    keys = ['!Date',  # Metadata to parse from header
+            '!Number of energy levels', 
+            '!Number of photoionization routes', 
+            '!Screened nuclear charge',
+            '!Final state in ion',
+            '!Excitation energy of final state',
+            '!Statistical weight of ion',
+            '!Cross-section unit',
+            '!Split J levels',
+            '!Total number of data pairs',
+            ]
+
+    def _table_gen(self, f):
+        """ Generator. Yields a cross section table for an energy level """
+        meta = {}
+        data = []
+
+        for line in f:
+
+            if '!Configuration name' in line:
+                meta['Configuration'] = line.split()[0]
+
+            if '!Type of cross-section' in line:
+                meta['Type of cross-section'] = line.split()[0]
+
+            if '!Number of cross-section points' in line:
+                meta['Points'] = int(line.split()[0])
+
+                for i in range(meta['Points']):
+
+                    values = f.readline().split()
+                    if len(values) > 2:  # Verner ground state fits case
+
+                        data.append( list(map(int, values[:2])) + list(map(float, values[2:])) )
+
+                        if i == meta['Points']/len(values) -1:
+                            break
+
+                    else:
+                        data.append(map(to_float, values))              
+
+                break
+
+        df = pd.DataFrame.from_records(data)
+        df._meta = meta    
+
+        yield df
+
+
+    def load(self, fname):
+    
+        meta = {}
+        tables = []
+
+        # There's only one .gz file: POT/I/4mar12/phot.tar.gz
+        with gzip.open(fname, 'rt') if fname[-2:] == 'gz' else open(fname) as f :
+
+            for line in f:
+                for k in self.keys:
+
+                    if k in line:
+                        meta[k.strip('!')] = line.split()[0]
+
+                        if '!Total number of data pairs' in line:
+                            break
+
+
+        with gzip.open(fname, 'rt') if fname[-2:] == 'gz' else open(fname) as f :
+
+            while True:
+
+                df = next(self._table_gen(f), None)
+
+                if df.empty:
+                    break
+
+                if df.shape[1] == 2:
+                    df.columns = ['Energy', 'Sigma']
+
+                elif df.shape[1] == 1:
+                    df.columns = ['Fit coefficients']
+
+                elif df.shape[1] == 8:
+                    df.columns = ['n', 'l', 'E', 'E_0', 'sigma_0', 'y(a)', 'P', 'y(w)']
+
+                else:
+                    warnings.warn('Inconsistent number of columns')
+
+                tables.append(df)
+
+
+        tables.insert(0, meta)
+
+        self.base = tables[1:]
+        self.columns = tables[0]
+
+
+
+
+    
+
+
