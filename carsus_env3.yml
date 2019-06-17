@@ -50,4 +50,4 @@ dependencies:
   #- sphinxcontrib-bibtex
   #- sphinxcontrib-tikz
   #- nbsphinx
-  - chiantipy==0.8.5
+  - chiantipy==0.8.4
