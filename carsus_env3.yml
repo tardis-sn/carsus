@@ -24,6 +24,7 @@ dependencies:
 - h5py
 - pytables
 - pyne=0.5     # TARDIS dep
+- tqdm         # TARDIS dep
 
 # Analysis
 - jupyter
@@ -50,4 +51,3 @@ dependencies:
   #- sphinxcontrib-tikz
   #- nbsphinx
   - chiantipy==0.8.4
-  - tqdm
