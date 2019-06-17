@@ -8,7 +8,7 @@ dependencies:
 - python=3
 - numpy=1.15
 - pandas=0.22
-- astropy=3
+- astropy=3.1
 - Cython=0.29  # TARDIS dep
 - numexpr
 - ipyparallel
@@ -24,6 +24,7 @@ dependencies:
 - h5py
 - pytables
 - pyne=0.5     # TARDIS dep
+- tqdm         # TARDIS dep
 
 # Analysis
 - jupyter
@@ -49,5 +50,4 @@ dependencies:
   #- sphinxcontrib-bibtex
   #- sphinxcontrib-tikz
   #- nbsphinx
-  - chiantipy==0.8.4
-  - tqdm
+  - chiantipy==0.8.5
