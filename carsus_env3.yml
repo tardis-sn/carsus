@@ -46,8 +46,8 @@ dependencies:
 # Pip
 - pip:
   - git+https://github.com/tardis-sn/tardis
+  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
   #- sphinx_bootstrap_theme
   #- sphinxcontrib-bibtex
   #- sphinxcontrib-tikz
   #- nbsphinx
-  - chiantipy==0.8.4
