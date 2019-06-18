@@ -5,7 +5,7 @@ from carsus.io.base import BaseParser
 
 
 def find_row(fname, string1, string2='', how='both', num_row=False):
-    """  """
+    """ Search strings inside plain text files and return values or matching row number. """
     with open(fname, encoding='ISO-8859-1') as f:
         n = 0
         for line in f:        
@@ -52,7 +52,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-            (default value = COLUMNS)
+            (default value = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)'])
             
         Methods
         -------
@@ -110,7 +110,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-            (default value = COLUMNS)
+            (default value = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
             
         Methods
         -------
@@ -169,7 +169,6 @@ class CMFGENCollisionalDataParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-            (default value = COLUMNS)
             
         Methods
         -------
