@@ -98,7 +98,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = df.drop(columns=['#'])
     
         else:
-            warnings.warn('Inconsistent number of columns')
+            warnings.warn('Inconsistent number of columns')  # TODO: raise exception here (discuss)
 
         self.base = df
         self.columns = df.columns.tolist()
