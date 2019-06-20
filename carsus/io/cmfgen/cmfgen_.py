@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import gzip
 import warnings
 from carsus.io.base import BaseParser
 
