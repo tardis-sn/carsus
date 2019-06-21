@@ -247,7 +247,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 meta['Configuration'] = line.split()[0]
 
             if '!Type of cross-section' in line:
-                meta['Type of cross-section'] = line.split()[0]
+                meta['Type of cross-section'] = int(line.split()[0])
 
             if '!Number of cross-section points' in line:
                 meta['Points'] = int(line.split()[0])
