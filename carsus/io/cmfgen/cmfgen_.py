@@ -182,7 +182,7 @@ class CMFGENCollisionalDataParser(BaseParser):
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
-        kwargs['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'  # FIXME: This is the same regex used in OSC files, change it
+        kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=Pe)-'  # TODO: this regex needs some review
         kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
 
         try:
@@ -193,8 +193,9 @@ class CMFGENCollisionalDataParser(BaseParser):
             pass
     
         try:
-            names = find_row(fname, 'ransition\T').split()
-            names = [ n.replace('D', 'E') for n in names ]
+            names = find_row(fname, 'ransition\T').split()  # Not a typo
+            # Comment next line when trying new regexes!
+            names = [ np.format_float_scientific(to_float(x)*1e+04, precision=4) for x in names[1:] ]
             kwargs['names'] = ['State A', 'State B'] + names[1:]
 
         except AttributeError:
@@ -202,8 +203,13 @@ class CMFGENCollisionalDataParser(BaseParser):
     
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
-            df.iloc[:,2:] = df.iloc[:,2:].multiply(1e+04)  # FIXME: this apply for all COL files?
-    
+            for c in df.columns[2:]:          # This is done column-wise on purpose
+                try:
+                    df[c] = df[c].astype('float64')
+
+                except ValueError:
+                    df[c] = df[c].map(to_float).astype('float64')
+
         except pd.errors.EmptyDataError:
             df = pd.DataFrame()
             warnings.warn('Empty table')
