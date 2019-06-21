@@ -296,7 +296,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                         if '!Total number of data pairs' in line:
                             break
 
-
+        # TODO: make this work in a single context
         with gzip.open(fname, 'rt') if fname[-2:] == 'gz' else open(fname) as f :
 
             while True:
