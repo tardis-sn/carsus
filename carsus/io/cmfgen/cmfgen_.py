@@ -314,15 +314,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 tables.append(df)
 
-
         tables.insert(0, meta)
-
         self.base = tables[1:]
         self.columns = tables[0]
-
-
-
-
-    
-
-
