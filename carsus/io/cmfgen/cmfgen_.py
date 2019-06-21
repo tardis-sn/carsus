@@ -257,7 +257,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     values = f.readline().split()
                     if len(values) > 2:  # Verner ground state fits case
 
-                        data.append( list(map(int, values[:2])) + list(map(float, values[2:])) )
+                        data.append(list(map(int, values[:2])) + list(map(float, values[2:])))
 
                         if i == meta['Points']/len(values) -1:
                             break
