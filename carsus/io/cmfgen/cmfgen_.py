@@ -261,7 +261,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 for i in range(meta['Points']):
 
                     values = f.readline().split()
-                    if len(values) > 2:  # Verner ground state fits case
+                    if len(values) > 2:  # Verner ground state fits
 
                         data.append(list(map(int, values[:2])) + list(map(float, values[2:])))
 
@@ -285,7 +285,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         tables = []
 
         # There's only one .gz file: POT/I/4mar12/phot.tar.gz
-        with gzip.open(fname, 'rt') if fname[-2:] == 'gz' else open(fname) as f :
+        with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
 
             for line in f:
                 for k in self.keys:
@@ -297,7 +297,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                             break
 
         # TODO: make this work in a single context
-        with gzip.open(fname, 'rt') if fname[-2:] == 'gz' else open(fname) as f :
+        with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
 
             while True:
 
@@ -312,7 +312,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 elif df.shape[1] == 1:
                     df.columns = ['Fit coefficients']
 
-                elif df.shape[1] == 8:
+                elif df.shape[1] == 8:  # Verner ground state fits. TODO: add units
                     df.columns = ['n', 'l', 'E', 'E_0', 'sigma_0', 'y(a)', 'P', 'y(w)']
 
                 else:
