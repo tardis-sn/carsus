@@ -125,8 +125,9 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         kwargs['index_col'] = False
         kwargs['sep'] = '\s*\|\s*|-?\s+-?|(?<=[^ED\s])-(?=[^\s])'
         kwargs['skiprows'] = find_row(fname, "Transition", "Lam", num_row=True) +1
-    
-        n = find_row(fname, "Number of transitions").split()[0]
+
+        # Will only parse tables listed increasing lower level i, e.g. FE/II/24may96/osc_nahar.dat
+        n = find_row(fname, "Number of transitions").split()[0]  
         kwargs['nrows'] = int(n)
 
         columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
