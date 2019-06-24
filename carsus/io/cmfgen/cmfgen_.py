@@ -240,7 +240,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             '!Total number of data pairs',
             ]
 
-    def _table_gen(self, f):
+    def _table_gen(self, f):  # TODO: Make assertion for the yielded DataFrame
         """ Generator. Yields a cross section table for an energy level """
         meta = {}
         data = []
@@ -256,18 +256,19 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             if '!Number of cross-section points' in line:
                 meta['Points'] = int(line.split()[0])
 
-                for i in range(meta['Points']):
+                p = meta['Points']
+                for i in range(p):
 
                     values = f.readline().split()
-                    if len(values) > 2:  # Verner ground state fits
+                    if len(values) == 8:  # Verner ground state fits
 
                         data.append(list(map(int, values[:2])) + list(map(float, values[2:])))
 
-                        if i == meta['Points']/len(values) -1:
+                        if i == p/len(values) -1:
                             break
 
                     else:
-                        data.append(map(to_float, values))              
+                        data.append(map(to_float, values))
 
                 break
 
