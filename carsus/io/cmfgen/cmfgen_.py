@@ -212,6 +212,17 @@ class CMFGENCollisionalDataParser(BaseParser):
             df = pd.DataFrame()
             warnings.warn('Empty table')
 
+        try:
+            n = int(find_row(fname, "Number of transitions").split()[0])
+
+            if df.shape[0] != n:
+                # Sometimes header values can't be trusted, e.g: NEON/III/19nov07/col_neiii 
+                # so we only display a warn instead of making an assertion
+                warnings.warn('`Number of transitions` and DataFrame dimension don\'t match')
+        
+        except AttributeError:
+            warnings.warn('File without header')
+
         self.base = df
         self.columns = df.columns.tolist()
 
