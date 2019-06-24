@@ -11,6 +11,10 @@ def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: ad
         n = 0
         for line in f:        
             n += 1
+
+            if how == 'one':
+                if string1 in line or string2 in line:
+                    break
             
             if how == 'both':
                 if string1 in line and string2 in line:
@@ -189,7 +193,13 @@ class CMFGENCollisionalDataParser(BaseParser):
         kwargs['index_col'] = False
         kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=Pe)-'  # TODO: this regex needs some review
         kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
-    
+
+        # FIXME: expensive solution for two files with more than one table 
+        # ARG/III/19nov07/col_ariii  &  HE/II/5dec96/he2col.dat
+        footer = find_row(fname, "Johnson values:", "dln_OMEGA_dlnT", how='one', num_row=True)
+        if footer is not None:
+            kwargs['nrows'] = footer -kwargs['skiprows'] -2
+
         try:
             names = find_row(fname, 'ransition\T').split()  # Not a typo
             # Comment next line when trying new regexes!
