@@ -185,13 +185,6 @@ class CMFGENCollisionalDataParser(BaseParser):
         kwargs['index_col'] = False
         kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=Pe)-'  # TODO: this regex needs some review
         kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
-
-        try:
-            n = find_row(fname, "Number of transitions").split()[0]
-            kwargs['nrows'] = int(n)
-    
-        except AttributeError:
-            pass
     
         try:
             names = find_row(fname, 'ransition\T').split()  # Not a typo
