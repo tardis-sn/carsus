@@ -240,7 +240,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             '!Total number of data pairs',
             ]
 
-    def _table_gen(self, f):  # TODO: Make assertion for the yielded DataFrame
+    def _table_gen(self, f):
         """ Generator. Yields a cross section table for an energy level """
         meta = {}
         data = []
@@ -272,7 +272,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 break
 
-        df = pd.DataFrame.from_records(data)
+        df = pd.DataFrame.from_records(data)  # TODO: make assertions for the yielded DataFrame
         df._meta = meta    
 
         yield df
@@ -319,6 +319,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 tables.append(df)
 
-        tables.insert(0, meta)
+        tables.insert(0, meta)  # TODO: assert the `tables` list length
         self.base = tables[1:]
         self.columns = tables[0]
