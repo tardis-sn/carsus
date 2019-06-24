@@ -5,7 +5,7 @@ import warnings
 from carsus.io.base import BaseParser
 
 
-def find_row(fname, string1, string2='', how='both', num_row=False):
+def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: add `skiprows` parameter
     """ Search strings inside plain text files and return values or matching row number. """
     with open(fname, encoding='ISO-8859-1') as f:
         n = 0
