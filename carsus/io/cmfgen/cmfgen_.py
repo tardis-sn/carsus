@@ -101,6 +101,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
         else:
             warnings.warn('Inconsistent number of columns')  # TODO: raise exception here (discuss)
 
+        assert df.shape[0] == int(n)
+
         self.base = df
         self.columns = df.columns.tolist()
 
@@ -160,6 +162,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         if df.shape[0] > 0 and 'D' in str(df['f'][0]):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
+
+        assert df.shape[0] == int(n)
 
         self.base = df
         self.columns = df.columns.tolist()
