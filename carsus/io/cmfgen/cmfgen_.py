@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import itertools
 import gzip
 import warnings
 from carsus.io.base import BaseParser
@@ -33,6 +34,18 @@ def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: ad
         return n
                     
     return line
+
+
+def parse_header(fname, keys, start=0, stop=50):
+    """ Returns a dictionary with header values """
+    meta = {}
+    with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
+        for line in itertools.islice(f, start, stop):  # start=17, stop=None
+            for k in keys:
+                if k in line:
+                    meta[k.strip('!')] = line.split()[0]
+    
+    return meta
 
 
 def to_float(string):
@@ -301,22 +314,8 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
     def load(self, fname):
     
-        meta = {}
+        meta = parse_header(fname, self.keys)
         tables = []
-
-        # There's only one .gz file: POT/I/4mar12/phot.tar.gz
-        with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
-
-            for line in f:
-                for k in self.keys:
-
-                    if k in line:
-                        meta[k.strip('!')] = line.split()[0]
-
-                        if '!Total number of data pairs' in line:
-                            break
-
-        # TODO: make this work in a single context
         with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
 
             while True:
