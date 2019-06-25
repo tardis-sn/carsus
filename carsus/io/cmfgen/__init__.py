@@ -1,4 +1,4 @@
-from carsus.io.cmfgen.cmfgen_ import (CMFGENOscillatorStrengthsParser, 
-                                      CMFGENEnergyLevelsParser,
-                                      CMFGENCollisionalDataParser,
-                                      CMFGENPhotoionizationCrossSectionParser)
+from carsus.io.cmfgen.base import (CMFGENOscillatorStrengthsParser, 
+                                   CMFGENEnergyLevelsParser,
+                                   CMFGENCollisionalDataParser,
+                                   CMFGENPhotoionizationCrossSectionParser)
