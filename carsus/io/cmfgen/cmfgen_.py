@@ -201,7 +201,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         self.base = df
         self.columns = df.columns.tolist()
         self.meta = meta
-        
+
 
 class CMFGENCollisionalDataParser(BaseParser):
     """
@@ -216,8 +216,14 @@ class CMFGENCollisionalDataParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute
     """
 
+    keys = ['!Number of transitions',  # Metadata to parse from header. TODO: look for more keys
+            '!Number of T values OMEGA tabulated at', 
+            '!Scaling factor for OMEGA (non-FILE values)', 
+            '!Value for OMEGA if f=0',
+            ]
+
     def load(self, fname):
-    
+        meta = parse_header(fname, self.keys)       
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
@@ -253,19 +259,19 @@ class CMFGENCollisionalDataParser(BaseParser):
             warnings.warn('Empty table')
 
         try:
-            n = int(find_row(fname, "Number of transitions").split()[0])
-
+            n = int(meta['Number of transitions'])
             if df.shape[0] != n:
                 # Sometimes header values can't be trusted, e.g: NEON/III/19nov07/col_neiii 
                 # so we only display a warn instead of making an assertion
                 warnings.warn('`Number of transitions` and DataFrame dimension don\'t match')
         
-        except AttributeError:
+        except TypeError:  # int(None) triggers a TypeError
             warnings.warn('File without header')
 
+        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
-
+        self.meta = meta
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     """
