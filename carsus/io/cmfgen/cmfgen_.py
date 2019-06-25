@@ -42,7 +42,7 @@ def parse_header(fname, keys, start=0, stop=50):
     with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f :
         for line in itertools.islice(f, start, stop):  # start=17, stop=None
             for k in keys:
-                if k in line:
+                if k.lower() in line.lower():
                     meta[k.strip('!')] = line.split()[0]
 
     return meta
