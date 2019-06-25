@@ -7,7 +7,28 @@ from carsus.io.base import BaseParser
 
 
 def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: add `skiprows` parameter
-    """ Search strings inside plain text files and return values or matching row number. """
+    """Search strings inside plain text files and returns matching line or row number.
+    
+    Parameters
+    ----------
+    fname : str
+        Path to plain text file.
+    string1 : str
+        String to search.    
+    string2 : str
+        Extra string to search (default is '').
+    how : {'one', 'both', 'first'}
+        If 'both' search for string1 AND string2. If 'one' search for string1 OR string2.\
+            If 'first' searches for 'string1' AND NOT string2 (default is 'both').
+    num_row : bool
+        If true, returns row number instead (default is False).
+
+    Returns
+    -------
+    str or int
+        Returns matching line or row number.
+
+    """
     with open(fname, encoding='ISO-8859-1') as f:
         n = 0
         for line in f:        
@@ -37,7 +58,25 @@ def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: ad
 
 
 def parse_header(fname, keys, start=0, stop=50):
-    """ Returns a dictionary with header values """
+    """Parse header from CMFGEN files.
+    
+    Parameters
+    ----------
+    fname : str
+        Path to plain text file.
+    keys : list of str
+        Entries to search.    
+    start : int
+        First line to search in (default is 0).
+    stop : int
+        Last line to search in (default is 50).
+
+    Returns
+    -------
+    dict
+        Dictionary containing metadata.
+
+    """  
     meta = {k.strip('!'): None for k in keys}
     with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f :
         for line in itertools.islice(f, start, stop):  # start=17, stop=None
@@ -71,7 +110,9 @@ class CMFGENEnergyLevelsParser(BaseParser):
         base : pandas.DataFrame
         columns : list of str
             (default value = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)'])
-            
+        meta : dict 
+            Metadata parsed from file header.
+
         Methods
         -------
         load(fname)
@@ -143,6 +184,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         base : pandas.DataFrame
         columns : list of str
             (default value = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
+        meta : dict 
+            Metadata parsed from file header.
             
         Methods
         -------
@@ -209,6 +252,8 @@ class CMFGENCollisionalDataParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
+        meta : dict 
+            Metadata parsed from file header.
             
         Methods
         -------
@@ -278,7 +323,9 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         Description
         ----------
         base : list of pandas.DataFrame 's
-        columns : dictionary with photoionization cross-section file metadata
+        columns : list of str
+        meta : dict 
+            Metadata parsed from file header.
             
         Methods
         -------
@@ -366,4 +413,5 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
         self.fname = fname
         self.base = tables[1:]
-        self.columns = tables[0]
+        self.columns = []
+        self.meta = tables[0]
