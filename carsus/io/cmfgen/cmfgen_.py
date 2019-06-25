@@ -38,13 +38,13 @@ def find_row(fname, string1, string2='', how='both', num_row=False):  # TODO: ad
 
 def parse_header(fname, keys, start=0, stop=50):
     """ Returns a dictionary with header values """
-    meta = {}
-    with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f :
+    meta = {k.strip('!'): None for k in keys}
+    with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f :
         for line in itertools.islice(f, start, stop):  # start=17, stop=None
             for k in keys:
                 if k in line:
                     meta[k.strip('!')] = line.split()[0]
-    
+
     return meta
 
 
@@ -78,16 +78,26 @@ class CMFGENEnergyLevelsParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute
     """
 
+    keys = ['!Date',  # Metadata to parse from header. TODO: look for more keys
+            '!Format date', 
+            '!Number of energy levels', 
+            '!Ionization energy',
+            '!Screened nuclear charge',
+            '!Number of transitions',
+            ]
+
     def load(self, fname):
+
+        meta = parse_header(fname, self.keys)
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
         kwargs['sep'] = '\s+'
         kwargs['skiprows'] = find_row(fname, "Number of transitions", num_row=True)
-    
-        n = find_row(fname, "Number of energy levels").split()[0]
-        kwargs['nrows'] = int(n)
-
+        
+        n = int(meta['Number of energy levels'])
+        kwargs['nrows'] = n
+        
         columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
         
         try:
@@ -120,8 +130,10 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         assert df.shape[0] == int(n)
 
+        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
+        self.meta = meta
 
 
 class CMFGENOscillatorStrengthsParser(BaseParser):
@@ -139,6 +151,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
+        
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
@@ -262,7 +275,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         load(fname)
             Parses the input data and stores the results in the `base` attribute
     """
-    keys = ['!Date',  # Metadata to parse from header
+    keys = ['!Date',
             '!Number of energy levels', 
             '!Number of photoionization routes', 
             '!Screened nuclear charge',
