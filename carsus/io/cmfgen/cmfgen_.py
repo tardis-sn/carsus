@@ -128,7 +128,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         else:
             warnings.warn('Inconsistent number of columns')  # TODO: raise exception here (discuss)
 
-        assert df.shape[0] == int(n)
+        assert df.shape[0] == n
 
         self.fname = fname
         self.base = df
