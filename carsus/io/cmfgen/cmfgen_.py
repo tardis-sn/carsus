@@ -363,5 +363,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 tables.append(df)
 
         tables.insert(0, meta)  # TODO: assert the `tables` list length
+
+        self.fname = fname
         self.base = tables[1:]
         self.columns = tables[0]
