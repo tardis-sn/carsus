@@ -150,8 +150,10 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute
     """
 
+    keys = CMFGENEnergyLevelsParser.keys
+
     def load(self, fname):
-        
+        meta = parse_header(fname, self.keys)    
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
@@ -159,8 +161,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         kwargs['skiprows'] = find_row(fname, "Transition", "Lam", num_row=True) +1
 
         # Will only parse tables listed increasing lower level i, e.g. FE/II/24may96/osc_nahar.dat
-        n = find_row(fname, "Number of transitions").split()[0]  
-        kwargs['nrows'] = int(n)
+        n = int(meta['Number of transitions'])  
+        kwargs['nrows'] = n
 
         columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     
@@ -193,11 +195,13 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
 
-        assert df.shape[0] == int(n)
+        assert df.shape[0] == n
 
+        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
-
+        self.meta = meta
+        
 
 class CMFGENCollisionalDataParser(BaseParser):
     """
