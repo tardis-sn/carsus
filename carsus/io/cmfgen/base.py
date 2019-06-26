@@ -175,8 +175,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         else:
             warnings.warn('Inconsistent number of columns')  # TODO: raise exception here (discuss)
 
-        assert df.shape[0] == n
-
         self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
@@ -244,8 +242,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
 
-        assert df.shape[0] == n
-
         self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
@@ -308,16 +304,6 @@ class CMFGENCollisionalDataParser(BaseParser):
         except pd.errors.EmptyDataError:
             df = pd.DataFrame()
             warnings.warn('Empty table')
-
-        try:
-            n = int(meta['Number of transitions'])
-            if df.shape[0] != n:
-                # Sometimes header values can't be trusted, e.g: NEON/III/19nov07/col_neiii 
-                # so we only display a warn instead of making an assertion
-                warnings.warn('`Number of transitions` and DataFrame dimension don\'t match')
-        
-        except TypeError:  # int(None) triggers a TypeError
-            warnings.warn('File without header')
 
         self.fname = fname
         self.base = df
@@ -382,7 +368,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 break
 
-        df = pd.DataFrame.from_records(data)  # TODO: make assertions for the yielded DataFrame
+        df = pd.DataFrame.from_records(data)
         df._meta = meta    
 
         yield df
@@ -415,7 +401,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 tables.append(df)
 
-        tables.insert(0, meta)  # TODO: assert the `tables` list length
+        tables.insert(0, meta)
 
         self.fname = fname
         self.base = tables[1:]
