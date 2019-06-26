@@ -88,7 +88,13 @@ def parse_header(fname, keys, start=0, stop=50):
 
 
 def to_float(string):
-    """ String to float, taking care of Fortran 'D' values """
+    """ String to float, taking care of Fortran 'D' values
+    
+    Parameters
+    ----------
+    string : str
+
+    """  
     try:
         value = float(string.replace('D', 'E'))
     
