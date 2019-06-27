@@ -82,7 +82,7 @@ def parse_header(fname, keys, start=0, stop=50):
     """
     meta = {k.strip('!'): None for k in keys}
     with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f:
-        for line in itertools.islice(f, start, stop):  # start=17, stop=None
+        for line in itertools.islice(f, start, stop):
             for k in keys:
                 if k.lower() in line.lower():
                     meta[k.strip('!')] = line.split()[0]
@@ -125,7 +125,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute
+            Parses the input data and stores the results in the `base` attribute.
     """
 
     keys = ['!Date',  # Metadata to parse from header. TODO: look for more keys
@@ -201,7 +201,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute
+            Parses the input data and stores the results in the `base` attribute.
     """
 
     keys = CMFGENEnergyLevelsParser.keys
@@ -267,7 +267,7 @@ class CMFGENCollisionalDataParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute
+            Parses the input data and stores the results in the `base` attribute.
     """
 
     keys = ['!Number of transitions',  # Metadata to parse from header. TODO: look for more keys
@@ -330,7 +330,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute
+            Parses the input data and stores the results in the `base` attribute.
     """
     keys = ['!Date',
             '!Number of energy levels',
