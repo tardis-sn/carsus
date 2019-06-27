@@ -156,8 +156,12 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         # Assign column names by file content
         if df.shape[1] == 10:
+            # Read column names and split them keeping one space (e.g. '10^15 Hz')
             columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
-            columns = list(filter(lambda x: x != '', columns))
+            # Filter list elements containing empty strings
+            columns = [ c for c in columns if c != '' ]
+            # Remove left spaces and newlines
+            columns = [ c.rstrip().lstrip() for c in columns ]
             columns = ['Configuration'] + columns
             df.columns = columns
 
