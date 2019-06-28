@@ -75,7 +75,7 @@ install:
     - git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata
     - export CARSUS_REFDATA=$HOME/carsus-refdata
     # Fetch the testing database from carsus-db
-    - if [[ $TEST_MODE == 'with_test_db' ]]; then conda install -c ostrokach git-lfs=1.2.1 -y; fi
+    - if [[ $TEST_MODE == 'with_test_db' ]]; then conda install -c conda-forge git-lfs -y; fi
     - if [[ $TEST_MODE == 'with_test_db' ]]; then git lfs install --skip-smudge; fi
     - if [[ $TEST_MODE == 'with_test_db' ]]; then git clone $CARSUS_DB_URL $HOME/carsus-db; fi
     - if [[ $TEST_MODE == 'with_test_db' ]]; then cd $HOME/carsus-db; fi
