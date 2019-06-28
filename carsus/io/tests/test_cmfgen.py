@@ -9,7 +9,6 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENPhotoionizationCrossSectionParser,
                              )
 
-pytestmark = pytest.mark.skip(reason="Travis CI is not correctly set up for this test yet")
 
 REF_DATA_DIR = os.getenv('CARSUS_REFDATA')
 
