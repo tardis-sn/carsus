@@ -294,7 +294,7 @@ class CMFGENCollisionalDataParser(BaseParser):
             names = find_row(fname, 'ransition\T').split()  # Not a typo
             # Comment next line when trying new regexes!
             names = [np.format_float_scientific(to_float(x)*1e+04, precision=4) for x in names[1:]]
-            kwargs['names'] = ['State A', 'State B'] + names[1:]
+            kwargs['names'] = ['State A', 'State B'] + names
 
         except AttributeError:
             warnings.warn('No column names')  # TODO: some files have no column names nor header
