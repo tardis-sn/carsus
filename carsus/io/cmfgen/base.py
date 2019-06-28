@@ -317,6 +317,11 @@ class CMFGENCollisionalDataParser(BaseParser):
         self.columns = df.columns.tolist()
         self.meta = meta
 
+    def to_hdf(self, key='/collisional_data'):
+        with pd.HDFStore(self.fname + '.h5', 'a') as f:
+            f.append(key, self.base, format='table', data_columns=self.columns)
+            f.get_storer(key).attrs.metadata = self.meta
+
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     """
@@ -412,7 +417,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         self.base = tables
         self.columns = []
         self.meta = meta
-
 
     def to_hdf(self, key='/photoionization_cross_sections'):
 
