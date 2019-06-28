@@ -6,7 +6,7 @@ dist: xenial
 language: python
 
 python:
-    - 3.7
+    - 3.6
 
 cache:
   apt: true
@@ -22,31 +22,32 @@ env:
         - MINICONDA_URL='http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
         - CHIANTI_DATA_URL='http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz'
         - CARSUS_DB_URL='https://github.com/tardis-sn/carsus-db.git'
+        - CARSUS_REFDATA_URL='https://github.com/epassaro/carsus-refdata.git'
 
 matrix:
     include:
 
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test'
 
         # Test with remote data
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test --remote-data'
 
         # Test with slow tests
-        - python: 3.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--runslow"'
             - INSTALL_CHIANTI=true
 
         # Test with the test database
-        - python: 3.7
+        - python: 3.6
           env:
             - SETUP_CMD='test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
             - TEST_MODE='with_test_db'
 
         # Do a coverage test in Python 3.
-        - python: 3.7
+        - python: 3.6
           env: SETUP_CMD='test --coverage'
 
 before_install:
@@ -69,6 +70,10 @@ install:
     - wget $CHIANTI_DATA_URL -O $HOME/chianti/CHIANTI_9.0_data.tar.gz
     - tar -zxvf $HOME/chianti/CHIANTI_9.0_data.tar.gz -C $HOME/chianti
     - export XUVTOP=$HOME/chianti
+    # Fetch the CMFGEN sample files
+    - mkdir $HOME/carsus-refdata
+    - git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata
+    - export CARSUS_REFDATA=$HOME/carsus-refdata
     # Fetch the testing database from carsus-db
     - if [[ $TEST_MODE == 'with_test_db' ]]; then conda install -c ostrokach git-lfs=1.2.1 -y; fi
     - if [[ $TEST_MODE == 'with_test_db' ]]; then git lfs install --skip-smudge; fi
