@@ -254,6 +254,11 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         self.columns = df.columns.tolist()
         self.meta = meta
 
+    def to_hdf(self, key='/oscillator_strengths'):
+        with pd.HDFStore(self.fname + '.h5', 'a') as f:
+            f.append(key, self.base, format='table', data_columns=self.columns)
+            f.get_storer(key).attrs.metadata = self.meta
+
 
 class CMFGENCollisionalDataParser(BaseParser):
     """
