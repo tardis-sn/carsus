@@ -22,7 +22,7 @@ env:
         - MINICONDA_URL='http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
         - CHIANTI_DATA_URL='http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz'
         - CARSUS_DB_URL='https://github.com/tardis-sn/carsus-db.git'
-        - CARSUS_REFDATA_URL='https://github.com/epassaro/carsus-refdata.git'
+        - CARSUS_REFDATA_URL='https://github.com/tardis-sn/carsus-refdata.git'
 
 matrix:
     include:
