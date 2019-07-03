@@ -40,7 +40,8 @@ def pytest_addoption(parser):
                      help="include running slow tests during run")
     parser.addoption("--test-db", dest='test-db', default=None,
                      help="filename for the testing database")
-
+    parser.addoption("--refdata", dest='refdata', default=None,
+                     help="carsus-refdata folder location")
 
 @pytest.fixture
 def memory_session():
@@ -103,3 +104,12 @@ def test_session(test_engine, request):
     request.addfinalizer(fin)
 
     return session
+
+
+@pytest.fixture(scope="session")
+def refdata_path(request):
+    refdata_path = request.config.getoption("--refdata")
+    if refdata_path is None:
+        pytest.skip('--refdata folder path was not specified')
+    else:
+        return os.path.expandvars(os.path.expanduser(refdata_path))

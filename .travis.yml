@@ -46,6 +46,11 @@ matrix:
             - SETUP_CMD='test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
             - TEST_MODE='with_test_db'
 
+        - python: 3.6
+          env:
+            - SETUP_CMD='test --args="--refdata=$CARSUS_REFDATA"'
+            - TEST_MODE='with_refdata'
+
         # Do a coverage test in Python 3.
         - python: 3.6
           env: SETUP_CMD='test --coverage'
