@@ -1,0 +1,118 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+
+# Specify which branches you want to trigger for continuous deployment and/or applicable for pull requests.
+# Otherwise it triggers all of them.
+
+trigger:
+- master
+
+pr:
+- master
+
+# Consistent environment variables
+variables:
+  system.debug: "true"
+  PANDAS_VERSION: 0.24
+  ASTROPY_USE_SYSTEM_PYTEST: 1
+  SETUP_CMD: "test"
+  TEST_MODE: "normal"
+  CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
+  CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
+  PYTHONIOENCODING: UTF8
+  CONDA: "/usr/share/miniconda"
+  XUVTOP: "/usr/share/chianti"
+  PYTHON_VERSION: '3.7'
+
+jobs:
+
+- job: "Test"
+
+# Five different tests with different inputs
+  pool:
+    vmImage: "Ubuntu-16.04"
+  strategy:
+    matrix:
+      simple:
+        SETUP_CMD: "test"
+      remote_data:
+        SETUP_CMD: "test --remote-data"
+      slow:
+        SETUP_CMD: 'test --args="--runslow"'
+        INSTALL_CHIANTI: true
+      database:
+        SETUP_CMD: 'test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
+        TEST_MODE: "with_test_db"
+      coverage:
+        SETUP_CMD: 'test --coverage'
+    
+    maxParallel: 5
+
+  steps:
+
+# Add conda to path
+  - bash: |
+          echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+# Update conda and change its permissions to the Azure user 'vsts'
+  - bash: |
+          sudo chown -R $USER $CONDA
+          conda update -y conda
+    displayName: "updating conda and activating"
+
+  - bash: |
+          conda env create -f carsus_env3.yml
+    displayName: "Install Carsus env"
+
+# Download chianti data for tests
+  - bash: |
+          mkdir /usr/share/chianti
+          wget $CHIANTI_DATA_URL -O /usr/share/chianti/CHIANTI_9.0_data.tar.gz
+          tar -zxvf /usr/share/chianti/CHIANTI_9.0_data.tar.gz -C /usr/share/chianti
+    displayName: "Fetch Chianti Data"
+
+# Download database testing data for TEST_MODE
+  - bash: |
+          source activate carsus
+          conda install -c ostrokach git-lfs=1.2.1 -y
+          git lfs install --skip-smudge
+          git clone $CARSUS_DB_URL $HOME/carsus-db
+          cd $HOME/carsus-db
+          git lfs pull --include="test_databases/test.db" origin
+    condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
+    displayName: "Fetch the testing database from carsus-db"
+
+# Activate environment and start test
+  - bash: |
+          source activate carsus
+          echo python setup.py $SETUP_CMD
+          python setup.py $SETUP_CMD
+    displayName: "TARDIS test"
+
+# Make a coverage file in xml for Azure
+  - bash: |
+          source activate carsus
+          coverage xml
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], 'test --coverage'))
+    displayName: "Make xml file to publish"
+    
+# Publish Code Coverage Results
+# Publish Cobertura or JaCoCo code coverage results from a build
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'cobertura'
+      summaryFileLocation: '$(Build.Repository.LocalPath)/coverage.xml'
+      reportDirectory: '$(Build.Repository.LocalPath)/htmlcov'
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], 'test --coverage'))
+    displayName: "Publish Results of coverage"
+
+# Clean up in case of failure
+  - bash: |
+          source activate carsus
+          python -m sphinx --version
+    condition: failed()
+    displayName: 'Failure'
