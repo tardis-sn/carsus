@@ -10,5 +10,6 @@ datasets.
 
 .. toctree::
 
+    cmfgen/index.rst
     kurucz/index.rst
     nist/index.rst
