@@ -173,7 +173,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = df.drop(columns=['#'])
 
         elif df.shape[1] == 6:
-            df.columns = range(6)  # FIXME: These files don't have column names
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '#']
+            df = df.drop(columns=['#'])
 
         elif df.shape[1] == 5:
             df.columns = columns[:-2] + ['#']
