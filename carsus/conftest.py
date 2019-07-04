@@ -2,7 +2,8 @@
 # by importing them here in conftest.py they are discoverable by py.test
 # no matter how it is invoked within the source tree.
 
-from astropy.tests.plugins.config import *
+import pytest
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
