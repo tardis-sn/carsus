@@ -7,7 +7,7 @@ channels:
 dependencies:
 - python=3
 - numpy=1.15
-- pandas=0.22
+- pandas=0.24
 - astropy=3.2
 - Cython=0.29  # TARDIS dep
 - numexpr
@@ -17,7 +17,7 @@ dependencies:
 
 # I/O
 - beautifulsoup4
-- pyparsing=2.1.10
+- pyparsing=2.4.0
 - html5lib
 - SQLAlchemy=1.0.19
 - PyYAMl
@@ -31,9 +31,16 @@ dependencies:
 - matplotlib
 
 # Documentation
-- sphinx=1.5.6
+- sphinx
+- nbconvert
 - numpydoc
 - docutils
+- nbformat
+- sphinx_bootstrap_theme
+- sphinxcontrib-bibtex
+- sphinx_rtd_theme
+- nbsphinx
+- recommonmark
 
 # Test/Coverage requirements
 - coverage
@@ -47,7 +54,3 @@ dependencies:
 - pip:
   - git+https://github.com/tardis-sn/tardis
   - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
-  #- sphinx_bootstrap_theme
-  #- sphinxcontrib-bibtex
-  #- sphinxcontrib-tikz
-  #- nbsphinx
