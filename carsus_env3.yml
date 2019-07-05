@@ -36,12 +36,16 @@ dependencies:
 - docutils
 
 # Test/Coverage requirements
-- coverage
-- coveralls
-- pytest=4.5.0
-- pytest-cov
-- pytest-astropy
+- git-lfs
+- pytest
+- pytest-html
 - requests
+- coverage
+- docopt
+- pytest-cov
+- codecov
+
+
 
 # Pip
 - pip:
