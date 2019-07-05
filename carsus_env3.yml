@@ -32,26 +32,25 @@ dependencies:
 
 # Documentation
 - sphinx
+- nbconvert
 - numpydoc
 - docutils
+- nbformat
+- sphinx_bootstrap_theme
+- sphinxcontrib-bibtex
+- sphinx_rtd_theme
+- nbsphinx
+- recommonmark
+
 
 # Test/Coverage requirements
-- git-lfs
-- pytest
-- pytest-html
-- requests
 - coverage
-- docopt
+- pytest
 - pytest-cov
-- codecov
-
-
+- pytest-astropy
+- requests
 
 # Pip
 - pip:
   - git+https://github.com/tardis-sn/tardis
-#  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
-  #- sphinx_bootstrap_theme
-  #- sphinxcontrib-bibtex
-  #- sphinxcontrib-tikz
-  #- nbsphinx
+  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
