@@ -86,6 +86,12 @@ jobs:
     condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
     displayName: "Fetch the testing database from carsus-db"
 
+# Build carsus
+  - bash: |
+        source activate carsus
+        python setup.py build_ext --inplace
+    displayName: 'Carsus build'
+
 # Activate environment and start test
   - bash: |
           source activate carsus
