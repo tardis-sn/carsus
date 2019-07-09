@@ -1170,8 +1170,9 @@ class AtomData(object):
 
             md5_hash = hashlib.md5()
             for key in store.keys():
-                md5_hash.update(store[key].values.data)
-
+                tmp = np.ascontiguousarray(store[key].values.data)
+                md5_hash.update(tmp)
+                
             uuid1 = uuid.uuid1().hex
 
             print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
