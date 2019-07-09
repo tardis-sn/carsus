@@ -14,10 +14,6 @@ with_test_db = pytest.mark.skipif(
     reason="--testing database was not specified"
 )
 
-skipme = pytest.mark.skip(reason="TypeError: cannot do label indexing on\
-     <class 'pandas.core.indexes.base.Index'>with these indexers [1] of <class 'int'>")
-
-
 @pytest.fixture
 def atom_data(test_session, chianti_short_name):
     atom_data = AtomData(test_session,
@@ -305,8 +301,9 @@ def test_create_lines_convert_air2vacuum(lines, atomic_number, ion_number, level
 def test_create_lines_loggf_treshold(lines, atomic_number, ion_number, level_number_lower, level_number_upper):
     lines = lines.set_index(["atomic_number", "ion_number",
                              "level_number_lower", "level_number_upper"])
-    with pytest.raises(KeyError):
-        lines.loc[(atomic_number, ion_number, level_number_lower, level_number_upper)]
+    # Normally this would raise a `KeyError`. Keep this in mind for future releases of Pandas.
+    with pytest.raises(TypeError):
+        assert lines.loc[(atomic_number, ion_number, level_number_lower, level_number_upper)]
 
 
 @with_test_db
