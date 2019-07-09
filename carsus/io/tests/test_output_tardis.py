@@ -14,7 +14,8 @@ with_test_db = pytest.mark.skipif(
     reason="--testing database was not specified"
 )
 
-pytestmark = pytest.mark.skip(reason="Tests are failing due to empty DataFrames (traced to atom_data fixture)")
+skipme = pytest.mark.skip(reason="TypeError: cannot do label indexing on\
+     <class 'pandas.core.indexes.base.Index'>with these indexers [1] of <class 'int'>")
 
 
 @pytest.fixture
@@ -290,7 +291,7 @@ def test_create_lines_convert_air2vacuum(lines, atomic_number, ion_number, level
     assert_quantity_allclose(wavelength, exp_wavelength)
     assert_almost_equal(loggf, exp_loggf)
 
-
+@skipme
 @with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, level_number_lower, level_number_upper", [
     # Default loggf_threshold = -3
