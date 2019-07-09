@@ -27,7 +27,7 @@ class KnoxLongZetaIngester(object):
 
         zeta = np.recfromtxt(
                 self.data_fn,
-                usecols=xrange(1, 23),
+                usecols=range(1, 23),
                 names=names)
 
         zeta_df = (
@@ -41,7 +41,7 @@ class KnoxLongZetaIngester(object):
             if T.id is None:
                 self.session.flush()
 
-            for (atomic_number, ion_charge), rate in s.iteritems():
+            for (atomic_number, ion_charge), rate in s.items():
                 data.append(
                     Zeta(
                             atomic_number=atomic_number,
