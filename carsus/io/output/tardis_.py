@@ -166,7 +166,7 @@ class AtomData(object):
         }
 
         try:
-            self.selected_atomic_numbers = parse_selected_atoms(selected_atoms)
+            self.selected_atomic_numbers = list(map(int, parse_selected_atoms(selected_atoms)))
         except ParseException:
             raise ValueError('Input is not a valid atoms string {}'.format(selected_atoms))
 
@@ -175,6 +175,8 @@ class AtomData(object):
 
             try:
                 self.chianti_ions = parse_selected_species(chianti_ions)
+                self.chianti_ions = [ tuple(map(int,t)) for t in self.chianti_ions ]
+                
             except ParseException:
                 raise ValueError('Input is not a valid species string {}'.format(chianti_ions))
 
