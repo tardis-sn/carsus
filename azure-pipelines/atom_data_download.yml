@@ -9,14 +9,14 @@ variables:
 
 jobs:
 
-- job: "Fetch Atomic Data"
+- job: "Fetch_Atomic_Data"
 
-# Five different tests with different inputs
+# Agent pool and vm image
   pool:
     vmImage: "Ubuntu-16.04"
     
   steps:
-# Download chianti data for tests
+# Download atomic data for tests
   - bash: |
           mkdir /usr/share/ATOMIC_DATA
           wget $ATOMIC_DATA_URL -O /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz
