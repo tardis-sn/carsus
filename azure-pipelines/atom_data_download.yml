@@ -24,11 +24,6 @@ jobs:
     displayName: "Fetch atomic data"
 
   - bash: |
-          echo 'No need to update data'
-    condition: and(succeeded(), eq(variables['Hash_Check'],`md5sum atomic_data_15nov16.tar.gz`))
-    displayName: "Check if data is the same"
-
-  - bash: |
           check = `md5sum atomic_data_15nov16.tar.gz`
     displayName: "Assign hash value"
 
