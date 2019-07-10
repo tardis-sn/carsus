@@ -27,7 +27,22 @@ jobs:
   - bash: |
           check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
           echo $check
-    displayName: "Assign hash value"
+          echo "$check"
+          echo $(Hash_Check)
+          echo "$(Hash_Check)"
+          if [ "$(Hash_Check)" = "$check" ] ; then
+              echo 'test 1 succeeded' 
+          fi
+          if [ "$Hash_Check" = "$check" ] ; then
+              echo 'test 2 succeeded' 
+          fi
+          if [ $(Hash_Check) = "$check" ] ; then
+              echo 'test 3 succeeded' 
+          fi
+          if [ "$(Hash_Check)" = $check ] ; then
+              echo 'test 4 succeeded' 
+          fi
+    displayName: "debugging"
 
   - bash: |
           if [ "$(Hash_Check)" = "$check" ] ; then
