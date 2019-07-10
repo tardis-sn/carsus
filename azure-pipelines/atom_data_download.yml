@@ -5,7 +5,8 @@ pr:
 - none
 
 variables:
-  ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/cur_cmf_5may17.tar.gz"
+  ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
+  Hash_Check: "6947fe93c60fd266f8b4fbcaad9c7937  atomic_data_15nov16.tar.gz"
 
 jobs:
 
@@ -20,7 +21,22 @@ jobs:
   - bash: |
           mkdir /usr/share/ATOMIC_DATA
           wget $ATOMIC_DATA_URL -O /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz
-          tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
-    displayName: "Fetch Atomic Data"
+    displayName: "Fetch atomic data"
 
-    
+  - bash: |
+          echo 'No need to update data'
+    condition: and(succeeded(), eq(variables['Hash_Check'],`md5sum atomic_data_15nov16.tar.gz`))
+    displayName: "Check if data is the same"
+
+  - bash: |
+          check = `md5sum atomic_data_15nov16.tar.gz`
+    displayName: "Assign hash value"
+
+  - bash: |
+          echo 'No need to update data'
+    condition: and(succeeded(), eq(variables['Hash_Check'],check))
+    displayName: "Check if data is the same"
+
+  - bash: |
+          tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
+    displayName: "Unload atomic data"
