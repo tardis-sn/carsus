@@ -7,7 +7,7 @@ pr:
 variables:
   system.debug: 'true'
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
-  Hash_Check: "6947fe93c60fd266f8b4fbcaad9c7937  atomic_data_15nov16.tar.gz"
+  Hash_Check: "6947fe93c60fd266f8b4fbcaad9c7937  /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz"
 
 jobs:
 
