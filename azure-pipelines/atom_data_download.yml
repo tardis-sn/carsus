@@ -30,7 +30,7 @@ jobs:
     displayName: "Assign hash value"
 
   - bash: |
-          if [ $(Hash_Check) = $check ] ; then
+          if [ "$(Hash_Check)" = "$check" ] ; then
               echo 'No need to update data' ; else
               tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
