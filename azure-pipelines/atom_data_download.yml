@@ -5,6 +5,7 @@ pr:
 - none
 
 variables:
+  system.debug: 'true'
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
   Hash_Check: "6947fe93c60fd266f8b4fbcaad9c7937  atomic_data_15nov16.tar.gz"
 
@@ -25,11 +26,11 @@ jobs:
 
   - bash: |
           check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
-          echo $(check)
+          echo $check
     displayName: "Assign hash value"
 
   - bash: |
-          if [ $(Hash_Check) = $(check) ] ; then
+          if [ $(Hash_Check) = $check ] ; then
               echo 'No need to update data' ; else
               tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
