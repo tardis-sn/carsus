@@ -24,7 +24,7 @@ jobs:
     displayName: "Fetch atomic data"
 
   - bash: |
-          check=`md5sum atomic_data_15nov16.tar.gz`
+          check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
     displayName: "Assign hash value"
 
   - bash: |
