@@ -27,14 +27,6 @@ jobs:
   - bash: |
           check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
           if [ "$(Hash_Check)" = "$check" ]; then
-              echo 'test 1 succeeded'; else
-              echo 'test 1 failed'
-          fi
-    displayName: "debugging"
-
-  - bash: |
-          check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
-          if [ "$(Hash_Check)" = "$check" ]; then
               echo 'No need to update data'; else
               tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
