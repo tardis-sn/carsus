@@ -28,10 +28,9 @@ jobs:
     displayName: "Assign hash value"
 
   - bash: |
-          echo 'No need to update data'
-    condition: and(succeeded(), eq(variables['Hash_Check'],check))
+          if [ "$(Hash_Check)" = check ] ; then
+              echo 'No need to update data'
+          else [tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA]
+          fi
     displayName: "Check if data is the same"
 
-  - bash: |
-          tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
-    displayName: "Unload atomic data"
