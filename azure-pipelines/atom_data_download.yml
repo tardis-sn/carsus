@@ -29,7 +29,8 @@ jobs:
 
   - bash: |
           if [ "$(Hash_Check)" = check ] ; then
-              echo 'No need to update data'
+              echo 'No need to update data' ; else
+              tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
     displayName: "Check if data is the same"
 
