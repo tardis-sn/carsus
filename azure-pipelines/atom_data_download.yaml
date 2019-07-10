@@ -1,0 +1,26 @@
+trigger:
+- none
+
+pr:
+- none
+
+variables:
+  ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/cur_cmf_5may17.tar.gz"
+
+jobs:
+
+- job: "Fetch Atomic Data"
+
+# Five different tests with different inputs
+  pool:
+    vmImage: "Ubuntu-16.04"
+    
+  steps:
+# Download chianti data for tests
+  - bash: |
+          mkdir /usr/share/ATOMIC_DATA
+          wget $ATOMIC_DATA_URL -O /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz
+          tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
+    displayName: "Fetch Atomic Data"
+
+    
