@@ -31,7 +31,9 @@ jobs:
 
   - bash: |
           hash_check_1=`cat hash_check_1`
+          echo $hash_check_1
           hash_check_2=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
+          echo $hash_check_2
           if [ "$hash_check_1" = "$hash_check_2" ]; then
               echo 'No need to update data'; else
               sed -i 's/$hash_check_1/$hash_check_2/g' hash_check_1
