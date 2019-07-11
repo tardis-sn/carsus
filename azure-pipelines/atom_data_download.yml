@@ -7,7 +7,7 @@ pr:
 variables:
   system.debug: 'true'
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
-
+  SSH_REPO: git@github.com:tardis-sn/carsus.git
 jobs:
 
 - job: "Fetch_Atomic_Data"
@@ -68,5 +68,5 @@ jobs:
             exit 0
           fi
           git commit -m "Add new reference data and update hash code"
-          git push origin atom_data_pipeline
+          git push $(SSH_REPO) atom_data_pipeline
     displayName: "Push to github branch"
