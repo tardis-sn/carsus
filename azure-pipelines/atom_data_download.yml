@@ -39,6 +39,13 @@ jobs:
      #sshPassphrase: # Optional - leave empty if it was left empty while generating the key
      sshKeySecureFile: 'id_carsus_rsa'
 
+# Configure github
+  - bash: |
+          git config --local user.name "Azure Pipelines"
+          git config --local user.email "azuredevops@microsoft.com"
+          git checkout atom_data_pipeline || git checkout --orphan atom_data_pipeline
+          git pull $(SSH_REPO) atom_data_pipeline
+    displayName: "Configure github"
 
 # Download atomic data for tests
   - bash: |
@@ -60,8 +67,6 @@ jobs:
 
 # Push to github
   - bash: |
-          git config --local user.name "Azure Pipelines"
-          git config --local user.email "azuredevops@microsoft.com"
           git add --all
           if git diff --staged --quiet; then
             echo "exiting with no docs changes"
