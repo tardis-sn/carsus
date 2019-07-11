@@ -7,7 +7,6 @@ pr:
 variables:
   system.debug: 'true'
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
-  Hash_Check: "6947fe93c60fd266f8b4fbcaad9c7937  /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz"
 
 jobs:
 
@@ -18,6 +17,12 @@ jobs:
     vmImage: "Ubuntu-16.04"
     
   steps:
+
+# Python script
+# Run a Python file or inline script
+
+
+
 # Download atomic data for tests
   - bash: |
           mkdir /usr/share/ATOMIC_DATA
@@ -25,9 +30,13 @@ jobs:
     displayName: "Fetch atomic data"
 
   - bash: |
-          check=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
-          if [ "$(Hash_Check)" = "$check" ]; then
+          hash_check_1=`cat hash_check_1`
+          echo $hash_check_1
+          hash_check_2=`md5sum /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz`
+          echo $hash_check_2
+          if [ "$hash_check_1" = "$hash_check_2" ]; then
               echo 'No need to update data'; else
+              sed -i 's/$hash_check_1/$hash_check_2/g' hash_check_1
               tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
     displayName: "Extract data if updated"
