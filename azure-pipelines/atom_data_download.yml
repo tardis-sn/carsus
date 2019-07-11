@@ -8,6 +8,7 @@ variables:
   system.debug: 'true'
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
   SSH_REPO: git@github.com:tardis-sn/carsus.git
+  CMFGEN_DIR: /usr/share/ATOMIC_DATA/atomic
 jobs:
 
 - job: "Fetch_Atomic_Data"
@@ -75,3 +76,10 @@ jobs:
           git commit -m "Add new reference data and update hash code"
           git push $(SSH_REPO) atom_data_pipeline
     displayName: "Push to github branch"
+
+# Python script
+# Run a Python file or inline script
+  - task: PythonScript@0
+    inputs:
+      scriptSource: filePath
+      scriptPath: 'carsus/io/hdfgen.py'
