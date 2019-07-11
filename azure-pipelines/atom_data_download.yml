@@ -9,6 +9,7 @@ variables:
   ATOMIC_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
   SSH_REPO: git@github.com:tardis-sn/carsus.git
   CMFGEN_DIR: /usr/share/ATOMIC_DATA/atomic
+  PYTHON_VERSION: 3.7
 jobs:
 
 - job: "Fetch_Atomic_Data"
@@ -66,10 +67,10 @@ jobs:
 
 # Python script
 # Run a Python file or inline script
-#  - task: PythonScript@0
-#    inputs:
-#      scriptSource: filePath
-#      scriptPath: 'carsus/io/cmfgen/hdfgen.py'
+  - task: PythonScript@0
+    inputs:
+      scriptSource: filePath
+      scriptPath: 'carsus/io/cmfgen/hdfgen.py'
 
 
 # Push to github
