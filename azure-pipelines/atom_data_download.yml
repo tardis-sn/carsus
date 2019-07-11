@@ -40,12 +40,13 @@ jobs:
      #sshPassphrase: # Optional - leave empty if it was left empty while generating the key
      sshKeySecureFile: 'id_carsus_rsa'
 
+
 # Configure github
+  - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
+    submodules: recursive
   - bash: |
           git config --local user.name "Azure Pipelines"
           git config --local user.email "azuredevops@microsoft.com"
-          git checkout atom_data_pipeline || git checkout --orphan atom_data_pipeline
-          git pull $(SSH_REPO) atom_data_pipeline
     displayName: "Configure github"
 
 # Download atomic data for tests
@@ -68,10 +69,10 @@ jobs:
 
 # Python script
 # Run a Python file or inline script
-  - task: PythonScript@0
-    inputs:
-      scriptSource: filePath
-      scriptPath: 'carsus/io/cmfgen/hdfgen.py'
+#  - task: PythonScript@0
+#    inputs:
+#      scriptSource: filePath
+#      scriptPath: 'carsus/io/cmfgen/hdfgen.py'
 
 
 # Push to github
