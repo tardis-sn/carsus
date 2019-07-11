@@ -53,7 +53,7 @@ jobs:
           echo $hash_check_2
           if [ "$hash_check_1" = "$hash_check_2" ]; then
               echo 'No need to update data'; else
-              sed -i 's/$hash_check_1/$hash_check_2/g' hash_check_1
+              sed -i "s+$hash_check_1+$hash_check_2+g" hash_check_1
               tar -zxvf /usr/share/ATOMIC_DATA/ATOMIC_DATA.gz -C /usr/share/ATOMIC_DATA
           fi
     displayName: "Extract data and update hash check if updated"
