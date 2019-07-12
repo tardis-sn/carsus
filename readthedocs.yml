@@ -1,8 +1,0 @@
-formats:
-  - none
-
-conda:
-  file: carsus_ci/carsus_rtd_env27.yml
-
-python:
-   version: 2

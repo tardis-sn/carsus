@@ -2,33 +2,11 @@ name: carsus
 
 channels:
     - conda-forge
-    - default
 
 dependencies:
 - python=3
-- numpy=1.15
-- pandas=0.24
 - astropy=3.2
-- Cython=0.29  # TARDIS dep
-- numexpr
-- ipyparallel
-- uncertainties
 - pip
-
-# I/O
-- beautifulsoup4
-- pyparsing=2.2.0
-- html5lib
-- SQLAlchemy=1.0.19
-- PyYAMl
-- h5py
-- pytables
-- pyne=0.5     # TARDIS dep
-- tqdm         # TARDIS dep
-
-# Analysis
-- jupyter
-- matplotlib
 
 # Documentation
 - sphinx
@@ -41,16 +19,3 @@ dependencies:
 - sphinx_rtd_theme
 - nbsphinx
 - recommonmark
-
-# Test/Coverage requirements
-- coverage
-- coveralls
-- pytest=4.5.0
-- pytest-cov
-- pytest-astropy
-- requests
-
-# Pip
-- pip:
-  - git+https://github.com/tardis-sn/tardis
-  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4

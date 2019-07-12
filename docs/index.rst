@@ -1,22 +1,5 @@
-####################
-Carsus Documentation
-####################
+################################
+THE DOCUMENTATION HAS MOVED!!!!
+################################
 
-Carsus is a TARDIS support package for creating and working with atomic datasets
-
-
-
-For more information about how to use this package, see the :ref:`api`.
-
-
-Contents:
-
-.. toctree::
-    :maxdepth: 1
-
-    notebooks/quickstart.ipynb
-    io/data_sources
-    api
-    model
-    macroatom
-    notebooks/kurucz_chianti_h_he.ipynb
+See `<https://tardis-sn.github.io/carsus>`_
