@@ -1,0 +1,23 @@
+name: carsus-ci
+
+channels:
+    - conda-forge
+
+dependencies:
+- python=3
+- astropy
+
+# RTD requirements
+- sphinx
+- nbconvert
+- numpydoc
+- docutils
+- nbformat
+- nbsphinx
+- sphinx_bootstrap_theme
+- sphinxcontrib-bibtex
+
+# pip packages
+- pip:
+  - git+https://github.com/tardis-sn/tardis
+  - sphinxcontrib-tikz

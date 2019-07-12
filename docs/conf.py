@@ -52,22 +52,12 @@ import datetime
 
 import sphinx_bootstrap_theme
 
-extensions = [
-    'sphinx.ext.autodoc',
-    'numpydoc',
-    'nbsphinx',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.graphviz'
-]
+extensions = []
 
 source_suffix = '.rst'
 ## get's rid of many toctree contains errors: see https://github.com/phn/pytpm/issues/3#issuecomment-12133978
 numpydoc_show_class_members = False
-extensions += ['matplotlib.sphinxext.plot_directive',
-               'sphinxcontrib.bibtex']
+extensions += []
 
 
 # -- General configuration ----------------------------------------------------
@@ -103,9 +93,9 @@ master_doc = 'index'
 
 import carsus
 # The short X.Y version.
-version = carsus.__version__.split('-', 1)[0]
+version = '-moved-documentation'
 # The full version, including alpha/beta/rc tags.
-release = carsus.__version__
+release = '-moved-documentation'
 
 
 # -- Options for HTML output ---------------------------------------------------
