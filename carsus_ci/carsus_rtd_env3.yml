@@ -19,5 +19,4 @@ dependencies:
 
 # pip packages
 - pip:
-  - git+https://github.com/tardis-sn/tardis
   - sphinxcontrib-tikz
