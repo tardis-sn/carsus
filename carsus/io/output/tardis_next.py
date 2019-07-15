@@ -61,7 +61,7 @@ class NISTWeightsComp:
 
     def to_hdf(self, fname):
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/atom_data', self.atom_data)
+            f.append('/atom_data', self.atom_data, min_itemsize={'symbol': 2, 'name': 15})
 
 
 class KnoxLongZetaData:  
