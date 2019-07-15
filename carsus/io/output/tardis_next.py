@@ -66,6 +66,7 @@ class NISTWeightsComp:
 
 class KnoxLongZetaData:  
     def __init__(self, fname):
+        self.fname = fname
         self._prepare_data()
 
     def _prepare_data(self):
