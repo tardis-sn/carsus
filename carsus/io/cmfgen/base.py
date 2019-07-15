@@ -190,7 +190,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
     def to_hdf(self, key='/energy_levels'):
         with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base, format='table', data_columns=self.columns)
+            f.append(key, self.base)
             f.get_storer(key).attrs.metadata = self.meta
 
 
@@ -262,7 +262,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
     def to_hdf(self, key='/oscillator_strengths'):
         with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base, format='table', data_columns=self.columns)
+            f.append(key, self.base)
             f.get_storer(key).attrs.metadata = self.meta
 
 
@@ -330,7 +330,7 @@ class CMFGENCollisionalDataParser(BaseParser):
 
     def to_hdf(self, key='/collisional_data'):
         with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base, format='table', data_columns=self.columns)
+            f.append(key, self.base)
             f.get_storer(key).attrs.metadata = self.meta
 
 
