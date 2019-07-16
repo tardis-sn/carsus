@@ -435,10 +435,10 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     def to_hdf(self, key='/photoionization_cross_sections'):
         if len(self.base) > 0:
             with pd.HDFStore(self.fname + '.h5', 'a') as f:
-                header = pd.Series(data=self.meta)  # FIXME: couldn't write this like `attr` metadata
-                f.put(key, header, format='table', data_columns=True)
 
                 for i in range(1, len(self.base)-1):
                     subkey = key + '/' + str(i)
-                    f.append(subkey, self.base[i], format='table', data_columns=True)
+                    f.append(subkey, self.base[i])
                     f.get_storer(subkey).attrs.metadata = self.base[i]._meta
+
+                f.root._v_attrs['metadata'] = self.meta
