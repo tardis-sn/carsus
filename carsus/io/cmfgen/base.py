@@ -189,9 +189,10 @@ class CMFGENEnergyLevelsParser(BaseParser):
         self.meta = meta
 
     def to_hdf(self, key='/energy_levels'):
-        with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base)
-            f.get_storer(key).attrs.metadata = self.meta
+        if not self.base.empty:
+            with pd.HDFStore(self.fname + '.h5', 'a') as f:
+                f.append(key, self.base)
+                f.get_storer(key).attrs.metadata = self.meta
 
 
 class CMFGENOscillatorStrengthsParser(BaseParser):
@@ -261,9 +262,10 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         self.meta = meta
 
     def to_hdf(self, key='/oscillator_strengths'):
-        with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base)
-            f.get_storer(key).attrs.metadata = self.meta
+        if not self.base.empty:
+            with pd.HDFStore(self.fname + '.h5', 'a') as f:
+                f.append(key, self.base)
+                f.get_storer(key).attrs.metadata = self.meta
 
 
 class CMFGENCollisionalDataParser(BaseParser):
@@ -329,9 +331,10 @@ class CMFGENCollisionalDataParser(BaseParser):
         self.meta = meta
 
     def to_hdf(self, key='/collisional_data'):
-        with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            f.append(key, self.base)
-            f.get_storer(key).attrs.metadata = self.meta
+        if not self.base.empty:
+            with pd.HDFStore(self.fname + '.h5', 'a') as f:
+                f.append(key, self.base)
+                f.get_storer(key).attrs.metadata = self.meta
 
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
@@ -430,12 +433,12 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         self.meta = meta
 
     def to_hdf(self, key='/photoionization_cross_sections'):
+        if len(self.base) > 0:
+            with pd.HDFStore(self.fname + '.h5', 'a') as f:
+                header = pd.Series(data=self.meta)  # FIXME: couldn't write this like `attr` metadata
+                f.put(key, header, format='table', data_columns=True)
 
-        with pd.HDFStore(self.fname + '.h5', 'a') as f:
-            header = pd.Series(data=self.meta)  # FIXME: couldn't write this like `attr` metadata
-            f.put(key, header, format='table', data_columns=True)
-
-            for i in range(1, len(self.base)-1):
-                subkey = key + '/' + str(i)
-                f.append(subkey, self.base[i], format='table', data_columns=True)
-                f.get_storer(subkey).attrs.metadata = self.base[i]._meta
+                for i in range(1, len(self.base)-1):
+                    subkey = key + '/' + str(i)
+                    f.append(subkey, self.base[i], format='table', data_columns=True)
+                    f.get_storer(subkey).attrs.metadata = self.base[i]._meta
