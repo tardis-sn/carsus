@@ -3,7 +3,7 @@ import glob
 from carsus import logger
 
 
-def h5dump(cmfgen_dir, patterns, parser, chunk_size=10):
+def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10):
     files = []
     for case in patterns:
         path = cmfgen_dir + '/**/*{}*'.format(case)
