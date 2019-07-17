@@ -294,22 +294,22 @@ class NISTIonizationEnergiesIngester(BaseIngester):
 
 
 class NISTIonizationEnergies:
-    """ """
+    """ Docstring """
     def __init__(self, spectra):
         input_data = download_ionization_energies(spectra)
         self.parser = NISTIonizationEnergiesParser(input_data)
         self._prepare_data()
 
     def _prepare_data(self):
-        self.ioniz_energies = pd.DataFrame()
-        self.ioniz_energies['atomic_number'] = self.parser.base['atomic_number']
-        self.ioniz_energies['ion_number'] = self.parser.base['ion_charge'] + 1
-        self.ioniz_energies['ionization_energy'] = self.parser.base['ionization_energy_str'].str.strip('[]()').astype(np.float64)
-        self.ioniz_energies.set_index(['atomic_number', 'ion_number'], inplace=True)
+        self.ionization_data = pd.DataFrame()
+        self.ionization_data['atomic_number'] = self.parser.base['atomic_number']
+        self.ionization_data['ion_number'] = self.parser.base['ion_charge'] + 1
+        self.ionization_data['ionization_energy'] = self.parser.base['ionization_energy_str'].str.strip('[]()').astype(np.float64)
+        self.ionization_data.set_index(['atomic_number', 'ion_number'], inplace=True)
 
         # Convert DataFrame to Series
-        self.ioniz_energies = self.ioniz_energies['ionization_energy']
+        self.ionization_data = self.ionization_data['ionization_energy']
 
     def to_hdf(self, fname):
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/ionization_data', self.ioniz_energies)
+            f.append('/ionization_data', self.ionization_data)
