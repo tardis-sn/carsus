@@ -1,10 +1,7 @@
 import os
 import glob
+from carsus import logger
 
-class Colors:
-    OK = '\033[92m'
-    FAIL = '\033[91m'
-    END = '\033[0m'
 
 def h5dump(cmfgen_dir, patterns, parser, chunk_size=10):
     files = []
@@ -21,20 +18,18 @@ def h5dump(cmfgen_dir, patterns, parser, chunk_size=10):
 
         _ = []
         for fname in chunk:
-            print('Parsing file -- {}'.format(fname), end=' ')
             try:
                 obj = parser.__class__(fname)
-                print(Colors.OK + 'OK' + Colors.END)
+                logger.info('Parsed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
                 _.append(obj)
 
             except:
-                print(Colors.FAIL + 'FAIL' + Colors.END)
+                logger.error('Parsing failed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
 
         for obj in _:
-            print('Dumping file -- {}.h5'.format(obj.fname), end=' ')
             try:
                 obj.to_hdf()
-                print(Colors.OK + 'OK' + Colors.END)
+                logger.info('Dumped {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
 
             except:
-                print(Colors.FAIL + 'FAIL' + Colors.END)
+                logger.error('Dumping failed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
