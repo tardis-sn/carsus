@@ -24,12 +24,12 @@ def h5dump(cmfgen_dir, patterns, parser, chunk_size=10):
                 _.append(obj)
 
             except:
-                logger.error('Parsing failed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.error('Failed parsing {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
 
         for obj in _:
             try:
                 obj.to_hdf()
-                logger.info('Dumped {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.info('Dumped {}.h5'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
 
             except:
-                logger.error('Dumping failed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.error('Failed dump {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
