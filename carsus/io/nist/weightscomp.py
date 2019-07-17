@@ -8,9 +8,12 @@ import pandas as pd
 
 from bs4 import BeautifulSoup
 from astropy import units as u
+from carsus.base import basic_atomic_data_fname
 from carsus.model import AtomWeight
+from carsus.util import parse_selected_atoms
 from carsus.io.base import BasePyparser, BaseIngester
 from carsus.io.util import to_nom_val_and_std_dev
+from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
 from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, MASS_NUM_COL,\
     AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
     AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
@@ -183,3 +186,36 @@ class NISTWeightsCompIngester(BaseIngester):
         if atomic_weights:
             self.ingest_atomic_weights()
             self.session.flush()
+
+
+class NISTWeightsComp:
+    """ Docstring """
+    def __init__(self, atoms):
+        input_data = download_weightscomp()
+        self.parser = NISTWeightsCompPyparser(input_data=input_data)
+        self._prepare_data(atoms)
+
+    def _prepare_data(self, atoms):
+        atomic_numbers = parse_selected_atoms(atoms)
+        atom_data_list = []
+
+        for atomic_number in atomic_numbers:
+            basic_atomic_data = pd.read_csv(basic_atomic_data_fname)
+            basic_atomic_data = basic_atomic_data.loc[atomic_number-1]
+
+            atom_masses = self.parser.prepare_atomic_dataframe()
+            atom_masses = atom_masses.drop(columns='atomic_weight_std_dev')
+            atom_masses = atom_masses.rename(columns={'atomic_weight_nominal_value': 'mass'})
+
+            data = atom_masses.loc[[(atomic_number)]]
+            data['symbol'] = basic_atomic_data['symbol']
+            data['name'] = basic_atomic_data['name']
+
+            atom_data_list.append(data)
+
+        atom_data = pd.concat(atom_data_list)
+        self.atom_data = atom_data[['symbol', 'name', 'mass']]
+
+    def to_hdf(self, fname):
+        with pd.HDFStore(fname, 'a') as f:
+            f.append('/atom_data', self.atom_data, min_itemsize={'symbol': 2, 'name': 15})
