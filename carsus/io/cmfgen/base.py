@@ -294,7 +294,7 @@ class CMFGENCollisionalDataParser(BaseParser):
         kwargs = {}
         kwargs['header'] = None
         kwargs['index_col'] = False
-        kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=Pe)-'  # TODO: this regex needs some review
+        kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-'  # TODO: this regex needs some review
         kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
 
         # FIXME: expensive solution for two files with more than one table
