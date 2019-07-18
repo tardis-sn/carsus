@@ -7,8 +7,8 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
     files = []
     ignore_patterns = ['.h5'] + ignore_patterns
     for case in patterns:
-        path = cmfgen_dir + '/**/*{}*'.format(case)
-        files = files + glob.glob(path.replace('//', '/'), recursive=True)
+        path = '{0}/**/*{1}*'.format(cmfgen_dir, case)
+        files = files + glob.glob(path, recursive=True)
 
         for i in ignore_patterns:
             files = [f for f in files if i not in f]
@@ -21,18 +21,19 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
 
         _ = []
         for fname in chunk:
+            output = fname.replace(cmfgen_dir, '')
             try:
                 obj = parser.__class__(fname)
-                logger.info('Parsed {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.info('Parsed {}'.format(output))
                 _.append(obj)
 
             except:
-                logger.error('Failed parsing {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.error('Failed parsing {}'.format(output))
 
         for obj in _:
             try:
                 obj.to_hdf()
-                logger.info('Dumped {}.h5'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.info('Dumped {}.h5'.format(output))
 
             except:
-                logger.error('Failed dump {}'.format(fname.replace(cmfgen_dir + 'atomic/', '')))
+                logger.error('Failed dump {}'.format(output))
