@@ -3,12 +3,15 @@ import glob
 from carsus import logger
 
 
-def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10):
+def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
     files = []
+    ignore_patterns = ['.h5'] + ignore_patterns
     for case in patterns:
         path = cmfgen_dir + '/**/*{}*'.format(case)
         files = files + glob.glob(path.replace('//', '/'), recursive=True)
-        files = [f for f in files if not f.endswith('.h5')]
+
+        for i in ignore_patterns:
+            files = [f for f in files if i not in f]
 
     n = chunk_size
     files_chunked = [files[i:i+n] for i in range(0, len(files), n)]
