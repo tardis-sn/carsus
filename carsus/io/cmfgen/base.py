@@ -436,7 +436,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         if len(self.base) > 0:
             with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
 
-                for i in range(1, len(self.base)-1):
+                for i in range(0, len(self.base)-1):
                     subkey = '{0}/{1}'.format(key, i)
                     f.append(subkey, self.base[i])
                     f.get_storer(subkey).attrs.metadata = self.base[i]._meta
