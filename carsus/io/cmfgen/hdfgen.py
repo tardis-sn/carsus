@@ -31,6 +31,7 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
                 logger.error('Failed parsing {}'.format(output))
 
         for obj in _:
+            output = obj.fname.replace(cmfgen_dir, '')
             try:
                 obj.to_hdf()
                 logger.info('Dumped {}.h5'.format(output))
