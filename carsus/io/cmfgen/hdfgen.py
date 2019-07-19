@@ -21,22 +21,20 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
 
         _ = []
         for fname in chunk:
-            output = fname.replace(cmfgen_dir, '')
             try:
                 obj = parser.__class__(fname)
-                logger.info('Parsed {}'.format(output))
+                logger.info('Parsed {}'.format(fname))
                 _.append(obj)
 
             except TypeError:
-                logger.error('Failed parsing {} (try checking `find_row` function)'.format(output))
+                logger.error('Failed parsing {} (try checking `find_row` function)'.format(fname))
             
             except UnboundLocalError:
-                logger.error('Failed parsing {} (try checking `to_float` function)'.format(output))
+                logger.error('Failed parsing {} (try checking `to_float` function)'.format(fname))
             
             except IsADirectoryError:
-                logger.error('Failed parsing {} (is a directory)'.format(output))
+                logger.error('Failed parsing {} (is a directory)'.format(fname))
 
         for obj in _:
-            output = obj.fname.replace(cmfgen_dir, '')
             obj.to_hdf()
-            logger.info('Dumped {}.h5'.format(output))
+            logger.info('Dumped {}.h5'.format(obj.fname))
