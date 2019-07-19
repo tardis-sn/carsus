@@ -4,6 +4,17 @@ from carsus import logger
 
 
 def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
+    """Function to parse and dump the entire CMFGEN database.
+
+    Arguments:
+        cmfgen_dir {path} -- Path to the CMFGEN atomic database
+        patterns {list of str} -- String patterns to search for
+        parser {class} -- CMFGEN parser class
+
+    Keyword Arguments:
+        chunk_size {int} -- (default: {10})
+        ignore_patterns {list of str} -- String patterns to ignore (default: {[]})
+    """
     files = []
     ignore_patterns = ['.h5'] + ignore_patterns
     for case in patterns:
@@ -28,10 +39,10 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
 
             except TypeError:
                 logger.error('Failed parsing {} (try checking `find_row` function)'.format(fname))
-            
+
             except UnboundLocalError:
                 logger.error('Failed parsing {} (try checking `to_float` function)'.format(fname))
-            
+
             except IsADirectoryError:
                 logger.error('Failed parsing {} (is a directory)'.format(fname))
 
