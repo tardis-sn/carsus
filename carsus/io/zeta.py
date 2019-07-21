@@ -55,3 +55,34 @@ class KnoxLongZetaIngester(object):
     def ingest(self):
         self.ingest_zeta_values()
         self.session.commit()
+
+
+class KnoxLongZetaData:  
+    def __init__(self, fname):
+        self.fname = fname
+        self._prepare_data()
+
+    def _prepare_data(self):
+        t_values = np.arange(2000, 42000, 2000)
+
+        names = ['atomic_number', 'ion_charge']
+        names += [str(i) for i in t_values]
+
+        zeta_raw = np.recfromtxt(
+                self.fname,
+                usecols=range(1, 23),
+                names=names)
+
+        self.zeta_data = (
+                pd.DataFrame(zeta_raw).set_index(
+                    ['atomic_number', 'ion_charge'])
+                )
+
+        columns = [float(c) for c in self.zeta_data.columns]
+
+        # To match exactly the `old` format
+        self.zeta_data.columns = pd.Float64Index(columns, name='temp')
+
+    def to_hdf(self, fname):
+        with pd.HDFStore(fname, 'a') as f:
+            f.append('/zeta_data', self.zeta_data)
