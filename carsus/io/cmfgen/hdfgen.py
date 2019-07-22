@@ -1,6 +1,7 @@
 import glob
-from carsus import logger
+import logging
 
+logger = logging.getLogger(__name__)
 
 def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
     """Function to parse and dump the entire CMFGEN database.
