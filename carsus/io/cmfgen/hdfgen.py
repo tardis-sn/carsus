@@ -6,14 +6,18 @@ logger = logging.getLogger(__name__)
 def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
     """Function to parse and dump the entire CMFGEN database.
 
-    Arguments:
-        cmfgen_dir {path} -- Path to the CMFGEN atomic database
-        patterns {list of str} -- String patterns to search for
-        parser {class} -- CMFGEN parser class
-
-    Keyword Arguments:
-        chunk_size {int} -- (default: {10})
-        ignore_patterns {list of str} -- String patterns to ignore (default: {[]})
+    Parameters
+    ----------
+    cmfgen_dir : path
+        Path to the CMFGEN atomic database
+    patterns : list of str
+        String patterns to search for
+    parser : class
+        CMFGEN parser class
+    chunk_size : int, optional
+        Number of files to parse together, by default 10
+    ignore_patterns : list, optional
+        String patterns to ignore, by default []
     """
     files = []
     ignore_patterns = ['.h5'] + ignore_patterns
