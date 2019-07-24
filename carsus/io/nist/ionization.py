@@ -293,8 +293,18 @@ class NISTIonizationEnergiesIngester(BaseIngester):
             self.session.flush()
 
 
-class NISTIonizationEnergies:
-    """ Docstring """
+class NISTIonizationEnergies(BaseParser):
+    """
+    Attributes
+    ----------
+    base : pandas.Series
+
+    Methods
+    -------
+    to_hdf(fname)
+        Dump the `base` DataFrame into an HDF5 file
+
+    """       
     def __init__(self, spectra):
         input_data = download_ionization_energies(spectra)
         self.parser = NISTIonizationEnergiesParser(input_data)

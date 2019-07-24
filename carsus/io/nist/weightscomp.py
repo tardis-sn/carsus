@@ -189,7 +189,19 @@ class NISTWeightsCompIngester(BaseIngester):
 
 
 class NISTWeightsComp(BaseParser):
-    """ Docstring """
+    """
+    Attributes
+    ----------
+    base : pandas.DataFrame
+
+    columns : list of str
+
+    Methods
+    -------
+    to_hdf(fname)
+        Dump the `base` DataFrame into an HDF5 file
+
+    """    
     def __init__(self, atoms):
         input_data = download_weightscomp()
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
