@@ -58,7 +58,18 @@ class KnoxLongZetaIngester(object):
         self.session.commit()
 
 
-class KnoxLongZeta(BaseParser):  
+class KnoxLongZeta(BaseParser):
+    """
+        Description
+        ----------
+        base : pandas.DataFrame
+        columns : list of str
+
+        Methods
+        -------
+        to_hdf(fname)
+            Dump the `base` DataFrame into an HDF5 file
+    """
     def __init__(self, fname):
         self.fname = fname
         self._prepare_data()
