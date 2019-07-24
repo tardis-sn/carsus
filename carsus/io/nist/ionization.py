@@ -301,15 +301,15 @@ class NISTIonizationEnergies:
         self._prepare_data()
 
     def _prepare_data(self):
-        self.ionization_data = pd.DataFrame()
-        self.ionization_data['atomic_number'] = self.parser.base['atomic_number']
-        self.ionization_data['ion_number'] = self.parser.base['ion_charge'] + 1
-        self.ionization_data['ionization_energy'] = self.parser.base['ionization_energy_str'].str.strip('[]()').astype(np.float64)
-        self.ionization_data.set_index(['atomic_number', 'ion_number'], inplace=True)
+        ionization_data = pd.DataFrame()
+        ionization_data['atomic_number'] = self.parser.base['atomic_number']
+        ionization_data['ion_number'] = self.parser.base['ion_charge'] + 1
+        ionization_data['ionization_energy'] = self.parser.base['ionization_energy_str'].str.strip('[]()').astype(np.float64)
+        ionization_data.set_index(['atomic_number', 'ion_number'], inplace=True)
 
-        # Convert DataFrame to Series
-        self.ionization_data = self.ionization_data['ionization_energy']
+        # `base` attribute is a Series object
+        self.base = ionization_data['ionization_energy']
 
     def to_hdf(self, fname):
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/ionization_data', self.ionization_data)
+            f.append('/ionization_data', self.base)
