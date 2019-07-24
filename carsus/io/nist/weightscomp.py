@@ -11,7 +11,7 @@ from astropy import units as u
 from carsus.base import basic_atomic_data_fname
 from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
-from carsus.io.base import BasePyparser, BaseIngester
+from carsus.io.base import BasePyparser, BaseIngester, BaseParser
 from carsus.io.util import to_nom_val_and_std_dev
 from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
 from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, MASS_NUM_COL,\
@@ -188,7 +188,7 @@ class NISTWeightsCompIngester(BaseIngester):
             self.session.flush()
 
 
-class NISTWeightsComp:
+class NISTWeightsComp(BaseParser):
     """ Docstring """
     def __init__(self, atoms):
         input_data = download_weightscomp()
@@ -214,8 +214,9 @@ class NISTWeightsComp:
             atom_data_list.append(data)
 
         atom_data = pd.concat(atom_data_list)
-        self.atom_data = atom_data[['symbol', 'name', 'mass']]
+        self.base = atom_data[['symbol', 'name', 'mass']]
+        self.columns = atom_data.columns
 
     def to_hdf(self, fname):
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/atom_data', self.atom_data, min_itemsize={'symbol': 2, 'name': 15})
+            f.append('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})
