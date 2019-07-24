@@ -13,3 +13,4 @@ datasets.
     cmfgen/index.rst
     kurucz/index.rst
     nist/index.rst
+    zeta/index.rst
