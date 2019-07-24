@@ -60,7 +60,7 @@ class KnoxLongZetaIngester(object):
 
 class KnoxLongZeta(BaseParser):
     """
-        Description
+        Attributes
         ----------
         base : pandas.DataFrame
         columns : list of str
