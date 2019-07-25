@@ -199,7 +199,7 @@ class NISTWeightsComp(BaseParser):
     Methods
     -------
     to_hdf(fname)
-        Dump the `base` DataFrame into an HDF5 file
+        Dump the `base` attribute into an HDF5 file
 
     """    
     def __init__(self, atoms):
@@ -230,5 +230,12 @@ class NISTWeightsComp(BaseParser):
         self.columns = atom_data.columns
 
     def to_hdf(self, fname):
+        """Dump the `base` attribute into an HDF5 file
+
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        """
         with pd.HDFStore(fname, 'a') as f:
             f.append('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})

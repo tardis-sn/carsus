@@ -302,7 +302,7 @@ class NISTIonizationEnergies(BaseParser):
     Methods
     -------
     to_hdf(fname)
-        Dump the `base` DataFrame into an HDF5 file
+        Dump the `base` attribute into an HDF5 file
 
     """       
     def __init__(self, spectra):
@@ -321,5 +321,12 @@ class NISTIonizationEnergies(BaseParser):
         self.base = ionization_data['ionization_energy']
 
     def to_hdf(self, fname):
+        """Dump the `base` attribute into an HDF5 file
+
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        """
         with pd.HDFStore(fname, 'a') as f:
             f.append('/ionization_data', self.base)
