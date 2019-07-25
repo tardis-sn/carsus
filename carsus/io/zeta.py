@@ -68,7 +68,7 @@ class KnoxLongZeta(BaseParser):
         Methods
         -------
         to_hdf(fname)
-            Dump the `base` DataFrame into an HDF5 file
+            Dump the `base` attribute into an HDF5 file
     """
     def __init__(self, fname):
         self.fname = fname
@@ -97,5 +97,12 @@ class KnoxLongZeta(BaseParser):
         self.columns = columns
 
     def to_hdf(self, fname):
+        """Dump the `base` attribute into an HDF5 file
+
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        """
         with pd.HDFStore(fname, 'a') as f:
             f.append('/zeta_data', self.base)
