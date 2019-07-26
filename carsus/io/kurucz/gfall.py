@@ -2,14 +2,17 @@ import re, logging
 
 import numpy as np
 import pandas as pd
+import astropy.units as u
 
 from astropy import units as u
 from sqlalchemy import and_
 from pyparsing import ParseException
 from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineWavelength, LineGFValue, MEDIUM_VACUUM, MEDIUM_AIR
-from carsus.io.base import IngesterError
-from carsus.util import convert_atomic_number2symbol, parse_selected_species
+from carsus.io.base import IngesterError, BaseParser
+from carsus.util import (convert_atomic_number2symbol, 
+                         parse_selected_species,
+                         convert_wavelength_air2vacuum)
 
 
 GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
@@ -476,3 +479,42 @@ class GFALLIngester(object):
             self.session.flush()
 
 
+class GFALL(BaseParser):
+    """ Docstring """
+    def __init__(self, fname, ions):
+        self.gfall_reader = GFALLReader(fname)
+        self.ions = parse_selected_species(ions) 
+        self._get_all_lines_data()
+    
+    def _get_all_lines_data(self):
+        gf = self.gfall_reader
+
+        df_list = []
+        for ion in self.ions:
+            df = gf.lines.loc[ion]
+            df = df.reset_index()
+            df['level_index_lower'] = 0  # FIXME: we need levels data
+            df['level_index_upper'] = 1  # FIXME: we need levels data
+            df_list.append(df)
+
+        lines = pd.concat(df_list)
+        lines['line_id'] = range(1, len(lines)+1)
+        lines['loggf'] = lines['gf'].apply(np.log10)
+
+        names = {'level_index_lower': 'lower_level_id', 'level_index_upper': 'upper_level_id'}
+        lines.rename(columns=names, inplace=True)
+        lines.set_index('line_id', inplace=True)
+        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower', 'j_lower'], inplace=True)
+
+        lines.loc[lines['wavelength'] <= GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
+        lines.loc[lines['wavelength'] > GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: x*u.nm)
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: x.to('angstrom'))
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
+
+        air_mask = lines['medium'] == MEDIUM_AIR
+        lines.loc[air_mask, 'wavelength'] = convert_wavelength_air2vacuum(
+                lines.loc[air_mask, 'wavelength'])
+        lines.drop(columns=['medium'], inplace=True)
+
+        self.lines = lines
