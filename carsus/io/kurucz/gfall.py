@@ -482,19 +482,20 @@ class GFALLIngester(object):
 class GFALL(BaseParser):
     """ Docstring """
     def __init__(self, fname, ions):
-        ions = parse_selected_species(ions)
-        self.ions = ions
+        self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
+        self._create_ions_df()
         self._get_all_levels_data()
         self._get_all_lines_data()
+
+    def _create_ions_df(self):
+        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
+        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
+        self.ions_df = ions_df
     
     def _get_all_lines_data(self):
         gf = self.gfall_reader
-
-        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
-        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
-
-        lines = gf.lines.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+        lines = gf.lines.reset_index().join(self.ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
                                           set_index(["atomic_number", "ion_charge"])
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
@@ -523,15 +524,12 @@ class GFALL(BaseParser):
         atoms = ', '.join(atoms)
         nist_parser = NISTIonizationEnergies(atoms)
         ground_levels = nist_parser.get_ground_levels()
-        
-        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
-        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
- 
+
         gf = self.gfall_reader
         gf.levels['g'] = 2*gf.levels['j'] + 1
         gf.levels['g'] = gf.levels['g'].map(np.int)
 
-        levels = gf.levels.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+        levels = gf.levels.reset_index().join(self.ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
                                           set_index(["atomic_number", "ion_charge"])
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels['level_id'] = range(1, len(levels)+1)
