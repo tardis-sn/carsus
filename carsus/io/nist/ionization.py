@@ -320,6 +320,18 @@ class NISTIonizationEnergies(BaseParser):
         # `base` attribute is a Series object
         self.base = ionization_data['ionization_energy']
 
+    def get_ground_levels(self):
+        levels = self.parser.prepare_ground_levels()
+        levels['g'] = 2*levels['J'] + 1
+        levels['g'] = levels['g'].astype(np.int)
+        levels['energy'] = 0.
+        levels = levels[['g','energy']]
+        levels = levels.reset_index()
+        levels['line_id'] = range(1, len(levels)+1)
+        levels = levels.set_index('line_id')
+   
+        return levels
+
     def to_hdf(self, fname):
         """Dump the `base` attribute into an HDF5 file
 
