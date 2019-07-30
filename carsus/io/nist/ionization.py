@@ -321,6 +321,13 @@ class NISTIonizationEnergies(BaseParser):
         self.base = ionization_data['ionization_energy']
 
     def get_ground_levels(self):
+        """Returns a DataFrame with the ground levels for the selected spectra
+        
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with ground levels
+        """
         levels = self.parser.prepare_ground_levels()
         levels['g'] = 2*levels['J'] + 1
         levels['g'] = levels['g'].astype(np.int)
