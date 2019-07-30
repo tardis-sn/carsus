@@ -483,7 +483,8 @@ class GFALL(BaseParser):
     """ Docstring """
     def __init__(self, fname, ions):
         self.gfall_reader = GFALLReader(fname)
-        self.ions = parse_selected_species(ions) 
+        self.ions = parse_selected_species(ions)
+        self._get_all_levels_data()
         self._get_all_lines_data()
     
     def _get_all_lines_data(self):
@@ -518,3 +519,26 @@ class GFALL(BaseParser):
         lines.drop(columns=['medium'], inplace=True)
 
         self.lines = lines
+
+
+    def _get_all_levels_data(self):
+        gf = self.gfall_reader
+        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
+        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
+
+        gf.levels['g'] = 2*gf.levels['j'] + 1
+        gf.levels['g'] = gf.levels['g'].map(np.int)
+
+        levels = gf.levels.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+                                          set_index(["atomic_number", "ion_charge"])
+        levels = levels.drop(columns=['j', 'label', 'method'])
+        levels['level_id'] = range(1, len(levels)+1)
+        levels = levels.reset_index().set_index('level_id').rename(columns={'ion_charge': 'ion_number'})
+        levels = levels.drop(columns=['level_index'])
+        levels = levels[['atomic_number', 'ion_number', 'g', 'energy']]
+
+        levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
+        levels['energy'] = levels['energy'].apply(lambda x: x.to(u.eV, equivalencies=u.spectral()))
+        levels['energy'] = levels['energy'].apply(lambda x: x.value)
+
+        self.levels = levels
