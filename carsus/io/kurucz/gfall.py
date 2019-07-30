@@ -13,7 +13,7 @@ from carsus.io.base import IngesterError, BaseParser
 from carsus.util import (convert_atomic_number2symbol, 
                          parse_selected_species,
                          convert_wavelength_air2vacuum)
-
+from carsus.io.nist.ionization import NISTIonizationEnergies
 
 GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
 
@@ -482,23 +482,20 @@ class GFALLIngester(object):
 class GFALL(BaseParser):
     """ Docstring """
     def __init__(self, fname, ions):
+        ions = parse_selected_species(ions)
+        self.ions = ions
         self.gfall_reader = GFALLReader(fname)
-        self.ions = parse_selected_species(ions)
         self._get_all_levels_data()
         self._get_all_lines_data()
     
     def _get_all_lines_data(self):
         gf = self.gfall_reader
 
-        df_list = []
-        for ion in self.ions:
-            df = gf.lines.loc[ion]
-            df = df.reset_index()
-            df['level_index_lower'] = 0  # FIXME: we need levels data
-            df['level_index_upper'] = 1  # FIXME: we need levels data
-            df_list.append(df)
+        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
+        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
 
-        lines = pd.concat(df_list)
+        lines = gf.lines.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+                                          set_index(["atomic_number", "ion_charge"])
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
@@ -522,10 +519,15 @@ class GFALL(BaseParser):
 
 
     def _get_all_levels_data(self):
-        gf = self.gfall_reader
+        atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
+        atoms = ', '.join(atoms)
+        nist_parser = NISTIonizationEnergies(atoms)
+        ground_levels = nist_parser.get_ground_levels()
+        
         ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
         ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
-
+ 
+        gf = self.gfall_reader
         gf.levels['g'] = 2*gf.levels['j'] + 1
         gf.levels['g'] = gf.levels['g'].map(np.int)
 
