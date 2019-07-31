@@ -543,8 +543,8 @@ class GFALL(BaseParser):
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
         levels = pd.concat([ground_levels, levels])
-        levels['line_id'] = range(1, len(levels)+1)
-        levels = levels.set_index('line_id')
+        levels['level_id'] = range(1, len(levels)+1)
+        levels = levels.set_index('level_id')
         levels = levels.drop_duplicates(keep='last')
 
         self.levels = levels
