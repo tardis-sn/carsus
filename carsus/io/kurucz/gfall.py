@@ -524,6 +524,7 @@ class GFALL(BaseParser):
         atoms = ', '.join(atoms)
         nist_parser = NISTIonizationEnergies(atoms)
         ground_levels = nist_parser.get_ground_levels()
+        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
 
         gf = self.gfall_reader
         gf.levels['g'] = 2*gf.levels['j'] + 1
@@ -533,12 +534,17 @@ class GFALL(BaseParser):
                                           set_index(["atomic_number", "ion_charge"])
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels['level_id'] = range(1, len(levels)+1)
-        levels = levels.reset_index().set_index('level_id').rename(columns={'ion_charge': 'ion_number'})
-        levels = levels.drop(columns=['level_index'])
+        levels = levels.reset_index().reset_index(drop=True)
+        levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy']]
 
         levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
         levels['energy'] = levels['energy'].apply(lambda x: x.to(u.eV, equivalencies=u.spectral()))
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
+
+        levels = pd.concat([ground_levels, levels])
+        levels['line_id'] = range(1, len(levels)+1)
+        levels = levels.set_index('line_id')
+        levels = levels.drop_duplicates(keep='last')
 
         self.levels = levels
