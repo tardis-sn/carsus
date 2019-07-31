@@ -334,8 +334,6 @@ class NISTIonizationEnergies(BaseParser):
         levels['energy'] = 0.
         levels = levels[['g','energy']]
         levels = levels.reset_index()
-        levels['line_id'] = range(1, len(levels)+1)
-        levels = levels.set_index('line_id')
    
         return levels
 
