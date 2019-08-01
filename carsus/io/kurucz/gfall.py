@@ -499,9 +499,26 @@ class GFALL(BaseParser):
         parser = NISTIonizationEnergies(atoms)
         ground_levels = parser.get_ground_levels()
         ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
-        
+
         self.ionization_energies = parser.base
         self.ground_levels = ground_levels
+
+    @staticmethod
+    def _create_artificial_fully_ionized(levels):
+        """ Create artificial levels for fully ionized ions. """
+        fully_ionized_levels = list()
+    
+        for atomic_number, _ in levels.groupby("atomic_number"):
+            fully_ionized_levels.append(
+                (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
+            )
+    
+        levels_columns = ["level_id", "atomic_number", "ion_number", "level_number", "energy", "g", "metastable"]
+        fully_ionized_levels_dtypes = [(key, levels.dtypes[key]) for key in levels_columns]
+    
+        fully_ionized_levels = np.array(fully_ionized_levels, dtype=fully_ionized_levels_dtypes)
+    
+        return pd.DataFrame(data=fully_ionized_levels)
 
     def _get_all_lines_data(self):
         gf = self.gfall_reader
@@ -555,8 +572,30 @@ class GFALL(BaseParser):
 
     def _prepare_levels(self):
         """ Returns almost the same output than `AtomData.levels` (no metastable flags) """
-        self.levels_all = self._get_all_levels_data()
-
-
-
+        levels_all = self._get_all_levels_data().reset_index()
+        ionization_energies = self.ionization_energies.reset_index()
+        ionization_energies['ion_number'] -= 1
         
+        # Culling autoionization levels
+        levels_w_ionization_energies = pd.merge(levels_all, ionization_energies, how='left', \
+            on=["atomic_number", "ion_number"])
+        mask = levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
+        levels = levels_w_ionization_energies[mask].copy()
+
+        # Creating levels numbers
+        levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
+        levels["level_number"] = levels.groupby(['atomic_number', 'ion_number'])['energy']. \
+            transform(lambda x: np.arange(len(x))).values
+        levels["level_number"] = levels["level_number"].astype(np.int)
+
+        # Create `metastable` column with False as default
+        levels['metastable'] = False
+        levels = levels[['atomic_number', 'energy', 'g', 'ion_number', 'level_id', \
+            'level_number', 'metastable']]
+
+        # Create and append artificial levels for fully ionized ions
+        artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
+        levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
+        levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
+
+        self.levels = levels
