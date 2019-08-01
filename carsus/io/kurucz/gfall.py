@@ -485,14 +485,13 @@ class GFALL(BaseParser):
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ions_df()
-        self._get_all_levels_data()
-        self._get_all_lines_data()
+        self._prepare_levels()
 
     def _create_ions_df(self):
         ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
         ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
         self.ions_df = ions_df
-    
+
     def _get_all_lines_data(self):
         gf = self.gfall_reader
         lines = gf.lines.reset_index().join(self.ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
@@ -516,10 +515,10 @@ class GFALL(BaseParser):
                 lines.loc[air_mask, 'wavelength'])
         lines.drop(columns=['medium'], inplace=True)
 
-        self.lines = lines
-
+        return lines
 
     def _get_all_levels_data(self):
+        """ Returns the same output than `AtomData._get_all_levels_data()` """
         atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
         atoms = ', '.join(atoms)
         nist_parser = NISTIonizationEnergies(atoms)
@@ -547,4 +546,12 @@ class GFALL(BaseParser):
         levels = levels.set_index('level_id')
         levels = levels.drop_duplicates(keep='last')
 
-        self.levels = levels
+        return levels
+
+    def _prepare_levels(self):
+        """ Returns almost the same output than `AtomData.levels` (no metastable flags) """
+        self.levels_all = self._get_all_levels_data()
+
+
+
+        
