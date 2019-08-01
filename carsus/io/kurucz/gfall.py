@@ -485,12 +485,23 @@ class GFALL(BaseParser):
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ions_df()
+        self._create_ionization_data()
         self._prepare_levels()
 
     def _create_ions_df(self):
         ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
         ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
         self.ions_df = ions_df
+    
+    def _create_ionization_data(self):
+        atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
+        atoms = ', '.join(atoms)
+        parser = NISTIonizationEnergies(atoms)
+        ground_levels = parser.get_ground_levels()
+        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
+        
+        self.ionization_energies = parser.base
+        self.ground_levels = ground_levels
 
     def _get_all_lines_data(self):
         gf = self.gfall_reader
@@ -519,12 +530,6 @@ class GFALL(BaseParser):
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
-        atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
-        atoms = ', '.join(atoms)
-        nist_parser = NISTIonizationEnergies(atoms)
-        ground_levels = nist_parser.get_ground_levels()
-        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
-
         gf = self.gfall_reader
         gf.levels['g'] = 2*gf.levels['j'] + 1
         gf.levels['g'] = gf.levels['g'].map(np.int)
@@ -541,7 +546,7 @@ class GFALL(BaseParser):
         levels['energy'] = levels['energy'].apply(lambda x: x.to(u.eV, equivalencies=u.spectral()))
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
-        levels = pd.concat([ground_levels, levels])
+        levels = pd.concat([self.ground_levels, levels])
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
         levels = levels.drop_duplicates(keep='last')
