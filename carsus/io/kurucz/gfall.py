@@ -521,9 +521,18 @@ class GFALL(BaseParser):
         return pd.DataFrame(data=fully_ionized_levels)
 
     def _get_all_lines_data(self):
+        """ Returns the same output than `AtomData._get_all_lines_data()` """  
         gf = self.gfall_reader
-        lines = gf.lines.reset_index().join(self.ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
-                                          set_index(["atomic_number", "ion_charge"])
+
+        df_list = []
+        for ion in self.ions:
+            df = gf.lines.loc[ion]
+            df = df.reset_index()
+            df['level_index_lower'] = 0  # FIXME: we need levels data
+            df['level_index_upper'] = 1  # FIXME: we need levels data
+            df_list.append(df)
+        
+        lines = pd.concat(df_list)
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
