@@ -522,24 +522,42 @@ class GFALL(BaseParser):
 
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """  
-        gf = self.gfall_reader
 
+        gf = self.gfall_reader
         df_list = []
+
         for ion in self.ions:
             df = gf.lines.loc[ion]
             df = df.reset_index()
-            df['level_index_lower'] = 0  # FIXME: we need levels data
-            df['level_index_upper'] = 1  # FIXME: we need levels data
+
+            lvl_index2id = self._levels_all.set_index(['atomic_number', 'ion_number']).loc[ion]
+            lvl_index2id = lvl_index2id.reset_index()
+            lvl_index2id = lvl_index2id[['level_id']]
+
+            lower_level_id = []
+            upper_level_id = []
+            for i, row in df.iterrows():
+
+                llid = int(row['level_index_lower'])
+                ulid = int(row['level_index_upper'])
+
+                upper = int(lvl_index2id.loc[ulid])
+                lower = int(lvl_index2id.loc[llid])
+
+                lower_level_id.append(lower)
+                upper_level_id.append(upper)
+
+            df['lower_level_id'] = pd.Series(lower_level_id)
+            df['upper_level_id'] = pd.Series(upper_level_id)
             df_list.append(df)
         
         lines = pd.concat(df_list)
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
-        names = {'level_index_lower': 'lower_level_id', 'level_index_upper': 'upper_level_id'}
-        lines.rename(columns=names, inplace=True)
         lines.set_index('line_id', inplace=True)
-        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower', 'j_lower'], inplace=True)
+        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower', 'j_lower', \
+            'level_index_lower', 'level_index_upper'], inplace=True)
 
         lines.loc[lines['wavelength'] <= GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
         lines.loc[lines['wavelength'] > GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
@@ -607,4 +625,5 @@ class GFALL(BaseParser):
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
         levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
 
+        self._levels_all = levels_all
         self.levels = levels
