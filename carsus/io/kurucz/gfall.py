@@ -484,15 +484,9 @@ class GFALL(BaseParser):
     def __init__(self, fname, ions):
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
-        self._create_ions_df()
         self._create_ionization_data()
         self._prepare_levels()
 
-    def _create_ions_df(self):
-        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
-        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
-        self.ions_df = ions_df
-    
     def _create_ionization_data(self):
         atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
         atoms = ', '.join(atoms)
@@ -579,7 +573,9 @@ class GFALL(BaseParser):
         gf.levels['g'] = 2*gf.levels['j'] + 1
         gf.levels['g'] = gf.levels['g'].map(np.int)
 
-        levels = gf.levels.reset_index().join(self.ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+        ions_df = pd.DataFrame.from_records(self.ions, columns=["atomic_number", "ion_charge"])
+        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
+        levels = gf.levels.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
                                           set_index(["atomic_number", "ion_charge"])
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels['level_id'] = range(1, len(levels)+1)
