@@ -485,7 +485,7 @@ class GFALL(BaseParser):
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ionization_data()
-        self._prepare_levels()
+        self._create_levels_lines()
 
     def _create_ionization_data(self):
         atoms = set([convert_atomic_number2symbol(i[0]) for i in self.ions])
@@ -594,8 +594,8 @@ class GFALL(BaseParser):
 
         return levels
 
-    def _prepare_levels(self):
-        """ Returns almost the same output than `AtomData.levels` (no metastable flags) """
+    def _create_levels_lines(self):
+        """ Returns almost the same output than `AtomData.create_levels_lines` method """
         levels_all = self._get_all_levels_data().reset_index()
         ionization_energies = self.ionization_energies.reset_index()
         ionization_energies['ion_number'] -= 1
