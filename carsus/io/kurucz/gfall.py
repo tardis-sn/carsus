@@ -552,9 +552,14 @@ class GFALL(BaseParser):
         df_list = []
 
         for ion in self.ions:
-            df = gf.lines.loc[ion]
-            df = df.reset_index()
 
+            try: 
+                df = gf.lines.loc[ion]
+
+            except (KeyError, TypeError) as e:
+                continue
+
+            df = df.reset_index()
             lvl_index2id = levels.set_index(['atomic_number', 'ion_number']).loc[ion]
             lvl_index2id = lvl_index2id.reset_index()
             lvl_index2id = lvl_index2id[['level_id']]
