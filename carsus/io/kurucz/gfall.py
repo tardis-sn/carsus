@@ -604,7 +604,10 @@ class GFALL(BaseParser):
         levels_w_ionization_energies = pd.merge(levels_all, ionization_energies, how='left', \
             on=["atomic_number", "ion_number"])
         mask = levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
+
         levels = levels_w_ionization_energies[mask].copy()
+        levels = levels.set_index('level_id').sort_values(by=['atomic_number', 'ion_number'])
+        levels = levels.drop(columns='ionization_energy')
 
         # Creating levels numbers
         levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
@@ -614,9 +617,10 @@ class GFALL(BaseParser):
 
         # Create `metastable` column with False as default
         levels['metastable'] = False
-        levels = levels[['atomic_number', 'energy', 'g', 'ion_number', 'level_id', \
+        levels = levels[['atomic_number', 'energy', 'g', 'ion_number', \
             'level_number', 'metastable']]
 
+        levels = levels.reset_index()
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
