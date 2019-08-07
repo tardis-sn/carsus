@@ -5,6 +5,7 @@ import pandas as pd
 import astropy.units as u
 
 from astropy import units as u
+from astropy import constants as const
 from sqlalchemy import and_
 from pyparsing import ParseException
 from carsus.model import DataSource, Ion, Level, LevelEnergy,\
@@ -640,7 +641,7 @@ class GFALL(BaseParser):
         # Create the metastable flags for levels
         levels["metastable"] = self._create_metastable_flags(levels, lines_all, -3)
 
-        # Creating levels numbers
+        # Create levels numbers
         levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
         levels["level_number"] = levels.groupby(['atomic_number', 'ion_number'])['energy']. \
             transform(lambda x: np.arange(len(x))).values
@@ -649,12 +650,41 @@ class GFALL(BaseParser):
         levels = levels[['atomic_number', 'energy', 'g', 'ion_number', \
             'level_number', 'metastable']]
 
+        # Join atomic_number, ion_number, level_number_lower, level_number_upper on lines
+        lower_levels = levels.rename(
+                columns={
+                    "level_number": "level_number_lower",
+                    "g": "g_l"}
+                ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
+        upper_levels = levels.rename(
+                columns={
+                    "level_number": "level_number_upper",
+                    "g": "g_u"}
+                ).loc[:, ["level_number_upper", "g_u"]]
+        lines = lines.join(lower_levels, on="lower_level_id").join(upper_levels, on="upper_level_id")
+
+        # Calculate absorption oscillator strength f_lu and emission oscillator strength f_ul
+        lines["f_lu"] = lines["gf"] / lines["g_l"]
+        lines["f_ul"] = lines["gf"] / lines["g_u"]
+
+        # Calculate frequency
+        lines['nu'] = u.Quantity(lines['wavelength'], 'angstrom').to('Hz', u.spectral())
+
+        # Calculate Einstein coefficients
+        einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value ** 2) / (const.m_e.cgs.value * const.c.cgs.value)
+        lines['B_lu'] = einstein_coeff * lines['f_lu'] / (const.h.cgs.value * lines['nu'])
+        lines['B_ul'] = einstein_coeff * lines['f_ul'] / (const.h.cgs.value * lines['nu'])
+        lines['A_ul'] = 2 * einstein_coeff * lines['nu'] ** 2 / const.c.cgs.value ** 2 * lines['f_ul']
+
+        # Reset indexes because `level_id` cannot be an index once we
+        # add artificial levels for fully ionized ions that don't have ids (-1)
+        lines = lines.reset_index()
         levels = levels.reset_index()
-        
+
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
         levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
 
-        self._levels_all = levels_all
+        self.lines = lines
         self.levels = levels
