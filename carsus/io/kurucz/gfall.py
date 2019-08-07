@@ -514,7 +514,26 @@ class GFALL(BaseParser):
     
         return pd.DataFrame(data=fully_ionized_levels)
 
-    def _get_all_lines_data(self):
+    @staticmethod
+    def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
+
+        # Filter lines on the loggf threshold value
+        metastable_lines = lines.loc[lines["loggf"] > levels_metastable_loggf_threshold]
+
+        # Count the remaining strong transitions
+        metastable_lines_grouped = metastable_lines.groupby("upper_level_id")
+        metastable_counts = metastable_lines_grouped["upper_level_id"].count()
+        metastable_counts.name = "metastable_counts"
+
+        # If there are no strong transitions for a level (the count is NaN) then the metastable flag is True
+        # else (the count is a natural number) the metastable flag is False
+        levels = levels.join(metastable_counts)
+        metastable_flags = levels["metastable_counts"].isnull()
+        metastable_flags.name = "metastable"
+
+        return metastable_flags
+
+    def _get_all_lines_data(self, levels):
         """ Returns the same output than `AtomData._get_all_lines_data()` """  
 
         gf = self.gfall_reader
@@ -524,7 +543,7 @@ class GFALL(BaseParser):
             df = gf.lines.loc[ion]
             df = df.reset_index()
 
-            lvl_index2id = self._levels_all.set_index(['atomic_number', 'ion_number']).loc[ion]
+            lvl_index2id = levels.set_index(['atomic_number', 'ion_number']).loc[ion]
             lvl_index2id = lvl_index2id.reset_index()
             lvl_index2id = lvl_index2id[['level_id']]
 
@@ -597,6 +616,7 @@ class GFALL(BaseParser):
     def _create_levels_lines(self):
         """ Returns almost the same output than `AtomData.create_levels_lines` method """
         levels_all = self._get_all_levels_data().reset_index()
+        lines_all = self._get_all_lines_data(levels_all)
         ionization_energies = self.ionization_energies.reset_index()
         ionization_energies['ion_number'] -= 1
         
@@ -604,10 +624,21 @@ class GFALL(BaseParser):
         levels_w_ionization_energies = pd.merge(levels_all, ionization_energies, how='left', \
             on=["atomic_number", "ion_number"])
         mask = levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
-
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index('level_id').sort_values(by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
+
+        # Clean lines
+        lines = lines_all.join(pd.DataFrame(index=levels.index), on="lower_level_id", how="inner").\
+            join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
+
+        # Culling lines with low gf values
+        lines = lines.loc[lines["loggf"] > -3]
+
+        # Do not clean levels that don't exist in lines
+
+        # Create the metastable flags for levels
+        levels["metastable"] = self._create_metastable_flags(levels, lines_all, -3)
 
         # Creating levels numbers
         levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
@@ -615,12 +646,11 @@ class GFALL(BaseParser):
             transform(lambda x: np.arange(len(x))).values
         levels["level_number"] = levels["level_number"].astype(np.int)
 
-        # Create `metastable` column with False as default
-        levels['metastable'] = False
         levels = levels[['atomic_number', 'energy', 'g', 'ion_number', \
             'level_number', 'metastable']]
 
         levels = levels.reset_index()
+        
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
