@@ -482,7 +482,9 @@ class GFALLIngester(object):
 
 class GFALL(BaseParser):
     """ Docstring """
-    def __init__(self, fname, ions):
+    def __init__(self, fname, ions, lines_loggf_threshold=-3, \
+        levels_metastable_loggf_threshold=-3):
+        
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ionization_data()
@@ -614,7 +616,7 @@ class GFALL(BaseParser):
 
         return levels
 
-    def _create_levels_lines(self):
+    def _create_levels_lines(self, lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3):
         """ Returns almost the same output than `AtomData.create_levels_lines` method """
         levels_all = self._get_all_levels_data().reset_index()
         lines_all = self._get_all_lines_data(levels_all)
@@ -634,12 +636,13 @@ class GFALL(BaseParser):
             join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
 
         # Culling lines with low gf values
-        lines = lines.loc[lines["loggf"] > -3]
+        lines = lines.loc[lines["loggf"] > lines_loggf_threshold]
 
         # Do not clean levels that don't exist in lines
 
         # Create the metastable flags for levels
-        levels["metastable"] = self._create_metastable_flags(levels, lines_all, -3)
+        levels["metastable"] = self._create_metastable_flags(levels, lines_all, \
+            levels_metastable_loggf_threshold)
 
         # Create levels numbers
         levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
