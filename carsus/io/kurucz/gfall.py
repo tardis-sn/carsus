@@ -481,10 +481,21 @@ class GFALLIngester(object):
 
 
 class GFALL(BaseParser):
-    """ Docstring """
+    """
+    Attributes
+    ----------
+    levels_prepared : pandas.DataFrame
+    lines_prepared : pandas.DataFrame
+
+    Methods
+    -------
+    to_hdf(fname)
+        Dump `levels_prepared` and `lines_prepared` attributes into an HDF5 file
+
+    """
     def __init__(self, fname, ions, lines_loggf_threshold=-3, \
         levels_metastable_loggf_threshold=-3):
-        
+
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ionization_data()
@@ -502,24 +513,23 @@ class GFALL(BaseParser):
 
     @staticmethod
     def _create_artificial_fully_ionized(levels):
-        """ Create artificial levels for fully ionized ions. """
+        """ Create artificial levels for fully ionized ions """
         fully_ionized_levels = list()
-    
+
         for atomic_number, _ in levels.groupby("atomic_number"):
             fully_ionized_levels.append(
                 (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
             )
-    
+
         levels_columns = ["level_id", "atomic_number", "ion_number", "level_number", "energy", "g", "metastable"]
         fully_ionized_levels_dtypes = [(key, levels.dtypes[key]) for key in levels_columns]
-    
+
         fully_ionized_levels = np.array(fully_ionized_levels, dtype=fully_ionized_levels_dtypes)
-    
+
         return pd.DataFrame(data=fully_ionized_levels)
 
     @staticmethod
     def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
-
         # Filter lines on the loggf threshold value
         metastable_lines = lines.loc[lines["loggf"] > levels_metastable_loggf_threshold]
 
@@ -537,8 +547,7 @@ class GFALL(BaseParser):
         return metastable_flags
 
     def _get_all_lines_data(self, levels):
-        """ Returns the same output than `AtomData._get_all_lines_data()` """  
-
+        """ Returns the same output than `AtomData._get_all_lines_data()` """
         gf = self.gfall_reader
         df_list = []
 
@@ -566,7 +575,7 @@ class GFALL(BaseParser):
             df['lower_level_id'] = pd.Series(lower_level_id)
             df['upper_level_id'] = pd.Series(upper_level_id)
             df_list.append(df)
-        
+
         lines = pd.concat(df_list)
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
