@@ -737,3 +737,16 @@ class GFALL(BaseParser):
                     "level_number_lower", "level_number_upper"], inplace=True)
 
         return lines_prepared
+
+
+    def to_hdf(self, fname):
+        """Dump the `base` attribute into an HDF5 file
+
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        """
+        with pd.HDFStore(fname, 'a') as f:
+            f.append('/levels', self.levels_prepared)
+            f.append('/lines', self.lines_prepared)
