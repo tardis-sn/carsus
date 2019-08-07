@@ -688,3 +688,52 @@ class GFALL(BaseParser):
 
         self.lines = lines
         self.levels = levels
+
+    @property
+    def levels_prepared(self):
+        """
+        Prepare the DataFrame with levels for TARDIS
+
+        Returns
+        -------
+        levels_prepared: pandas.DataFrame
+            DataFrame with:
+                index: none;
+                columns: atomic_number, ion_number, level_number, energy[eV], g[1], metastable.
+        """
+
+        levels_prepared = self.levels.loc[:, [
+            "atomic_number", "ion_number", "level_number",
+            "energy", "g", "metastable"]].copy()
+
+        # Set index
+        levels_prepared.set_index(
+                ["atomic_number", "ion_number", "level_number"], inplace=True)
+
+        return levels_prepared
+
+    @property
+    def lines_prepared(self):
+        """
+            Prepare the DataFrame with lines for TARDIS
+
+            Returns
+            -------
+            lines_prepared : pandas.DataFrame
+                DataFrame with:
+                    index: none;
+                    columns: line_id, atomic_number, ion_number, level_number_lower, level_number_upper,
+                             wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1], B_ul[?], B_ul[?], A_ul[1/s].
+        """
+
+        lines_prepared = self.lines.loc[:, [
+            "line_id", "wavelength", "atomic_number", "ion_number",
+            "f_ul", "f_lu", "level_number_lower", "level_number_upper",
+            "nu", "B_lu", "B_ul", "A_ul"]].copy()
+
+        # Set the index
+        lines_prepared.set_index([
+                    "atomic_number", "ion_number",
+                    "level_number_lower", "level_number_upper"], inplace=True)
+
+        return lines_prepared
