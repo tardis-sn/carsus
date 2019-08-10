@@ -1,1 +1,1 @@
-from .gfall import GFALLReader, GFALLIngester
+from .gfall import GFALLReader, GFALLIngester, GFALL
