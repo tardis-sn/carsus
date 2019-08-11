@@ -915,5 +915,7 @@ class GFALL(BaseParser):
            Path to the HDF5 output file
         """
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/levels', self.levels_prepared)
-            f.append('/lines', self.lines_prepared)
+            f.put('/levels', self.levels_prepared)
+            f.put('/lines', self.lines_prepared)
+            f.put('/macro_atom_data', self.macro_atom_prepared)
+            f.put('/macro_atom_references', self.macro_atom_references_prepared)
