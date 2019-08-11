@@ -500,12 +500,17 @@ class GFALL(BaseParser):
     def __init__(self, fname, ions, lines_loggf_threshold=-3, \
         levels_metastable_loggf_threshold=-3):
 
+        self.levels_lines_param = {
+            "levels_metastable_loggf_threshold": levels_metastable_loggf_threshold,
+            "lines_loggf_threshold": lines_loggf_threshold
+        }
+
         self.ions = parse_selected_species(ions)
         self.gfall_reader = GFALLReader(fname)
         self._create_ionization_data()
         self.levels_all = self._get_all_levels_data().reset_index()
         self.lines_all = self._get_all_lines_data(self.levels_all)
-        self._create_levels_lines()
+        self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
         self._create_macro_atom_references()
 
