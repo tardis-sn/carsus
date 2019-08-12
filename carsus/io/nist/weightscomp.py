@@ -217,7 +217,8 @@ class NISTWeightsComp(BaseParser):
 
             atom_masses = self.parser.prepare_atomic_dataframe()
             atom_masses = atom_masses.drop(columns='atomic_weight_std_dev')
-            atom_masses = atom_masses.rename(columns={'atomic_weight_nominal_value': 'mass'})
+            atom_masses = atom_masses.rename(
+                            columns={'atomic_weight_nominal_value': 'mass'})
 
             data = atom_masses.loc[[(atomic_number)]]
             data['symbol'] = basic_atomic_data['symbol']
