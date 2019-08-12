@@ -314,7 +314,8 @@ class NISTIonizationEnergies(BaseParser):
         ionization_data = pd.DataFrame()
         ionization_data['atomic_number'] = self.parser.base['atomic_number']
         ionization_data['ion_number'] = self.parser.base['ion_charge'] + 1
-        ionization_data['ionization_energy'] = self.parser.base['ionization_energy_str'].str.strip('[]()').astype(np.float64)
+        ionization_data['ionization_energy'] = self.parser.base[
+                        'ionization_energy_str'].str.strip('[]()').astype(np.float64)
         ionization_data.set_index(['atomic_number', 'ion_number'], inplace=True)
 
         # `base` attribute is a Series object
