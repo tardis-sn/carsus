@@ -313,8 +313,24 @@ class GFALLReader(object):
         lines = lines_upper_idx.reset_index().set_index(
             ['atomic_number', 'ion_charge', 'level_index_lower', 'level_index_upper'])
 
-
         return lines
+
+    def to_hdf(self, fname, key='lines', raw=True):
+        """Dump the `base` attribute into an HDF5 file
+
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        raw : bool
+           If `True` stores `gfall_raw` attribute (default is `True`).
+        """
+        with pd.HDFStore(fname, 'a') as f:
+            if raw:
+                f.put(key, self.gfall_raw)
+            
+            else:
+                f.put(key, self.gfall)
 
 
 class GFALLIngester(object):
@@ -474,5 +490,4 @@ class GFALLIngester(object):
         if lines:
             self.ingest_lines()
             self.session.flush()
-
 
