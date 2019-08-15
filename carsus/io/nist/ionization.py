@@ -348,4 +348,4 @@ class NISTIonizationEnergies(BaseParser):
            Path to the HDF5 output file
         """
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/ionization_data', self.base)
+            f.put('/ionization_data', self.base)

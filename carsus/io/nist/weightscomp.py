@@ -239,4 +239,4 @@ class NISTWeightsComp(BaseParser):
            Path to the HDF5 output file
         """
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})
+            f.put('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})
