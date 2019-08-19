@@ -36,6 +36,7 @@ class TARDISAtomData:
 
         self.ionization_energies = ionization_energies.base
         self.ground_levels = ionization_energies.get_ground_levels()
+        self.ground_levels.rename(columns={'ion_charge': 'ion_number'}, inplace=True)
 
         self.levels_all = self._get_all_levels_data().reset_index()
         self.lines_all = self._get_all_lines_data(self.levels_all)
@@ -174,7 +175,6 @@ class TARDISAtomData:
         mask = levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index('level_id').sort_values(by=['atomic_number', 'ion_number'])
-        levels['ion_number'] = levels['ion_number'].astype(np.int64)
         levels = levels.drop(columns='ionization_energy')
 
         # Clean lines
@@ -292,7 +292,7 @@ class TARDISAtomData:
         fname : path
            Path to the HDF5 output file
         """
-        
+
         with pd.HDFStore(fname, 'a') as f:
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
