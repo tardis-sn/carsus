@@ -143,12 +143,14 @@ class CMFGENEnergyLevelsParser(BaseParser):
         kwargs['header'] = None
         kwargs['index_col'] = False
         kwargs['sep'] = '\s+'
-        kwargs['skiprows'] = find_row(fname, "Number of transitions", num_row=True)
+        kwargs['skiprows'] = find_row(
+            fname, "Number of transitions", num_row=True)
 
         n = int(meta['Number of energy levels'])
         kwargs['nrows'] = n
 
-        columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
+        columns = ['Configuration', 'g',
+                   'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
@@ -173,7 +175,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = df.drop(columns=['#'])
 
         elif df.shape[1] == 6:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '#']
+            df.columns = ['Configuration', 'g',
+                          'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '#']
             df = df.drop(columns=['#'])
 
         elif df.shape[1] == 5:
@@ -181,7 +184,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = df.drop(columns=['#'])
 
         else:
-            warnings.warn('Inconsistent number of columns')  # TODO: raise exception here (discuss)
+            # TODO: raise exception here (discuss)
+            warnings.warn('Inconsistent number of columns')
 
         self.fname = fname
         self.base = df
@@ -191,7 +195,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
     def to_hdf(self, key='/energy_levels'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.append(key, self.base)
+                f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
 
@@ -219,13 +223,15 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         kwargs['header'] = None
         kwargs['index_col'] = False
         kwargs['sep'] = '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])'
-        kwargs['skiprows'] = find_row(fname, "Transition", "Lam", num_row=True) + 1
+        kwargs['skiprows'] = find_row(
+            fname, "Transition", "Lam", num_row=True) + 1
 
         # Will only parse tables listed increasing lower level i, e.g. FE/II/24may96/osc_nahar.dat
         n = int(meta['Number of transitions'])
         kwargs['nrows'] = n
 
-        columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+        columns = ['State A', 'State B', 'f', 'A',
+                   'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
@@ -264,7 +270,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     def to_hdf(self, key='/oscillator_strengths'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.append(key, self.base)
+                f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
 
@@ -299,18 +305,21 @@ class CMFGENCollisionalDataParser(BaseParser):
 
         # FIXME: expensive solution for two files with more than one table
         # ARG/III/19nov07/col_ariii  &  HE/II/5dec96/he2col.dat
-        footer = find_row(fname, "Johnson values:", "dln_OMEGA_dlnT", how='one', num_row=True)
+        footer = find_row(fname, "Johnson values:",
+                          "dln_OMEGA_dlnT", how='one', num_row=True)
         if footer is not None:
             kwargs['nrows'] = footer - kwargs['skiprows'] - 2
 
         try:
             names = find_row(fname, 'ransition\T').split()  # Not a typo
             # Comment next line when trying new regexes!
-            names = [np.format_float_scientific(to_float(x)*1e+04, precision=4) for x in names[1:]]
+            names = [np.format_float_scientific(
+                to_float(x)*1e+04, precision=4) for x in names[1:]]
             kwargs['names'] = ['State A', 'State B'] + names
 
         except AttributeError:
-            warnings.warn('No column names')  # TODO: some files have no column names nor header
+            # TODO: some files have no column names nor header
+            warnings.warn('No column names')
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
@@ -333,7 +342,7 @@ class CMFGENCollisionalDataParser(BaseParser):
     def to_hdf(self, key='/collisional_data'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.append(key, self.base)
+                f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
 
@@ -385,7 +394,8 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     values = f.readline().split()
                     if len(values) == 8:  # Verner ground state fits
 
-                        data.append(list(map(int, values[:2])) + list(map(float, values[2:])))
+                        data.append(
+                            list(map(int, values[:2])) + list(map(float, values[2:])))
 
                         if i == p/len(values) - 1:
                             break
@@ -420,7 +430,8 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     df.columns = ['Fit coefficients']
 
                 elif df.shape[1] == 8:  # Verner ground state fits. TODO: add units
-                    df.columns = ['n', 'l', 'E', 'E_0', 'sigma_0', 'y(a)', 'P', 'y(w)']
+                    df.columns = ['n', 'l', 'E', 'E_0',
+                                  'sigma_0', 'y(a)', 'P', 'y(w)']
 
                 else:
                     warnings.warn('Inconsistent number of columns')
@@ -438,7 +449,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
                 for i in range(0, len(self.base)-1):
                     subkey = '{0}/{1}'.format(key, i)
-                    f.append(subkey, self.base[i])
+                    f.put(subkey, self.base[i])
                     f.get_storer(subkey).attrs.metadata = self.base[i]._meta
 
                 f.root._v_attrs['metadata'] = self.meta

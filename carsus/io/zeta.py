@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 from carsus.io.base import BaseParser
 from carsus.model import (
-        Zeta,
-        Temperature,
-        DataSource
-        )
+    Zeta,
+    Temperature,
+    DataSource
+)
 
 
 class KnoxLongZetaIngester(object):
@@ -14,9 +14,9 @@ class KnoxLongZetaIngester(object):
         self.session = session
         self.data_fn = data_fn
         self.data_source = DataSource.as_unique(
-                self.session,
-                short_name=ds_name
-                )
+            self.session,
+            short_name=ds_name
+        )
         if self.data_source.data_source_id is None:
             self.session.flush()
 
@@ -27,14 +27,14 @@ class KnoxLongZetaIngester(object):
         names += [str(i) for i in t_values]
 
         zeta = np.recfromtxt(
-                self.data_fn,
-                usecols=range(1, 23),
-                names=names)
+            self.data_fn,
+            usecols=range(1, 23),
+            names=names)
 
         zeta_df = (
-                pd.DataFrame.from_records(zeta).set_index(
-                    ['atomic_number', 'ion_charge']).T
-                )
+            pd.DataFrame.from_records(zeta).set_index(
+                ['atomic_number', 'ion_charge']).T
+        )
 
         data = list()
         for i, s in zeta_df.iterrows():
@@ -45,13 +45,13 @@ class KnoxLongZetaIngester(object):
             for (atomic_number, ion_charge), rate in s.items():
                 data.append(
                     Zeta(
-                            atomic_number=atomic_number,
-                            ion_charge=ion_charge,
-                            data_source=self.data_source,
-                            temp=T,
-                            zeta=rate
-                            )
+                        atomic_number=atomic_number,
+                        ion_charge=ion_charge,
+                        data_source=self.data_source,
+                        temp=T,
+                        zeta=rate
                     )
+                )
 
     def ingest(self):
         self.ingest_zeta_values()
@@ -70,6 +70,7 @@ class KnoxLongZeta(BaseParser):
         to_hdf(fname)
             Dump the `base` attribute into an HDF5 file
     """
+
     def __init__(self, fname):
         self.fname = fname
         self._prepare_data()
@@ -81,14 +82,14 @@ class KnoxLongZeta(BaseParser):
         names += [str(i) for i in t_values]
 
         zeta_raw = np.recfromtxt(
-                self.fname,
-                usecols=range(1, 23),
-                names=names)
+            self.fname,
+            usecols=range(1, 23),
+            names=names)
 
         self.base = (
-                pd.DataFrame(zeta_raw).set_index(
-                    ['atomic_number', 'ion_charge'])
-                )
+            pd.DataFrame(zeta_raw).set_index(
+                ['atomic_number', 'ion_charge'])
+        )
 
         columns = [float(c) for c in self.base.columns]
 
@@ -105,4 +106,4 @@ class KnoxLongZeta(BaseParser):
            Path to the HDF5 output file
         """
         with pd.HDFStore(fname, 'a') as f:
-            f.append('/zeta_data', self.base)
+            f.put('/zeta_data', self.base)
