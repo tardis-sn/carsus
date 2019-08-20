@@ -19,11 +19,14 @@ class TARDISAtomData:
     ----------
     levels_prepared : pandas.DataFrame
     lines_prepared : pandas.DataFrame
+    macro_atom_prepared : pandas.DataFrame
+    macro_atom_references_prepared : pandas.DataFrame
+
 
     Methods
     -------
     to_hdf(fname)
-        Dump `levels_prepared` and `lines_prepared` attributes into an HDF5 file
+        Dump all attributes into an HDF5 file
     """
 
     def __init__(self, gfall_reader, ionization_energies, ions, lines_loggf_threshold=-3, \
