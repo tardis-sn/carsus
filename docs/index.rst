@@ -19,4 +19,4 @@ Contents:
     api
     model
     macroatom
-    notebooks/kurucz_chianti_h_he.ipynb
+    notebooks/tardis_atomic_file.ipynb
