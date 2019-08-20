@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import hashlib
+import uuid
 from carsus.util import parse_selected_species, convert_wavelength_air2vacuum
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 from astropy import units as u
@@ -485,3 +487,16 @@ class TARDISAtomData:
             f.put('/lines', self.lines_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references', self.macro_atom_references_prepared)
+
+            md5_hash = hashlib.md5()
+            for key in f.keys():
+                tmp = np.ascontiguousarray(f[key].values.data)
+                md5_hash.update(tmp)
+
+            uuid1 = uuid.uuid1().hex
+
+            print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(
+                md5_hash.hexdigest(), uuid1))
+
+            f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
+            f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
