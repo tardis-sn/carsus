@@ -45,8 +45,6 @@ class TARDISAtomData:
 
         self.ionization_energies = ionization_energies.base
         self.ground_levels = ionization_energies.get_ground_levels()
-        self.ground_levels.rename(
-            columns={'ion_charge': 'ion_number'}, inplace=True)
 
         self.levels_all = self._get_all_levels_data().reset_index()
         self.lines_all = self._get_all_lines_data(self.levels_all)
@@ -116,7 +114,17 @@ class TARDISAtomData:
             lambda x: x.to(u.eV, equivalencies=u.spectral()))
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
-        levels = pd.concat([self.ground_levels, levels], sort=True)
+        ground_levels = self.ground_levels
+        ground_levels.rename(
+            columns={'ion_charge': 'ion_number'}, inplace=True)
+
+        # Fixes Ar II duplicated ground level. For Kurucz, ground state has g=2,
+        # for NIST has g=4. We keep Kurucz.
+        mask = (ground_levels['atomic_number'] == 18) & (
+            ground_levels['ion_number'] == 1)
+        ground_levels.loc[mask, 'g'] = 2
+
+        levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
         levels = levels.drop_duplicates(keep='last')
