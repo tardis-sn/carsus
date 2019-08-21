@@ -32,11 +32,13 @@ class TARDISAtomData:
         Dump all attributes into an HDF5 file
     """
 
-    def __init__(self, gfall_reader, ionization_energies, ions, lines_loggf_threshold=-3,
+    def __init__(self, gfall_reader, ionization_energies, ions,
+                 lines_loggf_threshold=-3,
                  levels_metastable_loggf_threshold=-3):
 
         self.levels_lines_param = {
-            "levels_metastable_loggf_threshold": levels_metastable_loggf_threshold,
+            "levels_metastable_loggf_threshold":
+            levels_metastable_loggf_threshold,
             "lines_loggf_threshold": lines_loggf_threshold
         }
 
@@ -64,7 +66,8 @@ class TARDISAtomData:
             )
 
         levels_columns = ["level_id", "atomic_number",
-                          "ion_number", "level_number", "energy", "g", "metastable"]
+                          "ion_number", "level_number",
+                          "energy", "g", "metastable"]
         fully_ionized_levels_dtypes = [
             (key, levels.dtypes[key]) for key in levels_columns]
 
@@ -74,7 +77,8 @@ class TARDISAtomData:
         return pd.DataFrame(data=fully_ionized_levels)
 
     @staticmethod
-    def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
+    def _create_metastable_flags(levels, lines,
+                                 levels_metastable_loggf_threshold=-3):
         # Filter lines on the loggf threshold value
         metastable_lines = lines.loc[lines["loggf"]
                                      > levels_metastable_loggf_threshold]
@@ -84,8 +88,9 @@ class TARDISAtomData:
         metastable_counts = metastable_lines_grouped["upper_level_id"].count()
         metastable_counts.name = "metastable_counts"
 
-        # If there are no strong transitions for a level (the count is NaN) then the metastable flag is True
-        # else (the count is a natural number) the metastable flag is False
+        # If there are no strong transitions for a level (the count is NaN)
+        # then the metastable flag is True else (the count is a natural number)
+        # the metastable flag is False
         levels = levels.join(metastable_counts)
         metastable_flags = levels["metastable_counts"].isnull()
         metastable_flags.name = "metastable"
@@ -101,7 +106,9 @@ class TARDISAtomData:
         ions_df = pd.DataFrame.from_records(
             self.ions, columns=["atomic_number", "ion_charge"])
         ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
-        levels = gf.levels.reset_index().join(ions_df, how="inner", on=["atomic_number", "ion_charge"]).\
+        levels = gf.levels.reset_index().join(ions_df, how="inner",
+                                              on=["atomic_number",
+                                                  "ion_charge"]).\
             set_index(["atomic_number", "ion_charge"])
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels['level_id'] = range(1, len(levels)+1)
@@ -118,8 +125,8 @@ class TARDISAtomData:
         ground_levels.rename(
             columns={'ion_charge': 'ion_number'}, inplace=True)
 
-        # Fixes Ar II duplicated ground level. For Kurucz, ground state has g=2,
-        # for NIST has g=4. We keep Kurucz.
+        # Fixes Ar II duplicated ground level. For Kurucz, ground state
+        # has g=2, for NIST has g=4. We keep Kurucz.
         mask = (ground_levels['atomic_number'] == 18) & (
             ground_levels['ion_number'] == 1)
         ground_levels.loc[mask, 'g'] = 2
@@ -141,7 +148,7 @@ class TARDISAtomData:
             try:
                 df = gf.lines.loc[ion]
 
-            except (KeyError, TypeError) as e:
+            except (KeyError, TypeError):
                 continue
 
             df = df.reset_index()
@@ -172,8 +179,9 @@ class TARDISAtomData:
         lines['loggf'] = lines['gf'].apply(np.log10)
 
         lines.set_index('line_id', inplace=True)
-        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
-                            'level_index_lower', 'level_index_upper'], inplace=True)
+        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
+                            'j_lower', 'level_index_lower',
+                            'level_index_upper'], inplace=True)
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
@@ -193,24 +201,31 @@ class TARDISAtomData:
 
         return lines
 
-    def _create_levels_lines(self, lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3):
-        """ Returns almost the same output than `AtomData.create_levels_lines` method """
+    def _create_levels_lines(self, lines_loggf_threshold=-3,
+                             levels_metastable_loggf_threshold=-3):
+        """ Returns almost the same output than
+        `AtomData.create_levels_lines` method """
         levels_all = self.levels_all
         lines_all = self.lines_all
         ionization_energies = self.ionization_energies.reset_index()
         ionization_energies['ion_number'] -= 1
 
         # Culling autoionization levels
-        levels_w_ionization_energies = pd.merge(levels_all, ionization_energies, how='left',
-                                                on=["atomic_number", "ion_number"])
-        mask = levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
+        levels_w_ionization_energies = pd.merge(levels_all,
+                                                ionization_energies,
+                                                how='left',
+                                                on=["atomic_number",
+                                                    "ion_number"])
+        mask = levels_w_ionization_energies["energy"] < \
+            levels_w_ionization_energies["ionization_energy"]
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index('level_id').sort_values(
             by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
 
         # Clean lines
-        lines = lines_all.join(pd.DataFrame(index=levels.index), on="lower_level_id", how="inner").\
+        lines = lines_all.join(pd.DataFrame(index=levels.index),
+                               on="lower_level_id", how="inner").\
             join(pd.DataFrame(index=levels.index),
                  on="upper_level_id", how="inner")
 
@@ -220,20 +235,23 @@ class TARDISAtomData:
         # Do not clean levels that don't exist in lines
 
         # Create the metastable flags for levels
-        levels["metastable"] = self._create_metastable_flags(levels, lines_all,
-                                                             levels_metastable_loggf_threshold)
+        levels["metastable"] = \
+            self._create_metastable_flags(levels, lines_all,
+                                          levels_metastable_loggf_threshold)
 
         # Create levels numbers
         levels = levels.sort_values(
             ["atomic_number", "ion_number", "energy", "g"])
-        levels["level_number"] = levels.groupby(['atomic_number', 'ion_number'])['energy']. \
+        levels["level_number"] = levels.groupby(['atomic_number',
+                                                 'ion_number'])['energy']. \
             transform(lambda x: np.arange(len(x))).values
         levels["level_number"] = levels["level_number"].astype(np.int)
 
         levels = levels[['atomic_number', 'energy', 'g', 'ion_number',
                          'level_number', 'metastable']]
 
-        # Join atomic_number, ion_number, level_number_lower, level_number_upper on lines
+        # Join atomic_number, ion_number, level_number_lower,
+        # level_number_upper on lines
         lower_levels = levels.rename(
             columns={
                 "level_number": "level_number_lower",
@@ -247,7 +265,8 @@ class TARDISAtomData:
         lines = lines.join(lower_levels, on="lower_level_id").join(
             upper_levels, on="upper_level_id")
 
-        # Calculate absorption oscillator strength f_lu and emission oscillator strength f_ul
+        # Calculate absorption oscillator strength f_lu and emission
+        # oscillator strength f_ul
         lines["f_lu"] = lines["gf"] / lines["g_l"]
         lines["f_ul"] = lines["gf"] / lines["g_u"]
 
@@ -271,8 +290,8 @@ class TARDISAtomData:
         levels = levels.reset_index()
 
         # Create and append artificial levels for fully ionized ions
-        artificial_fully_ionized_levels = self._create_artificial_fully_ionized(
-            levels)
+        artificial_fully_ionized_levels = \
+            self._create_artificial_fully_ionized(levels)
         levels = levels.append(
             artificial_fully_ionized_levels, ignore_index=True)
         levels = levels.sort_values(
@@ -290,7 +309,8 @@ class TARDISAtomData:
         levels_prepared: pandas.DataFrame
             DataFrame with:
                 index: none;
-                columns: atomic_number, ion_number, level_number, energy[eV], g[1], metastable.
+                columns: atomic_number, ion_number, level_number,
+                            energy[eV], g[1], metastable.
         """
 
         levels_prepared = self.levels.loc[:, [
@@ -312,8 +332,10 @@ class TARDISAtomData:
             lines_prepared : pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: line_id, atomic_number, ion_number, level_number_lower, level_number_upper,
-                             wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1], B_ul[?], B_ul[?], A_ul[1/s].
+                    columns: line_id, atomic_number, ion_number,
+                             level_number_lower, level_number_upper,
+                             wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
+                             B_ul[?], B_ul[?], A_ul[1/s].
         """
 
         lines_prepared = self.lines.loc[:, [
@@ -336,10 +358,12 @@ class TARDISAtomData:
             macro_atom: pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: atomic_number, ion_number, source_level_number, target_level_number,
-                        transition_line_id, transition_type, transition_probability.
+                    columns: atomic_number, ion_number, source_level_number,
+                             target_level_number, transition_line_id,
+                             transition_type, transition_probability.
             Notes:
-                Refer to the docs: http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
+                Refer to the docs:
+                http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
         """
         # Exclude artificially created levels from levels
         levels = self.levels.loc[self.levels["level_id"]
@@ -358,11 +382,14 @@ class TARDISAtomData:
         macro_atom_dtype = [("atomic_number", np.int), ("ion_number", np.int),
                             ("source_level_number",
                              np.int), ("target_level_number", np.int),
-                            ("transition_line_id", np.int), ("transition_type", np.int), ("transition_probability", np.float)]
+                            ("transition_line_id",
+                             np.int), ("transition_type", np.int),
+                            ("transition_probability", np.float)]
 
         for line_id, row in lines.iterrows():
             atomic_number, ion_number = row["atomic_number"], row["ion_number"]
-            level_number_lower, level_number_upper = row["level_number_lower"], row["level_number_upper"]
+            level_number_lower, level_number_upper = \
+                row["level_number_lower"], row["level_number_upper"]
             nu = row["nu"]
             f_ul, f_lu = row["f_ul"], row["f_lu"]
             e_lower, e_upper = row["energy_lower"], row["energy_upper"]
@@ -375,12 +402,15 @@ class TARDISAtomData:
             transition_probabilities_dict[P_INTERNAL_UP] = f_lu * \
                 e_lower / (const.h.cgs.value * nu)
 
-            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
-                               line_id, P_EMISSION_DOWN, transition_probabilities_dict[P_EMISSION_DOWN]))
-            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
-                               line_id, P_INTERNAL_DOWN, transition_probabilities_dict[P_INTERNAL_DOWN]))
-            macro_atom.append((atomic_number, ion_number, level_number_lower, level_number_upper,
-                               line_id, P_INTERNAL_UP, transition_probabilities_dict[P_INTERNAL_UP]))
+            macro_atom.append((atomic_number, ion_number, level_number_upper,
+                               level_number_lower, line_id, P_EMISSION_DOWN,
+                               transition_probabilities_dict[P_EMISSION_DOWN]))
+            macro_atom.append((atomic_number, ion_number, level_number_upper,
+                               level_number_lower, line_id, P_INTERNAL_DOWN,
+                               transition_probabilities_dict[P_INTERNAL_DOWN]))
+            macro_atom.append((atomic_number, ion_number, level_number_lower,
+                               level_number_upper, line_id, P_INTERNAL_UP,
+                               transition_probabilities_dict[P_INTERNAL_UP]))
 
         macro_atom = np.array(macro_atom, dtype=macro_atom_dtype)
         macro_atom = pd.DataFrame(macro_atom)
@@ -399,10 +429,12 @@ class TARDISAtomData:
             macro_atom_prepared : pandas.DataFrame
                 DataFrame with the *macro atom data* with:
                     index: none;
-                    columns: atomic_number, ion_number, source_level_number, destination_level_number,
-                        transition_line_id, transition_type, transition_probability.
+                    columns: atomic_number, ion_number, source_level_number,
+                             destination_level_number, transition_line_id
+                             transition_type, transition_probability.
             Notes:
-                Refer to the docs: http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
+                Refer to the docs:
+                http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
         """
 
         macro_atom_prepared = self.macro_atom.loc[:, [
@@ -430,9 +462,11 @@ class TARDISAtomData:
             macro_atom_reference : pandas.DataFrame
                 DataFrame with:
                 index: no index;
-                and columns: atomic_number, ion_number, source_level_number, count_down, count_up, count_total
+                and columns: atomic_number, ion_number, source_level_number,
+                count_down, count_up, count_total
         """
-        macro_atom_references = self.levels.rename(columns={"level_number": "source_level_number"}).\
+        macro_atom_references = self.levels.rename(
+            columns={"level_number": "source_level_number"}).\
             loc[:, ["atomic_number", "ion_number",
                     "source_level_number", "level_id"]]
 
@@ -452,12 +486,12 @@ class TARDISAtomData:
             macro_atom_references["count_up"]
 
         # Convert to int
-        macro_atom_references["count_down"] = macro_atom_references["count_down"].astype(
-            np.int)
-        macro_atom_references["count_up"] = macro_atom_references["count_up"].astype(
-            np.int)
-        macro_atom_references["count_total"] = macro_atom_references["count_total"].astype(
-            np.int)
+        macro_atom_references["count_down"] = \
+            macro_atom_references["count_down"].astype(np.int)
+        macro_atom_references["count_up"] = \
+            macro_atom_references["count_up"].astype(np.int)
+        macro_atom_references["count_total"] = \
+            macro_atom_references["count_total"].astype(np.int)
 
         self.macro_atom_references = macro_atom_references
 
@@ -470,7 +504,8 @@ class TARDISAtomData:
             macro_atom_references_prepared : pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: atomic_number, ion_number, source_level_number, count_down, count_up, count_total.
+                    columns: atomic_number, ion_number, source_level_number,
+                             count_down, count_up, count_total.
         """
         macro_atom_references_prepared = self.macro_atom_references.loc[:, [
             "atomic_number", "ion_number", "source_level_number", "count_down",
@@ -494,7 +529,8 @@ class TARDISAtomData:
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
-            f.put('/macro_atom_references', self.macro_atom_references_prepared)
+            f.put('/macro_atom_references',
+                  self.macro_atom_references_prepared)
 
             md5_hash = hashlib.md5()
             for key in f.keys():
