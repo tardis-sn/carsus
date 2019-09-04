@@ -8,6 +8,7 @@ from astropy import units as u
 from astropy import constants as const
 
 # [nm], wavelengths above this value are given in air
+# TODO: pass GFALL_AIR_THRESHOLD as parameter
 GFALL_AIR_THRESHOLD = 200
 
 P_EMISSION_DOWN = -1
@@ -101,7 +102,7 @@ class TARDISAtomData:
         """ Returns the same output than `AtomData._get_all_levels_data()` """
         gf = self.gfall_reader
         gf.levels['g'] = 2*gf.levels['j'] + 1
-        gf.levels['g'] = gf.levels['g'].map(np.int)
+        gf.levels['g'] = gf.levels['g'].astype(np.int)
 
         ions_df = pd.DataFrame.from_records(
             self.ions, columns=["atomic_number", "ion_charge"])
@@ -127,6 +128,7 @@ class TARDISAtomData:
 
         # Fixes Ar II duplicated ground level. For Kurucz, ground state
         # has g=2, for NIST has g=4. We keep Kurucz.
+
         mask = (ground_levels['atomic_number'] == 18) & (
             ground_levels['ion_number'] == 1)
         ground_levels.loc[mask, 'g'] = 2
@@ -274,6 +276,7 @@ class TARDISAtomData:
         lines['nu'] = u.Quantity(
             lines['wavelength'], 'angstrom').to('Hz', u.spectral())
 
+        # TODO: move Einstein coefficients calculation into a static method
         # Calculate Einstein coefficients
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
@@ -335,7 +338,8 @@ class TARDISAtomData:
                     columns: line_id, atomic_number, ion_number,
                              level_number_lower, level_number_upper,
                              wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
-                             B_ul[?], B_ul[?], A_ul[1/s].
+                             B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1], 
+                             A_ul[1/s].
         """
 
         lines_prepared = self.lines.loc[:, [
@@ -363,7 +367,7 @@ class TARDISAtomData:
                              transition_type, transition_probability.
             Notes:
                 Refer to the docs:
-                http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
+                https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
         """
         # Exclude artificially created levels from levels
         levels = self.levels.loc[self.levels["level_id"]
@@ -434,7 +438,7 @@ class TARDISAtomData:
                              transition_type, transition_probability.
             Notes:
                 Refer to the docs:
-                http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
+                https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
         """
 
         macro_atom_prepared = self.macro_atom.loc[:, [
