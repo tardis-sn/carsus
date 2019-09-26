@@ -101,20 +101,24 @@ class TARDISAtomData:
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
         gf = self.gfall_reader
-        gf.levels['g'] = 2*gf.levels['j'] + 1
-        gf.levels['g'] = gf.levels['g'].astype(np.int)
+        df_list = []
 
-        ions_df = pd.DataFrame.from_records(
-            self.ions, columns=["atomic_number", "ion_charge"])
-        ions_df = ions_df.set_index(['atomic_number', 'ion_charge'])
-        levels = gf.levels.reset_index().join(ions_df, how="inner",
-                                              on=["atomic_number",
-                                                  "ion_charge"]).\
-            set_index(["atomic_number", "ion_charge"])
+        for ion in self.ions:
+            try:
+                df = gf.levels.loc[ion].copy()
+
+            except (KeyError, TypeError):
+                continue
+
+            df['atomic_number'] = ion[0]
+            df['ion_number'] = ion[1]
+            df_list.append(df)
+
+        levels = pd.concat(df_list, sort=True)
+        levels['g'] = 2*levels['j'] + 1
+        levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
-        levels['level_id'] = range(1, len(levels)+1)
-        levels = levels.reset_index().reset_index(drop=True)
-        levels = levels.rename(columns={'ion_charge': 'ion_number'})
+        levels = levels.reset_index(drop=True)
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy']]
 
         levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
@@ -338,7 +342,7 @@ class TARDISAtomData:
                     columns: line_id, atomic_number, ion_number,
                              level_number_lower, level_number_upper,
                              wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
-                             B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1], 
+                             B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1],
                              A_ul[1/s].
         """
 
