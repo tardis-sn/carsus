@@ -98,6 +98,17 @@ class TARDISAtomData:
 
         return metastable_flags
 
+    @staticmethod
+    def _create_einstein_coeff(lines):
+        einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
+                          2) / (const.m_e.cgs.value * const.c.cgs.value)
+        lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
+            (const.h.cgs.value * lines['nu'])
+        lines['B_ul'] = einstein_coeff * lines['f_ul'] / \
+            (const.h.cgs.value * lines['nu'])
+        lines['A_ul'] = 2 * einstein_coeff * lines['nu'] ** 2 / \
+            const.c.cgs.value ** 2 * lines['f_ul']
+
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
         gf = self.gfall_reader
@@ -280,16 +291,8 @@ class TARDISAtomData:
         lines['nu'] = u.Quantity(
             lines['wavelength'], 'angstrom').to('Hz', u.spectral())
 
-        # TODO: move Einstein coefficients calculation into a static method
-        # Calculate Einstein coefficients
-        einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
-                          2) / (const.m_e.cgs.value * const.c.cgs.value)
-        lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
-            (const.h.cgs.value * lines['nu'])
-        lines['B_ul'] = einstein_coeff * lines['f_ul'] / \
-            (const.h.cgs.value * lines['nu'])
-        lines['A_ul'] = 2 * einstein_coeff * lines['nu'] ** 2 / \
-            const.c.cgs.value ** 2 * lines['f_ul']
+        # Create Einstein coefficients
+        self._create_einstein_coeff(lines)
 
         # Reset indexes because `level_id` cannot be an index once we
         # add artificial levels for fully ionized ions that don't have ids (-1)
