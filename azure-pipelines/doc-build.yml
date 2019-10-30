@@ -54,7 +54,7 @@ jobs:
 # Update conda without asking for confirmation
   - bash: |
       sudo chown -R $USER $CONDA
-      conda update -y conda    
+      #conda update -y conda    
     displayName: Updating conda and activating
 # Install the conda environment made for Carsus
   - bash: |
