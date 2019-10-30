@@ -78,7 +78,7 @@ jobs:
 # Download database testing data for TEST_MODE
   - bash: |
           source activate carsus
-          conda install -c ostrokach git-lfs=1.2.1 -y
+          conda install git-lfs -c conda-forge -y
           git lfs install --skip-smudge
           git clone $CARSUS_DB_URL $HOME/carsus-db
           cd $HOME/carsus-db
