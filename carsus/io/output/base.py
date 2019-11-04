@@ -127,8 +127,9 @@ class TARDISAtomData:
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
         gf = self.gfall_reader
-        gf_list = []
+        ch = self.chianti_reader
 
+        gf_list = []
         for ion in self.ions:
             try:
                 df = gf.levels.loc[ion].copy()
@@ -141,7 +142,6 @@ class TARDISAtomData:
             df['source'] = 'gfall'
             gf_list.append(df)
 
-        ch = self.chianti_reader
         ch_list = []
         ch_ions = []
         for ion in self.chianti_ions:
@@ -179,6 +179,7 @@ class TARDISAtomData:
             columns={'ion_charge': 'ion_number'}, inplace=True)
         ground_levels['source'] = 'nist'
 
+        # TODO: delete this block after creating a script that fixes GFALL typos
         # Fixes Ar II duplicated ground level. For Kurucz, ground state
         # has g=2, for NIST has g=4. We keep Kurucz.
 
@@ -210,17 +211,19 @@ class TARDISAtomData:
     def _get_all_lines_data(self, levels):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
         gf = self.gfall_reader
-        gf_list = []
+        ch = self.chianti_reader
 
         gf_ions = [item for item in self.ions if item not in self.chianti_ions]
+        gf_list = []
         for ion in gf_ions:
 
             try:
                 df = gf.lines.loc[ion]
-                df['source'] = 'gfall'
 
             except (KeyError, TypeError):
                 continue
+
+            df['source'] = 'gfall'
 
             # TODO: move this piece of code to a staticmethod
             df = df.reset_index()
@@ -246,17 +249,16 @@ class TARDISAtomData:
             df['upper_level_id'] = pd.Series(upper_level_id)
             gf_list.append(df)
 
-        ch = self.chianti_reader
         ch_list = []
         for ion in self.chianti_ions:
 
             try:
                 df = ch.lines.loc[ion]
-                df['source'] = 'chianti'
 
             except (KeyError, TypeError):
                 continue
 
+            df['source'] = 'chianti'
             # TODO: move this piece of code to a staticmethod      
             df = df.reset_index()
             lvl_index2id = levels.set_index(
