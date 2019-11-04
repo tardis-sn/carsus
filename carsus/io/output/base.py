@@ -213,12 +213,22 @@ class TARDISAtomData:
         gf = self.gfall_reader
         ch = self.chianti_reader
 
-        gf_ions = [item for item in self.ions if item not in self.chianti_ions]
+        start = 1
         gf_list = []
-        for ion in gf_ions:
+        for ion in self.ions:
 
             try:
                 df = gf.lines.loc[ion]
+
+                # To match `line_id` field with the old API
+                if ion in self.chianti_ions:
+                    df['line_id'] = range(start, len(df) + start)
+                    start += len(df)
+                    continue
+
+                else:
+                    df['line_id'] = range(start, len(df) + start)
+                    start += len(df)
 
             except (KeyError, TypeError):
                 continue
@@ -254,6 +264,8 @@ class TARDISAtomData:
 
             try:
                 df = ch.lines.loc[ion]
+                df['line_id'] = range(start, len(df) + start)
+                start = len(df) + start
 
             except (KeyError, TypeError):
                 continue
@@ -285,7 +297,7 @@ class TARDISAtomData:
 
         df_list = gf_list + ch_list
         lines = pd.concat(df_list, sort=True)
-        lines['line_id'] = range(1, len(lines)+1)
+        #lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
         lines.set_index('line_id', inplace=True)
