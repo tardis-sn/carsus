@@ -305,18 +305,27 @@ class TARDISAtomData:
                             'j_lower', 'level_index_lower',
                             'level_index_upper'], inplace=True)
 
+
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
         lines.loc[lines['wavelength'] >
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
-        lines['wavelength'] = lines['wavelength'].apply(lambda x: x*u.nm)
+
+        air_mask = lines['medium'] == MEDIUM_AIR
+        gfall_mask = lines['source'] == 'gfall'
+        chianti_mask = lines['source'] == 'chianti'
+
+        lines.loc[gfall_mask, 'wavelength'] = lines.loc[gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
+        lines.loc[chianti_mask, 'wavelength'] = lines.loc[chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
         lines['wavelength'] = lines['wavelength'].apply(
             lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
-        air_mask = lines['medium'] == MEDIUM_AIR
-        lines.loc[air_mask, 'wavelength'] = convert_wavelength_air2vacuum(
+
+        # Why not Chianti?
+        lines.loc[air_mask & gfall_mask, 'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
+
         lines.drop(columns=['medium'], inplace=True)
         lines = lines[['lower_level_id', 'upper_level_id',
                        'wavelength', 'gf', 'loggf', 'source']]
