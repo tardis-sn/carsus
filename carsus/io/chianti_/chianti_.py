@@ -499,42 +499,48 @@ class ChiantiReader:
     def __init__(self, ions):
         self.ions = parse_selected_species(ions)
         self._get_levels_lines()
-        
+
     def _get_levels_lines(self):
 
         lvl_list = []
         lns_list = []
         for ion in self.ions:
-            
+
             ch_ion = convert_species_tuple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
-            
+
             lvl = reader.levels
             lvl['atomic_number'] = ion[0]
             lvl['ion_number'] = ion[1]
-            
+
             # Index must start from zero
             lvl.index = range(0, len(lvl))
             lvl.index.name = 'level_index'
             lvl_list.append(reader.levels)
-                        
+
             lns = reader.lines
             lns['atomic_number'] = ion[0]
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
-        
+
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
         levels['method'] = None
         levels = levels.reset_index()
         levels = levels.set_index(['atomic_number', 'ion_number', 'level_index'])
         levels = levels[['energy', 'j', 'label', 'method']]
-        
+
         lines = pd.concat(lns_list, sort=True)
         lines = lines.reset_index()
         lines = lines.rename(columns={'lower_level_index': 'level_index_lower' , 
                                       'upper_level_index': 'level_index_upper',
                                       'gf_value': 'gf'})
+
+        # I'm not sure why we need this workaround.
+        # Kurucz levels starts from zero, Chianti from 1.
+        lines['level_index_lower'] = lines['level_index_lower'] -1
+        lines['level_index_upper'] = lines['level_index_upper'] -1
+
         lines = lines.set_index(['atomic_number', 'ion_charge', 
                                  'level_index_lower', 'level_index_upper'])
         lines['energy_upper'] = None
@@ -543,6 +549,6 @@ class ChiantiReader:
         lines['j_lower'] = None
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                       'wavelength', 'gf']]
-        
+
         self.levels = levels
         self.lines = lines

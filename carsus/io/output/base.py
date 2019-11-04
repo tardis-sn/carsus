@@ -33,8 +33,10 @@ class TARDISAtomData:
         Dump all attributes into an HDF5 file
     """
 
-    def __init__(self, gfall_reader,
-                 ionization_energies, ions,
+    def __init__(self, 
+                 ionization_energies,
+                 gfall_reader,
+                 ions,
                  chianti_reader=None,
                  chianti_ions=None,
                  lines_loggf_threshold=-3,
@@ -208,17 +210,19 @@ class TARDISAtomData:
     def _get_all_lines_data(self, levels):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
         gf = self.gfall_reader
-        df_list = []
+        gf_list = []
 
-        ions = [item for item in self.ions if item not in self.chianti_ions]
-        for ion in ions:
+        gf_ions = [item for item in self.ions if item not in self.chianti_ions]
+        for ion in gf_ions:
 
             try:
                 df = gf.lines.loc[ion]
+                df['source'] = 'gfall'
 
             except (KeyError, TypeError):
                 continue
 
+            # TODO: move this piece of code to a staticmethod
             df = df.reset_index()
             lvl_index2id = levels.set_index(
                 ['atomic_number', 'ion_number']).loc[ion]
@@ -240,8 +244,44 @@ class TARDISAtomData:
 
             df['lower_level_id'] = pd.Series(lower_level_id)
             df['upper_level_id'] = pd.Series(upper_level_id)
-            df_list.append(df)
+            gf_list.append(df)
 
+        ch = self.chianti_reader
+        ch_list = []
+        for ion in self.chianti_ions:
+
+            try:
+                df = ch.lines.loc[ion]
+                df['source'] = 'chianti'
+
+            except (KeyError, TypeError):
+                continue
+
+            # TODO: move this piece of code to a staticmethod      
+            df = df.reset_index()
+            lvl_index2id = levels.set_index(
+                ['atomic_number', 'ion_number']).loc[ion]
+            lvl_index2id = lvl_index2id.reset_index()
+            lvl_index2id = lvl_index2id[['level_id']]
+
+            lower_level_id = []
+            upper_level_id = []
+            for i, row in df.iterrows():
+
+                llid = int(row['level_index_lower'])
+                ulid = int(row['level_index_upper'])
+
+                upper = int(lvl_index2id.loc[ulid])
+                lower = int(lvl_index2id.loc[llid])
+
+                lower_level_id.append(lower)
+                upper_level_id.append(upper)
+
+            df['lower_level_id'] = pd.Series(lower_level_id)
+            df['upper_level_id'] = pd.Series(upper_level_id)
+            ch_list.append(df)
+
+        df_list = gf_list + ch_list
         lines = pd.concat(df_list, sort=True)
         lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
@@ -265,7 +305,7 @@ class TARDISAtomData:
             lines.loc[air_mask, 'wavelength'])
         lines.drop(columns=['medium'], inplace=True)
         lines = lines[['lower_level_id', 'upper_level_id',
-                       'wavelength', 'gf', 'loggf']]
+                       'wavelength', 'gf', 'loggf', 'source']]
 
         return lines
 
