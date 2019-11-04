@@ -33,7 +33,7 @@ class TARDISAtomData:
         Dump all attributes into an HDF5 file
     """
 
-    def __init__(self, 
+    def __init__(self,
                  ionization_energies,
                  gfall_reader,
                  ions,
@@ -167,7 +167,8 @@ class TARDISAtomData:
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels = levels.reset_index(drop=True)
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 'source']]
+        levels = levels[['atomic_number',
+                         'ion_number', 'g', 'energy', 'source']]
 
         levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
         levels['energy'] = levels['energy'].apply(
@@ -179,7 +180,7 @@ class TARDISAtomData:
             columns={'ion_charge': 'ion_number'}, inplace=True)
         ground_levels['source'] = 'nist'
 
-        # TODO: delete this block after creating a script that fixes GFALL typos
+        # TODO: delete after creating a script that fixes GFALL typos
         # Fixes Ar II duplicated ground level. For Kurucz, ground state
         # has g=2, for NIST has g=4. We keep Kurucz.
 
@@ -191,9 +192,12 @@ class TARDISAtomData:
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
 
-        # Deliberately keep the duplicated Chianti levels until we finish this feature:
-        mask = (levels['source'] != 'chianti') & (levels[['atomic_number', 'ion_number', 'energy', 'g']].duplicated(keep='last'))
-        levels  = levels[~mask]
+        # Deliberately keep the duplicated Chianti levels
+        # until we finish this feature:
+        mask = (levels['source'] != 'chianti') & (
+            levels[['atomic_number', 'ion_number',
+                    'energy', 'g']].duplicated(keep='last'))
+        levels = levels[~mask]
 
         # We keep only Chianti levels for the selected ions
         if ch_ions:
@@ -203,10 +207,10 @@ class TARDISAtomData:
                         levels['ion_number'] == ion[1])
                 levels.drop(levels[mask].index, inplace=True)
 
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 'source']]
+        levels = levels[['atomic_number',
+                         'ion_number', 'g', 'energy', 'source']]
 
         return levels
-
 
     def _get_all_lines_data(self, levels):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
@@ -271,7 +275,7 @@ class TARDISAtomData:
                 continue
 
             df['source'] = 'chianti'
-            # TODO: move this piece of code to a staticmethod      
+            # TODO: move this piece of code to a staticmethod
             df = df.reset_index()
             lvl_index2id = levels.set_index(
                 ['atomic_number', 'ion_number']).loc[ion]
@@ -297,14 +301,13 @@ class TARDISAtomData:
 
         df_list = gf_list + ch_list
         lines = pd.concat(df_list, sort=True)
-        #lines['line_id'] = range(1, len(lines)+1)
+        # lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
         lines.set_index('line_id', inplace=True)
         lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
                             'j_lower', 'level_index_lower',
                             'level_index_upper'], inplace=True)
-
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
@@ -315,15 +318,17 @@ class TARDISAtomData:
         gfall_mask = lines['source'] == 'gfall'
         chianti_mask = lines['source'] == 'chianti'
 
-        lines.loc[gfall_mask, 'wavelength'] = lines.loc[gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
-        lines.loc[chianti_mask, 'wavelength'] = lines.loc[chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
+        lines.loc[gfall_mask, 'wavelength'] = lines.loc[
+            gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
+        lines.loc[chianti_mask, 'wavelength'] = lines.loc[
+            chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
         lines['wavelength'] = lines['wavelength'].apply(
             lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
-
         # Why not Chianti?
-        lines.loc[air_mask & gfall_mask, 'wavelength'] = convert_wavelength_air2vacuum(
+        lines.loc[air_mask & gfall_mask,
+                  'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
 
         lines.drop(columns=['medium'], inplace=True)
