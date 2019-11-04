@@ -12,7 +12,7 @@ from carsus.io.base import IngesterError
 from carsus.io.util import convert_species_tuple2chianti_str
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
 from carsus.model import DataSource, Ion, Level, LevelEnergy,\
-    Line,LineGFValue, LineAValue, LineWavelength, MEDIUM_VACUUM, \
+    Line, LineGFValue, LineAValue, LineWavelength, MEDIUM_VACUUM, \
     ECollision, ECollisionEnergy, ECollisionGFValue, ECollisionTempStrength
 
 # Compatibility with older versions and pip versions:
@@ -136,8 +136,10 @@ class ChiantiIonReader(object):
 
     @property
     def last_bound_level(self):
-        ionization_potential = u.eV.to(u.Unit("cm-1"), value=self.ion.Ip, equivalencies=u.spectral())
-        last_row = self.levels.loc[self.levels['energy'] < ionization_potential].tail(1)
+        ionization_potential = u.eV.to(
+            u.Unit("cm-1"), value=self.ion.Ip, equivalencies=u.spectral())
+        last_row = self.levels.loc[self.levels['energy']
+                                   < ionization_potential].tail(1)
         return last_row.index[0]
 
     @property
@@ -151,8 +153,10 @@ class ChiantiIonReader(object):
             but due to some bug in pandas out-of-range rows are included in the resulting DataFrame.
         """
         transitions = transitions.reset_index()
-        transitions = transitions.loc[transitions["upper_level_index"] <= self.last_bound_level]
-        transitions = transitions.set_index(["lower_level_index", "upper_level_index"])
+        transitions = transitions.loc[transitions["upper_level_index"]
+                                      <= self.last_bound_level]
+        transitions = transitions.set_index(
+            ["lower_level_index", "upper_level_index"])
         transitions = transitions.sort_index()
         return transitions
 
@@ -171,7 +175,8 @@ class ChiantiIonReader(object):
         try:
             elvlc = self.ion.Elvlc
         except AttributeError:
-            raise ChiantiIonReaderError("No levels data is available for ion {}".format(self.ion.Spectroscopic))
+            raise ChiantiIonReaderError(
+                "No levels data is available for ion {}".format(self.ion.Spectroscopic))
 
         levels_dict = {}
 
@@ -188,10 +193,12 @@ class ChiantiIonReader(object):
         levels = pd.DataFrame(levels_dict)
 
         # Replace empty labels with NaN
-        levels.loc[:, "label"] = levels["label"].replace(r'\s+', np.nan, regex=True)
+        levels.loc[:, "label"] = levels["label"].replace(
+            r'\s+', np.nan, regex=True)
 
         # Extract configuration and term from the "pretty" column
-        levels[["term", "configuration"]] = levels["pretty"].str.rsplit(' ', expand=True, n=1)
+        levels[["term", "configuration"]] = levels["pretty"].str.rsplit(
+            ' ', expand=True, n=1)
         levels = levels.drop("pretty", axis=1)
 
         levels = levels.set_index("level_index")
@@ -204,7 +211,8 @@ class ChiantiIonReader(object):
         try:
             wgfa = self.ion.Wgfa
         except AttributeError:
-            raise ChiantiIonReaderError("No lines data is available for ion {}".format(self.ion.Spectroscopic))
+            raise ChiantiIonReaderError(
+                "No lines data is available for ion {}".format(self.ion.Spectroscopic))
 
         lines_dict = {}
 
@@ -238,7 +246,8 @@ class ChiantiIonReader(object):
         try:
             scups = self.ion.Scups
         except AttributeError:
-            raise ChiantiIonReaderError("No collision data is available for ion {}".format(self.ion.Spectroscopic))
+            raise ChiantiIonReaderError(
+                "No collision data is available for ion {}".format(self.ion.Spectroscopic))
 
         collisions_dict = {}
 
@@ -247,7 +256,8 @@ class ChiantiIonReader(object):
 
         collisions = pd.DataFrame(collisions_dict)
 
-        collisions = collisions.set_index(["lower_level_index", "upper_level_index"])
+        collisions = collisions.set_index(
+            ["lower_level_index", "upper_level_index"])
         collisions = collisions.sort_index()
 
         return collisions
@@ -283,8 +293,8 @@ class ChiantiIngester(object):
     def __init__(self, session, ions=None, ds_short_name=None):
         if ds_short_name is None:
             ds_short_name = '{}_v{}'.format(
-                    self.ds_prefix,
-                    masterlist_version)
+                self.ds_prefix,
+                masterlist_version)
 
         self.session = session
         # ToDo write a parser for Spectral Notation
@@ -295,7 +305,8 @@ class ChiantiIngester(object):
             try:
                 ions = parse_selected_species(ions)
             except ParseException:
-                raise ValueError('Input is not a valid species string {}'.format(ions))
+                raise ValueError(
+                    'Input is not a valid species string {}'.format(ions))
             self.ions = [convert_species_tuple2chianti_str(_) for _ in ions]
         else:
             self.ions = masterlist_ions
@@ -306,7 +317,8 @@ class ChiantiIngester(object):
             else:
                 print("Ion {0} is not available".format(ion))
 
-        self.data_source = DataSource.as_unique(self.session, short_name=ds_short_name)
+        self.data_source = DataSource.as_unique(
+            self.session, short_name=ds_short_name)
         # To get the id if a new data source was created
         if self.data_source.data_source_id is None:
             self.session.flush()
@@ -336,17 +348,20 @@ class ChiantiIngester(object):
         for rdr in self.ion_readers:
 
             atomic_number = rdr.ion.Z
-            ion_charge = rdr.ion.Ion -1
+            ion_charge = rdr.ion.Ion - 1
 
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+            ion = Ion.as_unique(
+                self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
             try:
                 bound_levels = rdr.bound_levels
             except ChiantiIonReaderError:
-                print("Levels not found for ion {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+                print("Levels not found for ion {} {}".format(
+                    convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting levels for {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+            print("Ingesting levels for {} {}".format(
+                convert_atomic_number2symbol(atomic_number), ion_charge))
 
             # ToDo: Determine parity from configuration
 
@@ -377,15 +392,18 @@ class ChiantiIngester(object):
             atomic_number = rdr.ion.Z
             ion_charge = rdr.ion.Ion - 1
 
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+            ion = Ion.as_unique(
+                self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
             try:
                 bound_lines = rdr.bound_lines
             except ChiantiIonReaderError:
-                print("Lines not found for ion {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+                print("Lines not found for ion {} {}".format(
+                    convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting lines for {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+            print("Ingesting lines for {} {}".format(
+                convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)
 
@@ -426,22 +444,26 @@ class ChiantiIngester(object):
 
     def ingest_collisions(self):
 
-        print("Ingesting collisions from {}".format(self.data_source.short_name))
+        print("Ingesting collisions from {}".format(
+            self.data_source.short_name))
 
         for rdr in self.ion_readers:
 
             atomic_number = rdr.ion.Z
             ion_charge = rdr.ion.Ion - 1
 
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+            ion = Ion.as_unique(
+                self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
             try:
                 bound_collisions = rdr.bound_collisions
             except ChiantiIonReaderError:
-                print("Collisions not found for ion {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+                print("Collisions not found for ion {} {}".format(
+                    convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting collisions for {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+            print("Ingesting collisions for {} {}".format(
+                convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)
 
@@ -477,7 +499,7 @@ class ChiantiIngester(object):
                 e_col.temp_strengths = [
                     ECollisionTempStrength(temp=temp, strength=strength)
                     for temp, strength in zip(row["temperatures"], row["collision_strengths"])
-                    ]
+                ]
 
                 self.session.add(e_col)
 
@@ -495,8 +517,24 @@ class ChiantiIngester(object):
             self.ingest_collisions()
             self.session.flush()
 
+
 class ChiantiReader:
+    """
+        Class for extracting lines and levels data from Chianti.
+        Mimics the GFALLReader class.
+
+        Attributes
+        ----------
+        levels: DataFrame
+        lines: DataFrame
+    """
+
     def __init__(self, ions):
+        """
+        Parameters
+        ----------
+        ions : string
+        """
         self.ions = parse_selected_species(ions)
         self._get_levels_lines()
 
@@ -527,28 +565,29 @@ class ChiantiReader:
         levels = levels.rename(columns={'J': 'j'})
         levels['method'] = None
         levels = levels.reset_index()
-        levels = levels.set_index(['atomic_number', 'ion_number', 'level_index'])
+        levels = levels.set_index(
+            ['atomic_number', 'ion_number', 'level_index'])
         levels = levels[['energy', 'j', 'label', 'method']]
 
         lines = pd.concat(lns_list, sort=True)
         lines = lines.reset_index()
-        lines = lines.rename(columns={'lower_level_index': 'level_index_lower' , 
+        lines = lines.rename(columns={'lower_level_index': 'level_index_lower',
                                       'upper_level_index': 'level_index_upper',
                                       'gf_value': 'gf'})
 
         # I'm not sure why we need this workaround.
         # Kurucz levels starts from zero, Chianti from 1.
-        lines['level_index_lower'] = lines['level_index_lower'] -1
-        lines['level_index_upper'] = lines['level_index_upper'] -1
+        lines['level_index_lower'] = lines['level_index_lower'] - 1
+        lines['level_index_upper'] = lines['level_index_upper'] - 1
 
-        lines = lines.set_index(['atomic_number', 'ion_charge', 
+        lines = lines.set_index(['atomic_number', 'ion_charge',
                                  'level_index_lower', 'level_index_upper'])
         lines['energy_upper'] = None
         lines['energy_lower'] = None
         lines['j_upper'] = None
         lines['j_lower'] = None
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
-                      'wavelength', 'gf']]
+                       'wavelength', 'gf']]
 
         self.levels = levels
         self.lines = lines
