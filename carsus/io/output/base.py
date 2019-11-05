@@ -143,13 +143,9 @@ class TARDISAtomData:
             gf_list.append(df)
 
         ch_list = []
-        ch_ions = []
         for ion in self.chianti_ions:
             try:
                 df = ch.levels.loc[ion].copy()
-                # Save for later use the selected AND existing
-                # ions in Chianti.
-                ch_ions.append(ion)
 
             except (KeyError, TypeError):
                 continue
@@ -200,12 +196,11 @@ class TARDISAtomData:
         levels = levels[~mask]
 
         # We keep only Chianti levels for the selected ions
-        if ch_ions:
-            for ion in ch_ions:
-                mask = (levels['source'] == 'gfall') & (
-                    levels['atomic_number'] == ion[0]) & (
-                        levels['ion_number'] == ion[1])
-                levels.drop(levels[mask].index, inplace=True)
+        for ion in self.chianti_ions:
+            mask = (levels['source'] == 'gfall') & (
+                levels['atomic_number'] == ion[0]) & (
+                    levels['ion_number'] == ion[1])
+            levels.drop(levels[mask].index, inplace=True)
 
         levels = levels[['atomic_number',
                          'ion_number', 'g', 'energy', 'source']]
