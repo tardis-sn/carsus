@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 import pickle
@@ -14,6 +15,8 @@ from carsus.util import convert_atomic_number2symbol, parse_selected_species
 from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineGFValue, LineAValue, LineWavelength, MEDIUM_VACUUM, \
     ECollision, ECollisionEnergy, ECollisionGFValue, ECollisionTempStrength
+
+logger = logging.getLogger(__name__)
 
 # Compatibility with older versions and pip versions:
 try:
@@ -547,7 +550,13 @@ class ChiantiReader:
             ch_ion = convert_species_tuple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
 
-            lvl = reader.levels
+            try:
+                lvl = reader.levels
+
+            except ChiantiIonReaderError:
+                logger.info('No level data for {}'.format(ch_ion))
+                continue
+
             lvl['atomic_number'] = ion[0]
             lvl['ion_number'] = ion[1]
 
