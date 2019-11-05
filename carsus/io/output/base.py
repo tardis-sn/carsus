@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import pandas as pd
 import hashlib
@@ -14,6 +15,8 @@ GFALL_AIR_THRESHOLD = 200
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
 P_INTERNAL_UP = 1
+
+logger = logging.getLogger(__name__)
 
 
 class TARDISAtomData:
@@ -51,6 +54,8 @@ class TARDISAtomData:
 
         self.ions = parse_selected_species(ions)
         self.ionization_energies = ionization_energies.base
+
+        logger.info('Ingesting ground levels from NIST')
         self.ground_levels = ionization_energies.get_ground_levels()
         self.gfall_reader = gfall_reader
 
@@ -130,6 +135,7 @@ class TARDISAtomData:
         ch = self.chianti_reader
 
         gf_list = []
+        logger.info('Ingesting levels from GFALL')
         for ion in self.ions:
             try:
                 df = gf.levels.loc[ion].copy()
@@ -143,6 +149,7 @@ class TARDISAtomData:
             gf_list.append(df)
 
         ch_list = []
+        logger.info('Ingesting levels from Chianti')
         for ion in self.chianti_ions:
             try:
                 df = ch.levels.loc[ion].copy()
@@ -214,6 +221,7 @@ class TARDISAtomData:
 
         start = 1
         gf_list = []
+        logger.info('Ingesting lines from GFALL')
         for ion in self.ions:
 
             try:
@@ -259,6 +267,7 @@ class TARDISAtomData:
             gf_list.append(df)
 
         ch_list = []
+        logger.info('Ingesting lines from Chianti')
         for ion in self.chianti_ions:
 
             try:
