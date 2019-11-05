@@ -183,7 +183,7 @@ class TARDISAtomData:
             columns={'ion_charge': 'ion_number'}, inplace=True)
         ground_levels['source'] = 'nist'
 
-        # TODO: delete after creating a script that fixes GFALL typos
+        # TODO: delete after creating a script that fixes GFALL typos.
         # Fixes Ar II duplicated ground level. For Kurucz, ground state
         # has g=2, for NIST has g=4. We keep Kurucz.
 
@@ -227,7 +227,8 @@ class TARDISAtomData:
             try:
                 df = gf.lines.loc[ion]
 
-                # To match `line_id` field with the old API
+                # To match `line_id` field with the old API we keep
+                # track of how many GFALL lines we are skipping.
                 if ion in self.chianti_ions:
                     df['line_id'] = range(start, len(df) + start)
                     start += len(df)
@@ -305,7 +306,6 @@ class TARDISAtomData:
 
         df_list = gf_list + ch_list
         lines = pd.concat(df_list, sort=True)
-        # lines['line_id'] = range(1, len(lines)+1)
         lines['loggf'] = lines['gf'].apply(np.log10)
 
         lines.set_index('line_id', inplace=True)
@@ -330,7 +330,7 @@ class TARDISAtomData:
             lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
-        # Why not Chianti?
+        # Why not for Chianti?
         lines.loc[air_mask & gfall_mask,
                   'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
