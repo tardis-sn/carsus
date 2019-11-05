@@ -39,7 +39,7 @@ class TARDISAtomData:
     def __init__(self,
                  ionization_energies,
                  gfall_reader,
-                 ions,
+                 gfall_ions,
                  chianti_reader=None,
                  chianti_ions=None,
                  lines_loggf_threshold=-3,
@@ -52,7 +52,7 @@ class TARDISAtomData:
             "lines_loggf_threshold": lines_loggf_threshold
         }
 
-        self.ions = parse_selected_species(ions)
+        self.gfall_ions = parse_selected_species(gfall_ions)
         self.ionization_energies = ionization_energies.base
 
         logger.info('Ingesting ground levels from NIST')
@@ -136,7 +136,7 @@ class TARDISAtomData:
 
         gf_list = []
         logger.info('Ingesting levels from GFALL')
-        for ion in self.ions:
+        for ion in self.gfall_ions:
             try:
                 df = gf.levels.loc[ion].copy()
 
@@ -222,7 +222,7 @@ class TARDISAtomData:
         start = 1
         gf_list = []
         logger.info('Ingesting lines from GFALL')
-        for ion in self.ions:
+        for ion in self.gfall_ions:
 
             try:
                 df = gf.lines.loc[ion]
