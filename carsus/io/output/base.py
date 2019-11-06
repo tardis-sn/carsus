@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import hashlib
 import uuid
-from carsus.util import parse_selected_species, convert_wavelength_air2vacuum
+from carsus.util import convert_wavelength_air2vacuum
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 from astropy import units as u
 from astropy import constants as const
@@ -40,7 +40,6 @@ class TARDISAtomData:
                  atomic_weights,
                  ionization_energies,
                  gfall_reader,
-                 gfall_ions,
                  zeta_data,
                  chianti_reader=None,
                  lines_loggf_threshold=-3,
@@ -56,16 +55,21 @@ class TARDISAtomData:
         self.atomic_weights = atomic_weights
         self.ionization_energies = ionization_energies
         self.ground_levels = ionization_energies.get_ground_levels()
+
+        gfall_ions = gfall_reader.levels.index.tolist()
+        # Remove last element from tuple (MultiIndex has 3 elements)
+        gfall_ions = [x[:-1] for x in gfall_ions]
+        # Keep unique tuples, list and sort them
+        gfall_ions = sorted(list(set(gfall_ions)))
         self.gfall_reader = gfall_reader
-        self.gfall_ions = parse_selected_species(gfall_ions)
+        self.gfall_ions = gfall_ions
+
         self.zeta_data = zeta_data
 
         # By the moment Chianti ions are optional
         if chianti_reader is not None:
             chianti_ions = chianti_reader.levels.index.tolist()
-            # Remove last element from tuple (MultiIndex has 3 elements)
             chianti_ions = [x[:-1] for x in chianti_ions]
-            # Keep unique tuples, list and sort them
             chianti_ions = sorted(list(set(chianti_ions)))
             self.chianti_reader = chianti_reader
             self.chianti_ions = chianti_ions
