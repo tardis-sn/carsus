@@ -139,33 +139,18 @@ class TARDISAtomData:
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
-        gf = self.gfall_reader
-        ch = self.chianti_reader
+        gf_levels = self.gfall_reader.levels.reset_index()
+        gf_levels['source'] = 'gfall'
 
-        gf_list = []
-        logger.info('Ingesting levels from GFALL')
-        for ion in self.gfall_ions:
-            try:
-                df = gf.levels.loc[ion].copy()
-
-            except (KeyError, TypeError):
-                continue
-
-            df['atomic_number'] = ion[0]
-            df['ion_number'] = ion[1]
-            df['source'] = 'gfall'
-            gf_list.append(df)
-
-        logger.info('Ingesting levels from Chianti')
-        ch_levels = ch.levels.reset_index()
+        ch_levels = self.chianti_reader.levels.reset_index()
         ch_levels['source'] = 'chianti'
 
-        gf_list.append(ch_levels)
-        levels = pd.concat(gf_list, sort=True)
+        levels = pd.concat([gf_levels, ch_levels], sort=True)
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels = levels.reset_index(drop=True)
+        levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number',
                          'ion_number', 'g', 'energy', 'source']]
 
@@ -182,7 +167,6 @@ class TARDISAtomData:
         # TODO: delete after creating a script that fixes GFALL typos.
         # Fixes Ar II duplicated ground level. For Kurucz, ground state
         # has g=2, for NIST has g=4. We keep NIST.
-
         mask = (ground_levels['atomic_number'] == 18) & (
             ground_levels['ion_number'] == 1)
         ground_levels.loc[mask, 'g'] = 4
