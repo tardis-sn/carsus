@@ -37,9 +37,11 @@ class TARDISAtomData:
     """
 
     def __init__(self,
+                 atomic_weights,
                  ionization_energies,
                  gfall_reader,
                  gfall_ions,
+                 zeta_data,
                  chianti_reader=None,
                  lines_loggf_threshold=-3,
                  levels_metastable_loggf_threshold=-3):
@@ -51,10 +53,12 @@ class TARDISAtomData:
             "lines_loggf_threshold": lines_loggf_threshold
         }
 
-        self.ionization_energies = ionization_energies.base
+        self.atomic_weights = atomic_weights
+        self.ionization_energies = ionization_energies
         self.ground_levels = ionization_energies.get_ground_levels()
         self.gfall_reader = gfall_reader
         self.gfall_ions = parse_selected_species(gfall_ions)
+        self.zeta_data = zeta_data
 
         # By the moment Chianti ions are optional
         if chianti_reader is not None:
@@ -331,7 +335,7 @@ class TARDISAtomData:
         `AtomData.create_levels_lines` method """
         levels_all = self.levels_all
         lines_all = self.lines_all
-        ionization_energies = self.ionization_energies.reset_index()
+        ionization_energies = self.ionization_energies.base.reset_index()
         ionization_energies['ion_number'] -= 1
 
         # Culling autoionization levels
@@ -642,6 +646,10 @@ class TARDISAtomData:
         fname : path
            Path to the HDF5 output file
         """
+
+        self.atomic_weights.to_hdf(fname)
+        self.ionization_energies.to_hdf(fname)
+        self.zeta_data.to_hdf(fname)
 
         with pd.HDFStore(fname, 'a') as f:
             f.put('/levels', self.levels_prepared)
