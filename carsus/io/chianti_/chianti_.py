@@ -558,7 +558,7 @@ class ChiantiReader:
                 continue
 
             lvl['atomic_number'] = ion[0]
-            lvl['ion_number'] = ion[1]
+            lvl['ion_charge'] = ion[1]
 
             # Index must start from zero
             lvl.index = range(0, len(lvl))
@@ -575,7 +575,7 @@ class ChiantiReader:
         levels['method'] = None
         levels = levels.reset_index()
         levels = levels.set_index(
-            ['atomic_number', 'ion_number', 'level_index'])
+            ['atomic_number', 'ion_charge', 'level_index'])
         levels = levels[['energy', 'j', 'label', 'method']]
 
         lines = pd.concat(lns_list, sort=True)
