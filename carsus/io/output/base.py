@@ -41,7 +41,6 @@ class TARDISAtomData:
                  gfall_reader,
                  gfall_ions,
                  chianti_reader=None,
-                 chianti_ions=None,
                  lines_loggf_threshold=-3,
                  levels_metastable_loggf_threshold=-3):
 
@@ -52,22 +51,23 @@ class TARDISAtomData:
             "lines_loggf_threshold": lines_loggf_threshold
         }
 
-        self.gfall_ions = parse_selected_species(gfall_ions)
         self.ionization_energies = ionization_energies.base
-
-        logger.info('Ingesting ground levels from NIST')
         self.ground_levels = ionization_energies.get_ground_levels()
         self.gfall_reader = gfall_reader
+        self.gfall_ions = parse_selected_species(gfall_ions)
 
         # By the moment Chianti ions are optional
-        if chianti_ions is not None:
-            self.chianti_ions = parse_selected_species(chianti_ions)
+        if chianti_reader is not None:
+            chianti_ions = chianti_reader.levels.index.tolist()
+            # Remove last element from tuple (MultiIndex has 3 elements)
+            chianti_ions = [x[:-1] for x in chianti_ions]
+            # Keep unique tuples, list and sort them
+            chianti_ions = sorted(list(set(chianti_ions)))
+            self.chianti_reader = chianti_reader
+            self.chianti_ions = chianti_ions
 
         else:
             self.chianti_ions = []
-
-        self.gfall_reader = gfall_reader
-        self.chianti_reader = chianti_reader
 
         self.levels_all = self._get_all_levels_data().reset_index()
         self.lines_all = self._get_all_lines_data(self.levels_all)
@@ -148,24 +148,12 @@ class TARDISAtomData:
             df['source'] = 'gfall'
             gf_list.append(df)
 
-        ch_list = []
         logger.info('Ingesting levels from Chianti')
-        for ion in self.chianti_ions:
-            try:
-                df = ch.levels.loc[ion].copy()
+        ch_levels = ch.levels.reset_index()
+        ch_levels['source'] = 'chianti'
 
-            except (KeyError, TypeError):
-                continue
-
-            df['atomic_number'] = ion[0]
-            df['ion_number'] = ion[1]
-            df['source'] = 'chianti'
-            ch_list.append(df)
-
-        # Chianti levels are appended a the end of GFALL levels
-        df_list = gf_list + ch_list
-
-        levels = pd.concat(df_list, sort=True)
+        gf_list.append(ch_levels)
+        levels = pd.concat(gf_list, sort=True)
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
@@ -271,15 +259,11 @@ class TARDISAtomData:
         logger.info('Ingesting lines from Chianti')
         for ion in self.chianti_ions:
 
-            try:
-                df = ch.lines.loc[ion]
-                df['line_id'] = range(start, len(df) + start)
-                start = len(df) + start
-
-            except (KeyError, TypeError):
-                continue
-
+            df = ch.lines.loc[ion]
+            df['line_id'] = range(start, len(df) + start)
+            start = len(df) + start
             df['source'] = 'chianti'
+
             # TODO: move this piece of code to a staticmethod
             df = df.reset_index()
             lvl_index2id = levels.set_index(
