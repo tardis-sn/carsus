@@ -1,4 +1,5 @@
-import re, logging
+import re
+import logging
 
 import numpy as np
 import pandas as pd
@@ -12,9 +13,11 @@ from carsus.io.base import IngesterError
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
 
 
-GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
+# [nm], wavelengths above this value are given in air
+GFALL_AIR_THRESHOLD = 200
 
 logger = logging.getLogger(__name__)
+
 
 class GFALLReader(object):
     """
@@ -32,21 +35,22 @@ class GFALLReader(object):
     """
 
     gfall_fortran_format = ('F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,'
-                             'A10,F6.2,F6.2,F6.2,A4,I2,I2,I3,F6.3,I3,F6.3,I5,I5,'
-                             '1X,I1,A1,1X,I1,A1,I1,A3,I5,I5,I6')
+                            'A10,F6.2,F6.2,F6.2,A4,I2,I2,I3,F6.3,I3,F6.3,I5,I5,'
+                            '1X,I1,A1,1X,I1,A1,I1,A3,I5,I5,I6')
 
     gfall_columns = ['wavelength', 'loggf', 'element_code', 'e_first', 'j_first',
-               'blank1', 'label_first', 'e_second', 'j_second', 'blank2',
-               'label_second', 'log_gamma_rad', 'log_gamma_stark',
-               'log_gamma_vderwaals', 'ref', 'nlte_level_no_first',
-               'nlte_level_no_second', 'isotope', 'log_f_hyperfine',
-               'isotope2', 'log_iso_abundance', 'hyper_shift_first',
-               'hyper_shift_second', 'blank3', 'hyperfine_f_first',
-               'hyperfine_note_first', 'blank4', 'hyperfine_f_second',
-               'hyperfine_note_second', 'line_strength_class', 'line_code',
-               'lande_g_first', 'lande_g_second', 'isotopic_shift']
+                     'blank1', 'label_first', 'e_second', 'j_second', 'blank2',
+                     'label_second', 'log_gamma_rad', 'log_gamma_stark',
+                     'log_gamma_vderwaals', 'ref', 'nlte_level_no_first',
+                     'nlte_level_no_second', 'isotope', 'log_f_hyperfine',
+                     'isotope2', 'log_iso_abundance', 'hyper_shift_first',
+                     'hyper_shift_second', 'blank3', 'hyperfine_f_first',
+                     'hyperfine_note_first', 'blank4', 'hyperfine_f_second',
+                     'hyperfine_note_second', 'line_strength_class', 'line_code',
+                     'lande_g_first', 'lande_g_second', 'isotopic_shift']
 
     default_unique_level_identifier = ['energy', 'j']
+
     def __init__(self, fname, unique_level_identifier=None):
         """
 
@@ -69,7 +73,6 @@ class GFALLReader(object):
                         'the gfall data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
-
 
     @property
     def gfall_raw(self):
@@ -118,7 +121,6 @@ class GFALLReader(object):
         # FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
         # 3F6.2,A4,2I2,I3,F6.3,I3,F6.3,2I5,1X,A1,A1,1X,A1,A1,i1,A3,2I5,I6)
 
-
         number_match = re.compile(r'\d+(\.\d+)?')
         type_match = re.compile(r'[FIXA]')
         type_dict = {'F': np.float64, 'I': np.int64, 'X': str, 'A': str}
@@ -128,10 +130,11 @@ class GFALLReader(object):
         field_widths = type_match.sub('', self.gfall_fortran_format)
         field_widths = map(int, re.sub(r'\.\d+', '', field_widths).split(','))
 
-        field_type_dict = {col:dtype for col, dtype in zip(self.gfall_columns, field_types)}
+        field_type_dict = {col: dtype for col,
+                           dtype in zip(self.gfall_columns, field_types)}
         gfall = pd.read_fwf(fname, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
-        #remove empty lines
+        # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
 
         return gfall
@@ -150,10 +153,9 @@ class GFALLReader(object):
                 a level DataFrame
         """
 
-
         gfall = gfall_raw if gfall_raw is not None else self.gfall_raw.copy()
-        gfall = gfall.rename(columns={'e_first':'energy_first',
-                                      'e_second':'energy_second'})
+        gfall = gfall.rename(columns={'e_first': 'energy_first',
+                                      'e_second': 'energy_second'})
         double_columns = [item.replace('_first', '') for item in gfall.columns if
                           item.endswith('first')]
 
@@ -167,7 +169,7 @@ class GFALLReader(object):
 
             gfall['{0}_lower'.format(column)] = data
 
-            data = pd.concat([gfall['{0}_first'.format(column)][~order_lower_upper], \
+            data = pd.concat([gfall['{0}_first'.format(column)][~order_lower_upper],
                               gfall['{0}_second'.format(column)][order_lower_upper]])
 
             gfall['{0}_upper'.format(column)] = data
@@ -238,7 +240,8 @@ class GFALLReader(object):
 
         levels = pd.concat([e_lower_levels[selected_columns],
                             e_upper_levels[selected_columns]])
-        unique_level_id = ['atomic_number', 'ion_charge'] + self.unique_level_identifier
+        unique_level_id = ['atomic_number', 'ion_charge'] + \
+            self.unique_level_identifier
 
         levels.drop_duplicates(unique_level_id, inplace=True)
         levels = levels.sort_values(['atomic_number', 'ion_charge', 'energy',
@@ -257,7 +260,8 @@ class GFALLReader(object):
         # levels["configuration"] = levels["configuration"].str.strip()
         # levels["term"] = levels["term"].str.strip()
 
-        levels.set_index(["atomic_number", "ion_charge", "level_index"], inplace=True)
+        levels.set_index(["atomic_number", "ion_charge",
+                          "level_index"], inplace=True)
         return levels
 
     def extract_lines(self, gfall=None, levels=None, selected_columns=None):
@@ -284,13 +288,16 @@ class GFALLReader(object):
 
         if selected_columns is None:
             selected_columns = ['atomic_number', 'ion_charge']
-            selected_columns += [item + '_lower' for item in self.unique_level_identifier]
-            selected_columns += [item + '_upper' for item in self.unique_level_identifier]
+            selected_columns += [item +
+                                 '_lower' for item in self.unique_level_identifier]
+            selected_columns += [item +
+                                 '_upper' for item in self.unique_level_identifier]
             selected_columns += ['wavelength', 'loggf']
 
-
-        logger.info('Extracting line data: {0}'.format(', '.join(selected_columns)))
-        unique_level_id = ['atomic_number', 'ion_charge'] + self.unique_level_identifier
+        logger.info('Extracting line data: {0}'.format(
+            ', '.join(selected_columns)))
+        unique_level_id = ['atomic_number', 'ion_charge'] + \
+            self.unique_level_identifier
         levels_idx = levels.reset_index()
         levels_idx = levels_idx.set_index(unique_level_id)
 
@@ -300,7 +307,8 @@ class GFALLReader(object):
 
         # Assigning levels to lines
 
-        levels_unique_idxed = self.levels.reset_index().set_index(['atomic_number', 'ion_charge'] + self.unique_level_identifier)
+        levels_unique_idxed = self.levels.reset_index().set_index(
+            ['atomic_number', 'ion_charge'] + self.unique_level_identifier)
 
         lines_lower_unique_idx = (['atomic_number', 'ion_charge'] +
                                   [item + '_lower' for item in self.unique_level_identifier])
@@ -328,7 +336,7 @@ class GFALLReader(object):
         with pd.HDFStore(fname, 'a') as f:
             if raw:
                 f.put(key, self.gfall_raw)
-            
+
             else:
                 f.put(key, self.gfall)
 
@@ -355,6 +363,7 @@ class GFALLIngester(object):
         ingest(session)
             Persists data into the database
     """
+
     def __init__(self, session, fname, ions=None, ds_short_name="ku_latest"):
         self.session = session
         self.gfall_reader = GFALLReader(fname)
@@ -362,13 +371,16 @@ class GFALLIngester(object):
             try:
                 ions = parse_selected_species(ions)
             except ParseException:
-                raise ValueError('Input is not a valid species string {}'.format(ions))
-            ions = pd.DataFrame.from_records(ions, columns=["atomic_number", "ion_charge"])
+                raise ValueError(
+                    'Input is not a valid species string {}'.format(ions))
+            ions = pd.DataFrame.from_records(
+                ions, columns=["atomic_number", "ion_charge"])
             self.ions = ions.set_index(['atomic_number', 'ion_charge'])
         else:
             self.ions = None
 
-        self.data_source = DataSource.as_unique(self.session, short_name=ds_short_name)
+        self.data_source = DataSource.as_unique(
+            self.session, short_name=ds_short_name)
         if self.data_source.data_source_id is None:  # To get the id if a new data source was created
             self.session.flush()
 
@@ -398,22 +410,25 @@ class GFALLIngester(object):
         # Select ions
         if self.ions is not None:
             levels = levels.reset_index().\
-                                  join(self.ions, how="inner",
-                                       on=["atomic_number", "ion_charge"]).\
-                                  set_index(["atomic_number", "ion_charge", "level_index"])
+                join(self.ions, how="inner",
+                     on=["atomic_number", "ion_charge"]).\
+                set_index(["atomic_number", "ion_charge", "level_index"])
 
         print("Ingesting levels from {}".format(self.data_source.short_name))
 
         for ion_index, ion_levels in levels.groupby(level=["atomic_number", "ion_charge"]):
 
             atomic_number, ion_charge = ion_index
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+            ion = Ion.as_unique(
+                self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting levels for {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+            print("Ingesting levels for {} {}".format(
+                convert_atomic_number2symbol(atomic_number), ion_charge))
 
             for index, row in ion_levels.iterrows():
 
-                level_index = index[2]  # index: (atomic_number, ion_charge, level_index)
+                # index: (atomic_number, ion_charge, level_index)
+                level_index = index[2]
 
                 ion.levels.append(
                     Level(level_index=level_index,
@@ -436,16 +451,19 @@ class GFALLIngester(object):
             lines = lines.reset_index(). \
                 join(self.ions, how="inner",
                      on=["atomic_number", "ion_charge"]). \
-                set_index(["atomic_number", "ion_charge", "level_index_lower", "level_index_upper"])
+                set_index(["atomic_number", "ion_charge",
+                           "level_index_lower", "level_index_upper"])
 
         print("Ingesting lines from {}".format(self.data_source.short_name))
 
         for ion_index, ion_lines in lines.groupby(level=["atomic_number", "ion_charge"]):
 
             atomic_number, ion_charge = ion_index
-            ion = Ion.as_unique(self.session, atomic_number=atomic_number, ion_charge=ion_charge)
+            ion = Ion.as_unique(
+                self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting lines for {} {}".format(convert_atomic_number2symbol(atomic_number), ion_charge))
+            print("Ingesting lines for {} {}".format(
+                convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)
 
@@ -490,4 +508,3 @@ class GFALLIngester(object):
         if lines:
             self.ingest_lines()
             self.session.flush()
-
