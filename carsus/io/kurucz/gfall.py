@@ -278,8 +278,9 @@ class GFALLReader(object):
                 df_list.append(df)
 
             levels = pd.concat(df_list, sort=True)
-            levels.set_index(["atomic_number", "ion_charge",
-                              "level_index"], inplace=True)
+
+        levels.set_index(["atomic_number", "ion_charge",
+                          "level_index"], inplace=True)
 
         return levels
 
@@ -349,8 +350,9 @@ class GFALLReader(object):
                 df_list.append(df)
 
             lines = pd.concat(df_list, sort=True)
-            lines.set_index(['atomic_number', 'ion_charge',
-                             'level_index_lower', 'level_index_upper'], inplace=True)
+
+        lines.set_index(['atomic_number', 'ion_charge',
+                         'level_index_lower', 'level_index_upper'], inplace=True)
 
         return lines
 
