@@ -51,7 +51,7 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ['energy', 'j']
 
-    def __init__(self, fname, ions, unique_level_identifier=None):
+    def __init__(self, fname, ions=None, unique_level_identifier=None):
         """
 
         Parameters
@@ -79,8 +79,9 @@ class GFALLReader(object):
 
         if ions is not None:
             self.ions = parse_selected_species(ions)
+
         else:
-            self.ions = []
+            self.ions = None
 
     @property
     def gfall_raw(self):
@@ -268,16 +269,17 @@ class GFALLReader(object):
         # levels["configuration"] = levels["configuration"].str.strip()
         # levels["term"] = levels["term"].str.strip()
 
-        df_list = []
-        for ion in self.ions:
-            mask = (levels['atomic_number'] == ion[0]) & (
-                levels['ion_charge'] == ion[1])
-            df = levels[mask]
-            df_list.append(df)
+        if self.ions is not None:
+            df_list = []
+            for ion in self.ions:
+                mask = (levels['atomic_number'] == ion[0]) & (
+                    levels['ion_charge'] == ion[1])
+                df = levels[mask]
+                df_list.append(df)
 
-        levels = pd.concat(df_list, sort=True)
-        levels.set_index(["atomic_number", "ion_charge",
-                          "level_index"], inplace=True)
+            levels = pd.concat(df_list, sort=True)
+            levels.set_index(["atomic_number", "ion_charge",
+                              "level_index"], inplace=True)
 
         return levels
 
@@ -338,16 +340,17 @@ class GFALLReader(object):
         lines_upper_idx['level_index_upper'] = levels_unique_idxed['level_index']
         lines = lines_upper_idx.reset_index()
 
-        df_list = []
-        for ion in self.ions:
-            mask = (lines['atomic_number'] == ion[0]) & (
-                lines['ion_charge'] == ion[1])
-            df = lines[mask]
-            df_list.append(df)
+        if self.ions is not None:
+            df_list = []
+            for ion in self.ions:
+                mask = (lines['atomic_number'] == ion[0]) & (
+                    lines['ion_charge'] == ion[1])
+                df = lines[mask]
+                df_list.append(df)
 
-        lines = pd.concat(df_list, sort=True)
-        lines.set_index(['atomic_number', 'ion_charge',
-                         'level_index_lower', 'level_index_upper'], inplace=True)
+            lines = pd.concat(df_list, sort=True)
+            lines.set_index(['atomic_number', 'ion_charge',
+                             'level_index_lower', 'level_index_upper'], inplace=True)
 
         return lines
 
