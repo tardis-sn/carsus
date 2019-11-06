@@ -268,9 +268,6 @@ class GFALLReader(object):
         # levels["configuration"] = levels["configuration"].str.strip()
         # levels["term"] = levels["term"].str.strip()
 
-        # levels.set_index(["atomic_number", "ion_charge",
-        #                  "level_index"], inplace=True)
-
         df_list = []
         for ion in self.ions:
             mask = (levels['atomic_number'] == ion[0]) & (
@@ -336,10 +333,21 @@ class GFALLReader(object):
                                   [item + '_upper' for item in self.unique_level_identifier])
         lines_lower_idx = lines.set_index(lines_lower_unique_idx)
         lines_lower_idx['level_index_lower'] = levels_unique_idxed['level_index']
-        lines_upper_idx = lines_lower_idx.reset_index().set_index(lines_upper_unique_idx)
+        lines_upper_idx = lines_lower_idx.reset_index().set_index(
+            lines_upper_unique_idx)
         lines_upper_idx['level_index_upper'] = levels_unique_idxed['level_index']
-        lines = lines_upper_idx.reset_index().set_index(
-            ['atomic_number', 'ion_charge', 'level_index_lower', 'level_index_upper'])
+        lines = lines_upper_idx.reset_index()
+
+        df_list = []
+        for ion in self.ions:
+            mask = (lines['atomic_number'] == ion[0]) & (
+                lines['ion_charge'] == ion[1])
+            df = lines[mask]
+            df_list.append(df)
+
+        lines = pd.concat(df_list, sort=True)
+        lines.set_index(['atomic_number', 'ion_charge',
+                         'level_index_lower', 'level_index_upper'], inplace=True)
 
         return lines
 
