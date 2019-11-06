@@ -51,13 +51,16 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ['energy', 'j']
 
-    def __init__(self, fname, unique_level_identifier=None):
+    def __init__(self, fname, ions, unique_level_identifier=None):
         """
 
         Parameters
         ----------
         fname: str
             path to the gfall file
+
+        ions: str, optional
+            ions to extract, by default None
 
         unique_level_identifier: list
             list of attributes to identify unique levels from. Will always use
@@ -73,6 +76,11 @@ class GFALLReader(object):
                         'the gfall data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
+
+        if ions is not None:
+            self.ions = parse_selected_species(ions)
+        else:
+            self.ions = []
 
     @property
     def gfall_raw(self):
@@ -260,8 +268,20 @@ class GFALLReader(object):
         # levels["configuration"] = levels["configuration"].str.strip()
         # levels["term"] = levels["term"].str.strip()
 
+        # levels.set_index(["atomic_number", "ion_charge",
+        #                  "level_index"], inplace=True)
+
+        df_list = []
+        for ion in self.ions:
+            mask = (levels['atomic_number'] == ion[0]) & (
+                levels['ion_charge'] == ion[1])
+            df = levels[mask]
+            df_list.append(df)
+
+        levels = pd.concat(df_list, sort=True)
         levels.set_index(["atomic_number", "ion_charge",
                           "level_index"], inplace=True)
+
         return levels
 
     def extract_lines(self, gfall=None, levels=None, selected_columns=None):
