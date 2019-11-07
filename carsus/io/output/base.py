@@ -67,6 +67,7 @@ class TARDISAtomData:
         self.zeta_data = zeta_data
 
         # TODO: priorities should not be managed by the `init` method.
+        self.chianti_reader = chianti_reader
         if chianti_reader is not None:
             chianti_lvls = chianti_reader.levels.reset_index()
             chianti_lvls = chianti_lvls.set_index(
@@ -79,7 +80,6 @@ class TARDISAtomData:
             chianti_ions = chianti_lvls.index.tolist()
             chianti_ions = [x[:-1] for x in chianti_ions]
             chianti_ions = sorted(list(set(chianti_ions)))
-            self.chianti_reader = chianti_reader
             self.chianti_ions = chianti_ions
 
         else:
@@ -150,8 +150,11 @@ class TARDISAtomData:
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
-        ch_levels = self.chianti_reader.levels.reset_index()
-        ch_levels['source'] = 'chianti'
+        if self.chianti_reader is not None:
+            ch_levels = self.chianti_reader.levels.reset_index()
+            ch_levels['source'] = 'chianti'
+        else:
+            ch_levels = pd.DataFrame(columns=gf_levels.columns)
 
         levels = pd.concat([gf_levels, ch_levels], sort=True)
         levels['g'] = 2*levels['j'] + 1
