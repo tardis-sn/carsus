@@ -66,9 +66,17 @@ class TARDISAtomData:
 
         self.zeta_data = zeta_data
 
-        # By the moment Chianti ions are optional
+        # TODO: priorities should not be managed by the `init` method.
         if chianti_reader is not None:
-            chianti_ions = chianti_reader.levels.index.tolist()
+            chianti_lvls = chianti_reader.levels.reset_index()
+            chianti_lvls = chianti_lvls.set_index(
+                ['atomic_number', 'ion_charge', 'priority'])
+
+            mask = chianti_lvls.index.get_level_values(
+                'priority') > self.gfall_reader.priority
+
+            chianti_lvls = chianti_lvls[mask]
+            chianti_ions = chianti_lvls.index.tolist()
             chianti_ions = [x[:-1] for x in chianti_ions]
             chianti_ions = sorted(list(set(chianti_ions)))
             self.chianti_reader = chianti_reader

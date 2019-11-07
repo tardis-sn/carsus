@@ -532,13 +532,14 @@ class ChiantiReader:
         lines: DataFrame
     """
 
-    def __init__(self, ions):
+    def __init__(self, ions, priority=10):
         """
         Parameters
         ----------
         ions : string
         """
         self.ions = parse_selected_species(ions)
+        self.priority = priority
         self._get_levels_lines()
 
     def _get_levels_lines(self):
@@ -573,10 +574,11 @@ class ChiantiReader:
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
         levels['method'] = None
+        levels['priority'] = self.priority
         levels = levels.reset_index()
         levels = levels.set_index(
             ['atomic_number', 'ion_charge', 'level_index'])
-        levels = levels[['energy', 'j', 'label', 'method']]
+        levels = levels[['energy', 'j', 'label', 'method', 'priority']]
 
         lines = pd.concat(lns_list, sort=True)
         lines = lines.reset_index()

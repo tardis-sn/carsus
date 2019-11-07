@@ -51,7 +51,7 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ['energy', 'j']
 
-    def __init__(self, fname, ions=None, unique_level_identifier=None):
+    def __init__(self, fname, ions=None, priority=10, unique_level_identifier=None):
         """
 
         Parameters
@@ -82,6 +82,8 @@ class GFALLReader(object):
 
         else:
             self.ions = None
+
+        self.priority = priority
 
     @property
     def gfall_raw(self):
@@ -281,6 +283,8 @@ class GFALLReader(object):
 
         levels.set_index(["atomic_number", "ion_charge",
                           "level_index"], inplace=True)
+
+        levels['priority'] = self.priority
 
         return levels
 
