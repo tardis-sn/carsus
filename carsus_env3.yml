@@ -44,7 +44,7 @@ dependencies:
 - recommonmark
 
 # Test/Coverage requirements
-- coverage
+- coverage=4
 - coveralls
 - pytest=4.5.0
 - pytest-cov
