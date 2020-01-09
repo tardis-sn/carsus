@@ -7,7 +7,7 @@ channels:
 dependencies:
 - python=3
 - setuptools
-- numpy=1.17
+- numpy=1.15
 - pandas=0.24
 - astropy=3.2
 - Cython=0.29  # TARDIS dep
