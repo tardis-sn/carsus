@@ -150,7 +150,7 @@ class TARDISAtomData:
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
-        if self.chianti_reader is not None:
+        if len(self.chianti_ions) > 0:
             ch_levels = self.chianti_reader.levels.reset_index()
             ch_levels['source'] = 'chianti'
         else:
