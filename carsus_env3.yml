@@ -5,7 +5,7 @@ channels:
     - default
 
 dependencies:
-- python=3
+- python=3.6
 - setuptools
 - numpy=1.17
 - pandas=0.24
