@@ -175,13 +175,6 @@ class TARDISAtomData:
             columns={'ion_charge': 'ion_number'}, inplace=True)
         ground_levels['source'] = 'nist'
 
-        # TODO: delete after creating a script that fixes GFALL typos.
-        # Fixes Ar II duplicated ground level. For Kurucz, ground state
-        # has g=2, for NIST has g=4. We keep NIST.
-        mask = (ground_levels['atomic_number'] == 18) & (
-            ground_levels['ion_number'] == 1)
-        ground_levels.loc[mask, 'g'] = 4
-
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
