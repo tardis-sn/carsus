@@ -7,7 +7,7 @@ created on Mar 3, 2020
 
 import numpy as np
 import pandas as pd
-from carcus.io.atomic_data import Atomic_Data
+from carsus.io.atomic_data import Atomic_Data
 import pytest
 
 
