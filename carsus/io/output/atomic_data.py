@@ -2,11 +2,16 @@
 =====================
 TARDIS Atomic_data module
 =====================
-created on Mar 6, 2020
+created on Feb 29, 2020
 """
 
 import numpy as np
 import pandas as pd
+import zipfile, urllib.request, shutil
+from os import path
+import os
+import tarfile
+
 
 class Atomic_Data: 
     """ Will serve as base class for all atomic data contained in 
@@ -32,7 +37,27 @@ class Atomic_Data:
          
          """
     
-    data = pd.read_csv( 'carsus/io/output/si2_osc_kurucz' , header = None )
+    
+    url = 'http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz'
+    file_name = 'atomic.tar.gz'
+    
+    if(path.exists(file_name) or path.exists('cmf_doc')):
+        pass
+    else:
+        with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
+            if file_name.endswith("tar.gz"):
+                tar = tarfile.open(file_name, "r:gz")
+                tar.extractall()
+                tar.close()
+                os.remove(file_name)
+            elif file_name.endswith("tar"):
+                tar = tarfile.open(file_name, "r:")
+                tar.extractall()
+                tar.close()
+                os.remove(file_name)
+                
+    data = pd.read_csv( 'atomic/SIL/II/16sep15/si2_osc_kurucz' , header = None )
     data = data[0] .str. split( expand = True)
     data. replace( "|" , np.nan , inplace = True )
     data ["NaN"] = data .isnull(). sum( axis = 1 )
@@ -80,4 +105,3 @@ class Atomic_Data:
             second_table = second_table. drop( [i] , axis = 1 )
     
     second_table = second_table. drop( ["NaN"] , axis = 1 )
-    
