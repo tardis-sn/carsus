@@ -32,7 +32,7 @@ class Atomic_Data:
          
          """
     
-    data = pd.read_csv( 'si2_osc_kurucz' , header = None )
+    data = pd.read_csv( 'carsus/io/output/si2_osc_kurucz' , header = None )
     data = data[0] .str. split( expand = True)
     data. replace( "|" , np.nan , inplace = True )
     data ["NaN"] = data .isnull(). sum( axis = 1 )
