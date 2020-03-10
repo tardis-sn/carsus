@@ -11,9 +11,10 @@ import zipfile, urllib.request, shutil
 from os import path
 import os
 import tarfile
-
+import re
 
 class Atomic_Data: 
+    
     """ Will serve as base class for all atomic data contained in 
     'si2_osc_kurucz' in order to provide consistent Tabular data.
     
@@ -22,10 +23,10 @@ class Atomic_Data:
         data : dataframe
             raw unprocessed data
             
-        first_table : dataframe
+        AtomicLevels : dataframe
             Contains Energy Levels and statistical weights for Si II
             
-        second_table : dataframe
+        Transitions : dataframe
             Oscillator strengths for LLL 
             
     Example to use
@@ -33,7 +34,7 @@ class Atomic_Data:
          
          x = Atomic_Data()
          
-         print ( x.first_table )
+         print ( x.AtomicLevels )
          
          """
     
@@ -57,51 +58,54 @@ class Atomic_Data:
                 tar.close()
                 os.remove(file_name)
                 
-    data = pd.read_csv( 'atomic/SIL/II/16sep15/si2_osc_kurucz' , header = None )
-    data = data[0] .str. split( expand = True)
-    data. replace( "|" , np.nan , inplace = True )
-    data ["NaN"] = data .isnull(). sum( axis = 1 )
-    
-    """
-    data conatins two tables.
-    Need to collect them separately
-
-    """
-    t1 = 0
-    t2 = 0
+    file = open('atomic/SIL/II/16sep15/si2_osc_kurucz' , 'r') 
+    data = file.readlines()
+    start = 0
+    end = 0
     t = []
+    counter = -1
+    words1 = len(data[0].split())
+    words2 = 0
     
-    for i in range( data.shape[0]-1 ):
-        if( abs(data["NaN"][i+1] - data["NaN"][i]) > 2 ):
-            if(t2 - t1 > 5):
-                t.append([t1,t2])
-            t1 = i+1
-            t2 = i+1
+    for i in data:
+        words2 = len(i.split()) 
+        
+        if abs(words1 - words2) > 2 :
+        
+            if end - start > 5:
+                t.append([start,end])
+            
+            start = counter+1
+            end = counter+1
+        
         else:
-            t2 = t2 + 1
-    t.append([t1,data.shape[0]])
+            end = end + 1
+        
+        words1 = words2
+        counter += 1
     
-    first_table = data[ t[0][0] : t[0][1]+1 ][ : ]
-    first_table. reset_index( inplace = True)
-    first_table = first_table. drop( ["NaN"] , axis = 1 )
+    t.append([start,counter])
     
-    second_table = data [ t[1][0]+1 : t[1][1]+1] [ : ]
-    second_table. reset_index ( inplace = True )
+    AtomicLevels = pd.DataFrame( columns = ["State", "g" ,"E(cm^-1)", "10^15 Hz", "eV", "Lam(A)","ID","ARAD" ,"C4" ,"C6"] )
     
-    for i in range(second_table.shape[0]):
-        if ( second_table["NaN"][i] > 3):
-            first_atr , second_atr = second_table[0][i]. split( "]-" )
-            first_atr += "]"
-            c = "-" + second_atr
-            j = 7
-            while ( j > 0 ):
-                second_table .at[ i , j+1 ] = second_table[j][i]
-                j -= 1
-            second_table. at[ i , 0 ] = first_atr
-            second_table. at[ i , 1 ] = c
+    for i in range(t[0][0], t[0][1]+1):
+        x = re.findall("[a-zA-Z0-9_\/\[\-\+.\)\()]+]*", data[i])
+        y=[]
+     
+        for j in x:
+            y.append(re.sub("^-|-$", "" , j))
+        
+        ydf = pd.DataFrame( columns = ["State", "g" ,"E(cm^-1)", "10^15 Hz", "eV", "Lam(A)","ID","ARAD" ,"C4" ,"C6"] ,data = [y])
+        AtomicLevels = AtomicLevels.append(ydf, ignore_index = True)
+        
+    Transitions = pd.DataFrame(columns = ["Transition from","Transition to" ,"f","A","Lam(A)","i","j"])
     
-    for i in list(second_table.columns):
-        if(second_table .isnull(). sum( axis = 0 )[i] > second_table.shape[0]//2):
-            second_table = second_table. drop( [i] , axis = 1 )
-    
-    second_table = second_table. drop( ["NaN"] , axis = 1 )
+    for i in range(t[1][0], t[1][1]+1):
+        x = re.findall("[a-zA-Z0-9_\/\[\-\+.\)\()]+]*", data[i])
+        y=[]
+      
+        for j in x:
+            y.append(re.sub("^-|-$", "" , j))
+        
+        ydf = pd.DataFrame(columns = ["Transition from","Transition to" ,"f","A","Lam(A)","i","j"], data = [y])
+        Transitions = Transitions.append(ydf, ignore_index = True)
