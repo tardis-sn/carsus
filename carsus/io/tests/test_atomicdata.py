@@ -18,8 +18,8 @@ def test_atomicdata():
     """
     
     atomic_data = Atomic_Data()
-    first_table = atomic_data.first_table
-    second_table = atomic_data.second_table
+    first_table = atomic_data.AtomicLevels
+    second_table = atomic_data.Transitions
     
     assert len(list(first_table.columns)) == 11
     assert len(list(second_table.columns)) == 8
