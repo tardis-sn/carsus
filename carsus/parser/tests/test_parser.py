@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from tardis.parser import parser
+from carsus.parser import parser
 import pytest
 import tempfile
 import os
