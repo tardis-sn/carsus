@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Fri Mar 13 21:40:38 2020
-
-@author: piyush
+=====================
+TARDIS UPDATE_CMFGEN module
+=====================
+created on Mar 10, 2020
 """
 
 from bs4 import BeautifulSoup
@@ -26,11 +25,7 @@ class UPDATE_CMFGEN():
         hidden_folder : String
             It is the name of the folder which is hidden and where all the data 
             is stored. The data includes the extracted file, log file and HDF5 
-            files. 
-            
-    Member Functions
-        ----------
-        get_links : 
+            files.          
          
     """
     
@@ -44,47 +39,71 @@ class UPDATE_CMFGEN():
             else:
                 print("The given folder was not hidden.")
                 print("The default folder will be used.")
+        
+        if path.exists(self.hidden_folder):
+            pass
+        else:
+            os.mkdir(self.hidden_folder)
                 
         
-    def get_links(self):
+    def get_links(self, url = "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm"):
         """
         Fetches all links and also update the log Table.
         
         Parameters
         ----------
-        None
+        url (Optional): String
+            url where the links are present
 
         Returns
         ----------
         None
         """
 
-        url="http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm"
         html_content = requests.get(url).text
-        first = "http://kookaburra.phyast.pitt.edu/hillier/"
+        if url != "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm":
+            first = "https://my-static-site-exampl1601.herokuapp.com/"
+        else:
+            first = "http://kookaburra.phyast.pitt.edu/hillier/"
         
         soup = BeautifulSoup(html_content, "lxml")
-        file = open( self.hidden_folder + "/CMFGEN.txt" , "r")
+        if path.exists(self.hidden_folder + "/CMFGEN.txt"):
+            file = open( self.hidden_folder + "/CMFGEN.txt" , "r")
+        else:
+            file = open( self.hidden_folder + "/CMFGEN.txt" , "w")
+            file.close()
+            file = open( self.hidden_folder + "/CMFGEN.txt" , "r")
+            
         file_new = open( self.hidden_folder + "/CMFGEN2.txt" ,"w")
         
-        for link, date in zip (soup.find_all("a")[2:-1], soup.find_all("dd")[:-1]):
-            
+        for link, date in zip (soup.find_all("a")[2:], soup.find_all("dd")[:]):
+        
             new_text = link.text
             new_href = link.get("href")
-            new_href = first + new_href.split("../")[1]
+            
+            if url == "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm":
+                if "http" not in new_href:
+                    new_href = first + new_href.split("../")[1]
+            else:
+                new_href = first + new_href
             new_date = date.text[1:]
             
-            prev_text = file.readline()
-            prev_href = file.readline()
-            prev_date = file.readline()
-            prev_version = file.readline()
-            file.readline()
+            if os.stat(self.hidden_folder + "/CMFGEN.txt").st_size == 0:
+                prev_date = ""
+                prev_text = ""
+                prev_href = ""
+                prev_version = ":0"
+            
+            else:
+                prev_text = file.readline()
+                prev_href = file.readline()
+                prev_date = file.readline()
+                prev_version = file.readline()
             
             if prev_date != new_date+"\n":
                 file_new.write("Inner Text: {}".format(new_text)+"\n")
                 file_new.write(new_href)
                 file_new.write(date.text+"\n")
-                print(str(int(prev_version.split(":")[1])+1))
                 file_new.write("Version:"+str(int(prev_version.split(":")[1])+1))
                 file_new.write("\n")
             
@@ -93,7 +112,6 @@ class UPDATE_CMFGEN():
                 file_new.write(prev_href)
                 file_new.write(prev_date)
                 file_new.write(prev_version)
-                file_new.write("\n")
 
         file_new.close()
         file.close()
@@ -124,7 +142,7 @@ class UPDATE_CMFGEN():
         
         if url.endswith("tar.gz"):
             return_file = return_file +'.tar.gz'
-        elif url.endswith("tar.gz"):
+        elif url.endswith("tar"):
             return_file = return_file + '.tar'
             
         return return_file
@@ -158,7 +176,7 @@ class UPDATE_CMFGEN():
         
         file_name = self.hidden_folder + "/"+self.file_With_Extension(url, name)
         print(file_name)
-        
+
         if path.exists(self.hidden_folder + "/"+name):
             pass
 
@@ -167,25 +185,23 @@ class UPDATE_CMFGEN():
             if path.exists(antepenult_ver):
                 shutil.rmtree(antepenult_ver)
             
-            with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-                extract_path = file_name.split(".")[1]
-                extract_path = "."+extract_path
+            extract_path = self.hidden_folder + "/" + name
                 
-                if file_name.endswith("tar.gz"):
-                    tar = tarfile.open(file_name, "r:gz")
-                    tar.extractall(extract_path+"/")
-                    tar.close()
-                    os.remove(file_name)
-                
-                elif file_name.endswith("tar"):
-                    tar = tarfile.open(file_name, "r:")
-                    tar.extractall(extract_path+"/")
-                    tar.close()
-                    os.remove(file_name)
-            print("extract_path", extract_path)
+            urllib.request.urlretrieve(url, file_name)
+            file = tarfile.open(file_name)
+            file.extractall(path=extract_path)
+            file.close()
+            os.remove(file_name)
+            
+            hdf5directory = extract_path.split("/")[0] + "/" + "HDF5" + extract_path.split("/")[1]
+            if(path.exists(hdf5directory)):
+                pass
+            else:
+                os.mkdir(hdf5directory)
+            
+            self.make_HDF5_files(extract_path, "", hdf5directory)
             self.list_all_files(extract_path, "", previous_ver)
-
+                
 
     def is_same(self, path1, path2):
         """
@@ -203,15 +219,15 @@ class UPDATE_CMFGEN():
         ----------
         Boolean Value
         """
-        
         file1 = open(path1 , 'r') 
         data1 = file1.readlines()
         file2 = open(path2 , 'r') 
         data2 = file2.readlines()
-        
+
         for i, j in zip(data1, data2):
-            
-            if i!=j :
+            print("i",i)
+            print("j",j)
+            if i.replace(" ","")!=j.replace(" ","") :
                 return False
         
         return True
@@ -328,7 +344,7 @@ class UPDATE_CMFGEN():
         
         for key in dataframes: 
             store.put( str(key) , dataframes[key])
-            store.get_storer(str(key)).attrs.metadata = MetaData
+            store.get_storer(str(key)).attrs.metadata = MetaData[key]
             
         store.close()
     
@@ -348,13 +364,11 @@ class UPDATE_CMFGEN():
         None
         """
         dataframes, metadata = self.extract_tabular_data(path)
-        print(path.split("/"))
         last_path = ""
         for i in path.split("/")[2:-1]:
             last_path += "/" + i
         last_path += "/" + os.path.splitext(path.split("/")[-1])[0] +".h5"
         writepath = path.split("/")[0] + "/HDF5" + path.split("/")[1] + last_path
-        print(writepath)
         self.write_to_HDF5( dataframes, metadata, writepath)
         
     
@@ -377,20 +391,25 @@ class UPDATE_CMFGEN():
         ----------
         None
         """
+        extensions = [".dat", ".sp", ".txt", ""]
+        
         with os.scandir(basepath) as entries:
             for entry in entries:
                 
                 if entry.is_file():
                     new_path = HDF5directory +"/"+ os.path.splitext(entry.name)[0] +".h5"
-                    f = open(new_path,"w")
-                    f.close()
+                    old_path = basepath + "/" + entry.name
+                    if os.path.splitext(entry.name)[1] in extensions :
+                        if os.path.exists(old_path):
+                            f = open(new_path,"w")
+                            f.close()
                     
                 elif entry.is_dir():
                     if(path.exists(os.path.join(HDF5directory,entry.name))):
                         pass
                     else:
-                        print(os.path.join(HDF5directory,entry.name))
                         os.mkdir(os.path.join(HDF5directory,entry.name))
+                    
                     self.make_HDF5_files(os.path.join(basepath,entry.name),
                                         os.path.join(directory,entry.name),
                                         os.path.join(HDF5directory,entry.name))
@@ -415,13 +434,6 @@ class UPDATE_CMFGEN():
         ----------
         None
         """
-        hdf5directory = basepath.split("/")[0] + "/" + "HFD5" + basepath.split("/")[1]
-        if(path.exists(hdf5directory)):
-            pass
-        else:
-            os.mkdir(hdf5directory)
-        
-        self.make_HDF5_files(basepath, directory, hdf5directory)
         
         extensions = [".dat", ".sp", ".txt", ""]
         with os.scandir(basepath) as entries:
@@ -448,27 +460,28 @@ class UPDATE_CMFGEN():
                                         os.path.join(prev_ver,entry.name))
                     
                     
-    def update(self):
+    def update(self, url = "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm"):
         """
         The driver function which will ultimately update the data of HDF5 files
         
         Parameters
         ----------
-        None
+        url (Optional): String
+            url where the links are present
 
         Returns
         ----------
         None
         """
 
-        self.get_links()
+        self.get_links(url)
         file = open(self.hidden_folder + "/CMFGEN.txt","r")
         data = file.readlines()
         t=0
-
+        
         for i in range(len(data)):
             
-            if data[i]!="\n" :
+            if data[i]!="\n":
                 t = t + 1
 
             if t == 4 :
@@ -476,5 +489,3 @@ class UPDATE_CMFGEN():
                 self.download_data ( data[i-2][:-1], 
                                     data[i-3].split(":")[1][:-1].replace(" ","")
                                     + "@" + data[i].split(":")[1][:-1] )
-
-a = UPDATE_CMFGEN()
