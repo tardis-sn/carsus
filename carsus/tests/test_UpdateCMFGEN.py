@@ -55,6 +55,6 @@ def testisSame(update_class):
     inturn checks that the log file produced by the getlinks function is correct 
     or not.
     """
-    assert update_class.is_same(".Testing/CMFGEN.txt", ".Testing/CARSUSFolder@1/CARSUS/CMFGEN.txt")
+    assert update_class.is_same("carsus/tests/.Testing/CMFGEN.txt", "carsus/tests/.Testing/CARSUSFolder@1/CARSUS/CMFGEN.txt")
     
 
