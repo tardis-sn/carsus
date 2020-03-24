@@ -17,7 +17,6 @@ import urllib.request, shutil
 import tarfile
 import re
 import h5py
-
 @pytest.fixture()
 def update_class():
     
@@ -68,11 +67,11 @@ def test_createdHDF5():
     Also files of incorrect extensions should not be created.
     """
     
-    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/CMFGEN.h5")
-    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/file2.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/Subfolder/file.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/file.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.h5")    
+    assert os.path.exists(os.path.join(os.path.dirname(__file__), ".Testing/HDF5CARSUSFolder@1/CARSUS/CMFGEN.h5"))
+    assert os.path.exists(os.path.join(os.path.dirname(__file__),".Testing/HDF5CARSUSFolder@1/CARSUS/file2.h5"))
+    assert os.path.exists(os.path.join(os.path.dirname(__file__),".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/Subfolder/file.h5"))
+    assert os.path.exists(os.path.join(os.path.dirname(__file__),".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/file.h5"))
+    assert os.path.exists(os.path.join(os.path.dirname(__file__),".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.h5"))    
     
     
 @pytest.mark.HDF5
