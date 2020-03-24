@@ -1,8 +1,0 @@
-Inner Text: CARSUS Folder
-https://my-static-site-exampl1601.herokuapp.com/Download/CARSUS.tar.gz
-Last updated 22-March-2020
-Version:1
-Inner Text: TARDIS Folder
-https://my-static-site-exampl1601.herokuapp.com/Download/TARDIS.tar.gz
-Last updated 22-March-2020
-Version:1
