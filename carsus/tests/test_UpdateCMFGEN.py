@@ -29,7 +29,6 @@ def update_class():
     
     a = UPDATE_CMFGEN(".Testing")
     url = "https://carsusatomicdatatest.herokuapp.com/test.html"
-    a.update(url)
     return a
 
 
