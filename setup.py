@@ -94,7 +94,8 @@ generate_version_py(PACKAGENAME, VERSION, RELEASE,
 scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
            if not os.path.basename(fname).startswith('README')]
 
-
+libraries = [s.strip() for s in metadata.get('install_requires', 'astropy').split(',') ]
+libraries.append("BeautifulSoup>=4.8.1")
 # Get configuration information from all of the various subpackages.
 # See the docstring for setup_helpers.update_package_files for more
 # details.
@@ -133,7 +134,7 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      install_requires=[s.strip() for s in metadata.get('install_requires', 'astropy').split(','), 'BeautifulSoup >= 4.8.1'],
+      install_requires=libraries,
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
       license=LICENSE,
