@@ -95,7 +95,7 @@ scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
            if not os.path.basename(fname).startswith('README')]
 
 libraries = [s.strip() for s in metadata.get('install_requires', 'astropy').split(',') ]
-libraries.append("BeautifulSoup>=4.8.1")
+libraries.append("beautifulsoup4")
 # Get configuration information from all of the various subpackages.
 # See the docstring for setup_helpers.update_package_files for more
 # details.
