@@ -96,6 +96,7 @@ scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
 
 libraries = [s.strip() for s in metadata.get('install_requires', 'astropy').split(',') ]
 libraries.append("beautifulsoup4")
+libraries.append("lxml beautifulsoup4 html5lib")
 # Get configuration information from all of the various subpackages.
 # See the docstring for setup_helpers.update_package_files for more
 # details.
