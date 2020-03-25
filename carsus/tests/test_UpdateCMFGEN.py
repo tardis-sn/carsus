@@ -61,7 +61,7 @@ def testisSame(update_class):
     
 
 @pytest.mark.HDF5
-def test_createdHDF5():
+def test_createdHDF5(update_class):
     
     """
     This function tests whether all HDF5 files are created at correct positions. 
