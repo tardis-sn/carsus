@@ -95,8 +95,13 @@ scripts = [fname for fname in glob.glob(os.path.join('scripts', '*'))
            if not os.path.basename(fname).startswith('README')]
 
 libraries = [s.strip() for s in metadata.get('install_requires', 'astropy').split(',') ]
-libraries.append("beautifulsoup4")
-libraries.append("lxml beautifulsoup4 html5lib")
+libraries.append("beautifulsoup4==4.8.2")
+libraries.append("lxml==4.5.0")
+libraries.append("html5lib==1.0.1")
+libraries.append("tables==3.6.1")
+libraries.append("h5py==2.10.0")
+libraries.append("requests==2.22.0")
+
 # Get configuration information from all of the various subpackages.
 # See the docstring for setup_helpers.update_package_files for more
 # details.
