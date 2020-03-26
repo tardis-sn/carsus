@@ -17,7 +17,6 @@ import urllib.request, shutil
 import tarfile
 import re
 import h5py
-
 @pytest.fixture()
 def update_class():
     
@@ -68,32 +67,34 @@ def test_createdHDF5(update_class):
     Also files of incorrect extensions should not be created.
     """
     
-    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/CMFGEN.h5")
-    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/file2.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/Subfolder/file.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/file.h5")
-    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.h5")    
+    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/CMFGEN.hdf5")
+    assert os.path.exists(".Testing/HDF5CARSUSFolder@1/CARSUS/file2.hdf5")
+    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/Subfolder/file.hdf5")
+    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder1/file.hdf5")
+    assert os.path.exists(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.hdf5")    
     
     
 @pytest.mark.HDF5
-def test_HDF5(update_class):
+def test_HDF5():
 
     """
     This function checks that data is perfectly written in HDF5 file.
     It also checks that the data itself is correct or not from physics point 
     of view by taking example of si2_osc_kurucz file.
     """
+    a = UPDATE_CMFGEN(".Testing")
+    url = "https://carsusatomicdatatest.herokuapp.com/test.html"
+    a.update(url)
+    a.process_file(".Testing/TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz")
     
-    update_class.process_file(".Testing/TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz")
-    
-    first_table = pd.read_hdf(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.h5", "0")
-    second_table = pd.read_hdf(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.h5", "1")
+    first_table = pd.read_hdf(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.hdf5", "0")
+    second_table = pd.read_hdf(".Testing/HDF5TARDISFolder@1/TARDIS/Folder2/si2_osc_kurucz.hdf5", "1")
     
     assert len(list(first_table.columns)) == 10
-    assert len(list(second_table.columns)) == 7
+    assert len(list(second_table.columns)) == 9
     
-    assert first_table.shape[0] == 156
-    assert second_table.shape[0] == 4195
+    assert first_table.shape[0] == 157
+    assert second_table.shape[0] == 4196
     
     #checking if all values of g(statistical weight of the energy level) is greater than zero
     eval_dataframe = first_table[first_table["g"].astype("float64")>0.0]
