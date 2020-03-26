@@ -17,10 +17,11 @@ import tarfile
 import re
 import h5py
 
+
 class UPDATE_CMFGEN():
     
     """     
-    Class Members
+    Description
         ----------
         hidden_folder : String
             It is the name of the folder which is hidden and where all the data 
@@ -31,7 +32,7 @@ class UPDATE_CMFGEN():
     
     hidden_folder = ".CMFGEN"
     
-    
+
     def __init__(self, *args, **kwargs):
         if args:    
             if(args[0][0]=='.' and args[0]!='.'):
@@ -45,6 +46,112 @@ class UPDATE_CMFGEN():
         else:
             os.mkdir(self.hidden_folder)
                 
+            
+    def OSC_Parser(self,path):
+        """
+        Reads and process the OSC file. It stores the output information in a HDF5
+        file format.
+        
+        Parameters
+        ----------
+        path: String
+            path where the file is located
+            
+        Returns
+        ----------
+        Dataframes: Dictionary
+            dataframe as value and number as key
+        
+        Metadata: Dictionary
+            MetaData as value and dataframe number as key
+
+        """
+        metadata = {}
+        META_PATTERN = "^([\w\-\.]+)\s+!([\w ]+)$"
+        Dataframe_PATTERN = "\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])"
+        
+        with open(path, encoding='ISO-8859-1') as f:
+            n = 1
+            for line in f:
+                if re.match(META_PATTERN,line):
+                    val = line.split("!")
+                    val = [word.strip() for word in val]
+                    metadata[val[1]] = val[0]
+                    
+                if "Number of transitions" in line:
+                    break
+                n += 1
+            
+            else:
+                n = None
+                line = None
+        
+        Energy_Table = pd.read_csv(path, header = None, index_col = False, 
+                                   sep = Dataframe_PATTERN ,skiprows = n, 
+                                   nrows = int(metadata['Number of energy levels']),
+                                   engine='python')
+        
+        if Energy_Table.shape[1] == 10:
+            columns = ['Configuration', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 
+                       'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
+            Energy_Table.columns = columns
+    
+        elif Energy_Table.shape[1] == 7:
+            Energy_Table.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV',
+                                    'Hz 10^15', 'Lam(A)', '?']
+            Energy_Table = Energy_Table.drop(columns=['?'])
+    
+        elif Energy_Table.shape[1] == 6:
+            Energy_Table.columns = ['Configuration', 'g',
+                                    'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '?']
+            Energy_Table = Energy_Table.drop(columns=['?'])
+    
+        elif Energy_Table.shape[1] == 5:
+            Energy_Table.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV','?']
+            Energy_Table = Energy_Table.drop(columns=['?'])
+            
+        with open(path, encoding='ISO-8859-1') as f:
+            n = 1
+            for line in f:
+                if "i-j" in line:
+                    break
+                n += 1
+            
+            else:
+                n = None
+                line = None
+                
+        Transition_Table = pd.read_csv(path, header = None, index_col = False,
+                                       skiprows = n, sep = Dataframe_PATTERN, 
+                                       nrows = int(metadata["Number of transitions"]),
+                                       engine='python')
+
+        if Transition_Table.shape[1] == 9:
+            Transition_Table.columns = ['State A', 'State B', 'f', 'A','Lam(A)',
+                                        'i', 'j', 'Lam(obs)', '% Acc']
+
+        elif Transition_Table.shape[1] == 10:
+            Transition_Table.columns = ['State A', 'State B', 'f', 'A', 'Lam(A)',
+                                        'i', 'j', 'Lam(obs)', '% Acc','?']
+            Transition_Table = Transition_Table.drop(columns=['?'])
+
+        elif Transition_Table.shape[1] == 8:
+            Transition_Table.columns = ['State A', 'State B', 'f', 'A',
+                                        'Lam(A)', 'i', 'j','?']
+            Transition_Table = Transition_Table.drop(columns=['?'])
+            Transition_Table['Lam(obs)'] = np.nan
+            Transition_Table['% Acc'] = np.nan
+        
+        Dataframes = {}
+        Dataframes[0] = Energy_Table
+        Dataframes[1] = Transition_Table
+        
+        Metadata = {}
+        Metadata[0] = metadata
+        Metadata[1] = metadata
+        
+        return Dataframes, Metadata
+    
         
     def get_links(self, url = "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm"):
         """
@@ -252,6 +359,9 @@ class UPDATE_CMFGEN():
             MetaData as value and dataframe number as key
 
         """
+        if "osc" in path:
+            return self.OSC_Parser(path)
+        
         file = open(path , 'r') 
         data = file.readlines()
         start, end = 0,0
@@ -338,15 +448,10 @@ class UPDATE_CMFGEN():
         ----------
         None
         """
-        hf = h5py.File(path, 'w')
-        hf.close()
-        store = pd.HDFStore(path)
-        
-        for key in dataframes: 
-            store.put( str(key) , dataframes[key])
-            store.get_storer(str(key)).attrs.metadata = MetaData[key]
-            
-        store.close()
+        for key in dataframes:
+            with pd.HDFStore(path, 'a') as f:
+                f.put(str(key), dataframes[key], format='table', data_columns=True)
+                f.get_storer(str(key)).attrs.metadata = MetaData[key]
     
     
     def process_file(self, path):
@@ -367,7 +472,7 @@ class UPDATE_CMFGEN():
         last_path = ""
         for i in path.split("/")[2:-1]:
             last_path += "/" + i
-        last_path += "/" + os.path.splitext(path.split("/")[-1])[0] +".h5"
+        last_path += "/" + os.path.splitext(path.split("/")[-1])[0] +".hdf5"
         writepath = path.split("/")[0] + "/HDF5" + path.split("/")[1] + last_path
         self.write_to_HDF5( dataframes, metadata, writepath)
         
@@ -397,7 +502,7 @@ class UPDATE_CMFGEN():
             for entry in entries:
                 
                 if entry.is_file():
-                    new_path = HDF5directory +"/"+ os.path.splitext(entry.name)[0] +".h5"
+                    new_path = HDF5directory +"/"+ os.path.splitext(entry.name)[0] +".hdf5"
                     old_path = basepath + "/" + entry.name
                     if os.path.splitext(entry.name)[1] in extensions :
                         if os.path.exists(old_path):
