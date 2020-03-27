@@ -209,10 +209,12 @@ class CMFGENOscillatorStrengthsParser():
           
           x.pop(10)
           x.pop(9)
-      except IndexError :
+
+      except IndexError : #check index error 
+
         pass
 
-    if len(new_output[skip+n+1+13])==9 :
+    if len(new_output[cstart+2])==9 :
       columns=columns1
     else :
       columns=columns2
