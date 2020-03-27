@@ -1,455 +1,226 @@
-import numpy as np
+import requests 
+import os 
+from tqdm import tqdm
+import re
+import tarfile
+from pprint import pprint
 import pandas as pd
-import itertools
-import gzip
-import warnings
-from carsus.io.base import BaseParser
-
-
-# TODO: add `skiprows` parameter
-def find_row(fname, string1, string2='', how='both', num_row=False):
-    """Search strings inside plain text files and returns matching\
-    line or row number.
-
-    Parameters
-    ----------
-    fname : str
-        Path to plain text file.
-    string1 : str
-        String to search.
-    string2 : str
-        Extra string to search (default is '').
-    how : {'one', 'both', 'first'}
-        If 'both' search for string1 AND string2. If 'one' search for string1\
-            OR string2. If 'first' searches for 'string1' AND NOT string2\
-            (default is 'both').
-    num_row : bool
-        If true, returns row number instead (default is False).
-
-    Returns
-    -------
-    str or int
-        Returns matching line or row number.
-
-    """
-    with open(fname, encoding='ISO-8859-1') as f:
-        n = 0
-        for line in f:
-            n += 1
-
-            if how == 'one':
-                if string1 in line or string2 in line:
-                    break
-
-            if how == 'both':
-                if string1 in line and string2 in line:
-                    break
-
-            if how == 'first':
-                if string1 in line and string2 not in line:
-                    break
-
-        # In case there's no match
-        else:
-            n = None
-            line = None
-
-    if num_row is True:
-        return n
-
-    return line
-
-
-def parse_header(fname, keys, start=0, stop=50):
-    """Parse header from CMFGEN files.
-
-    Parameters
-    ----------
-    fname : str
-        Path to plain text file.
-    keys : list of str
-        Entries to search.
-    start : int
-        First line to search in (default is 0).
-    stop : int
-        Last line to search in (default is 50).
-
-    Returns
-    -------
-    dict
-        Dictionary containing metadata.
-
-    """
-    meta = {k.strip('!'): None for k in keys}
-    with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f:
-        for line in itertools.islice(f, start, stop):
-            for k in keys:
-                if k.lower() in line.lower():
-                    meta[k.strip('!')] = line.split()[0]
-
-    return meta
-
-
-def to_float(string):
-    """ String to float, taking care of Fortran 'D' values
-
-    Parameters
-    ----------
-    string : str
-
-    """
-    try:
-        value = float(string.replace('D', 'E'))
-
-    except ValueError:
-
-        if string == '1-.00':      # Bad value at MG/VIII/23oct02/phot_sm_3000 line 23340
-            value = 10.00
-
-        if string == '*********':  # Bad values at SUL/V/08jul99/phot_op.big lines 9255-9257
-            value = np.nan
-
-    return value
-
-
-class CMFGENEnergyLevelsParser(BaseParser):
-    """
-        Description
-        ----------
-        base : pandas.DataFrame
-        columns : list of str
-            (default value = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)'])
-        meta : dict
-            Metadata parsed from file header.
-
-        Methods
-        -------
-        load(fname)
-            Parses the input data and stores the results in the `base` attribute.
-    """
-
-    keys = ['!Date',  # Metadata to parse from header. TODO: look for more keys
-            '!Format date',
-            '!Number of energy levels',
-            '!Ionization energy',
-            '!Screened nuclear charge',
-            '!Number of transitions',
-            ]
-
-    def load(self, fname):
-
-        meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s+'
-        kwargs['skiprows'] = find_row(
-            fname, "Number of transitions", num_row=True)
-
-        n = int(meta['Number of energy levels'])
-        kwargs['nrows'] = n
-
-        columns = ['Configuration', 'g',
-                   'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
-
-        try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
-
-        except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=columns)
-            warnings.warn('Empty table')
-
-        # Assign column names by file content
-        if df.shape[1] == 10:
-            # Read column names and split them keeping one space (e.g. '10^15 Hz')
-            columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
-            # Filter list elements containing empty strings
-            columns = [c for c in columns if c != '']
-            # Remove left spaces and newlines
-            columns = [c.rstrip().lstrip() for c in columns]
-            columns = ['Configuration'] + columns
-            df.columns = columns
-
-        elif df.shape[1] == 7:
-            df.columns = columns + ['#']
-            df = df.drop(columns=['#'])
-
-        elif df.shape[1] == 6:
-            df.columns = ['Configuration', 'g',
-                          'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '#']
-            df = df.drop(columns=['#'])
-
-        elif df.shape[1] == 5:
-            df.columns = columns[:-2] + ['#']
-            df = df.drop(columns=['#'])
-
-        else:
-            # TODO: raise exception here (discuss)
-            warnings.warn('Inconsistent number of columns')
-
-        self.fname = fname
-        self.base = df
-        self.columns = df.columns.tolist()
-        self.meta = meta
-
-    def to_hdf(self, key='/energy_levels'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
-
-
-class CMFGENOscillatorStrengthsParser(BaseParser):
-    """
-        Description
-        ----------
-        base : pandas.DataFrame
-        columns : list of str
-            (default value = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
-        meta : dict
-            Metadata parsed from file header.
-
-        Methods
-        -------
-        load(fname)
-            Parses the input data and stores the results in the `base` attribute.
-    """
-
-    keys = CMFGENEnergyLevelsParser.keys
-
-    def load(self, fname):
-        meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])'
-        kwargs['skiprows'] = find_row(
-            fname, "Transition", "Lam", num_row=True) + 1
-
-        # Will only parse tables listed increasing lower level i, e.g. FE/II/24may96/osc_nahar.dat
-        n = int(meta['Number of transitions'])
-        kwargs['nrows'] = n
-
-        columns = ['State A', 'State B', 'f', 'A',
-                   'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
-
-        try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
-
-        except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=columns)
-            warnings.warn('Empty table')
-
-        # Assign column names by file content
-        if df.shape[1] == 9:
-            df.columns = columns
-
-        elif df.shape[1] == 10:
-            df.columns = columns + ['?']
-            df = df.drop(columns=['?'])
-
-        elif df.shape[1] == 8:
-            df.columns = columns[:-2] + ['#']
-            df = df.drop(columns=['#'])
-            df['Lam(obs)'] = np.nan
-            df['% Acc'] = np.nan
-
-        else:
-            warnings.warn('Inconsistent number of columns')
-
-        # Fix for Fortran float type 'D'
-        if df.shape[0] > 0 and 'D' in str(df['f'][0]):
-            df['f'] = df['f'].map(to_float)
-            df['A'] = df['A'].map(to_float)
-
-        self.fname = fname
-        self.base = df
-        self.columns = df.columns.tolist()
-        self.meta = meta
-
-    def to_hdf(self, key='/oscillator_strengths'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
-
-
-class CMFGENCollisionalDataParser(BaseParser):
-    """
-        Description
-        ----------
-        base : pandas.DataFrame
-        columns : list of str
-        meta : dict
-            Metadata parsed from file header.
-
-        Methods
-        -------
-        load(fname)
-            Parses the input data and stores the results in the `base` attribute.
-    """
-
-    keys = ['!Number of transitions',  # Metadata to parse from header. TODO: look for more keys
-            '!Number of T values OMEGA tabulated at',
-            '!Scaling factor for OMEGA (non-FILE values)',
-            '!Value for OMEGA if f=0',
-            ]
-
-    def load(self, fname):
-        meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-'
-        kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
-
-        # FIXME: expensive solution for two files with more than one table
-        # ARG/III/19nov07/col_ariii  &  HE/II/5dec96/he2col.dat
-        footer = find_row(fname, "Johnson values:",
-                          "dln_OMEGA_dlnT", how='one', num_row=True)
-        if footer is not None:
-            kwargs['nrows'] = footer - kwargs['skiprows'] - 2
-
-        try:
-            names = find_row(fname, 'ransition\T').split()  # Not a typo
-            # Comment next line when trying new regexes!
-            names = [np.format_float_scientific(
-                to_float(x)*1e+04, precision=4) for x in names[1:]]
-            kwargs['names'] = ['State A', 'State B'] + names
-
-        except AttributeError:
-            # TODO: some files have no column names nor header
-            warnings.warn('No column names')
-
-        try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
-            for c in df.columns[2:]:          # This is done column-wise on purpose
-                try:
-                    df[c] = df[c].astype('float64')
-
-                except ValueError:
-                    df[c] = df[c].map(to_float).astype('float64')
-
-        except pd.errors.EmptyDataError:
-            df = pd.DataFrame()
-            warnings.warn('Empty table')
-
-        self.fname = fname
-        self.base = df
-        self.columns = df.columns.tolist()
-        self.meta = meta
-
-    def to_hdf(self, key='/collisional_data'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
-
-
-class CMFGENPhotoionizationCrossSectionParser(BaseParser):
-    """
-        Description
-        ----------
-        base : list of pandas.DataFrame 's
-        columns : list of str
-        meta : dict
-            Metadata parsed from file header.
-
-        Methods
-        -------
-        load(fname)
-            Parses the input data and stores the results in the `base` attribute.
-    """
-    keys = ['!Date',
-            '!Number of energy levels',
-            '!Number of photoionization routes',
-            '!Screened nuclear charge',
-            '!Final state in ion',
-            '!Excitation energy of final state',
-            '!Statistical weight of ion',
-            '!Cross-section unit',
-            '!Split J levels',
-            '!Total number of data pairs',
-            ]
-
-    def _table_gen(self, f):
-        """ Generator. Yields a cross section table for an energy level """
-        meta = {}
-        data = []
-
-        for line in f:
-
-            if '!Configuration name' in line:
-                meta['Configuration'] = line.split()[0]
-
-            if '!Type of cross-section' in line:
-                meta['Type of cross-section'] = int(line.split()[0])
-
-            if '!Number of cross-section points' in line:
-                meta['Points'] = int(line.split()[0])
-
-                p = meta['Points']
-                for i in range(p):
-
-                    values = f.readline().split()
-                    if len(values) == 8:  # Verner ground state fits
-
-                        data.append(
-                            list(map(int, values[:2])) + list(map(float, values[2:])))
-
-                        if i == p/len(values) - 1:
-                            break
-
-                    else:
-                        data.append(map(to_float, values))
-
-                break
-
-        df = pd.DataFrame.from_records(data)
-        df._meta = meta
-
-        yield df
-
-    def load(self, fname):
-
-        meta = parse_header(fname, self.keys)
-        tables = []
-        with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f:
-
-            while True:
-
-                df = next(self._table_gen(f), None)
-
-                if df.empty:
-                    break
-
-                if df.shape[1] == 2:
-                    df.columns = ['Energy', 'Sigma']
-
-                elif df.shape[1] == 1:
-                    df.columns = ['Fit coefficients']
-
-                elif df.shape[1] == 8:  # Verner ground state fits. TODO: add units
-                    df.columns = ['n', 'l', 'E', 'E_0',
-                                  'sigma_0', 'y(a)', 'P', 'y(w)']
-
-                else:
-                    warnings.warn('Inconsistent number of columns')
-
-                tables.append(df)
-
-        self.fname = fname
-        self.base = tables
-        self.columns = []
-        self.meta = meta
-
-    def to_hdf(self, key='/photoionization_cross_sections'):
-        if len(self.base) > 0:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
-
-                for i in range(0, len(self.base)-1):
-                    subkey = '{0}/{1}'.format(key, i)
-                    f.put(subkey, self.base[i])
-                    f.get_storer(subkey).attrs.metadata = self.base[i]._meta
-
-                f.root._v_attrs['metadata'] = self.meta
+import numpy as np
+
+working_directory=os.getcwd()
+print(working_directory)
+
+#pass header as True to get header information
+#pass download as False to disable download
+def download_database(download=True,header=False) :
+  url="http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
+  h = requests.head(url, allow_redirects=True)
+  header = h.headers
+  filelength=int(header["Content-Length"])
+
+  if header :
+    
+    print("Content Type : ",header["content-type"])
+    print("Last Modified :",header["Last-Modified"])
+    print("Todays Date :",header["Date"])
+    print("File Size :",filelength/10e5,"MB")
+
+
+  if download : 
+    filename=url.split("/")[-1]
+    if os.path.exists(filename) :
+      return print("File already exists .")
+    r = requests.get(url, stream=True)
+    with open(filename, 'wb') as f:
+        pbar = tqdm(total=int(filelength/1024))
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:                   # filter out keep-alive new chunks
+              pbar.update ()
+              f.write(chunk)
+
+
+
+
+
+def parse_header(output,start=0,end=50) :   #start and end can be changed if a header is expected to be beyond default range
+  
+
+  pattern="![A-Za-z]+.+"
+  p=re.compile(pattern)
+
+  keys={}
+  count=[]
+  for x in range(start,min(len(output),end)) :
+    temp=p.findall(output[x])
+    if temp != [] :
+      value=output[x].split(" ")[0]
+      keys[temp[0][1:]]=value
+      count.append(x)
+  
+  return keys,count[0],count[-1]
+
+
+
+
+class CMFGENEnergyLevelsParser():
+
+  '''
+  modelled on the base parser class , yet to be inherited 
+  
+  attributes : 
+  meta = returns meta header data of the file
+  load method =loads the compressed database and searches for the passed file (extraaction of file is not required )
+  fname= represents the filename passed at class insantiation 
+  base = represents a panda dataframe composed of the parsed data 
+  
+  Note : 
+  This parser has been re written and the logic has been changed and the find row method been deprecated to optimize the code 
+  to be excecuted within one pass of the file .
+  
+  Important Points :
+  The to_hdf() function will produce the output in your current working directory .
+  To specfiy a path where the output has to be taken pass the specifc file path to the fname parameter in the function call.
+  The file path passed to the class at insantiation has to satrt from  atomic/..
+  compared to ./atomic in the previous version .
+  '''
+
+
+
+
+
+
+  def __init__ (self,fname) :  
+
+    self.load(fname)
+    
+
+
+  def load(self,fname) :
+    base_filename="atomic_data_15nov16.tar.gz"
+    t = tarfile.open(base_filename,'r:gz')
+    file=t.extractfile(fname)
+    #output will contain all of the file content line by line 
+    output=list(map(lambda x: x.strip().decode("utf-8"),file.readlines()))
+    meta,cstart,skip=parse_header(output)
+    new_output=list(map(lambda x: x.split(),output))
+    columns=[x for x in new_output[cstart-3] if x!=" "]
+ 
+    n=int(meta['Number of energy levels'])
+   
+    df = pd.DataFrame(new_output[skip+2:skip+n+2],columns=columns,index=range(0,n))
+ 
+
+    
+    self.meta=meta
+    self.base=df
+    self.fname=fname
+    self.columns=columns
+
+  def to_hdf(self, key='/energy_levels',fname=working_directory):
+    if not self.base.empty:
+      with pd.HDFStore('{}.h5'.format(fname), 'a') as f:
+          f.put(key, self.base)
+          f.get_storer(key).attrs.metadata = self.meta
+
+
+class CMFGENOscillatorStrengthsParser():
+
+
+  '''
+  modelled on the base parser class , yet to be inherited 
+  
+  attributes : 
+  meta = returns meta header data of the file
+  load method =loads the compressed database and searches for the passed file (extraaction of file is not required )
+  fname= represents the filename passed at class insantiation 
+  base = represents a panda dataframe composed of the parsed data 
+  
+  Note : 
+  This parser has been re written and the logic has been changed and the find row method been deprecated to optimize the code 
+  to be excecuted within one pass of the file .
+  
+  Important Points :
+  The to_hdf() function will produce the output in your current working directory .
+  To specfiy a path where the output has to be taken pass the specifc file path to the fname parameter in the function call.
+  The file path passed to the class at insantiation has to satrt from  atomic/..
+  compared to ./atomic in the previous version .
+  '''
+
+
+
+  def __init__ (self,fname) :
+
+    self.load(fname)
+
+    
+
+
+  def load(self,fname) :
+    base_filename="atomic_data_15nov16.tar.gz"
+    t = tarfile.open(base_filename,'r:gz')
+    file=t.extractfile(fname)
+    #output will contain all of the file content line by line 
+    output=list(map(lambda x: x.strip().decode("utf-8"),file.readlines()))
+    meta,cstart,skip=parse_header(output)
+    new_output=list(map(lambda x: x.split(),output))
+    columns=columns = ['State A', 'State B', 'f', 'A','Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    n=int(meta['Number of energy levels'])
+    m=int(meta['Number of transitions'])
+
+    for x in new_output[skip+n+1+13:skip+n+1+13+m]:
+      i=x[0].find("-")
+      try :
+        if i !=-1 :
+          x.insert(1,x[0][i+1:])
+          x[0]=x[0][:i]
+          
+        else :
+          x[1]=x[1][1:]
+    
+        if x[5].endswith("-") :
+          x[5]=x[5][:-1]
+        if x[8]=="|" :
+          x[7]=np.nan
+        else :
+          x[7]=x[8]
+        if len(x)==9+1 :
+          if x[9]== "|" :
+            x[8]=np.nan
+          else :
+            x[8]=x[9]
+          x.pop(9)
+        elif len(x)==10 +1:
+          if x[10]=="|" :
+            x[8]=np.nan
+
+          else :
+            x[8]=x[10]
+          x.pop(10)
+          x.pop(9)
+          
+        elif len(x)==11+1 :
+          x[7]=x[8]
+          x[8]=x[10]
+          x.pop(11)
+          
+          x.pop(10)
+          x.pop(9)
+      except IndexError :  #check index error 
+        print(x)
+
+   
+    df = pd.DataFrame(new_output[skip+n+1+13:skip+n+1+13+m],columns=columns,index=range(0,m))
+ 
+
+    
+    self.meta=meta
+    self.base=df
+    self.fname=fname
+    self.columns=columns
+
+
+  def to_hdf(self, key='/oscillator_strengths',fname=working_directory):
+    if not self.base.empty:
+      with pd.HDFStore('{}.h5'.format(fname), 'a') as f:
+          f.put(key, self.base)
+          f.get_storer(key).attrs.metadata = self.meta
