@@ -62,8 +62,6 @@ def parse_header(output,start=0,end=50) :   #start and end can be changed if a h
   return keys,count[0],count[-1]
 
 
-
-
 class CMFGENEnergyLevelsParser():
 
   '''
@@ -156,11 +154,24 @@ class CMFGENOscillatorStrengthsParser():
     output=list(map(lambda x: x.strip().decode("utf-8"),file.readlines()))
     meta,cstart,skip=parse_header(output)
     new_output=list(map(lambda x: x.split(),output))
-    columns=columns = ['State A', 'State B', 'f', 'A','Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    columns1 = ['State A', 'State B', 'f', 'A','Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    columns2=['State A', 'State B', 'f', 'A','Lam(A)', 'i', 'j', 'Transition Number']
+    
+    
     n=int(meta['Number of energy levels'])
     m=int(meta['Number of transitions'])
+    cstart=0
 
-    for x in new_output[skip+n+1+13:skip+n+1+13+m]:
+    for start in range(skip+n,skip+n+100) :
+      if len(new_output[start])<1 :
+        continue
+
+      if new_output[start][0]=="Transition" :
+
+        cstart=start
+        break
+
+    for x in new_output[cstart+2:cstart+2+m+1]:
       i=x[0].find("-")
       try :
         if i !=-1 :
@@ -183,11 +194,11 @@ class CMFGENOscillatorStrengthsParser():
             x[8]=x[9]
           x.pop(9)
         elif len(x)==10 +1:
-          if x[10]=="|" :
+          if x[9]=="|" :
             x[8]=np.nan
 
           else :
-            x[8]=x[10]
+            x[8]=x[9]
           x.pop(10)
           x.pop(9)
           
@@ -199,10 +210,13 @@ class CMFGENOscillatorStrengthsParser():
           x.pop(10)
           x.pop(9)
       except IndexError :
-        print(x)
+        pass
 
-   
-    df = pd.DataFrame(new_output[skip+n+1+13:skip+n+1+13+m],columns=columns,index=range(0,m))
+    if len(new_output[skip+n+1+13])==9 :
+      columns=columns1
+    else :
+      columns=columns2
+    df = pd.DataFrame(new_output[cstart+2:cstart+2+m+1],columns=columns,index=range(0,m))
  
 
     
@@ -219,7 +233,3 @@ class CMFGENOscillatorStrengthsParser():
           f.get_storer(key).attrs.metadata = self.meta
 
 
-
-t=CMFGENEnergyLevelsParser("./atomic/SIL/II/16sep15/si2_osc_kurucz")
-print(t.meta)
-print(t.base)
