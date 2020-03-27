@@ -3,12 +3,11 @@ import os
 from tqdm import tqdm
 import re
 import tarfile
-from pprint import pprint
+# from pprint import pprint
 import pandas as pd
 import numpy as np
 
 working_directory=os.getcwd()
-print(working_directory)
 
 #pass header as True to get header information
 #pass download as False to disable download
