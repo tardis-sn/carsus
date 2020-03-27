@@ -198,8 +198,8 @@ class CMFGENOscillatorStrengthsParser():
           
           x.pop(10)
           x.pop(9)
-      except IndexError :
-        print(x)
+      except IndexError : #check index error 
+        pass
 
    
     df = pd.DataFrame(new_output[skip+n+1+13:skip+n+1+13+m],columns=columns,index=range(0,m))
@@ -219,7 +219,3 @@ class CMFGENOscillatorStrengthsParser():
           f.get_storer(key).attrs.metadata = self.meta
 
 
-
-t=CMFGENEnergyLevelsParser("./atomic/SIL/II/16sep15/si2_osc_kurucz")
-print(t.meta)
-print(t.base)
