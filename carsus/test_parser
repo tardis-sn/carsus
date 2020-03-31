@@ -1,0 +1,74 @@
+"""
+The following is a parser to read in the tabulated data contained in si2_osc_kurucz.
+The file is located in /atomic/SIL/II/16sep15
+The parser reads in the data and parses it into a dataframe.
+"""
+
+import pandas as pd
+import re
+import os
+
+def target_file(file_name, file_path):
+
+    """
+    Find the file to be parsed, "file_name", at path "file_path".
+    This function returns the path of the file we want to parse.
+    """
+    
+    for root, dirs, files in os.walk(file_path):
+        if file_name in files:
+            return os.path.join(root, file_name)
+            
+            
+def data_extract(file_path):
+    """
+    Returns file data in string format.
+    """
+    
+    file_data = ""
+    with open(file_path, 'r') as file_object:
+        file_data += file_object.read()
+    return file_data
+
+def tabular_data(pattern, string, columns, flags=0):
+    """
+    Extracts the tabulated data from the file according to the pattern.
+    
+    Parameters:-
+    pattern refers to the regex pattern.
+    string refers to the string on which to match the expression.
+    columns refers to the column names
+    flags refers flags to be passed to matcher object. This is optional.
+    
+    This function returns a pandas dataframe.
+    """
+    df = pd.DataFrame(df_columns=columns)
+    matches = re.finditer(pattern, string, flags)
+
+    for counter, match in enumerate(matches, start=1):
+        for group_counter in range(0, len(match.groups())):
+            df.loc[counter, df_columns[group_counter]] = match.group(group_counter+1)
+
+    return df
+
+def parse_file(directory, file_name, pattern, columns):
+    
+    # Finds file and extracts data
+    fpath = target_file(file_name, directory)
+    print('The file resides in:', path)
+
+    filedata = data_extract(path)
+
+    # Metadata parsing
+    df = extract_tabular_data(pattern, filedata, columns, re.MULTILINE)
+    return df
+    # Extraction of tabulated data
+    df1 = extract_tabular_data(PATTERN1, table1, columns1, re.MULTILINE)
+    df1.set_index("ID", inplace=True)
+    print(df1.head())
+
+    df2 = extract_tabular_data(PATTERN2, table2, columns2, re.MULTILINE)
+    print(df2.head())
+            
+
+    
