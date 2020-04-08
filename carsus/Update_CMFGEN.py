@@ -22,11 +22,11 @@ class UPDATE_CMFGEN():
     
     """     
     Description
-        ----------
-        hidden_folder : String
-            It is the name of the folder which is hidden and where all the data 
-            is stored. The data includes the extracted file, log file and HDF5 
-            files.          
+    ----------
+    hidden_folder : String
+        It is the name of the folder which is hidden and where all the data 
+        is stored. The data includes the extracted file, log file and HDF5 
+        files.          
          
     """
     
@@ -165,8 +165,8 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
-        """
 
+        """
         html_content = requests.get(url).text
         if url != "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm":
             first = "https://my-static-site-exampl1601.herokuapp.com/"
@@ -243,6 +243,7 @@ class UPDATE_CMFGEN():
         ----------
         String
             complete file name(along extension)
+
         """
         
         return_file = name
@@ -271,8 +272,8 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+
         """
-        
         antepenult_ver = name.split("@")[0] + "@" + str(int(name.split("@")[1])-2)
         antepenult_ver = self.hidden_folder + "/"+ antepenult_ver
         print(antepenult_ver)
@@ -325,6 +326,8 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         Boolean Value
+            Whether the given files are same or not
+
         """
         file1 = open(path1 , 'r') 
         data1 = file1.readlines()
@@ -447,6 +450,7 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+
         """
         for key in dataframes:
             with pd.HDFStore(path, 'a') as f:
@@ -467,6 +471,7 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+
         """
         dataframes, metadata = self.extract_tabular_data(path)
         last_path = ""
@@ -495,6 +500,7 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+
         """
         extensions = [".dat", ".sp", ".txt", ""]
         
@@ -538,6 +544,7 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+
         """
         
         extensions = [".dat", ".sp", ".txt", ""]
@@ -577,6 +584,7 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
+        
         """
 
         self.get_links(url)
