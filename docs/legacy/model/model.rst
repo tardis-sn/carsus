@@ -1,7 +1,7 @@
-Database Models in carsus
+Database Models in Carsus
 ===========================
 
-Atomic models in carsus
+Atomic models in Carsus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: carsus.model.atomic
     :members:

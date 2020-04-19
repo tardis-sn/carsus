@@ -1,6 +1,6 @@
 .. _api:
 
-Reference/API
+API reference
 =================
 
 carsus.io.base Module
@@ -23,7 +23,7 @@ Members
 Class Inheritance Diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/io_base_inheritance.png
+.. image:: ../images/io_base_inheritance.png
     :width: 300
 
 
@@ -47,6 +47,6 @@ Members
 Class Inheritance Diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: images/io_nist_inheritance.png
+.. image:: ../images/io_nist_inheritance.png
     :width: 400
 

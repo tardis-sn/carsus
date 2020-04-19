@@ -93,7 +93,7 @@ rst_epilog = """
 
 # This does not *have* to match the package name, but typically does
 project = u'Carsus'
-author = u'TARDIS team'
+author = u'TARDIS collaboration'
 copyright = '{0}, {1}'.format(datetime.datetime.now().year, author)
 
 master_doc = 'index'
