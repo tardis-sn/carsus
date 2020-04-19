@@ -13,7 +13,7 @@ Contents
     
     installation.rst
     quickstart
-    io/data_sources
+    io/datasets
     legacy/legacy.rst
     compare_atomic_files
 
