@@ -1,4 +1,4 @@
-Macro Atom
+Macro atom
 ----------
 
 The macro atom is described in detail in :cite:`2002A&A...384..725L`. The basic principal is that when an energy packet
