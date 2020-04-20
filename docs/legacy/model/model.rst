@@ -1,4 +1,4 @@
-Database Models in Carsus
+Database models in Carsus
 ===========================
 
 Atomic models in Carsus

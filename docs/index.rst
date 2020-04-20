@@ -2,8 +2,7 @@
 Welcome to Carsus's documentation!
 **********************************
 
-Carsus is the `TARDIS <http://tardis-sn.github.io/tardis/>`_ support package for creating atomic datasets.
-
+Carsus is a package to manage atomic datasets. It can read data from a variety of sources and output them to file formats readable by radiative transfer codes.
 
 Contents
 ********
