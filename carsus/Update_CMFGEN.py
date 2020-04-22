@@ -16,6 +16,7 @@ import urllib.request, shutil
 import tarfile
 import re
 import h5py
+from carsus.parsers import *
 
 
 class UPDATE_CMFGEN():
@@ -46,113 +47,7 @@ class UPDATE_CMFGEN():
         else:
             os.mkdir(self.hidden_folder)
                 
-            
-    def OSC_Parser(self,path):
-        """
-        Reads and process the OSC file. It stores the output information in a HDF5
-        file format.
-        
-        Parameters
-        ----------
-        path: String
-            path where the file is located
-            
-        Returns
-        ----------
-        Dataframes: Dictionary
-            dataframe as value and number as key
-        
-        Metadata: Dictionary
-            MetaData as value and dataframe number as key
-
-        """
-        metadata = {}
-        META_PATTERN = "^([\w\-\.]+)\s+!([\w ]+)$"
-        Dataframe_PATTERN = "\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])"
-        
-        with open(path, encoding='ISO-8859-1') as f:
-            n = 1
-            for line in f:
-                if re.match(META_PATTERN,line):
-                    val = line.split("!")
-                    val = [word.strip() for word in val]
-                    metadata[val[1]] = val[0]
-                    
-                if "Number of transitions" in line:
-                    break
-                n += 1
-            
-            else:
-                n = None
-                line = None
-        
-        Energy_Table = pd.read_csv(path, header = None, index_col = False, 
-                                   sep = Dataframe_PATTERN ,skiprows = n, 
-                                   nrows = int(metadata['Number of energy levels']),
-                                   engine='python')
-        
-        if Energy_Table.shape[1] == 10:
-            columns = ['Configuration', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 
-                       'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
-            Energy_Table.columns = columns
-    
-        elif Energy_Table.shape[1] == 7:
-            Energy_Table.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV',
-                                    'Hz 10^15', 'Lam(A)', '?']
-            Energy_Table = Energy_Table.drop(columns=['?'])
-    
-        elif Energy_Table.shape[1] == 6:
-            Energy_Table.columns = ['Configuration', 'g',
-                                    'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '?']
-            Energy_Table = Energy_Table.drop(columns=['?'])
-    
-        elif Energy_Table.shape[1] == 5:
-            Energy_Table.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV','?']
-            Energy_Table = Energy_Table.drop(columns=['?'])
-            
-        with open(path, encoding='ISO-8859-1') as f:
-            n = 1
-            for line in f:
-                if "i-j" in line:
-                    break
-                n += 1
-            
-            else:
-                n = None
-                line = None
                 
-        Transition_Table = pd.read_csv(path, header = None, index_col = False,
-                                       skiprows = n, sep = Dataframe_PATTERN, 
-                                       nrows = int(metadata["Number of transitions"]),
-                                       engine='python')
-
-        if Transition_Table.shape[1] == 9:
-            Transition_Table.columns = ['State A', 'State B', 'f', 'A','Lam(A)',
-                                        'i', 'j', 'Lam(obs)', '% Acc']
-
-        elif Transition_Table.shape[1] == 10:
-            Transition_Table.columns = ['State A', 'State B', 'f', 'A', 'Lam(A)',
-                                        'i', 'j', 'Lam(obs)', '% Acc','?']
-            Transition_Table = Transition_Table.drop(columns=['?'])
-
-        elif Transition_Table.shape[1] == 8:
-            Transition_Table.columns = ['State A', 'State B', 'f', 'A',
-                                        'Lam(A)', 'i', 'j','?']
-            Transition_Table = Transition_Table.drop(columns=['?'])
-            Transition_Table['Lam(obs)'] = np.nan
-            Transition_Table['% Acc'] = np.nan
-        
-        Dataframes = {}
-        Dataframes[0] = Energy_Table
-        Dataframes[1] = Transition_Table
-        
-        Metadata = {}
-        Metadata[0] = metadata
-        Metadata[1] = metadata
-        
-        return Dataframes, Metadata
-    
-        
     def get_links(self, url = "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm"):
         """
         Fetches all links and also update the log Table.
@@ -161,11 +56,9 @@ class UPDATE_CMFGEN():
         ----------
         url (Optional): String
             url where the links are present
-
         Returns
         ----------
         None
-
         """
         html_content = requests.get(url).text
         if url != "http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm":
@@ -235,15 +128,12 @@ class UPDATE_CMFGEN():
         ----------
         url: String
             url where the file is located
-
         name: String
             name with which you want to store the file on the local machine
-
         Returns
         ----------
         String
             complete file name(along extension)
-
         """
         
         return_file = name
@@ -265,14 +155,11 @@ class UPDATE_CMFGEN():
         ----------
         url: String
             url where the file is located
-
         name: String
             name with which you want to store the file on the local machine
-
         Returns
         ----------
         None
-
         """
         antepenult_ver = name.split("@")[0] + "@" + str(int(name.split("@")[1])-2)
         antepenult_ver = self.hidden_folder + "/"+ antepenult_ver
@@ -319,7 +206,6 @@ class UPDATE_CMFGEN():
         ----------
         path1: String
             path where the first file is located
-
         path2: String
             path where the second file is located
         
@@ -327,7 +213,6 @@ class UPDATE_CMFGEN():
         ----------
         Boolean Value
             Whether the given files are same or not
-
         """
         file1 = open(path1 , 'r') 
         data1 = file1.readlines()
@@ -360,10 +245,15 @@ class UPDATE_CMFGEN():
         
         metadata_dict: Dictionary
             MetaData as value and dataframe number as key
-
         """
-        if "osc" in path:
-            return self.OSC_Parser(path)
+        if "osc" in path.lower():
+            return OSC_Parser(path)
+        
+        if "col" in path.lower():
+            return COL_Parser(path)
+        
+        if "osc" in path.lower():
+            return PHOT_Parser(path)
         
         file = open(path , 'r') 
         data = file.readlines()
@@ -394,8 +284,8 @@ class UPDATE_CMFGEN():
         COLUMNS_ENERGY_LEVELS = ['Configuration', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
         COLUMNS_OSCILLATOR_STRENGTHS = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i','j']
         
-        META_PATTERN = "^([\w\-\.]+)\s+!([\w ]+)$"
-        Dataframe_PATTERN = "[a-zA-Z0-9_\/\[\-\+.\)\()]+]*"
+        META_PATTERN = r"^([\w\-\.]+)\s+!([\w ]+)$"
+        Dataframe_PATTERN = r"[a-zA-Z0-9_\/\[\-\+.\)\()]+]*"
         
         dataframe_dict = {}
         metadata_dict = {}
@@ -450,7 +340,6 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
-
         """
         for key in dataframes:
             with pd.HDFStore(path, 'a') as f:
@@ -471,7 +360,6 @@ class UPDATE_CMFGEN():
         Returns
         ----------
         None
-
         """
         dataframes, metadata = self.extract_tabular_data(path)
         last_path = ""
@@ -490,17 +378,14 @@ class UPDATE_CMFGEN():
         ----------
         basepath: String
             The base folder
-
         directory: String
             The folder we are currently on
             
         HDF5directory: String
             The folder in which HDF5 files are to be created
-
         Returns
         ----------
         None
-
         """
         extensions = [".dat", ".sp", ".txt", ""]
         
@@ -534,17 +419,14 @@ class UPDATE_CMFGEN():
         ----------
         basepath: String
             The base folder of current version
-
         directory: String
             The folder we are currently on
-
         prev_ver: String
             The base folder of previous version
             
         Returns
         ----------
         None
-
         """
         
         extensions = [".dat", ".sp", ".txt", ""]
@@ -580,7 +462,6 @@ class UPDATE_CMFGEN():
         ----------
         url (Optional): String
             url where the links are present
-
         Returns
         ----------
         None
@@ -602,3 +483,4 @@ class UPDATE_CMFGEN():
                 self.download_data ( data[i-2][:-1], 
                                     data[i-3].split(":")[1][:-1].replace(" ","")
                                     + "@" + data[i].split(":")[1][:-1] )
+
