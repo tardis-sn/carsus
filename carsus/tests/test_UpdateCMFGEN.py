@@ -17,6 +17,7 @@ import urllib.request, shutil
 import tarfile
 import re
 import h5py
+
 @pytest.fixture()
 def update_class():
     
@@ -53,15 +54,14 @@ def testisSame(update_class):
     
     """
     This function tests the is_same function by comparing the log file. This 
-    inturn checks that the log file produced by the getlinks function is correct 
+    inturn checks that the log file produced by the getlinks function is correct
     or not.
     """
     assert update_class.is_same(".Testing/CMFGEN.txt", ".Testing/CARSUSFolder@1/CARSUS/CMFGEN.txt")
     
 
 @pytest.mark.HDF5
-def test_createdHDF5(update_class):
-    
+def test_createdhdf5(update_class):
     """
     This function tests whether all HDF5 files are created at correct positions. 
     Also files of incorrect extensions should not be created.
