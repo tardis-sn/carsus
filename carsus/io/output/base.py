@@ -184,7 +184,9 @@ class TARDISAtomData:
                        'energy', 'g']].duplicated(keep='last')	
         levels = levels[~mask]
 
-        # Keep Chianti levels over GFALL.
+        # Keep higher priority levels over GFALLL: if levels with
+        # different source than 'gfall' made to this point should
+        # be kept.
         for ion in self.chianti_ions:
             mask = (levels['source'] == 'gfall') & (
                 levels['atomic_number'] == ion[0]) & (
