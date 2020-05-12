@@ -184,6 +184,14 @@ class TARDISAtomData:
         # for different configurations. 
         # 
         # e.g. ChiantiIonReader('h_1')
+        #
+        # In fact, the following code should only remove the du-
+        # plicated ground levels. Other duplicated levels should
+        # be removed at the reader stage.
+        #
+        # TODO: a more clear way to get the same result could be: 
+        # "keep only zero energy levels from NIST source".
+
         mask = (levels['source'] != 'chianti') & (
             levels[['atomic_number', 'ion_number',
                     'energy', 'g']].duplicated(keep='last'))	
