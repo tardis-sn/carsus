@@ -51,7 +51,8 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ['energy', 'j']
 
-    def __init__(self, fname, ions=None, priority=10, unique_level_identifier=None):
+    def __init__(self, fname='http://kurucz.harvard.edu/linelists/gfall/gfall.dat', 
+                    ions=None, priority=10, unique_level_identifier=None):
         """
 
         Parameters
