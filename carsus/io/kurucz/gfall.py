@@ -51,8 +51,9 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ['energy', 'j']
 
-    def __init__(self, fname='http://kurucz.harvard.edu/linelists/gfall/gfall.dat', 
-                    ions=None, priority=10, unique_level_identifier=None):
+    def __init__(self, ions=None, 
+                 fname='http://kurucz.harvard.edu/linelists/gfall/gfall.dat',
+                 priority=10, unique_level_identifier=None):
         """
 
         Parameters
@@ -404,7 +405,7 @@ class GFALLIngester(object):
 
     def __init__(self, session, fname, ions=None, ds_short_name="ku_latest"):
         self.session = session
-        self.gfall_reader = GFALLReader(fname)
+        self.gfall_reader = GFALLReader(ions, fname)
         if ions is not None:
             try:
                 ions = parse_selected_species(ions)

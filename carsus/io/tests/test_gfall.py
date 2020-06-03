@@ -10,7 +10,7 @@ from carsus.model import Ion, Level, LevelEnergy, DataSource, Line
 
 @pytest.fixture()
 def gfall_rdr(gfall_fname):
-    return GFALLReader(gfall_fname)
+    return GFALLReader(fname=gfall_fname)
 
 
 @pytest.fixture()
