@@ -1,3 +1,5 @@
+import os
+import carsus
 import numpy as np
 import pandas as pd
 from carsus.io.base import BaseParser
@@ -7,6 +9,9 @@ from carsus.model import (
     DataSource
 )
 
+ZETA_PATH = os.path.join(os.path.dirname(carsus.__file__), 
+                        'data', 
+                        'knox_long_recombination_zeta.dat')
 
 class KnoxLongZetaIngester(object):
 
@@ -71,8 +76,13 @@ class KnoxLongZeta(BaseParser):
             Dump the `base` attribute into an HDF5 file
     """
 
-    def __init__(self, fname):
-        self.fname = fname
+    def __init__(self, fname=None):
+
+        if fname is None:
+            self.fname = ZETA_PATH
+        else:
+            self.fname = fname
+
         self._prepare_data()
 
     def _prepare_data(self):
