@@ -202,7 +202,7 @@ class NISTWeightsComp(BaseParser):
         Dump the `base` attribute into an HDF5 file
 
     """
-    def __init__(self, atoms='H-U'):
+    def __init__(self, atoms='H-Pu'):
         input_data = download_weightscomp()
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
