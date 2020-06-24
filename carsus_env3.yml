@@ -20,7 +20,7 @@ dependencies:
 - beautifulsoup4
 - pyparsing=2.2.0
 - html5lib
-- SQLAlchemy=1.0.19
+- SQLAlchemy=1.0
 - PyYAMl
 - h5py
 - pytables
