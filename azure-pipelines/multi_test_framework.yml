@@ -18,7 +18,7 @@ variables:
   system.debug: "true"
   PANDAS_VERSION: 0.24
   ASTROPY_USE_SYSTEM_PYTEST: 1
-  SETUP_CMD: "test"
+  SETUP_CMD: ""
   TEST_MODE: "normal"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
@@ -37,17 +37,17 @@ jobs:
   strategy:
     matrix:
       simple:
-        SETUP_CMD: "test"
+        SETUP_CMD: ""
       remote_data:
-        SETUP_CMD: "test --remote-data"
+        SETUP_CMD: "--remote-data"
       slow:
-        SETUP_CMD: 'test --args="--runslow"'
+        SETUP_CMD: "--runslow"
         INSTALL_CHIANTI: true
       database:
-        SETUP_CMD: 'test --args="--test-db=$HOME/carsus-db/test_databases/test.db"'
+        SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
         TEST_MODE: "with_test_db"
       coverage:
-        SETUP_CMD: 'test --coverage'
+        SETUP_CMD: "--coverage"
     
     maxParallel: 5
 
@@ -89,15 +89,15 @@ jobs:
 # Activate environment and start test
   - bash: |
           source activate carsus
-          echo python setup.py $SETUP_CMD
-          python setup.py $SETUP_CMD
+          echo pytest carsus $SETUP_CMD
+          pytest carsus $SETUP_CMD
     displayName: "TARDIS test"
 
 # Make a coverage file in xml for Azure
   - bash: |
           source activate carsus
           coverage xml
-    condition: and(succeeded(), eq(variables['SETUP_CMD'], 'test --coverage'))
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--coverage'))
     displayName: "Make xml file to publish"
     
 # Publish Code Coverage Results
@@ -107,7 +107,7 @@ jobs:
       codeCoverageTool: 'cobertura'
       summaryFileLocation: '$(Build.Repository.LocalPath)/coverage.xml'
       reportDirectory: '$(Build.Repository.LocalPath)/htmlcov'
-    condition: and(succeeded(), eq(variables['SETUP_CMD'], 'test --coverage'))
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--coverage'))
     displayName: "Publish Results of coverage"
 
 # Clean up in case of failure
