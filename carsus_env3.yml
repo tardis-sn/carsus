@@ -42,7 +42,6 @@ dependencies:
 - pytest-cov
 - pytest-astropy
 - coverage
-- coveralls
 - requests
 
 # ChiantiPy dependencies
