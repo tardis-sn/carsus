@@ -26,6 +26,7 @@ variables:
   CONDA: "/usr/share/miniconda"
   XUVTOP: "/usr/share/chianti"
   PYTHON_VERSION: '3.7'
+  codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
 
 jobs:
 
@@ -93,21 +94,10 @@ jobs:
     displayName: "Carsus test"
 
   - bash: |
-          source activate carsus
-          coverage xml
+          bash <(curl -s https://codecov.io/bash)
     condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
-    displayName: "Make xml file to publish"
+    displayName: "Upload to codecov.io"
     
-# Publish Code Coverage Results
-# Publish Cobertura or JaCoCo code coverage results from a build
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: 'cobertura'
-      summaryFileLocation: '$(Build.Repository.LocalPath)/coverage.xml'
-      reportDirectory: '$(Build.Repository.LocalPath)/htmlcov'
-    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
-    displayName: "Publish Results of coverage"
-
 # Clean up in case of failure
   - bash: |
           source activate carsus
