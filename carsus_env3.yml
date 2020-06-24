@@ -41,7 +41,7 @@ dependencies:
 - pytest=4
 - pytest-cov
 - pytest-astropy
-- coverage=4
+- coverage
 - coveralls
 - requests
 
