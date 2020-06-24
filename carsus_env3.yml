@@ -2,7 +2,6 @@ name: carsus
 
 channels:
     - conda-forge
-    - default
 
 dependencies:
 - python=3
@@ -46,7 +45,7 @@ dependencies:
 # Test/Coverage requirements
 - coverage=4
 - coveralls
-- pytest=4.5.0
+- pytest=4
 - pytest-cov
 - pytest-astropy
 - requests
