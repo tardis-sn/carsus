@@ -9,7 +9,7 @@ dependencies:
 - setuptools
 - numpy=1.15
 - pandas=1.0
-- astropy=3.2
+- astropy=3
 - Cython=0.29  # TARDIS dep
 - numexpr
 - ipyparallel
