@@ -53,5 +53,5 @@ dependencies:
 
 # Pip
 - pip:
-  - ChiantiPy=0.8.7
+  - ChiantiPy==0.8.7
   - git+https://github.com/tardis-sn/tardis
