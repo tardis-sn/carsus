@@ -10,7 +10,6 @@ dependencies:
 - pandas=1.0
 - astropy=3
 - numexpr
-- ipyparallel
 - uncertainties
 - pip
 
@@ -46,6 +45,10 @@ dependencies:
 - pytest-cov
 - pytest-astropy
 - requests
+
+# ChiantiPy dependencies
+- scipy
+- ipyparallel
 
 # Pip
 - pip:
