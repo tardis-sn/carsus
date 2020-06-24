@@ -53,5 +53,5 @@ dependencies:
 
 # Pip
 - pip:
-  - ChiantiPy==0.8.5
+  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4	
   - git+https://github.com/tardis-sn/tardis
