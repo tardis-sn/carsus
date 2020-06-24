@@ -9,7 +9,6 @@ dependencies:
 - numpy=1.15
 - pandas=1.0
 - astropy=3
-- numexpr
 - uncertainties
 - pip
 
@@ -39,11 +38,11 @@ dependencies:
 - recommonmark
 
 # Test/Coverage requirements
-- coverage=4
-- coveralls
 - pytest=4
 - pytest-cov
 - pytest-astropy
+- coverage=4
+- coveralls
 - requests
 
 # ChiantiPy dependencies
