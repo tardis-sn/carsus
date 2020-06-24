@@ -95,7 +95,7 @@ jobs:
   - bash: |
           source activate carsus
           coverage xml
-    condition: and(succeeded(), eq(variables['COVERAGE'], '--cov=carsus --cov-report=xml --cov-report=html'))
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
     displayName: "Make xml file to publish"
     
 # Publish Code Coverage Results
@@ -105,7 +105,7 @@ jobs:
       codeCoverageTool: 'cobertura'
       summaryFileLocation: '$(Build.Repository.LocalPath)/coverage.xml'
       reportDirectory: '$(Build.Repository.LocalPath)/htmlcov'
-    condition: and(succeeded(), eq(variables['COVERAGE'], true))
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
     displayName: "Publish Results of coverage"
 
 # Clean up in case of failure
