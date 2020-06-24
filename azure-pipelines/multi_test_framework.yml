@@ -31,7 +31,6 @@ jobs:
 
 - job: "Test"
 
-# Five different tests with different inputs
   pool:
     vmImage: "Ubuntu-16.04"
   strategy:
@@ -46,7 +45,7 @@ jobs:
         SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
         TEST_MODE: "with_test_db"
       coverage:
-        COVERAGE: true
+        SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
     
     maxParallel: 5
 
@@ -89,14 +88,14 @@ jobs:
   - bash: |
           source activate carsus
           echo pytest carsus $SETUP_CMD
+          pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
-    displayName: "TARDIS test"
+    displayName: "Carsus test"
 
-# Make a coverage file in xml for Azure
   - bash: |
           source activate carsus
           coverage xml
-    condition: and(succeeded(), eq(variables['COVERAGE'], true))
+    condition: and(succeeded(), eq(variables['COVERAGE'], '--cov=carsus --cov-report=xml --cov-report=html'))
     displayName: "Make xml file to publish"
     
 # Publish Code Coverage Results
