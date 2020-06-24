@@ -9,7 +9,6 @@ dependencies:
 - numpy=1.15
 - pandas=1.0
 - astropy=3
-- Cython=0.29  # TARDIS dep
 - numexpr
 - ipyparallel
 - uncertainties
@@ -23,8 +22,6 @@ dependencies:
 - PyYAMl
 - h5py
 - pytables
-- pyne=0.5     # TARDIS dep
-- tqdm         # TARDIS dep
 
 # Analysis
 - jupyter
@@ -52,5 +49,4 @@ dependencies:
 
 # Pip
 - pip:
-  - git+https://github.com/tardis-sn/tardis
   - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
