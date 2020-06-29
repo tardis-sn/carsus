@@ -271,8 +271,9 @@ class GFALLReader(object):
         # ToDo: The commented block below does not work with all lines. Find a way to parse it.
         # levels[["configuration", "term"]] = levels["label"].str.split(expand=True)
         # levels["configuration"] = levels["configuration"].str.strip()
-        # levels["term"] = levels["term"].str.strip()
-
+        # levels["term"] = levels["term"].s
+        
+        # TODO: move to a staticmethod
         if self.ions is not None:
             df_list = []
             for ion in self.ions:
