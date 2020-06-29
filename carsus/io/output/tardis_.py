@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import hashlib
 import uuid
 import re
@@ -1170,9 +1171,10 @@ class AtomData(object):
 
             md5_hash = hashlib.md5()
             for key in store.keys():
-                tmp = np.ascontiguousarray(store[key].values.data)
-                md5_hash.update(tmp)
-                
+                context = pa.default_serialization_context()
+                serialized_df = context.serialize(f[key])
+                md5_hash.update(serialized_df.to_buffer())
+
             uuid1 = uuid.uuid1().hex
 
             print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
