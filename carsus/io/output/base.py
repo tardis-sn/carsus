@@ -655,27 +655,35 @@ class TARDISAtomData:
            Path to the HDF5 output file
         """
 
-        self.atomic_weights.to_hdf(fname)
-        self.ionization_energies.to_hdf(fname)
-        self.zeta_data.to_hdf(fname)
-
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
+            f.put('/atom_data', self.atomic_weights.base)
+            f.put('/ionization_data', self.ionization_energies.base)
+            f.put('/zeta_data', self.zeta_data.base)
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
 
+            meta = []
             md5_hash = hashlib.md5()
             for key in f.keys():
                 context = pa.default_serialization_context()
                 serialized_df = context.serialize(f[key])
+
+                # Update the final MD5 sum
                 md5_hash.update(serialized_df.to_buffer())
+
+                # Save the Series/DataFrame MD5
+                meta.append((key, hashlib.md5(serialized_df.to_buffer()).hexdigest()))
 
             uuid1 = uuid.uuid1().hex
 
-            print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(
+            print("Signing TARDISAtomData: \nMD5: {}\nUUID1: {}".format(
                 md5_hash.hexdigest(), uuid1))
 
             f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
             f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
+
+            meta_df = pd.DataFrame.from_records(meta, columns=['key', 'value'])
+            f.put('/meta', meta_df)
