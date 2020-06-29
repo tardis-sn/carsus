@@ -348,6 +348,7 @@ class GFALLReader(object):
         lines_upper_idx['level_index_upper'] = levels_unique_idxed['level_index']
         lines = lines_upper_idx.reset_index()
 
+        #TODO: move to staticmethod
         if self.ions is not None:
             df_list = []
             for ion in self.ions:
