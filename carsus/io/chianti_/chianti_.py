@@ -528,8 +528,8 @@ class ChiantiReader:
 
         Attributes
         ----------
-        levels: DataFrame
-        lines: DataFrame
+        levels : DataFrame
+        lines : DataFrame
     """
 
     def __init__(self, ions, priority=10):
