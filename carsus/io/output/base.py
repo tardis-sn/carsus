@@ -77,6 +77,7 @@ class TARDISAtomData:
             mask = chianti_lvls.index.get_level_values(
                 'priority') > self.gfall_reader.priority
 
+            # TODO: make this piece of code more readable
             chianti_lvls = chianti_lvls[mask]
             chianti_ions = chianti_lvls.index.tolist()
             chianti_ions = [x[:-1] for x in chianti_ions]
