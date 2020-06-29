@@ -542,6 +542,7 @@ class ChiantiReader:
         self.priority = priority
         self._get_levels_lines()
 
+    # TODO: write docstring
     def _get_levels_lines(self):
 
         lvl_list = []
