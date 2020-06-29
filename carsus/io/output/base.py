@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import hashlib
 import uuid
 from carsus.util import convert_wavelength_air2vacuum
@@ -667,8 +668,9 @@ class TARDISAtomData:
 
             md5_hash = hashlib.md5()
             for key in f.keys():
-                tmp = np.ascontiguousarray(f[key].values.data)
-                md5_hash.update(tmp)
+                context = pa.default_serialization_context()
+                serialized_df = context.serialize(f[key])
+                md5_hash.update(serialized_df.to_buffer())
 
             uuid1 = uuid.uuid1().hex
 
