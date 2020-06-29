@@ -56,6 +56,7 @@ class TARDISAtomData:
         self.ionization_energies = ionization_energies
         self.ground_levels = ionization_energies.get_ground_levels()
 
+        # TODO: make this piece of code more readable 
         gfall_ions = gfall_reader.levels.index.tolist()
         # Remove last element from tuple (MultiIndex has 3 elements)
         gfall_ions = [x[:-1] for x in gfall_ions]
