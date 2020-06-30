@@ -3,6 +3,7 @@ Input module for the NIST Atomic Weights and Isotopic Compositions database
 http://www.nist.gov/pml/data/comp.cfm
 """
 
+import logging
 import requests
 import pandas as pd
 
@@ -18,6 +19,7 @@ from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, M
     AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
     AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
 
+logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
 
@@ -43,7 +45,7 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
         Preformatted text data
 
     """
-    print("Downloading data from the NIST Atomic Weights and Isotopic Compositions database.")
+    logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
     r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype})
     soup = BeautifulSoup(r.text, 'html5lib')
     pre_text_data = soup.pre.get_text()

@@ -3,6 +3,7 @@ Input module for the NIST Ionization Energies database
 http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 """
 
+import logging
 import requests
 import numpy as np
 import pandas as pd
@@ -15,6 +16,8 @@ from pyparsing import ParseException
 from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
 from carsus.io.base import BaseParser, BaseIngester
 from carsus.io.nist.ionization_grammar import level
+
+logger = logging.getLogger(__name__)
 
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 
@@ -55,7 +58,7 @@ def download_ionization_energies(
 
     data = {k: v for k, v in data.items() if v is not False}
 
-    print("Downloading ionization energies from the NIST Atomic Spectra Database.")
+    logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
     r = requests.post(IONIZATION_ENERGIES_URL, data=data)
     return r.text
 
