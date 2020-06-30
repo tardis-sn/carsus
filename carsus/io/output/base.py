@@ -1,10 +1,11 @@
 import logging
 import numpy as np
 import pandas as pd
-import pyarrow as pa
 import hashlib
 import uuid
-from carsus.util import convert_wavelength_air2vacuum
+from carsus.util import (convert_wavelength_air2vacuum,
+                         serialize_pandas_object,
+                         hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 from astropy import units as u
 from astropy import constants as const
@@ -29,7 +30,6 @@ class TARDISAtomData:
     lines_prepared : pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
-
 
     Methods
     -------
@@ -668,22 +668,26 @@ class TARDISAtomData:
             meta = []
             md5_hash = hashlib.md5()
             for key in f.keys():
-                context = pa.default_serialization_context()
-                serialized_df = context.serialize(f[key])
-
                 # Update the final MD5 sum
-                md5_hash.update(serialized_df.to_buffer())
-
+                md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
+                
                 # Save the Series/DataFrame MD5
-                meta.append((key, hashlib.md5(serialized_df.to_buffer()).hexdigest()))
+                meta.append(('md5sum', key.lstrip('/'), 
+                                hash_pandas_object(f[key])))
+            
+            meta_df = pd.DataFrame.from_records(meta, columns=['field', 'key',
+                        'value'], index=['field', 'key'])
 
             uuid1 = uuid.uuid1().hex
 
-            print("Signing TARDISAtomData: \nMD5: {}\nUUID1: {}".format(
-                md5_hash.hexdigest(), uuid1))
+            logger.info(f"Signing TARDISAtomData")
+            logger.info(f"MD5: {md5_hash.hexdigest()}")
+            logger.info(f"UUID1: {uuid1}")
 
             f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
             f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
-
-            meta_df = pd.DataFrame.from_records(meta, columns=['key', 'value'])
             f.put('/meta', meta_df)
+
+            self.meta = meta_df
+            
+            return

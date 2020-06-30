@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import pyarrow as pa
 import hashlib
 import uuid
 import re
@@ -42,7 +41,8 @@ from carsus.util import (
         convert_atomic_number2symbol,
         parse_selected_atoms,
         parse_selected_species,
-        query_columns
+        query_columns,
+        serialize_pandas_object
         )
 
 
@@ -1171,9 +1171,7 @@ class AtomData(object):
 
             md5_hash = hashlib.md5()
             for key in store.keys():
-                context = pa.default_serialization_context()
-                serialized_df = context.serialize(f[key])
-                md5_hash.update(serialized_df.to_buffer())
+                md5_hash.update(serialize_pandas_object(store[key]).to_buffer())
 
             uuid1 = uuid.uuid1().hex
 

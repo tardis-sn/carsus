@@ -7,3 +7,5 @@ from carsus.util.helpers import (
         get_data_path, query_columns
         )
 from carsus.util.selected import parse_selected_atoms, parse_selected_species
+
+from carsus.util.hash import serialize_pandas_object, hash_pandas_object
