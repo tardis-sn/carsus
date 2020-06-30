@@ -674,7 +674,15 @@ class TARDISAtomData:
                 # Save the Series/DataFrame MD5
                 meta.append(('md5sum', key.lstrip('/'), 
                                 hash_pandas_object(f[key])))
-            
+
+            # Save some important package versions
+            imports = ['astropy', 'numpy', 'pandas', 'pyarrow', 
+                       'tables', 'ChiantiPy']
+
+            for package in imports:
+                meta.append(('software', package,
+                             __import__(package).__version__))
+
             meta_df = pd.DataFrame.from_records(meta, columns=['field', 'key',
                         'value'], index=['field', 'key'])
 
