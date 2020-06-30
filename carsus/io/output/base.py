@@ -674,6 +674,10 @@ class TARDISAtomData:
                 # Save the Series/DataFrame MD5
                 meta.append(('md5sum', key.lstrip('/'), 
                                 hash_pandas_object(f[key])))
+            
+            # Save data source versions
+            meta.append(('sources', 'chianti_db', 
+                         self.chianti_reader.version))
 
             # Save some important package versions
             imports = ['astropy', 'numpy', 'pandas', 'pyarrow', 

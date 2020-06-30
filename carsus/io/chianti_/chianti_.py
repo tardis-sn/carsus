@@ -530,6 +530,7 @@ class ChiantiReader:
         ----------
         levels : DataFrame
         lines : DataFrame
+        version : str
     """
 
     def __init__(self, ions, priority=10):
@@ -603,3 +604,4 @@ class ChiantiReader:
 
         self.levels = levels
         self.lines = lines
+        self.version = versionRead()
