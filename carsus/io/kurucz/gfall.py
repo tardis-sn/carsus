@@ -481,7 +481,7 @@ class GFALLIngester(object):
                      on=["atomic_number", "ion_charge"]).\
                 set_index(["atomic_number", "ion_charge", "level_index"])
 
-        print("Ingesting levels from {}".format(self.data_source.short_name))
+        logger.info("Ingesting levels from {}.".format(self.data_source.short_name))
 
         for ion_index, ion_levels in levels.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -489,7 +489,7 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting levels for {} {}".format(
+            logger.info("Ingesting levels for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             for index, row in ion_levels.iterrows():
@@ -521,7 +521,7 @@ class GFALLIngester(object):
                 set_index(["atomic_number", "ion_charge",
                            "level_index_lower", "level_index_upper"])
 
-        print("Ingesting lines from {}".format(self.data_source.short_name))
+        logger.info("Ingesting lines from {}.".format(self.data_source.short_name))
 
         for ion_index, ion_lines in lines.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -529,7 +529,7 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting lines for {} {}".format(
+            logger.info("Ingesting lines for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)
