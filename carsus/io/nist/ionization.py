@@ -20,6 +20,7 @@ from carsus.io.nist.ionization_grammar import level
 logger = logging.getLogger(__name__)
 
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
+IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
 
 
 def download_ionization_energies(
@@ -312,6 +313,8 @@ class NISTIonizationEnergies(BaseParser):
         input_data = download_ionization_energies(spectra)
         self.parser = NISTIonizationEnergiesParser(input_data)
         self._prepare_data()
+        self._get_version()
+
 
     def _prepare_data(self):
         ionization_data = pd.DataFrame()
@@ -341,6 +344,21 @@ class NISTIonizationEnergies(BaseParser):
         levels = levels.reset_index()
 
         return levels
+
+    def _get_version(self):
+        """Returns NIST Atomic Spectra Database version.
+        """        
+        selector = "body > div > table:nth-child(1) > tbody > \
+                        tr:nth-child(1) > td:nth-child(1) > b"
+         
+        html = requests.get(IONIZATION_ENERGIES_VERSION_URL).text
+        bs = BeautifulSoup(html, 'html5lib')
+        
+        version = bs.select(selector)
+        version = version[0].text.replace(u'\xa0', ' ')\
+                    .replace('Version', ' ')
+
+        self.version = version
 
     def to_hdf(self, fname):
         """Dump the `base` attribute into an HDF5 file

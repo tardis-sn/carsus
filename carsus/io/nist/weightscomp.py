@@ -22,6 +22,7 @@ from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, M
 logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
+WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
 
 
 def download_weightscomp(ascii='ascii2', isotype='some'):
@@ -208,6 +209,7 @@ class NISTWeightsComp(BaseParser):
         input_data = download_weightscomp()
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
+        self._get_version()
 
     def _prepare_data(self, atoms):
         atomic_numbers = parse_selected_atoms(atoms)
@@ -231,6 +233,19 @@ class NISTWeightsComp(BaseParser):
         atom_data = pd.concat(atom_data_list)
         self.base = atom_data[['symbol', 'name', 'mass']]
         self.columns = atom_data.columns
+
+    def _get_version(self):
+        """Returns NIST Atomic Weights and Isotopic Components
+           Database version.
+        """
+        selector = "td"
+        html = requests.get(WEIGHTSCOMP_VERSION_URL).text
+        bs = BeautifulSoup(html, 'html5lib')
+        
+        version = bs.select(selector)
+        version = version[0].text.split()[1] 
+
+        self.version = version
 
     def to_hdf(self, fname):
         """Dump the `base` attribute into an HDF5 file
