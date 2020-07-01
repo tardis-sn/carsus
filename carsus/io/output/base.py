@@ -675,8 +675,10 @@ class TARDISAtomData:
                 meta.append(('md5sum', key.lstrip('/'), 
                                 hash_pandas_object(f[key])))
             
-            # Save data sources versions
-            meta.append(('sources', 'chianti_db', 
+            # Save datasets versions
+            meta.append(('datasets', 'gfall.dat',
+                         self.gfall_reader.version))
+            meta.append(('datasets', 'chianti_db', 
                          self.chianti_reader.version))
 
             # Save relevant package versions

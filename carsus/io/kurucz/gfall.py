@@ -11,6 +11,7 @@ from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineWavelength, LineGFValue, MEDIUM_VACUUM, MEDIUM_AIR
 from carsus.io.base import IngesterError
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
+from urllib.request import urlopen
 
 
 # [nm], wavelengths above this value are given in air
@@ -69,6 +70,14 @@ class GFALLReader(object):
             atomic_number and ion charge in addition.
         """
         self.fname = fname
+        self.priority = priority
+
+        if ions is not None:
+            self.ions = parse_selected_species(ions)
+
+        else:
+            self.ions = None
+
         self._gfall_raw = None
         self._gfall = None
         self._levels = None
@@ -78,14 +87,7 @@ class GFALLReader(object):
                         'the gfall data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
-
-        if ions is not None:
-            self.ions = parse_selected_species(ions)
-
-        else:
-            self.ions = None
-
-        self.priority = priority
+        self._version = None
 
     @property
     def gfall_raw(self):
@@ -110,6 +112,12 @@ class GFALLReader(object):
         if self._lines is None:
             self._lines = self.extract_lines()
         return self._lines
+
+    @property
+    def version(self):
+        if self._version is None:
+            self._version = self.get_version()
+        return self._version
 
     def read_gfall_raw(self, fname=None):
         """
@@ -363,6 +371,24 @@ class GFALLReader(object):
                          'level_index_lower', 'level_index_upper'], inplace=True)
 
         return lines
+
+    def get_version(self):
+        """Get `gfall.dat` file version.
+
+        Returns
+        -------
+        str
+            `gfall.dat` source and timestamp.
+        """        
+        if self.fname.startswith("http"):
+            conn = urlopen(self.fname)
+        else:
+            conn = urlopen(f"file:{self.fname}")
+
+        timestamp = conn.info().get('last-modified')
+        version = f"{timestamp}"
+        
+        return version
 
     def to_hdf(self, fname, key='lines', raw=True):
         """Dump the `base` attribute into an HDF5 file
