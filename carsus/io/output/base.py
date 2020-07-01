@@ -150,10 +150,12 @@ class TARDISAtomData:
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
+        logger.info('Ingesting levels from GFALL.')
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
         if len(self.chianti_ions) > 0:
+            logger.info('Ingesting levels from Chianti.')
             ch_levels = self.chianti_reader.levels.reset_index()
             ch_levels['source'] = 'chianti'
         else:
@@ -221,7 +223,7 @@ class TARDISAtomData:
 
         start = 1
         gf_list = []
-        logger.info('Ingesting lines from GFALL')
+        logger.info('Ingesting lines from GFALL.')
         for ion in self.gfall_ions:
 
             try:
@@ -268,7 +270,7 @@ class TARDISAtomData:
             gf_list.append(df)
 
         ch_list = []
-        logger.info('Ingesting lines from Chianti')
+        logger.info('Ingesting lines from Chianti.')
         for ion in self.chianti_ions:
 
             df = ch.lines.loc[ion]
@@ -701,7 +703,7 @@ class TARDISAtomData:
 
             uuid1 = uuid.uuid1().hex
 
-            logger.info(f"Signing TARDISAtomData")
+            logger.info(f"Signing TARDISAtomData.")
             logger.info(f"MD5: {md5_hash.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
 

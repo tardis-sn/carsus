@@ -84,7 +84,7 @@ class GFALLReader(object):
         self._lines = None
         if unique_level_identifier is None:
             logger.warn('A specific combination to identify unique levels from '
-                        'the gfall data has not been given. Defaulting to '
+                        'GFALL data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
         self._version = None
@@ -137,7 +137,7 @@ class GFALLReader(object):
         if fname is None:
             fname = self.fname
 
-        logger.info('Parsing GFALL {0}'.format(fname))
+        logger.info('Parsing GFALL {0}.'.format(fname))
 
         # FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
         # 3F6.2,A4,2I2,I3,F6.3,I3,F6.3,2I5,1X,A1,A1,1X,A1,A1,i1,A3,2I5,I6)
@@ -329,7 +329,7 @@ class GFALLReader(object):
                                  '_upper' for item in self.unique_level_identifier]
             selected_columns += ['wavelength', 'loggf']
 
-        logger.info('Extracting line data: {0}'.format(
+        logger.info('Extracting line data: {0}.'.format(
             ', '.join(selected_columns)))
         unique_level_id = ['atomic_number', 'ion_charge'] + \
             self.unique_level_identifier
