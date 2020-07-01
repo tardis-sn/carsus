@@ -678,8 +678,10 @@ class TARDISAtomData:
             # Save datasets versions
             meta.append(('datasets', 'gfall.dat',
                          self.gfall_reader.version))
-            meta.append(('datasets', 'chianti_db', 
-                         self.chianti_reader.version))
+
+            if self.chianti_reader is not None:
+                meta.append(('datasets', 'chianti_db', 
+                             self.chianti_reader.version))
 
             # Save relevant package versions
             imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
