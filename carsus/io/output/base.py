@@ -673,10 +673,9 @@ class TARDISAtomData:
                 # Update the total MD5 sum
                 md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
                 
-                # Save the Series/DataFrame MD5
+                # Save the individual Series/DataFrame MD5
                 meta.append(('md5sum', key.lstrip('/'), 
-                                hash_pandas_object(f[key])))
-
+                                hash_pandas_object(f[key])[:20]))
 
             # Save datasets versions
             meta.append(('datasets', 'nist_weights', 
@@ -685,7 +684,7 @@ class TARDISAtomData:
                          self.ionization_energies.version))
 
             meta.append(('datasets', 'gfall.dat',
-                         self.gfall_reader.md5))
+                         self.gfall_reader.md5[:20]))
 
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti_data', 

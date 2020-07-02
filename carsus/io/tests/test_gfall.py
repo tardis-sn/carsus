@@ -14,8 +14,18 @@ def gfall_rdr(gfall_fname):
 
 
 @pytest.fixture()
+def gfall_rdr_http(gfall_http):
+    return GFALLReader(fname=gfall_http)
+
+
+@pytest.fixture()
 def gfall_raw(gfall_rdr):
     return gfall_rdr.gfall_raw
+
+
+@pytest.fixture()
+def gfall_raw_http(gfall_rdr_http):
+    return gfall_rdr_http.gfall_raw
 
 
 @pytest.fixture()
@@ -26,6 +36,7 @@ def gfall(gfall_rdr):
 @pytest.fixture()
 def levels(gfall_rdr):
     return gfall_rdr.levels
+
 
 @pytest.fixture()
 def lines(gfall_rdr):
@@ -43,6 +54,16 @@ def gfall_ingester(memory_session, gfall_fname):
 ])
 def test_grall_reader_gfall_raw(gfall_raw, index, wavelength, element_code, e_first, e_second):
     row = gfall_raw.loc[index]
+    assert_almost_equal(row["element_code"], element_code)
+    assert_almost_equal(row["wavelength"], wavelength)
+    assert_allclose([row["e_first"], row["e_second"]], [e_first, e_second])
+
+@pytest.mark.parametrize("index, wavelength, element_code, e_first, e_second",[
+    (14, 72.5537, 4.02, 983355.0, 1121184.0),
+    (37, 2.4898, 7.05, 0.0, 4016390.0)
+])
+def test_grall_reader_gfall_raw_http(gfall_raw_http, index, wavelength, element_code, e_first, e_second):
+    row = gfall_raw_http.loc[index]
     assert_almost_equal(row["element_code"], element_code)
     assert_almost_equal(row["wavelength"], wavelength)
     assert_allclose([row["e_first"], row["e_second"]], [e_first, e_second])

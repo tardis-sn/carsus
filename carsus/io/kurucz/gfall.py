@@ -60,7 +60,7 @@ class GFALLReader(object):
         Parameters
         ----------
         fname: str
-            path to the gfall file
+            path to the gfall file (http or local file)
 
         ions: str, optional
             ions to extract, by default None
@@ -152,18 +152,20 @@ class GFALLReader(object):
         field_type_dict = {col: dtype for col,
                            dtype in zip(self.gfall_columns, field_types)}
 
+        # Pass a buffer to `read_fwf` instead of a path to hash content on-the-fly.
         if self.fname.startswith("http"):
             response = requests.get(self.fname)
             buffer = BytesIO(response.content)
         else:
             buffer = BytesIO(open(self.fname, 'rb').read())
+
+        md5 = hashlib.md5(buffer.getbuffer()).hexdigest()
         
         gfall = pd.read_fwf(buffer, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
 
         # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
-        md5 = hashlib.md5(buffer.getbuffer()).hexdigest()
 
         return gfall, md5
 
