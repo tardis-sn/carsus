@@ -1,9 +1,10 @@
 import re
+import hashlib
 import logging
-
+import requests
 import numpy as np
 import pandas as pd
-
+from io import BytesIO
 from astropy import units as u
 from sqlalchemy import and_
 from pyparsing import ParseException
@@ -11,7 +12,6 @@ from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineWavelength, LineGFValue, MEDIUM_VACUUM, MEDIUM_AIR
 from carsus.io.base import IngesterError
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
-from urllib.request import urlopen
 
 
 # [nm], wavelengths above this value are given in air
@@ -92,7 +92,7 @@ class GFALLReader(object):
     @property
     def gfall_raw(self):
         if self._gfall_raw is None:
-            self._gfall_raw = self.read_gfall_raw()
+            self._gfall_raw, self.md5 = self.read_gfall_raw()
         return self._gfall_raw
 
     @property
@@ -113,11 +113,6 @@ class GFALLReader(object):
             self._lines = self.extract_lines()
         return self._lines
 
-    @property
-    def version(self):
-        if self._version is None:
-            self._version = self.get_version()
-        return self._version
 
     def read_gfall_raw(self, fname=None):
         """
@@ -132,6 +127,9 @@ class GFALLReader(object):
         -------
             pandas.DataFrame
                 pandas Dataframe represenation of gfall
+            
+            str
+                MD5 checksum
         """
 
         if fname is None:
@@ -153,12 +151,21 @@ class GFALLReader(object):
 
         field_type_dict = {col: dtype for col,
                            dtype in zip(self.gfall_columns, field_types)}
-        gfall = pd.read_fwf(fname, widths=field_widths, skip_blank_lines=True,
+
+        if self.fname.startswith("http"):
+            response = requests.get(self.fname)
+            buffer = BytesIO(response.content)
+        else:
+            buffer = BytesIO(open(self.fname, 'rb').read())
+        
+        gfall = pd.read_fwf(buffer, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
+
         # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
+        md5 = hashlib.md5(buffer.getbuffer()).hexdigest()
 
-        return gfall
+        return gfall, md5
 
     def parse_gfall(self, gfall_raw=None):
         """
@@ -370,25 +377,7 @@ class GFALLReader(object):
         lines.set_index(['atomic_number', 'ion_charge',
                          'level_index_lower', 'level_index_upper'], inplace=True)
 
-        return lines
-
-    def get_version(self):
-        """Get `gfall.dat` file version.
-
-        Returns
-        -------
-        str
-            `gfall.dat` source and timestamp.
-        """        
-        if self.fname.startswith("http"):
-            conn = urlopen(self.fname)
-        else:
-            conn = urlopen(f"file:{self.fname}")
-
-        timestamp = conn.info().get('last-modified')
-        version = f"{timestamp}"
-        
-        return version
+        return lines 
 
     def to_hdf(self, fname, key='lines', raw=True):
         """Dump the `base` attribute into an HDF5 file

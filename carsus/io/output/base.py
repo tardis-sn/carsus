@@ -679,12 +679,13 @@ class TARDISAtomData:
 
 
             # Save datasets versions
-            meta.append(('datasets', 'gfall.dat',
-                         self.gfall_reader.version))
             meta.append(('datasets', 'nist_weights', 
                          self.atomic_weights.version))
             meta.append(('datasets', 'nist_spectra', 
                          self.ionization_energies.version))
+
+            meta.append(('datasets', 'gfall.dat',
+                         self.gfall_reader.md5))
 
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti_data', 
