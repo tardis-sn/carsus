@@ -1,11 +1,22 @@
-#### Code Sample, a copy-pastable example if possible
+## Description
+<!--- Describe your problem or feature request -->
 
-```python
-# Your code here
+## Code sample
+<!--- Remove if not needed  -->
+
+A copy-pastable example (if possible).
 
 ```
-#### Problem description
+# Your code here!
 
-[this should explain **why** the current behaviour is a problem and why the expected output is a better solution.]
+```
 
-#### Expected Output
+
+## Your environment
+<!--- Remove if not needed  -->
+
+Paste the output of `conda list -n carsus`.
+
+```
+Your dependencies here!
+```
