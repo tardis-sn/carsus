@@ -1177,5 +1177,5 @@ class AtomData(object):
 
             print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
 
-            store.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
-            store.root._v_attrs['uuid1'] = uuid1.encode('ascii')
+            store.root._v_attrs['md5'] = md5_hash.hexdigest()
+            store.root._v_attrs['uuid1'] = uuid1
