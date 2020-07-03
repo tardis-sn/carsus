@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 import hashlib
+import platform
 import uuid
 import pytz
 from datetime import datetime
@@ -693,6 +694,7 @@ class TARDISAtomData:
                              self.chianti_reader.version))
 
             # Save relevant package versions
+            meta.append(('software', 'python', platform.python_version()))
             imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
                        'tables', 'ChiantiPy']
  
