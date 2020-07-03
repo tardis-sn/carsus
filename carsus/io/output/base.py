@@ -677,8 +677,8 @@ class TARDISAtomData:
                 md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
                 
                 # Save the individual Series/DataFrame MD5
-                meta.append(('md5sum', key.lstrip('/'), 
-                                hash_pandas_object(f[key])[:20]))
+                md5 = hash_pandas_object(f[key])
+                meta.append(('md5sum', key.lstrip('/'), md5[:20]))
 
             # Save datasets versions
             meta.append(('datasets', 'nist_weights', 
