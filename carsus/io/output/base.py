@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import hashlib
 import uuid
+import pytz
+from datetime import datetime
 from carsus.util import (convert_wavelength_air2vacuum,
                          serialize_pandas_object,
                          hash_pandas_object)
@@ -693,7 +695,7 @@ class TARDISAtomData:
             # Save relevant package versions
             imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
                        'tables', 'ChiantiPy']
-
+ 
             for package in imports:
                 meta.append(('software', package,
                              __import__(package).__version__))
@@ -710,6 +712,10 @@ class TARDISAtomData:
             f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
             f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
             f.put('/meta', meta_df)
+
+            utc = pytz.timezone('UTC')
+            timestamp = datetime.now(utc).strftime("%b %d, %Y %H:%M:%S UTC")
+            f.root._v_attrs['date'] = timestamp
 
             self.meta = meta_df
             
