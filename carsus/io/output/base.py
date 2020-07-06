@@ -121,7 +121,6 @@ class TARDISAtomData:
 
         return df
 
-
     @staticmethod
     def _create_artificial_fully_ionized(levels):
         """ Create artificial levels for fully ionized ions """
