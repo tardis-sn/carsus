@@ -279,7 +279,7 @@ class TARDISAtomData:
             df['line_id'] = range(start, len(df) + start)
             start = len(df) + start
 
-            self.get_lvl_index2id(df, levels, ion)
+            df = self.get_lvl_index2id(df, levels, ion)
             df['source'] = 'chianti'
             ch_list.append(df)
 
