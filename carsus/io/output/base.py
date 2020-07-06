@@ -91,7 +91,6 @@ class TARDISAtomData:
 
         self.levels_all = self._get_all_levels_data().reset_index()
         self.lines_all = self._get_all_lines_data(self.levels_all)
-
         self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
         self._create_macro_atom_references()
