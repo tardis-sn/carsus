@@ -95,6 +95,33 @@ class TARDISAtomData:
         self._create_macro_atom_references()
 
     @staticmethod
+    def get_lvl_index2id(df, levels, ion):
+        df = df.reset_index()
+        lvl_index2id = levels.set_index(
+                            ['atomic_number', 'ion_number']).loc[ion]
+        lvl_index2id = lvl_index2id.reset_index()
+        lvl_index2id = lvl_index2id[['level_id']]
+
+        lower_level_id = []
+        upper_level_id = []
+        for i, row in df.iterrows():
+
+            llid = int(row['level_index_lower'])
+            ulid = int(row['level_index_upper'])
+
+            upper = int(lvl_index2id.loc[ulid])
+            lower = int(lvl_index2id.loc[llid])
+
+            lower_level_id.append(lower)
+            upper_level_id.append(upper)
+
+        df['lower_level_id'] = pd.Series(lower_level_id)
+        df['upper_level_id'] = pd.Series(upper_level_id)
+
+        return df
+
+
+    @staticmethod
     def _create_artificial_fully_ionized(levels):
         """ Create artificial levels for fully ionized ions """
         fully_ionized_levels = list()
@@ -240,30 +267,8 @@ class TARDISAtomData:
             except (KeyError, TypeError):
                 continue
 
+            df = self.get_lvl_index2id(df, levels, ion)
             df['source'] = 'gfall'
-
-            # TODO: move this piece of code to a staticmethod
-            df = df.reset_index()
-            lvl_index2id = levels.set_index(
-                ['atomic_number', 'ion_number']).loc[ion]
-            lvl_index2id = lvl_index2id.reset_index()
-            lvl_index2id = lvl_index2id[['level_id']]
-
-            lower_level_id = []
-            upper_level_id = []
-            for i, row in df.iterrows():
-
-                llid = int(row['level_index_lower'])
-                ulid = int(row['level_index_upper'])
-
-                upper = int(lvl_index2id.loc[ulid])
-                lower = int(lvl_index2id.loc[llid])
-
-                lower_level_id.append(lower)
-                upper_level_id.append(upper)
-
-            df['lower_level_id'] = pd.Series(lower_level_id)
-            df['upper_level_id'] = pd.Series(upper_level_id)
             gf_list.append(df)
 
         ch_list = []
@@ -273,30 +278,9 @@ class TARDISAtomData:
             df = ch.lines.loc[ion]
             df['line_id'] = range(start, len(df) + start)
             start = len(df) + start
+
+            self.get_lvl_index2id(df, levels, ion)
             df['source'] = 'chianti'
-
-            # TODO: move this piece of code to a staticmethod
-            df = df.reset_index()
-            lvl_index2id = levels.set_index(
-                ['atomic_number', 'ion_number']).loc[ion]
-            lvl_index2id = lvl_index2id.reset_index()
-            lvl_index2id = lvl_index2id[['level_id']]
-
-            lower_level_id = []
-            upper_level_id = []
-            for i, row in df.iterrows():
-
-                llid = int(row['level_index_lower'])
-                ulid = int(row['level_index_upper'])
-
-                upper = int(lvl_index2id.loc[ulid])
-                lower = int(lvl_index2id.loc[llid])
-
-                lower_level_id.append(lower)
-                upper_level_id.append(upper)
-
-            df['lower_level_id'] = pd.Series(lower_level_id)
-            df['upper_level_id'] = pd.Series(upper_level_id)
             ch_list.append(df)
 
         df_list = gf_list + ch_list
