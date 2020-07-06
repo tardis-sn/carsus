@@ -65,8 +65,6 @@ class TARDISAtomData:
         self.gfall_reader = gfall_reader
         self.gfall_ions = gfall_ions
 
-        self.zeta_data = zeta_data
-
         # TODO: priorities should not be managed by the `init` method.
         self.chianti_reader = chianti_reader
         if chianti_reader is not None:
@@ -83,6 +81,8 @@ class TARDISAtomData:
             chianti_ions = [x[:-1] for x in chianti_ions]
             chianti_ions = sorted(list(set(chianti_ions)))
             self.chianti_ions = chianti_ions
+
+        self.zeta_data = zeta_data
 
         else:
             self.chianti_ions = []
