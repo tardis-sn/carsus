@@ -58,8 +58,10 @@ class TARDISAtomData:
 
         # TODO: make this piece of code more readable 
         gfall_ions = gfall_reader.levels.index.tolist()
+       
         # Remove last element from tuple (MultiIndex has 3 elements)
         gfall_ions = [x[:-1] for x in gfall_ions]
+
         # Keep unique tuples, list and sort them
         gfall_ions = sorted(list(set(gfall_ions)))
         self.gfall_reader = gfall_reader
