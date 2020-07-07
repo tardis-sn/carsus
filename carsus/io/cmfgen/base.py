@@ -352,6 +352,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
                 f.get_storer(key).attrs.metadata = self.meta
 
 
+# TODO: inherit from `BaseParser` class seems a bit forced
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     """
         Description
@@ -379,7 +380,17 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             ]
 
     def _table_gen(self, f):
-        """ Generator. Yields a cross section table for an energy level """
+        """Yields a cross section table for an energy level.
+
+        Parameters
+        ----------
+        f : file buffer
+
+        Yields
+        -------
+        pd.DataFrame
+            DataFrame with metadata.
+        """        
         meta = {}
         data = []
 
@@ -398,7 +409,8 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 for i in range(p):
 
                     values = f.readline().split()
-                    if len(values) == 8:  # Verner ground state fits
+                    # Verner ground state fits
+                    if len(values) == 8:
 
                         data.append(
                             list(map(int, values[:2])) + list(map(float, values[2:])))
