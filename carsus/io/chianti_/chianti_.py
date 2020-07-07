@@ -21,9 +21,10 @@ logger = logging.getLogger(__name__)
 # Compatibility with older versions and pip versions:
 try:
     from ChiantiPy.tools.io import versionRead
-    import ChiantiPy.core as ch
+    import ChiantiPy.core as ch 
+
 except ImportError:
-    # Shamefully copied from their github source:
+    # Shamefully copied from their GitHub source:
     def versionRead():
         """
         Read the version number of the CHIANTI database
