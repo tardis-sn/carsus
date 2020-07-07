@@ -1,10 +1,9 @@
-import logging
-import pandas as pd
-import numpy as np
-import pickle
 import os
 import re
-
+import pickle
+import logging
+import numpy as np
+import pandas as pd
 from numpy.testing import assert_almost_equal
 from astropy import units as u
 from sqlalchemy import and_
@@ -15,8 +14,6 @@ from carsus.util import convert_atomic_number2symbol, parse_selected_species
 from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineGFValue, LineAValue, LineWavelength, MEDIUM_VACUUM, \
     ECollision, ECollisionEnergy, ECollisionGFValue, ECollisionTempStrength
-
-logger = logging.getLogger(__name__)
 
 # Compatibility with older versions and pip versions:
 try:
@@ -36,6 +33,9 @@ except ImportError:
         vFile.close()
         return versionStr.strip()
     import chianti.core as ch
+
+
+logger = logging.getLogger(__name__)
 
 masterlist_ions_path = os.path.join(
     os.getenv('XUVTOP'), "masterlist", "masterlist_ions.pkl"
