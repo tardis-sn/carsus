@@ -91,22 +91,26 @@ def parse_header(fname, keys, start=0, stop=50):
 
 
 def to_float(string):
-    """ String to float, taking care of Fortran 'D' values
+    """ String to float, useful to work with Fortran 'D' type.
 
     Parameters
     ----------
     string : str
 
+    Returns
+    -------
+    float
     """
     try:
         value = float(string.replace('D', 'E'))
 
     except ValueError:
-
-        if string == '1-.00':      # Bad value at MG/VIII/23oct02/phot_sm_3000 line 23340
+        # Weird value in `MG/VIII/23oct02/phot_sm_3000`, line 23340
+        if string == '1-.00':
             value = 10.00
 
-        if string == '*********':  # Bad values at SUL/V/08jul99/phot_op.big lines 9255-9257
+        # Weird values in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
+        if string == '*********':
             value = np.nan
 
     return value
