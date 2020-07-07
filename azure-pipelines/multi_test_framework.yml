@@ -15,17 +15,10 @@ pr:
 
 # Consistent environment variables
 variables:
-  system.debug: "true"
-  PANDAS_VERSION: 0.24
-  ASTROPY_USE_SYSTEM_PYTEST: 1
   SETUP_CMD: ""
   TEST_MODE: "normal"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
-  PYTHONIOENCODING: UTF8
-  CONDA: "/usr/share/miniconda"
-  XUVTOP: "/usr/share/chianti"
-  PYTHON_VERSION: '3.7'
   codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
 
 jobs:
@@ -97,10 +90,3 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
     condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
     displayName: "Upload to codecov.io"
-    
-# Clean up in case of failure
-  - bash: |
-          source activate carsus
-          python -m sphinx --version
-    condition: failed()
-    displayName: 'Failure'
