@@ -544,12 +544,16 @@ class ChiantiReader:
         """
         self.ions = parse_selected_species(ions)
         self.priority = priority
-        self.get_collisions = collisions
-        self._get_levels_lines()
+        self._get_levels_lines(get_collisions=collisions)
 
-    # TODO: write docstring
-    def _get_levels_lines(self):
+    def _get_levels_lines(self, get_collisions=False):
+        """Generates `levels`, `lines`  and `collision` dataframes.
 
+        Parameters
+        ----------
+        get_collisions : bool, optional
+            Grab collisional data, by default False.
+        """
         lvl_list = []
         lns_list = []
         col_list = []
@@ -562,7 +566,7 @@ class ChiantiReader:
                 lvl = reader.levels
 
             except ChiantiIonReaderError:
-                logger.info('No level data for {}'.format(ch_ion))
+                logger.info(f'No levels data for `{ch_ion}`.')
                 continue
 
             lvl['atomic_number'] = ion[0]
@@ -578,7 +582,7 @@ class ChiantiReader:
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
 
-            if self.get_collisions:
+            if get_collisions:
                 col = reader.collisions
                 col['atomic_number'] = ion[0]
                 col['ion_charge'] = ion[1]
@@ -612,12 +616,13 @@ class ChiantiReader:
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf']]
 
-        if self.get_collisions:
+        if get_collisions:
             collisions = pd.concat(col_list, sort=True)
             collisions = collisions.reset_index()
             collisions = collisions.rename(columns={'lower_level_index': 'level_index_lower',
                                                     'upper_level_index': 'level_index_upper',
                                                     'gf_value': 'gf'})
+            # Do we need to fix level indexes here too ?
             collisions['level_index_lower'] = collisions['level_index_lower'] - 1
             collisions['level_index_upper'] = collisions['level_index_upper'] - 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
