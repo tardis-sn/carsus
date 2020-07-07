@@ -631,7 +631,7 @@ class ChiantiReader:
             collisions['level_index_upper'] = collisions['level_index_upper'] - 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
                                                'level_index_lower', 'level_index_upper'])
-            collisions = collisions[['temperatures', 'collision_strengths', 'gf_value', 'energy',	'ttype', 'cups']]
+            collisions = collisions[['temperatures', 'collision_strengths', 'gf_value', 'energy', 'ttype', 'cups']]
 
         self.levels = levels
         self.lines = lines
