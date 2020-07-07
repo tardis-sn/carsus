@@ -18,6 +18,7 @@ variables:
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
+  XUVTOP: "$HOME/chianti"
   codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
 
 jobs:
@@ -65,8 +66,8 @@ jobs:
 # Download chianti data for tests
   - bash: |
           mkdir /usr/share/chianti
-          wget $CHIANTI_DATA_URL -O /usr/share/chianti/CHIANTI_9.0_data.tar.gz
-          tar -zxvf /usr/share/chianti/CHIANTI_9.0_data.tar.gz -C /usr/share/chianti
+          wget $CHIANTI_DATA_URL -O $XUVTOP/CHIANTI_9.0_data.tar.gz
+          tar -zxvf $XUVTOP/CHIANTI_9.0_data.tar.gz -C $XUVTOP
     displayName: "Fetch Chianti Data"
 
 # Download database testing data for TEST_MODE
