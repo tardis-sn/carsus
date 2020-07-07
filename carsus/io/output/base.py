@@ -88,16 +88,16 @@ class TARDISAtomData:
             self.chianti_ions = []
 
         self.levels_all = self._get_all_levels_data()
-        self.lines_all = self._get_all_lines_data(self.levels_all)
+        self.lines_all = self._get_all_lines_data()
         self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
         self._create_macro_atom_references()
         self.zeta_data = zeta_data
 
     @staticmethod
-    def get_lvl_index2id(df, levels, ion):
+    def get_lvl_index2id(df, levels_all, ion):
         df = df.reset_index()
-        lvl_index2id = levels.set_index(
+        lvl_index2id = levels_all.set_index(
                             ['atomic_number', 'ion_number']).loc[ion]
         lvl_index2id = lvl_index2id.reset_index()
         lvl_index2id = lvl_index2id[['level_id']]
@@ -243,7 +243,7 @@ class TARDISAtomData:
 
         return levels
 
-    def _get_all_lines_data(self, levels):
+    def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
         gf = self.gfall_reader
         ch = self.chianti_reader
@@ -270,7 +270,7 @@ class TARDISAtomData:
             except (KeyError, TypeError):
                 continue
 
-            df = self.get_lvl_index2id(df, levels, ion)
+            df = self.get_lvl_index2id(df, self.levels_all, ion)
             df['source'] = 'gfall'
             gf_list.append(df)
 
@@ -282,7 +282,7 @@ class TARDISAtomData:
             df['line_id'] = range(start, len(df) + start)
             start = len(df) + start
 
-            df = self.get_lvl_index2id(df, levels, ion)
+            df = self.get_lvl_index2id(df, self.levels_all, ion)
             df['source'] = 'chianti'
             ch_list.append(df)
 
