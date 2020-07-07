@@ -532,14 +532,19 @@ class ChiantiReader:
         lines : DataFrame
     """
 
-    def __init__(self, ions, priority=10):
+    def __init__(self, ions, collisions=False, priority=10):
         """
         Parameters
         ----------
         ions : string
+            Selected Chianti ions.
+
+        collisions: bool, optional
+            Grab collisional data (default is False).
         """
         self.ions = parse_selected_species(ions)
         self.priority = priority
+        self.get_collisions = collisions
         self._get_levels_lines()
 
     # TODO: write docstring
@@ -547,6 +552,7 @@ class ChiantiReader:
 
         lvl_list = []
         lns_list = []
+        col_list = []
         for ion in self.ions:
 
             ch_ion = convert_species_tuple2chianti_str(ion)
@@ -572,6 +578,12 @@ class ChiantiReader:
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
 
+            if self.get_collisions:
+                col = reader.collisions
+                col['atomic_number'] = ion[0]
+                col['ion_charge'] = ion[1]
+                col_list.append(col)
+
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
         levels['method'] = None
@@ -587,7 +599,6 @@ class ChiantiReader:
                                       'upper_level_index': 'level_index_upper',
                                       'gf_value': 'gf'})
 
-        # I'm not sure why we need this workaround.
         # Kurucz levels starts from zero, Chianti from 1.
         lines['level_index_lower'] = lines['level_index_lower'] - 1
         lines['level_index_upper'] = lines['level_index_upper'] - 1
@@ -601,5 +612,17 @@ class ChiantiReader:
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf']]
 
+        if self.get_collisions:
+            collisions = pd.concat(col_list, sort=True)
+            collisions = collisions.reset_index()
+            collisions = collisions.rename(columns={'lower_level_index': 'level_index_lower',
+                                                    'upper_level_index': 'level_index_upper',
+                                                    'gf_value': 'gf'})
+            collisions['level_index_lower'] = collisions['level_index_lower'] - 1
+            collisions['level_index_upper'] = collisions['level_index_upper'] - 1
+            collisions = collisions.set_index(['atomic_number', 'ion_charge',
+                                               'level_index_lower', 'level_index_upper'])
+
         self.levels = levels
         self.lines = lines
+        self.collisions = collisions
