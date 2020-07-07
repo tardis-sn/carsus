@@ -230,7 +230,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         kwargs['skiprows'] = find_row(
             fname, "Transition", "Lam", num_row=True) + 1
 
-        # Will only parse tables listed increasing lower level i, e.g. FE/II/24may96/osc_nahar.dat
+        # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
         n = int(meta['Number of transitions'])
         kwargs['nrows'] = n
 
@@ -261,7 +261,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         else:
             logger.warn(f'Inconsistent number of columns {fname}')
 
-        # Fix for Fortran float type 'D'
+        # Fix Fortran float type 'D'
         if df.shape[0] > 0 and 'D' in str(df['f'][0]):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
@@ -293,7 +293,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute.
     """
 
-    keys = ['!Number of transitions',  # Metadata to parse from header. TODO: look for more keys
+    keys = ['!Number of transitions',
             '!Number of T values OMEGA tabulated at',
             '!Scaling factor for OMEGA (non-FILE values)',
             '!Value for OMEGA if f=0',
@@ -308,14 +308,16 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
 
         # FIXME: expensive solution for two files with more than one table
-        # ARG/III/19nov07/col_ariii  &  HE/II/5dec96/he2col.dat
+        # `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
         footer = find_row(fname, "Johnson values:",
                           "dln_OMEGA_dlnT", how='one', num_row=True)
+
         if footer is not None:
             kwargs['nrows'] = footer - kwargs['skiprows'] - 2
 
         try:
-            names = find_row(fname, 'ransition\T').split()  # Not a typo
+            names = find_row(fname, 'ransition\T').split()  # Not a typo!
+            
             # Comment next line when trying new regexes!
             names = [np.format_float_scientific(
                 to_float(x)*1e+04, precision=4) for x in names[1:]]
@@ -327,7 +329,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
-            for c in df.columns[2:]:          # This is done column-wise on purpose
+            for c in df.columns[2:]:  # This is done column-wise on purpose
                 try:
                     df[c] = df[c].astype('float64')
 
@@ -354,7 +356,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     """
         Description
         ----------
-        base : list of pandas.DataFrame 's
+        base : list of pandas.DataFrame
         columns : list of str
         meta : dict
             Metadata parsed from file header.
