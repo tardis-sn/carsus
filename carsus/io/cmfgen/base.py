@@ -274,7 +274,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
                 f.get_storer(key).attrs.metadata = self.meta
 
 
-class CMFGENCollisionalDataParser(BaseParser):
+class CMFGENCollisionalStrengthsParser(BaseParser):
     """
         Description
         ----------
@@ -339,7 +339,7 @@ class CMFGENCollisionalDataParser(BaseParser):
         self.columns = df.columns.tolist()
         self.meta = meta
 
-    def to_hdf(self, key='/collisional_data'):
+    def to_hdf(self, key='/collisional_strengths'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
                 f.put(key, self.base)

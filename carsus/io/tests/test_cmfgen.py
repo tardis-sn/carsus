@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENOscillatorStrengthsParser,
-                              CMFGENCollisionalDataParser,
+                              CMFGENCollisionalStrengthsParser,
                               CMFGENPhotoionizationCrossSectionParser,
                              )
 
@@ -37,12 +37,12 @@ def vi_osc_fname(refdata_path):
 @with_refdata
 @pytest.fixture()
 def he2_col_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'collisional_data', 'he2col.dat')
+    return os.path.join(refdata_path, 'cmfgen', 'collisional_strengths', 'he2col.dat')
 
 @with_refdata
 @pytest.fixture()
 def ariii_col_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'collisional_data', 'col_ariii')
+    return os.path.join(refdata_path, 'cmfgen', 'collisional_strengths', 'col_ariii')
 
 @with_refdata
 @pytest.fixture()
@@ -89,7 +89,7 @@ def test_vi_osc(vi_osc_fname):
 
 @with_refdata
 def test_he2_col(he2_col_fname):
-    parser = CMFGENCollisionalDataParser(he2_col_fname)
+    parser = CMFGENCollisionalStrengthsParser(he2_col_fname)
     assert parser.base.shape[0] == 465
     assert parser.base.shape[1] == 11
     assert parser.base.iloc[-1,0] == '30___'
@@ -97,7 +97,7 @@ def test_he2_col(he2_col_fname):
 
 @with_refdata
 def test_ariii_col(ariii_col_fname):
-    parser = CMFGENCollisionalDataParser(ariii_col_fname)
+    parser = CMFGENCollisionalStrengthsParser(ariii_col_fname)
     n = int(parser.meta['Number of transitions'])
     assert parser.base.shape == (n, 13)
 
