@@ -198,7 +198,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
     def to_hdf(self, key='/energy_levels'):
         if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
+            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
@@ -273,7 +273,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
     def to_hdf(self, key='/oscillator_strengths'):
         if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
+            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
@@ -345,7 +345,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def to_hdf(self, key='/collisional_strengths'):
         if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
+            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
                 f.get_storer(key).attrs.metadata = self.meta
 
@@ -449,7 +449,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
     def to_hdf(self, key='/photoionization_cross_sections'):
         if len(self.base) > 0:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'a') as f:
+            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
 
                 for i in range(0, len(self.base)-1):
                     subkey = '{0}/{1}'.format(key, i)
