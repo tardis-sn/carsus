@@ -301,7 +301,6 @@ class ChiantiIngester(object):
                 masterlist_version)
 
         self.session = session
-        # ToDo write a parser for Spectral Notation
         self.ion_readers = list()
         self.ions = list()
 
@@ -626,13 +625,13 @@ class ChiantiReader:
             collisions = pd.concat(col_list, sort=True)
             collisions = collisions.reset_index()
             collisions = collisions.rename(columns={'lower_level_index': 'level_index_lower',
-                                                    'upper_level_index': 'level_index_upper',
-                                                    'gf_value': 'gf'})
+                                                    'upper_level_index': 'level_index_upper',})
             # Do we need to fix level indexes here too ?
             collisions['level_index_lower'] = collisions['level_index_lower'] - 1
             collisions['level_index_upper'] = collisions['level_index_upper'] - 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
                                                'level_index_lower', 'level_index_upper'])
+            collisions = collisions[['temperatures', 'collision_strengths', 'gf_value', 'energy',	'ttype', 'cups']]
 
         self.levels = levels
         self.lines = lines
