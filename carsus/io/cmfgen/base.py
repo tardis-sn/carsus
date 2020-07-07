@@ -132,7 +132,9 @@ class CMFGENEnergyLevelsParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute.
     """
 
-    keys = ['!Date',  # Metadata to parse from header. TODO: look for more keys
+    # Metadata to parse from header. 
+    # TODO: look for more keys
+    keys = ['!Date',
             '!Format date',
             '!Number of energy levels',
             '!Ionization energy',
@@ -141,7 +143,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
             ]
 
     def load(self, fname):
-
         meta = parse_header(fname, self.keys)
         kwargs = {}
         kwargs['header'] = None
