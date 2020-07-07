@@ -563,31 +563,36 @@ class ChiantiReader:
             ch_ion = convert_species_tuple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
 
+            # Do not keep levels if lines are not available.
             try:
                 lvl = reader.levels
+                lns = reader.lines
 
             except ChiantiIonReaderError:
-                logger.info(f'No levels data for `{ch_ion}`.')
+                logger.info(f'Missing levels/lines data for `{ch_ion}`.')
                 continue
 
             lvl['atomic_number'] = ion[0]
             lvl['ion_charge'] = ion[1]
 
-            # Index must start from zero
+            # Indexes must start from zero
             lvl.index = range(0, len(lvl))
             lvl.index.name = 'level_index'
             lvl_list.append(reader.levels)
-
-            lns = reader.lines
+            
             lns['atomic_number'] = ion[0]
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
 
             if get_collisions:
-                col = reader.collisions
-                col['atomic_number'] = ion[0]
-                col['ion_charge'] = ion[1]
-                col_list.append(col)
+                try:
+                    col = reader.collisions
+                    col['atomic_number'] = ion[0]
+                    col['ion_charge'] = ion[1]
+                    col_list.append(col)
+                
+                except ChiantiIonReaderError:
+                    logger.info(f'Missing collisional data for `{ch_ion}`.')
 
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
