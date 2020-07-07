@@ -87,7 +87,7 @@ class TARDISAtomData:
         else:
             self.chianti_ions = []
 
-        self.levels_all = self._get_all_levels_data().reset_index()
+        self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data(self.levels_all)
         self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
@@ -174,7 +174,9 @@ class TARDISAtomData:
             const.c.cgs.value ** 2 * lines['f_ul']
 
     def _get_all_levels_data(self):
-        """ Returns the same output than `AtomData._get_all_levels_data()` """
+        """ Returns the same output than `AtomData._get_all_levels_data()` 
+        with `reset_index` method applied.
+        """
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
@@ -236,6 +238,8 @@ class TARDISAtomData:
 
         levels = levels[['atomic_number',
                          'ion_number', 'g', 'energy', 'source']]
+
+        levels = levels.reset_index()
 
         return levels
 
