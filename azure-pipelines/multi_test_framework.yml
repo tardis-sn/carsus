@@ -3,7 +3,6 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
-
 # Specify which branches you want to trigger for continuous deployment and/or applicable for pull requests.
 # Otherwise it triggers all of them.
 
@@ -13,12 +12,12 @@ trigger:
 pr:
 - master
 
-# Consistent environment variables
 variables:
   SETUP_CMD: ""
   TEST_MODE: "normal"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
+  CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
 
 jobs:
@@ -38,6 +37,9 @@ jobs:
       database:
         SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
         TEST_MODE: "with_test_db"
+      refdata:
+        SETUP_CMD: "--refdata=$HOME/carsus-refdata"
+        TEST_MODE: "refdata"
       coverage:
         SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
     
@@ -78,7 +80,12 @@ jobs:
     condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
     displayName: "Fetch the testing database from carsus-db"
 
-# Activate environment and start test
+  - bash: |
+          source activate carsus
+          git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata
+    condition: and(succeeded(), eq(variables['TEST_MODE'], 'refdata'))
+    displayName: "Fetch carsus reference data"
+
   - bash: |
           source activate carsus
           echo pytest carsus $SETUP_CMD
