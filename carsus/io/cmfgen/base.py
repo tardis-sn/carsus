@@ -1,8 +1,8 @@
+import logging
 import numpy as np
 import pandas as pd
 import itertools
 import gzip
-import warnings
 from carsus.io.base import BaseParser
 
 
@@ -157,7 +157,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
-            warnings.warn('Empty table')
+            logging.warn('Empty table.')
 
         # Assign column names by file content
         if df.shape[1] == 10:
@@ -184,8 +184,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = df.drop(columns=['#'])
 
         else:
-            # TODO: raise exception here (discuss)
-            warnings.warn('Inconsistent number of columns')
+            logging.warn('Inconsistent number of columns.')
 
         self.fname = fname
         self.base = df
@@ -238,7 +237,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
-            warnings.warn('Empty table')
+            logging.warn('Empty table.')
 
         # Assign column names by file content
         if df.shape[1] == 9:
@@ -255,7 +254,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['% Acc'] = np.nan
 
         else:
-            warnings.warn('Inconsistent number of columns')
+            logging.warn('Inconsistent number of columns.')
 
         # Fix for Fortran float type 'D'
         if df.shape[0] > 0 and 'D' in str(df['f'][0]):
@@ -319,7 +318,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         except AttributeError:
             # TODO: some files have no column names nor header
-            warnings.warn('No column names')
+            logging.warn('Column names not found.')
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
@@ -332,7 +331,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame()
-            warnings.warn('Empty table')
+            logging.warn('Empty table.')
 
         self.fname = fname
         self.base = df
@@ -434,7 +433,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                                   'sigma_0', 'y(a)', 'P', 'y(w)']
 
                 else:
-                    warnings.warn('Inconsistent number of columns')
+                    logging.warn('Inconsistent number of columns.')
 
                 tables.append(df)
 
