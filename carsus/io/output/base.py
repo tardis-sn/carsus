@@ -84,8 +84,6 @@ class TARDISAtomData:
             chianti_ions = sorted(list(set(chianti_ions)))
             self.chianti_ions = chianti_ions
 
-        self.zeta_data = zeta_data
-
         else:
             self.chianti_ions = []
 
@@ -94,6 +92,7 @@ class TARDISAtomData:
         self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
         self._create_macro_atom_references()
+        self.zeta_data = zeta_data
 
     @staticmethod
     def get_lvl_index2id(df, levels, ion):
