@@ -31,14 +31,12 @@ def find_row(fname, string1, string2='', how='both', num_row=False):
     Returns
     -------
     str or int
-        Returns matching line or row number.
-
+        Returns matching line or match row number.
     """
     with open(fname, encoding='ISO-8859-1') as f:
         n = 0
         for line in f:
             n += 1
-
             if how == 'one':
                 if string1 in line or string2 in line:
                     break
@@ -80,9 +78,9 @@ def parse_header(fname, keys, start=0, stop=50):
     -------
     dict
         Dictionary containing metadata.
-
     """
     meta = {k.strip('!'): None for k in keys}
+
     with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f:
         for line in itertools.islice(f, start, stop):
             for k in keys:
