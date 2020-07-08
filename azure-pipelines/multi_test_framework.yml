@@ -47,7 +47,7 @@ jobs:
           TEST_MODE: "refdata"
 
         coverage:
-          SETUP_CMD: "--remote-data --runslow --refdata --cov=carsus --cov-report=xml --cov-report=html"
+          SETUP_CMD: "--remote-data --runslow --refdata=$HOME/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
           TEST_MODE: "coverage"
 
       maxParallel: 6
@@ -67,8 +67,9 @@ jobs:
 
       - bash: |
           source activate carsus
-          git clone $CARSUS_DB_URL $HOME/carsus-db
-        condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
+          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $HOME/carsus-db
+          cd $HOME/carsus-db
+          git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
 
       - bash: |
@@ -77,8 +78,7 @@ jobs:
           git clone https://github.com/epassaro/carsus-refdata.git $HOME/carsus-refdata
           cd $HOME/carsus-refdata
           git checkout update-readme
-        condition: and(succeeded(), eq(variables['TEST_MODE'], 'refdata'))
-        displayName: "Fetch Carsus reference data"
+        displayName: "Fetch reference data"
 
       - bash: |
           source activate carsus
