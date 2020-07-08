@@ -7,10 +7,10 @@
 # Otherwise it triggers all of them.
 
 trigger:
-- master
+  - master
 
 pr:
-- master
+  - master
 
 variables:
   SETUP_CMD: ""
@@ -19,85 +19,79 @@ variables:
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   XUVTOP: "$HOME/chianti"
-  codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
+  codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
 
 jobs:
+  - job: "Test"
+    pool:
+      vmImage: "Ubuntu-16.04"
 
-- job: "Test"
+    strategy:
+      matrix:
+        simple:
+          SETUP_CMD: ""
 
-  pool:
-    vmImage: "Ubuntu-16.04"
-  strategy:
-    matrix:
-      simple:
-        SETUP_CMD: ""
-      remote_data:
-        SETUP_CMD: "--remote-data"
-      slow:
-        SETUP_CMD: "--runslow"
-      database:
-        SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
-        TEST_MODE: "with_test_db"
-      refdata:
-        SETUP_CMD: "--refdata=$HOME/carsus-refdata"
-        TEST_MODE: "refdata"
-      coverage:
-        SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
-    
-    maxParallel: 5
+        remote_data:
+          SETUP_CMD: "--remote-data"
 
-  steps:
+        slow:
+          SETUP_CMD: "--runslow"
 
-# Add conda to path
-  - bash: |
+        database:
+          SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
+          TEST_MODE: "with_test_db"
+
+        refdata:
+          SETUP_CMD: "--refdata=$HOME/carsus-refdata"
+          TEST_MODE: "refdata"
+
+        coverage:
+          SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
+
+      maxParallel: 6
+
+    steps:
+      - bash: |
           echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to PATH
+        displayName: "Add conda to PATH"
 
-# Update conda and change its permissions to the Azure user 'vsts'
-  - bash: |
-          sudo chown -R $USER $CONDA
-          #conda update -y conda
-    displayName: "updating conda and activating"
-
-  - bash: |
+      - bash: |
           conda env create -f carsus_env3.yml
-    displayName: "Install Carsus env"
+        displayName: "Install Carsus environment"
 
-# Download chianti data for tests
-  - bash: |
+      - bash: |
           mkdir -p $XUVTOP
           wget $CHIANTI_DATA_URL -O $XUVTOP/CHIANTI_9.0_data.tar.gz
           tar -zxvf $XUVTOP/CHIANTI_9.0_data.tar.gz -C $XUVTOP
-    displayName: "Fetch Chianti Data"
+        displayName: "Fetch Chianti database"
 
-# Download database testing data for TEST_MODE
-  - bash: |
+      - bash: |
           source activate carsus
           conda install git-lfs -c conda-forge -y
           git lfs install --skip-smudge
           git clone $CARSUS_DB_URL $HOME/carsus-db
           cd $HOME/carsus-db
           git lfs pull --include="test_databases/test.db" origin
-    condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
-    displayName: "Fetch the testing database from carsus-db"
+        condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
+        displayName: "Fetch testing database"
 
-  - bash: |
+      - bash: |
           source activate carsus
           #git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
-          git clone https://github.com/epassaro/carsus-refdata.git
+          git clone https://github.com/epassaro/carsus-refdata.git $HOME/carsus-refdata
           cd $HOME/carsus-refdata
           git checkout update-readme
-    condition: and(succeeded(), eq(variables['TEST_MODE'], 'refdata'))
-    displayName: "Fetch carsus reference data"
+        condition: and(succeeded(), eq(variables['TEST_MODE'], 'refdata'))
+        displayName: "Fetch Carsus reference data"
 
-  - bash: |
+      - bash: |
           source activate carsus
           echo pytest carsus $SETUP_CMD
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
-    displayName: "Carsus test"
+        displayName: "Carsus test"
 
-  - bash: |
+      - bash: |
           bash <(curl -s https://codecov.io/bash)
-    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
-    displayName: "Upload to codecov.io"
+        condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
+        displayName: "Upload to codecov.io"
