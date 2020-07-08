@@ -13,6 +13,7 @@ pr:
   - master
 
 variables:
+  system.debug: "true"
   SETUP_CMD: ""
   TEST_MODE: "normal"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
