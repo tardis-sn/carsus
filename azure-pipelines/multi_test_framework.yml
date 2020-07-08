@@ -10,8 +10,6 @@ trigger:
   - master
 
 variables:
-  SETUP_CMD: ""
-  TEST_MODE: "normal"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
@@ -47,7 +45,7 @@ jobs:
           TEST_MODE: "refdata"
 
         coverage:
-          SETUP_CMD: "--remote-data --runslow --refdata=$HOME/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
+          SETUP_CMD: "--remote-data --runslow --test-db=$HOME/carsus-db/test_databases/test.db --refdata=$HOME/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
           TEST_MODE: "coverage"
 
       maxParallel: 6
