@@ -58,6 +58,7 @@ def test_grall_reader_gfall_raw(gfall_raw, index, wavelength, element_code, e_fi
     assert_almost_equal(row["wavelength"], wavelength)
     assert_allclose([row["e_first"], row["e_second"]], [e_first, e_second])
 
+@pytest.mark.remote_data
 @pytest.mark.parametrize("index, wavelength, element_code, e_first, e_second",[
     (14, 72.5537, 4.02, 983355.0, 1121184.0),
     (37, 2.4898, 7.05, 0.0, 4016390.0)
