@@ -46,7 +46,7 @@ jobs:
         SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
         TEST_MODE: "with_test_db"
       coverage:
-        SETUP_CMD: "--remote-data --cov=carsus --cov-report=xml --cov-report=html"
+        SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
     
     maxParallel: 5
 
@@ -95,7 +95,7 @@ jobs:
 
   - bash: |
           bash <(curl -s https://codecov.io/bash)
-    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--remote-data --cov=carsus --cov-report=xml --cov-report=html'))
+    condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
     displayName: "Upload to codecov.io"
     
 # Clean up in case of failure
