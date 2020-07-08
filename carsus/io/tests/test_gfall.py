@@ -202,3 +202,20 @@ def test_gfall_ingester_ingest_lines_wavelength_medium(memory_session, gfall_ing
     wavelength = line.wavelengths[0]
     assert_quantity_allclose(wavelength.quantity, exp_wavelength)
     assert wavelength.medium == exp_medium
+
+
+@pytest.mark.remote_data
+def test_gfall_hash(gfall_rdr):
+    gf = gfall_rdr
+    # Need to generate `gfall_raw` lazy attribute to get `md5`.
+    gf_raw = gf.gfall_raw
+
+    assert gf.md5 == 'e2149a67d52b7cb05fa5d35e6912cc98'
+
+
+@pytest.mark.remote_data
+def test_gfall_hash_http(gfall_rdr_http):
+    gf = gfall_rdr_http
+    gf_raw = gf.gfall_raw
+
+    assert gf.md5 == 'e2149a67d52b7cb05fa5d35e6912cc98'
