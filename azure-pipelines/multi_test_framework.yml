@@ -83,6 +83,7 @@ jobs:
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
         displayName: "Carsus test"
+        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
