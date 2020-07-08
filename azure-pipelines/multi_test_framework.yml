@@ -65,7 +65,7 @@ jobs:
 
 # Download chianti data for tests
   - bash: |
-          mkdir $XUVTOP
+          mkdir -p $XUVTOP
           wget $CHIANTI_DATA_URL -O $XUVTOP/CHIANTI_9.0_data.tar.gz
           tar -zxvf $XUVTOP/CHIANTI_9.0_data.tar.gz -C $XUVTOP
     displayName: "Fetch Chianti Data"
