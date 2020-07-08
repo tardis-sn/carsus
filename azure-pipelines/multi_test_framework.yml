@@ -85,6 +85,7 @@ jobs:
           source activate carsus
           #git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
           git clone https://github.com/epassaro/carsus-refdata.git
+          cd $HOME/carsus-refdata
           git checkout update-readme
     condition: and(succeeded(), eq(variables['TEST_MODE'], 'refdata'))
     displayName: "Fetch carsus reference data"
