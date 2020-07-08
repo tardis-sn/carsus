@@ -9,18 +9,15 @@
 trigger:
   - master
 
-pr:
-  - master
-
 variables:
-  system.debug: "true"
   SETUP_CMD: ""
   TEST_MODE: "normal"
-  CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
+  CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
   XUVTOP: "$HOME/chianti"
   codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
+  system.debug: "true"
 
 jobs:
   - job: "Test"
@@ -31,12 +28,15 @@ jobs:
       matrix:
         simple:
           SETUP_CMD: ""
+          TEST_MODE: "simple"
 
         remote_data:
           SETUP_CMD: "--remote-data"
+          TEST_MODE: "remote_data"
 
         slow:
           SETUP_CMD: "--runslow"
+          TEST_MODE: "runslow"
 
         database:
           SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
@@ -47,17 +47,16 @@ jobs:
           TEST_MODE: "refdata"
 
         coverage:
-          SETUP_CMD: "--cov=carsus --cov-report=xml --cov-report=html"
+          SETUP_CMD: "--remote-data --runslow --refdata --cov=carsus --cov-report=xml --cov-report=html"
+          TEST_MODE: "coverage"
 
       maxParallel: 6
 
     steps:
-      - bash: |
-          echo "##vso[task.prependpath]$CONDA/bin"
+      - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
 
-      - bash: |
-          conda env create -f carsus_env3.yml
+      - bash: conda env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
 
       - bash: |
@@ -68,11 +67,7 @@ jobs:
 
       - bash: |
           source activate carsus
-          conda install git-lfs -c conda-forge -y
-          git lfs install --skip-smudge
           git clone $CARSUS_DB_URL $HOME/carsus-db
-          cd $HOME/carsus-db
-          git lfs pull --include="test_databases/test.db" origin
         condition: and(succeeded(), eq(variables['TEST_MODE'], 'with_test_db'))
         displayName: "Fetch testing database"
 
@@ -87,12 +82,11 @@ jobs:
 
       - bash: |
           source activate carsus
-          echo pytest carsus $SETUP_CMD
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
         displayName: "Carsus test"
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
-        condition: and(succeeded(), eq(variables['SETUP_CMD'], '--cov=carsus --cov-report=xml --cov-report=html'))
+        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
         displayName: "Upload to codecov.io"
