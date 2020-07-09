@@ -51,15 +51,11 @@ jobs:
       maxParallel: 6
 
     steps:
+      - bash:  echo "##vso[task.setvariable variable=shellopts]errexit"
+        displayName: "Force exit on error (bash)"
+
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
-
-      - bash:  echo "##vso[task.setvariable variable=shellopts]errexit"
-        displayName: "Force exit on error (bash) "
-
-      - bash: |
-          touch -j
-          echo "hello world"
 
       - bash: conda env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
