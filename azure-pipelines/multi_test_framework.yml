@@ -54,6 +54,10 @@ jobs:
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
 
+      - bash: |
+          touch -j
+          echo "hello world"
+
       - bash: conda env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
 
