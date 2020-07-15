@@ -547,7 +547,7 @@ class ChiantiReader:
         self._get_levels_lines(get_collisions=collisions)
 
     def _get_levels_lines(self, get_collisions=False):
-        """Generates `levels`, `lines`  and `collision` dataframes.
+        """Generates `levels`, `lines`  and `collisions` DataFrames.
 
         Parameters
         ----------
