@@ -243,6 +243,25 @@ class TARDISAtomData:
 
         return levels
 
+    def create_collisions(self):
+        """ Returns the same output than `AtomData._get_all_lines_data()` """
+        ch_list = []
+        ch = self.chianti_reader
+
+        logger.info('Ingesting collisions from Chianti')
+        for ion in self.chianti_ions:
+
+            df = ch.collisions.loc[ion]
+            df = self.get_lvl_index2id(df, self.levels_all, ion)
+            df['source'] = 'chianti'
+            ch_list.append(df)
+
+        df_list = ch_list
+        collisions = pd.concat(df_list, sort=True)
+        collisions['col_id'] = range(1, len(collisions)+1)
+
+        return collisions   
+
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
         gf = self.gfall_reader
