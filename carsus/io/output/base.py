@@ -92,6 +92,10 @@ class TARDISAtomData:
         self._create_levels_lines(**self.levels_lines_param)
         self._create_macro_atom()
         self._create_macro_atom_references()
+
+        if not self.chianti_reader.collisions.empty:
+            self.collisions = self._create_collisions()
+
         self.zeta_data = zeta_data
 
     @staticmethod

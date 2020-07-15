@@ -640,3 +640,5 @@ class ChiantiReader:
 
         if get_collisions:
             self.collisions = collisions
+        else:
+            self.collisions = pd.DataFrame()
