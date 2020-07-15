@@ -154,6 +154,12 @@ class NISTIonizationEnergiesParser(BaseParser):
             except KeyError:
                 pass
 
+            if (np.isnan(lvl["J"])):
+                lvl["J"] = '0'
+                print("HELLO!")
+
+
+            
             try:
                 lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
                 lvl["spin_multiplicity"] = lvl_tokens["ls_term"]["mult"]
@@ -265,6 +271,8 @@ class NISTIonizationEnergiesIngester(BaseIngester):
             except TypeError:  # Raised when the variable is None
                 parity = None
 
+
+                
             ion.levels.append(
                 Level(data_source=self.data_source,
                       configuration=row["configuration"],
