@@ -440,8 +440,8 @@ class TARDISAtomData:
         # Keep this value to compare against SQL
         collisions['ds_id'] = 4
 
-        # `start` is tailored to compare `e_col_id` against SQL
-        start = (self.lines_all['source'] == 'chianti').sum() + 1
+        # `e_col_id` number starts after the last line id
+        start = self.lines_all.index[-1] + 1
         collisions['e_col_id'] = range(start, start + len(collisions))
         collisions = collisions.reset_index()
 
