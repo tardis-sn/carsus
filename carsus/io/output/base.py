@@ -417,7 +417,6 @@ class TARDISAtomData:
         self.levels = levels
 
     def _create_collisions(self):
-        """ Returns the same output than `AtomData._get_all_lines_data()` """
         # Exclude artificially created levels from levels
         levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
 
@@ -437,9 +436,8 @@ class TARDISAtomData:
         # Keep this value to compare against SQL
         collisions['ds_id'] = 4
 
-        # `e_col_id` must start from `len(self.lines_all)`
-        # to compare against SQL
-        start = len(self.lines_all)
+        # `start` is tailored to compare `e_col_id` against SQL
+        start = (self.lines_all['source'] == 'chianti').sum() + 1
         collisions['e_col_id'] = range(start, start + len(collisions))
         collisions = collisions.reset_index()
 
