@@ -243,24 +243,6 @@ class TARDISAtomData:
 
         return levels
 
-    def create_collisions(self):
-        """ Returns the same output than `AtomData._get_all_lines_data()` """
-        ch_list = []
-        ch = self.chianti_reader
-
-        logger.info('Ingesting collisions from Chianti')
-        for ion in self.chianti_ions:
-
-            df = ch.collisions.loc[ion]
-            df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['source'] = 'chianti'
-            ch_list.append(df)
-
-        df_list = ch_list
-        collisions = pd.concat(df_list, sort=True)
-        collisions['col_id'] = range(1, len(collisions)+1)
-
-        return collisions   
 
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
@@ -433,6 +415,60 @@ class TARDISAtomData:
 
         self.lines = lines
         self.levels = levels
+
+    def _create_collisions(self):
+        """ Returns the same output than `AtomData._get_all_lines_data()` """
+        # Exclude artificially created levels from levels
+        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
+
+        ch_list = []
+        ch = self.chianti_reader
+
+        logger.info('Ingesting collisions from Chianti')
+        for ion in self.chianti_ions:
+
+            df = ch.collisions.loc[ion]
+            df = self.get_lvl_index2id(df, self.levels_all, ion)
+            ch_list.append(df)
+
+        collisions = pd.concat(ch_list, sort=True)
+        collisions['source'] = 'chianti'
+
+        # Keep this value to compare against SQL
+        collisions['ds_id'] = 4
+
+        # `e_col_id` must start from `len(self.lines_all)`
+        # to compare against SQL
+        start = len(self.lines_all)
+        collisions['e_col_id'] = range(start, start + len(collisions))
+        collisions = collisions.reset_index()
+
+        # TODO: this piece of code is duplicated (see lines)
+        lower_levels = levels.rename(
+            columns={
+                "level_number": "level_number_lower",
+                "g": "g_l"}
+        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
+
+        upper_levels = levels.rename(
+            columns={
+                "level_number": "level_number_upper",
+                "g": "g_u"}
+        ).loc[:, ["level_number_upper", "g_u"]]
+
+        collisions = collisions.join(lower_levels, on="lower_level_id").join(
+                                            upper_levels, on="upper_level_id")
+        collisions = collisions.rename(columns={'ion_charge': 'ion_number',
+                                                'temperatures': 'btemp',
+                                                'collision_strengths': 'bscups'})
+        collisions = collisions[['e_col_id', 'lower_level_id',
+                                 'upper_level_id', 'ds_id',
+                                 'btemp', 'bscups', 'ttype', 'cups',
+                                 'gf', 'atomic_number', 'ion_number',
+                                 'level_number_lower']]
+        collisions = collisions.set_index('e_col_id')
+
+        return collisions
 
     @property
     def levels_prepared(self):
