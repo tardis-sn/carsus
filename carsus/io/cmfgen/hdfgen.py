@@ -22,7 +22,7 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
     files = []
     ignore_patterns = ['.h5'] + ignore_patterns
     for case in patterns:
-        path = '{0}/**/*{1}*'.format(cmfgen_dir, case)
+        path = f'{cmfgen_dir}/**/*{case}*'
         files = files + glob.glob(path, recursive=True)
 
         for i in ignore_patterns:
@@ -30,6 +30,7 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
 
     n = chunk_size
     files_chunked = [files[i:i+n] for i in range(0, len(files), n)]
+    logger.info(f'{len(files)} files selected.')
 
     # Divide read/dump in chunks for less I/O
     for chunk in files_chunked:
@@ -38,18 +39,21 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
         for fname in chunk:
             try:
                 obj = parser.__class__(fname)
-                logger.info('Parsed {}'.format(fname))
                 _.append(obj)
 
+            # tip: check `find_row`
             except TypeError:
-                logger.error('Failed parsing {} (try checking `find_row` function)'.format(fname))
+                logger.warning('`TypeError` raised while parsing `{}`.')
 
+            # tip: check `to_float`
             except UnboundLocalError:
-                logger.error('Failed parsing {} (try checking `to_float` function)'.format(fname))
+                logger.warning('`UnboundLocalError` raised while parsing `{fname}`.')
 
             except IsADirectoryError:
-                logger.error('Failed parsing {} (is a directory)'.format(fname))
+                logger.warning(f'`{fname}` is a directory.')
 
         for obj in _:
             obj.to_hdf()
-            logger.info('Dumped {}.h5'.format(obj.fname))
+
+    logger.info(f'Finished.')
+
