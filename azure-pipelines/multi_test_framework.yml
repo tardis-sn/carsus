@@ -67,7 +67,7 @@ jobs:
 
       - bash: |
           source activate carsus
-          git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
+          git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata
         displayName: "Fetch reference data"
 
       - bash: |
