@@ -4,7 +4,6 @@ channels:
   - conda-forge
 
 dependencies:
-<<<<<<< HEAD
   - python=3
   - setuptools
   - numpy=1.15
@@ -53,7 +52,6 @@ dependencies:
   # Pip
   - pip:
       - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
-=======
 - python=3
 - setuptools
 - numpy=1.15
@@ -102,4 +100,3 @@ dependencies:
 # Pip
 - pip:
   - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
->>>>>>> Major changes to the pipeline (run more tests on coverage)
