@@ -1,3 +1,4 @@
+import re
 import logging
 import numpy as np
 import pandas as pd
@@ -27,6 +28,7 @@ class TARDISAtomData:
     ----------
     levels_prepared : pandas.DataFrame
     lines_prepared : pandas.DataFrame
+    collisions_prepared: pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
 
@@ -44,13 +46,23 @@ class TARDISAtomData:
                  zeta_data,
                  chianti_reader=None,
                  lines_loggf_threshold=-3,
-                 levels_metastable_loggf_threshold=-3):
+                 levels_metastable_loggf_threshold=-3,
+                 collisions_temperatures=None):
 
         # TODO: pass these params to the function as `gfall_params`
         self.levels_lines_param = {
             "levels_metastable_loggf_threshold":
             levels_metastable_loggf_threshold,
             "lines_loggf_threshold": lines_loggf_threshold
+        }
+
+        if collisions_temperatures is None:
+            collisions_temperatures = np.arange(2000, 50000, 2000)
+        else:
+            collisions_temperatures = np.array(collisions_temperatures)
+
+        self.collisions_param = {
+            "temperatures": collisions_temperatures
         }
 
         self.atomic_weights = atomic_weights
@@ -583,6 +595,36 @@ class TARDISAtomData:
 
         return lines_prepared
 
+    @property
+    def collisions_prepared(self):
+        """
+            Prepare the DataFrame with electron collisions for TARDIS
+            Returns
+            -------
+            collisions_prepared : pandas.DataFrame
+                DataFrame with:
+                    index: atomic_number, ion_number, level_number_lower, level_number_upper;
+                    columns: e_col_id, delta_e, g_ratio, [collision strengths].
+        """
+
+        collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
+                              'level_number_lower', 'g_ratio', 'delta_e'] + \
+                              sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
+
+        collisions_prepared = self.collisions.loc[:, collisions_columns].copy()
+
+        # collisions_prepared = collisions_prepared.reset_index(drop=True)
+
+        # ToDo: maybe set multiindex
+        collisions_prepared.set_index([
+                    "atomic_number",
+                    "ion_number",
+                    "level_number_lower",
+                    "level_number_upper"],
+                    inplace=True)
+
+        return collisions_prepared
+
     def _create_macro_atom(self):
         """
             Create a DataFrame containing *macro atom* data.
@@ -761,7 +803,10 @@ class TARDISAtomData:
         with pd.HDFStore(fname, 'a') as f:
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
+            f.put('/collision_data', self.collisions_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
+            f.put('collision_data_temperatures', 
+                   pd.Series(self.collisions_param['temperatures']))
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
 

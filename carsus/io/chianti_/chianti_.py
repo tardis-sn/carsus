@@ -559,7 +559,7 @@ class ChiantiReader:
         col_list = []
         for ion in self.ions:
 
-            ch_ion = convert_species_tuple2chianti_str(ion)
+            ch_ion = convert_species_tcollisions['level_index_upper'] -uple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
 
             # Do not keep levels if lines are not available.
@@ -578,7 +578,7 @@ class ChiantiReader:
             lvl.index = range(0, len(lvl))
             lvl.index.name = 'level_index'
             lvl_list.append(reader.levels)
-            
+
             lns['atomic_number'] = ion[0]
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
@@ -589,7 +589,7 @@ class ChiantiReader:
                     col['atomic_number'] = ion[0]
                     col['ion_charge'] = ion[1]
                     col_list.append(col)
-                
+
                 except ChiantiIonReaderError:
                     logger.info(f'Missing collisional data for `{ch_ion}`.')
 
@@ -628,8 +628,8 @@ class ChiantiReader:
                                                     'upper_level_index': 'level_index_upper',
                                                     'gf_value': 'gf',})
             # Do we need to fix level indexes here too ?
-            collisions['level_index_lower'] = collisions['level_index_lower'] - 1
-            collisions['level_index_upper'] = collisions['level_index_upper'] - 1
+            collisions['level_index_lower'] -= 1
+            collisions['level_index_upper'] -= 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
                                                'level_index_lower', 'level_index_upper'])
             collisions = collisions[['temperatures', 'collision_strengths', 'gf', 'energy',
@@ -642,3 +642,7 @@ class ChiantiReader:
             self.collisions = collisions
         else:
             self.collisions = pd.DataFrame()
+
+    # TODO:
+    def to_hdf(self, fname):
+        raise NotImplementedError
