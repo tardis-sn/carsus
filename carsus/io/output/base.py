@@ -7,6 +7,7 @@ from carsus.util import convert_wavelength_air2vacuum
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 from astropy import units as u
 from astropy import constants as const
+from scipy import interpolate
 
 # [nm], wavelengths above this value are given in air
 # TODO: pass GFALL_AIR_THRESHOLD as parameter
@@ -445,21 +446,28 @@ class TARDISAtomData:
         collisions['e_col_id'] = range(start, start + len(collisions))
         collisions = collisions.reset_index()
 
-        # TODO: this piece of code is duplicated (see lines)
-        lower_levels = levels.rename(
-            columns={
-                "level_number": "level_number_lower",
-                "g": "g_l"}
-        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
-
-        upper_levels = levels.rename(
-            columns={
-                "level_number": "level_number_upper",
-                "g": "g_u"}
-        ).loc[:, ["level_number_upper", "g_u"]]
+        # Join atomic_number, ion_number, level_number_lower, level_number_upper
+        lower_levels = levels.rename(columns={"level_number": "level_number_lower", "g": "g_l", "energy": "energy_lower"}). \
+                              loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
+        upper_levels = levels.rename(columns={"level_number": "level_number_upper", "g": "g_u", "energy": "energy_upper"}). \
+                              loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
         collisions = collisions.join(lower_levels, on="lower_level_id").join(
                                             upper_levels, on="upper_level_id")
+
+        # Calculate delta_e
+        kb_ev = const.k_B.cgs.to('eV / K').value
+        collisions["delta_e"] = (collisions["energy_upper"] - collisions["energy_lower"])/kb_ev
+
+        # Calculate g_ratio
+        collisions["g_ratio"] = collisions["g_l"] / collisions["g_u"]
+
+        # TODO: pass temperatures as a parameter
+        temperatures = np.arange(2000, 50000, 2000)
+
+        # Derive columns for collisional strenghts
+        c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
+
         collisions = collisions.rename(columns={'ion_charge': 'ion_number',
                                                 'temperatures': 'btemp',
                                                 'collision_strengths': 'bscups'})
@@ -467,7 +475,59 @@ class TARDISAtomData:
                                  'upper_level_id', 'ds_id',
                                  'btemp', 'bscups', 'ttype', 'cups',
                                  'gf', 'atomic_number', 'ion_number',
-                                 'level_number_lower']]
+                                 'level_number_lower', 'g_l',
+                                 'energy_lower', 'level_number_upper', 
+                                 'g_u', 'energy_upper', 'delta_e', 
+                                    'g_ratio']]
+
+        def calculate_collisional_strength(row, temperatures):
+            """
+                Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38)
+            """
+            c = row["cups"]
+            x_knots = np.linspace(0, 1, len(row["btemp"]))
+            y_knots = row["bscups"]
+            delta_e = row["delta_e"]
+            g_u = row["g_u"]
+
+            ttype = row["ttype"]
+            if ttype > 5: ttype -= 5
+
+            kt = kb_ev * temperatures
+
+            spline_tck = interpolate.splrep(x_knots, y_knots)
+
+            if ttype == 1:
+                x = 1 - np.log(c) / np.log(kt / delta_e + c)
+                y_func = interpolate.splev(x, spline_tck)
+                upsilon = y_func * np.log(kt / delta_e + np.exp(1))
+
+            elif ttype == 2:
+                x = (kt / delta_e) / (kt / delta_e + c)
+                y_func = interpolate.splev(x, spline_tck)
+                upsilon = y_func
+
+            elif ttype == 3:
+                x = (kt / delta_e) / (kt / delta_e + c)
+                y_func = interpolate.splev(x, spline_tck)
+                upsilon = y_func / (kt / delta_e + 1)
+
+            elif ttype == 4:
+                x = 1 - np.log(c) / np.log(kt / delta_e + c)
+                y_func = interpolate.splev(x, spline_tck)
+                upsilon = y_func * np.log(kt / delta_e + c)
+
+            elif ttype == 5:
+                raise ValueError('Not sure what to do with ttype=5')
+
+            #### 1992A&A...254..436B Equation 20 & 22 #####
+
+            c_ul = 8.63e-6 * upsilon / (g_u * temperatures**.5)
+
+            return pd.Series(data=c_ul, index=c_ul_temperature_cols)
+
+        collisional_strengths = collisions.apply(calculate_collisional_strength, axis=1, args=(temperatures,))
+        collisions = collisions.join(collisional_strengths)
         collisions = collisions.set_index('e_col_id')
 
         return collisions
