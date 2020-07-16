@@ -643,6 +643,8 @@ class ChiantiReader:
         else:
             self.collisions = pd.DataFrame()
 
+        self.version = versionRead()
+
     # TODO:
     def to_hdf(self, fname):
         raise NotImplementedError
