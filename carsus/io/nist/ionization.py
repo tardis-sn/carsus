@@ -271,8 +271,6 @@ class NISTIonizationEnergiesIngester(BaseIngester):
             except TypeError:  # Raised when the variable is None
                 parity = None
 
-
-                
             ion.levels.append(
                 Level(data_source=self.data_source,
                       configuration=row["configuration"],
