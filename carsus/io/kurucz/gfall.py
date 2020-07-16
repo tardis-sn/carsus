@@ -78,6 +78,8 @@ class GFALLReader(object):
                         'the gfall data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
+        else:
+            self.unique_level_identifier = unique_level_identifier
 
         if ions is not None:
             self.ions = parse_selected_species(ions)
