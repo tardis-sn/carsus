@@ -115,5 +115,5 @@ class KnoxLongZeta(BaseParser):
         fname : path
            Path to the HDF5 output file
         """
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
             f.put('/zeta_data', self.base)

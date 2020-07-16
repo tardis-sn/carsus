@@ -3,7 +3,9 @@ import pandas as pd
 
 from pandas.util.testing import assert_frame_equal
 from numpy.testing import assert_almost_equal
-from carsus.io.nist import NISTWeightsCompIngester, NISTWeightsCompPyparser
+from carsus.io.nist import (NISTWeightsCompIngester, 
+                            NISTWeightsCompPyparser,
+                            NISTWeightsComp)
 from carsus.io.nist.weightscomp_grammar import *
 from carsus.model import AtomWeight
 
@@ -111,3 +113,13 @@ def test_weightscomp_ingest_default_count(memory_session):
     weightscomp_ingester.ingest(atomic_weights=True)
     assert memory_session.query(AtomWeight).\
                filter(AtomWeight.data_source==weightscomp_ingester.data_source).count() == 94
+
+
+@pytest.mark.remote_data
+def test_nist_weights_version():
+    nist_weights = NISTWeightsComp()
+    version = nist_weights.version
+    version_split = version.split('.')
+
+    assert len(version_split) > 1
+    to_int = [ int(i) for i in version_split ]

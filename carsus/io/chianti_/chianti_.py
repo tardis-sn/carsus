@@ -530,6 +530,7 @@ class ChiantiReader:
         ----------
         levels : DataFrame
         lines : DataFrame
+        version : str
     """
 
     def __init__(self, ions, collisions=False, priority=10):

@@ -3,6 +3,7 @@ Input module for the NIST Atomic Weights and Isotopic Compositions database
 http://www.nist.gov/pml/data/comp.cfm
 """
 
+import logging
 import requests
 import pandas as pd
 
@@ -18,8 +19,10 @@ from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, M
     AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
     AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
 
+logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
+WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
 
 
 def download_weightscomp(ascii='ascii2', isotype='some'):
@@ -43,7 +46,7 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
         Preformatted text data
 
     """
-    print("Downloading data from the NIST Atomic Weights and Isotopic Compositions database.")
+    logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
     r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype})
     soup = BeautifulSoup(r.text, 'html5lib')
     pre_text_data = soup.pre.get_text()
@@ -206,6 +209,7 @@ class NISTWeightsComp(BaseParser):
         input_data = download_weightscomp()
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
+        self._get_version()
 
     def _prepare_data(self, atoms):
         atomic_numbers = parse_selected_atoms(atoms)
@@ -230,6 +234,19 @@ class NISTWeightsComp(BaseParser):
         self.base = atom_data[['symbol', 'name', 'mass']]
         self.columns = atom_data.columns
 
+    def _get_version(self):
+        """Returns NIST Atomic Weights and Isotopic Components
+           Database version.
+        """
+        selector = "td"
+        html = requests.get(WEIGHTSCOMP_VERSION_URL).text
+        bs = BeautifulSoup(html, 'html5lib')
+        
+        version = bs.select(selector)
+        version = version[0].text.split()[1] 
+
+        self.version = version
+
     def to_hdf(self, fname):
         """Dump the `base` attribute into an HDF5 file
 
@@ -238,5 +255,5 @@ class NISTWeightsComp(BaseParser):
         fname : path
            Path to the HDF5 output file
         """
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
             f.put('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})

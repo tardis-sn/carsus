@@ -1,53 +1,54 @@
 name: carsus
 
 channels:
-    - conda-forge
+  - conda-forge
 
 dependencies:
-- python=3
-- setuptools
-- numpy=1.15
-- pandas=1.0
-- astropy=3
-- uncertainties
-- pip
+  - python=3
+  - setuptools
+  - numpy=1.15
+  - pandas=1.0
+  - astropy=3
+  - uncertainties
+  - pip
 
-# I/O
-- beautifulsoup4
-- pyparsing=2.2
-- html5lib
-- SQLAlchemy=1.0
-- PyYAMl
-- h5py
-- pytables
+  # I/O
+  - beautifulsoup4
+  - pyparsing=2.2
+  - html5lib
+  - SQLAlchemy=1.0
+  - PyYAMl
+  - h5py
+  - pytables
+  - pyarrow=0.14
 
-# Analysis
-- jupyter
-- matplotlib
+  # Analysis
+  - jupyter
+  - matplotlib
 
-# Documentation
-- sphinx
-- nbconvert
-- numpydoc
-- docutils
-- nbformat
-- sphinx_bootstrap_theme
-- sphinxcontrib-bibtex
-- sphinx_rtd_theme
-- nbsphinx
-- recommonmark
+  # Documentation
+  - sphinx
+  - nbconvert
+  - numpydoc
+  - docutils
+  - nbformat
+  - sphinx_bootstrap_theme
+  - sphinxcontrib-bibtex
+  - sphinx_rtd_theme
+  - nbsphinx
+  - recommonmark
 
-# Test/Coverage requirements
-- pytest=4
-- pytest-cov
-- pytest-astropy
-- coverage
-- requests
+  # Test/Coverage requirements
+  - pytest=4
+  - pytest-cov
+  - pytest-astropy
+  - coverage
+  - requests
 
-# ChiantiPy dependencies
-- scipy
-- ipyparallel
+  # ChiantiPy dependencies
+  - scipy
+  - ipyparallel
 
-# Pip
-- pip:
-  - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
+  # Pip
+  - pip:
+      - git+https://github.com/chianti-atomic/ChiantiPy.git@0.8.4
