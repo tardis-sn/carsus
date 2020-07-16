@@ -39,6 +39,7 @@ dependencies:
   - recommonmark
 
   # Test/Coverage requirements
+  - git-lfs
   - pytest=4
   - pytest-cov
   - pytest-astropy
