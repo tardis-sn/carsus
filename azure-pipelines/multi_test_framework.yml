@@ -1,11 +1,3 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
-# Specify which branches you want to trigger for continuous deployment and/or applicable for pull requests.
-# Otherwise it triggers all of them.
-
 trigger:
   - master
 
@@ -51,7 +43,7 @@ jobs:
       maxParallel: 6
 
     steps:
-      - bash:  echo "##vso[task.setvariable variable=shellopts]errexit"
+      - bash: echo "##vso[task.setvariable variable=shellopts]errexit"
         displayName: "Force exit on error (bash)"
 
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
@@ -75,10 +67,7 @@ jobs:
 
       - bash: |
           source activate carsus
-          #git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
-          git clone https://github.com/epassaro/carsus-refdata.git $HOME/carsus-refdata
-          cd $HOME/carsus-refdata
-          git checkout update-readme
+          git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
         displayName: "Fetch reference data"
 
       - bash: |
@@ -96,5 +85,5 @@ jobs:
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
-        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
         displayName: "Upload to codecov.io"
+        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
