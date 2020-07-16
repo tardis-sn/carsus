@@ -559,7 +559,7 @@ class ChiantiReader:
         col_list = []
         for ion in self.ions:
 
-            ch_ion = convert_species_tcollisions['level_index_upper'] -uple2chianti_str(ion)
+            ch_ion = ch_ion = convert_species_tuple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
 
             # Do not keep levels if lines are not available.
