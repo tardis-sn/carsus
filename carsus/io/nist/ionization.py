@@ -154,11 +154,11 @@ class NISTIonizationEnergiesParser(BaseParser):
             except KeyError:
                 pass
 
+            # To handle cases where the ground level J has not been understood:
+            # Take as assumption J=0
+            # Consider adding a log or warning message???
             if (np.isnan(lvl["J"])):
                 lvl["J"] = '0'
-                print("HELLO!")
-
-
             
             try:
                 lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])

@@ -1,4 +1,4 @@
-name: carsus_2020
+name: carsus
 
 channels:
     - conda-forge
