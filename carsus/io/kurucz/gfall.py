@@ -380,21 +380,18 @@ class GFALLReader(object):
 
         return lines 
 
-    def to_hdf(self, fname, key='lines', raw=True):
+    def to_hdf(self, fname):
         """
         Parameters
         ----------
         fname : path
            Path to the HDF5 output file
         raw : bool
-           If `True` stores `gfall_raw` attribute (default is `True`).
+           If `True` stores `gfall_raw` attribute (default is `True`)
         """
         with pd.HDFStore(fname, 'w') as f:
-            if raw:
-                f.put(key, self.gfall_raw)
-
-            else:
-                f.put(key, self.gfall)
+            f.put('/gfall_raw', self.gfall_raw)
+            f.put('/gfall', self.gfall)
 
 
 class GFALLIngester(object):

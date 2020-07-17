@@ -646,6 +646,15 @@ class ChiantiReader:
 
         self.version = versionRead()
 
-    # TODO:
     def to_hdf(self, fname):
-        raise NotImplementedError
+        """
+        Parameters
+        ----------
+        fname : path
+           Path to the HDF5 output file
+        """
+
+        with pd.HDFStore(fname, 'w') as f:
+            f.put('/levels', self.levels)
+            f.put('/lines', self.lines)
+            f.put('/collisions', self.collisions)
