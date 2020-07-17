@@ -49,7 +49,10 @@ jobs:
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
 
-      - bash: conda env create -f carsus_env3.yml
+      - bash: conda install mamba -c conda-forge -y
+        displayName: "Install mamba"
+
+      - bash: mamba env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
 
       - bash: |
