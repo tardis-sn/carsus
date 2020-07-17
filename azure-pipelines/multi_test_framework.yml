@@ -2,7 +2,7 @@ trigger:
   - master
 
 variables:
-  SYSTEM_DEBUG: "true"
+  SYSTEM_DEBUG: "false"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
