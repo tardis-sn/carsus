@@ -1,10 +1,9 @@
-import logging
-import pandas as pd
-import numpy as np
-import pickle
 import os
 import re
-
+import pickle
+import logging
+import numpy as np
+import pandas as pd
 from numpy.testing import assert_almost_equal
 from astropy import units as u
 from sqlalchemy import and_
@@ -16,14 +15,13 @@ from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineGFValue, LineAValue, LineWavelength, MEDIUM_VACUUM, \
     ECollision, ECollisionEnergy, ECollisionGFValue, ECollisionTempStrength
 
-logger = logging.getLogger(__name__)
-
 # Compatibility with older versions and pip versions:
 try:
     from ChiantiPy.tools.io import versionRead
-    import ChiantiPy.core as ch
+    import ChiantiPy.core as ch 
+
 except ImportError:
-    # Shamefully copied from their github source:
+    # Shamefully copied from their GitHub source:
     def versionRead():
         """
         Read the version number of the CHIANTI database
@@ -35,6 +33,9 @@ except ImportError:
         vFile.close()
         return versionStr.strip()
     import chianti.core as ch
+
+
+logger = logging.getLogger(__name__)
 
 masterlist_ions_path = os.path.join(
     os.getenv('XUVTOP'), "masterlist", "masterlist_ions.pkl"
@@ -300,7 +301,6 @@ class ChiantiIngester(object):
                 masterlist_version)
 
         self.session = session
-        # ToDo write a parser for Spectral Notation
         self.ion_readers = list()
         self.ions = list()
 
@@ -533,45 +533,66 @@ class ChiantiReader:
         version : str
     """
 
-    def __init__(self, ions, priority=10):
+    def __init__(self, ions, collisions=False, priority=10):
         """
         Parameters
         ----------
         ions : string
+            Selected Chianti ions.
+
+        collisions: bool, optional
+            Grab collisional data (default is False).
         """
         self.ions = parse_selected_species(ions)
         self.priority = priority
-        self._get_levels_lines()
+        self._get_levels_lines(get_collisions=collisions)
 
-    # TODO: write docstring
-    def _get_levels_lines(self):
+    def _get_levels_lines(self, get_collisions=False):
+        """Generates `levels`, `lines`  and `collisions` DataFrames.
 
+        Parameters
+        ----------
+        get_collisions : bool, optional
+            Grab collisional data, by default False.
+        """
         lvl_list = []
         lns_list = []
+        col_list = []
         for ion in self.ions:
 
-            ch_ion = convert_species_tuple2chianti_str(ion)
+            ch_ion = ch_ion = convert_species_tuple2chianti_str(ion)
             reader = ChiantiIonReader(ch_ion)
 
+            # Do not keep levels if lines are not available.
             try:
                 lvl = reader.levels
+                lns = reader.lines
 
             except ChiantiIonReaderError:
-                logger.info('No level data for {}'.format(ch_ion))
+                logger.info(f'Missing levels/lines data for `{ch_ion}`.')
                 continue
 
             lvl['atomic_number'] = ion[0]
             lvl['ion_charge'] = ion[1]
 
-            # Index must start from zero
+            # Indexes must start from zero
             lvl.index = range(0, len(lvl))
             lvl.index.name = 'level_index'
             lvl_list.append(reader.levels)
 
-            lns = reader.lines
             lns['atomic_number'] = ion[0]
             lns['ion_charge'] = ion[1]
             lns_list.append(lns)
+
+            if get_collisions:
+                try:
+                    col = reader.collisions
+                    col['atomic_number'] = ion[0]
+                    col['ion_charge'] = ion[1]
+                    col_list.append(col)
+
+                except ChiantiIonReaderError:
+                    logger.info(f'Missing collisional data for `{ch_ion}`.')
 
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
@@ -588,7 +609,6 @@ class ChiantiReader:
                                       'upper_level_index': 'level_index_upper',
                                       'gf_value': 'gf'})
 
-        # I'm not sure why we need this workaround.
         # Kurucz levels starts from zero, Chianti from 1.
         lines['level_index_lower'] = lines['level_index_lower'] - 1
         lines['level_index_upper'] = lines['level_index_upper'] - 1
@@ -602,6 +622,30 @@ class ChiantiReader:
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf']]
 
+        if get_collisions:
+            collisions = pd.concat(col_list, sort=True)
+            collisions = collisions.reset_index()
+            collisions = collisions.rename(columns={'lower_level_index': 'level_index_lower',
+                                                    'upper_level_index': 'level_index_upper',
+                                                    'gf_value': 'gf',})
+            # Do we need to fix level indexes here too ?
+            collisions['level_index_lower'] -= 1
+            collisions['level_index_upper'] -= 1
+            collisions = collisions.set_index(['atomic_number', 'ion_charge',
+                                               'level_index_lower', 'level_index_upper'])
+            collisions = collisions[['temperatures', 'collision_strengths', 'gf', 'energy',
+                                     'ttype', 'cups']]
+
         self.levels = levels
         self.lines = lines
+
+        if get_collisions:
+            self.collisions = collisions
+        else:
+            self.collisions = pd.DataFrame()
+
         self.version = versionRead()
+
+    # TODO:
+    def to_hdf(self, fname):
+        raise NotImplementedError

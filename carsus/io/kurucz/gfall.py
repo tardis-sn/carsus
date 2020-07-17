@@ -381,8 +381,7 @@ class GFALLReader(object):
         return lines 
 
     def to_hdf(self, fname, key='lines', raw=True):
-        """Dump the `base` attribute into an HDF5 file
-
+        """
         Parameters
         ----------
         fname : path
@@ -390,7 +389,7 @@ class GFALLReader(object):
         raw : bool
            If `True` stores `gfall_raw` attribute (default is `True`).
         """
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
             if raw:
                 f.put(key, self.gfall_raw)
 
