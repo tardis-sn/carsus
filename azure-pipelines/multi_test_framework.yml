@@ -30,7 +30,7 @@ jobs:
 
         database:
           SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
-          TEST_MODE: "with_test_db"
+          TEST_MODE: "database"
 
         refdata:
           SETUP_CMD: "--refdata=$HOME/carsus-refdata"
@@ -67,26 +67,28 @@ jobs:
           cd $HOME/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
+        condition: or(eq(variables['TEST_MODE'], 'database'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
           git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
         displayName: "Fetch reference data"
+        condition: or(eq(variables['TEST_MODE'], 'refdata'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
           pytest carsus $SETUP_CMD
         displayName: "Carsus test"
-        condition: and(succeeded(), ne(variables['TEST_MODE'], 'coverage'))
+        condition: ne(variables['TEST_MODE'], 'coverage')
 
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
         displayName: "Carsus test (with coverage)"
-        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
+        condition: eq(variables['TEST_MODE'], 'coverage')
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
         displayName: "Upload to codecov.io"
-        condition: and(succeeded(), eq(variables['TEST_MODE'], 'coverage'))
+        condition: eq(variables['TEST_MODE'], 'coverage')
