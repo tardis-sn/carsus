@@ -3,10 +3,11 @@ trigger:
 
 variables:
   PACKAGE_MANAGER: "mamba"
+  BUILD_DIR: $(Agent.BuildDirectory)
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
-  XUVTOP: "$HOME/chianti"
+  XUVTOP: "$BUILD_DIR/chianti"
   CODECOV_TOKEN: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
   SYSTEM_DEBUG: "false"
 
@@ -30,15 +31,15 @@ jobs:
           TEST_MODE: "runslow"
 
         database:
-          SETUP_CMD: "--test-db=$HOME/carsus-db/test_databases/test.db"
+          SETUP_CMD: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
           TEST_MODE: "database"
 
         refdata:
-          SETUP_CMD: "--refdata=$HOME/carsus-refdata"
+          SETUP_CMD: "--refdata=$BUILD_DIR/carsus-refdata"
           TEST_MODE: "refdata"
 
         coverage:
-          SETUP_CMD: "--remote-data --runslow --test-db=$HOME/carsus-db/test_databases/test.db --refdata=$HOME/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
+          SETUP_CMD: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
           TEST_MODE: "coverage"
 
       maxParallel: 6
@@ -65,15 +66,15 @@ jobs:
 
       - bash: |
           source activate carsus
-          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $HOME/carsus-db
-          cd $HOME/carsus-db
+          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $BUILD_DIR/carsus-db
+          cd $BUILD_DIR/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
         condition: or(eq(variables['TEST_MODE'], 'database'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
-          git clone $CARSUS_REFDATA_URL $HOME/carsus-refdata.git
+          git clone $CARSUS_REFDATA_URL $BUILD_DIR/carsus-refdata.git
         displayName: "Fetch reference data"
         condition: or(eq(variables['TEST_MODE'], 'refdata'), eq(variables['TEST_MODE'], 'coverage'))
 
