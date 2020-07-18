@@ -51,7 +51,7 @@ jobs:
         displayName: "Add conda to PATH"
 
       - bash: conda install mamba -c conda-forge -y
-        displayName: "Install mamba"
+        displayName: "Install Mamba package manager"
         condition: eq(variables['PACKAGE_MANAGER'], 'mamba')
 
       - bash: $PACKAGE_MANAGER env create -f carsus_env3.yml
