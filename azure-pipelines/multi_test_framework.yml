@@ -2,12 +2,13 @@ trigger:
   - master
 
 variables:
-  SYSTEM_DEBUG: "false"
+  PACKAGE_MANAGER: "mamba"
   CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
   CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
   XUVTOP: "$HOME/chianti"
   CODECOV_TOKEN: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
+  SYSTEM_DEBUG: "false"
 
 jobs:
   - job: "Test"
@@ -51,8 +52,9 @@ jobs:
 
       - bash: conda install mamba -c conda-forge -y
         displayName: "Install mamba"
+        condition: eq(variables['PACKAGE_MANAGER'], 'mamba')
 
-      - bash: mamba env create -f carsus_env3.yml
+      - bash: $PACKAGE_MANAGER env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
 
       - bash: |
