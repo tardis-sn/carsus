@@ -2,14 +2,14 @@ trigger:
   - master
 
 variables:
-  PACKAGE_MANAGER: "mamba"
-  BUILD_DIR: $(Agent.BuildDirectory)
-  CARSUS_DB_URL: "https://github.com/tardis-sn/carsus-db.git"
-  CARSUS_REFDATA_URL: "https://github.com/tardis-sn/carsus-refdata.git"
-  CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
-  XUVTOP: "$BUILD_DIR/chianti"
-  CODECOV_TOKEN: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
-  SYSTEM_DEBUG: "false"
+  package.manager: "mamba"
+  build.dir: $(Agent.BuildDirectory)
+  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
+  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
+  chianti.data.url: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
+  xuvtop: "$(build.dir)/chianti"
+  codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
+  system.debug: "false"
 
 jobs:
   - job: "Test"
@@ -19,28 +19,28 @@ jobs:
     strategy:
       matrix:
         simple:
-          SETUP_CMD: ""
-          TEST_MODE: "simple"
+          setup.cmd: ""
+          test.mode: "simple"
 
         remote_data:
-          SETUP_CMD: "--remote-data"
-          TEST_MODE: "remote_data"
+          setup.cmd: "--remote-data"
+          test.mode: "remote_data"
 
-        slow:
-          SETUP_CMD: "--runslow"
-          TEST_MODE: "runslow"
+        runslow:
+          setup.cmd: "--runslow"
+          test.mode: "runslow"
 
         database:
-          SETUP_CMD: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
-          TEST_MODE: "database"
+          setup.cmd: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
+          test.mode: "database"
 
         refdata:
-          SETUP_CMD: "--refdata=$BUILD_DIR/carsus-refdata"
-          TEST_MODE: "refdata"
+          setup.cmd: "--refdata=$BUILD_DIR/carsus-refdata"
+          test.mode: "refdata"
 
         coverage:
-          SETUP_CMD: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
-          TEST_MODE: "coverage"
+          setup.cmd: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
+          test.mode: "coverage"
 
       maxParallel: 6
 
@@ -53,7 +53,7 @@ jobs:
 
       - bash: conda install mamba -c conda-forge -y
         displayName: "Install Mamba package manager"
-        condition: eq(variables['PACKAGE_MANAGER'], 'mamba')
+        condition: eq(variables['package.manager'], 'mamba')
 
       - bash: $PACKAGE_MANAGER env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
@@ -70,28 +70,28 @@ jobs:
           cd $BUILD_DIR/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
-        condition: or(eq(variables['TEST_MODE'], 'database'), eq(variables['TEST_MODE'], 'coverage'))
+        condition: or(eq(variables['test.mode'], 'database'), eq(variables['test.mode'], 'coverage'))
 
       - bash: |
           source activate carsus
           git clone $CARSUS_REFDATA_URL $BUILD_DIR/carsus-refdata.git
         displayName: "Fetch reference data"
-        condition: or(eq(variables['TEST_MODE'], 'refdata'), eq(variables['TEST_MODE'], 'coverage'))
+        condition: or(eq(variables['test.mode'], 'refdata'), eq(variables['test.mode'], 'coverage'))
 
       - bash: |
           source activate carsus
           pytest carsus $SETUP_CMD
         displayName: "Carsus test"
-        condition: ne(variables['TEST_MODE'], 'coverage')
+        condition: ne(variables['test.mode'], 'coverage')
 
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
         displayName: "Carsus test (with coverage)"
-        condition: eq(variables['TEST_MODE'], 'coverage')
+        condition: eq(variables['test.mode'], 'coverage')
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
         displayName: "Upload to codecov.io"
-        condition: eq(variables['TEST_MODE'], 'coverage')
+        condition: eq(variables['test.mode'], 'coverage')
