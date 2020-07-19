@@ -19,28 +19,28 @@ jobs:
     strategy:
       matrix:
         simple:
-          setup.cmd: ""
-          test.mode: "simple"
+          SETUP_CMD: ""
+          TEST_MODE: "simple"
 
         remote_data:
-          setup.cmd: "--remote-data"
-          test.mode: "remote_data"
+          SETUP_CMD: "--remote-data"
+          TEST_MODE: "remote_data"
 
         runslow:
-          setup.cmd: "--runslow"
-          test.mode: "runslow"
+          SETUP_CMD: "--runslow"
+          TEST_MODE: "runslow"
 
         database:
-          setup.cmd: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
-          test.mode: "database"
+          SETUP_CMD: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
+          TEST_MODE: "database"
 
         refdata:
-          setup.cmd: "--refdata=$BUILD_DIR/carsus-refdata"
-          test.mode: "refdata"
+          SETUP_CMD: "--refdata=$BUILD_DIR/carsus-refdata"
+          TEST_MODE: "refdata"
 
         coverage:
-          setup.cmd: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
-          test.mode: "coverage"
+          SETUP_CMD: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
+          TEST_MODE: "coverage"
 
       maxParallel: 6
 
@@ -70,28 +70,28 @@ jobs:
           cd $BUILD_DIR/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
-        condition: or(eq(variables['test.mode'], 'database'), eq(variables['test.mode'], 'coverage'))
+        condition: or(eq(variables['TEST_MODE'], 'database'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
           git clone $CARSUS_REFDATA_URL $BUILD_DIR/carsus-refdata.git
         displayName: "Fetch reference data"
-        condition: or(eq(variables['test.mode'], 'refdata'), eq(variables['test.mode'], 'coverage'))
+        condition: or(eq(variables['TEST_MODE'], 'refdata'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
           pytest carsus $SETUP_CMD
         displayName: "Carsus test"
-        condition: ne(variables['test.mode'], 'coverage')
+        condition: ne(variables['TEST_MODE'], 'coverage')
 
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
           pytest carsus $SETUP_CMD
         displayName: "Carsus test (with coverage)"
-        condition: eq(variables['test.mode'], 'coverage')
+        condition: eq(variables['TEST_MODE'], 'coverage')
 
       - bash: |
           bash <(curl -s https://codecov.io/bash)
         displayName: "Upload to codecov.io"
-        condition: eq(variables['test.mode'], 'coverage')
+        condition: eq(variables['TEST_MODE'], 'coverage')
