@@ -464,3 +464,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     f.get_storer(subkey).attrs.metadata = self.base[i]._meta
 
                 f.root._v_attrs['metadata'] = self.meta
+
+
+class CMFGENReader:
+    pass
