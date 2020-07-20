@@ -156,9 +156,9 @@ class NISTIonizationEnergiesParser(BaseParser):
 
             # To handle cases where the ground level J has not been understood:
             # Take as assumption J=0
-            # Consider adding a log or warning message???
             if (np.isnan(lvl["J"])):
                 lvl["J"] = '0'
+                print(f"Set J=0 for ground state of species ({row['atomic_number']}, {row['ion_charge']}).")
             
             try:
                 lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
