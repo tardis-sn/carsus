@@ -2,7 +2,7 @@
 Input module for the NIST Ionization Energies database
 http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 """
-
+import logging
 import requests
 import numpy as np
 import pandas as pd
@@ -15,8 +15,10 @@ from pyparsing import ParseException
 from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
 from carsus.io.base import BaseParser, BaseIngester
 from carsus.io.nist.ionization_grammar import level
+from carsus.util import convert_atomic_number2symbol
 
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
+logger = logging.getLogger(__name__)
 
 
 def download_ionization_energies(
@@ -55,7 +57,7 @@ def download_ionization_energies(
 
     data = {k: v for k, v in data.items() if v is not False}
 
-    print("Downloading ionization energies from the NIST Atomic Spectra Database.")
+    logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
     r = requests.post(IONIZATION_ENERGIES_URL, data=data)
     return r.text
 
@@ -158,7 +160,7 @@ class NISTIonizationEnergiesParser(BaseParser):
             # Take as assumption J=0
             if (np.isnan(lvl["J"])):
                 lvl["J"] = '0'
-                print(f"Set J=0 for ground state of species ({row['atomic_number']}, {row['ion_charge']}).")
+                logger.warn(f"Set `J=0` for ground state of species `{convert_atomic_number2symbol(row['atomic_number'])} {row['ion_charge']}`.")
             
             try:
                 lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])
@@ -229,7 +231,7 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         if ioniz_energies is None:
             ioniz_energies = self.parser.prepare_ioniz_energies()
 
-        print("Ingesting ionization energies from {}".format(self.data_source.short_name))
+        logger.info(f"Ingesting ionization energies from {self.data_source.short_name}.")
 
         for index, row in ioniz_energies.iterrows():
             atomic_number, ion_charge = index
@@ -251,7 +253,7 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         if ground_levels is None:
             ground_levels = self.parser.prepare_ground_levels()
 
-        print("Ingesting ground levels from {}".format(self.data_source.short_name))
+        logger.info(f"Ingesting ground levels from {self.data_source.short_name}.")
 
         for index, row in ground_levels.iterrows():
             atomic_number, ion_charge = index
