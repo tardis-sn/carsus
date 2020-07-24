@@ -122,7 +122,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-            (default value = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)'])
         meta : dict
             Metadata parsed from file header.
 
@@ -202,7 +201,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-            (default value = ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
         meta : dict
             Metadata parsed from file header.
 
