@@ -18,7 +18,7 @@ import logging, sys
 from .base import init_db
 from .util.colored_logger import ColoredFormatter, formatter_message
 
-FORMAT = "[$BOLD%(name)-20s$RESET][%(levelname)-18s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
+FORMAT = "[$BOLD%(name)26s$RESET][%(levelname)8s] - %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
 COLOR_FORMAT = formatter_message(FORMAT, True)
 
 

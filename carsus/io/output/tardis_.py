@@ -41,7 +41,8 @@ from carsus.util import (
         convert_atomic_number2symbol,
         parse_selected_atoms,
         parse_selected_species,
-        query_columns
+        query_columns,
+        serialize_pandas_object
         )
 
 
@@ -1170,12 +1171,11 @@ class AtomData(object):
 
             md5_hash = hashlib.md5()
             for key in store.keys():
-                tmp = np.ascontiguousarray(store[key].values.data)
-                md5_hash.update(tmp)
-                
+                md5_hash.update(serialize_pandas_object(store[key]).to_buffer())
+
             uuid1 = uuid.uuid1().hex
 
             print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
 
-            store.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
-            store.root._v_attrs['uuid1'] = uuid1.encode('ascii')
+            store.root._v_attrs['md5'] = md5_hash.hexdigest()
+            store.root._v_attrs['uuid1'] = uuid1

@@ -1,9 +1,10 @@
 import re
+import hashlib
 import logging
-
+import requests
 import numpy as np
 import pandas as pd
-
+from io import BytesIO
 from astropy import units as u
 from sqlalchemy import and_
 from pyparsing import ParseException
@@ -59,7 +60,7 @@ class GFALLReader(object):
         Parameters
         ----------
         fname: str
-            path to the gfall file
+            path to the gfall file (http or local file)
 
         ions: str, optional
             ions to extract, by default None
@@ -69,17 +70,7 @@ class GFALLReader(object):
             atomic_number and ion charge in addition.
         """
         self.fname = fname
-        self._gfall_raw = None
-        self._gfall = None
-        self._levels = None
-        self._lines = None
-        if unique_level_identifier is None:
-            logger.warn('A specific combination to identify unique levels from '
-                        'the gfall data has not been given. Defaulting to '
-                        '["energy", "j"].')
-            self.unique_level_identifier = self.default_unique_level_identifier
-        else:
-            self.unique_level_identifier = unique_level_identifier
+        self.priority = priority
 
         if ions is not None:
             self.ions = parse_selected_species(ions)
@@ -87,12 +78,22 @@ class GFALLReader(object):
         else:
             self.ions = None
 
-        self.priority = priority
+        self._gfall_raw = None
+        self._gfall = None
+        self._levels = None
+        self._lines = None
+        if unique_level_identifier is None:
+            logger.warn('A specific combination to identify unique levels from '
+                        'GFALL data has not been given. Defaulting to '
+                        '["energy", "j"].')
+            self.unique_level_identifier = self.default_unique_level_identifier
+        else:
+            self.unique_level_identifier = unique_level_identifier
 
     @property
     def gfall_raw(self):
         if self._gfall_raw is None:
-            self._gfall_raw = self.read_gfall_raw()
+            self._gfall_raw, self.md5 = self.read_gfall_raw()
         return self._gfall_raw
 
     @property
@@ -113,6 +114,7 @@ class GFALLReader(object):
             self._lines = self.extract_lines()
         return self._lines
 
+
     def read_gfall_raw(self, fname=None):
         """
         Reading in a normal gfall.dat
@@ -126,12 +128,15 @@ class GFALLReader(object):
         -------
             pandas.DataFrame
                 pandas Dataframe represenation of gfall
+            
+            str
+                MD5 checksum
         """
 
         if fname is None:
             fname = self.fname
 
-        logger.info('Parsing GFALL {0}'.format(fname))
+        logger.info(f'Parsing GFALL: {fname}')
 
         # FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
         # 3F6.2,A4,2I2,I3,F6.3,I3,F6.3,2I5,1X,A1,A1,1X,A1,A1,i1,A3,2I5,I6)
@@ -147,12 +152,23 @@ class GFALLReader(object):
 
         field_type_dict = {col: dtype for col,
                            dtype in zip(self.gfall_columns, field_types)}
-        gfall = pd.read_fwf(fname, widths=field_widths, skip_blank_lines=True,
+
+        # Pass a buffer to `read_fwf` instead of a path to hash content on-the-fly.
+        if self.fname.startswith("http"):
+            response = requests.get(self.fname)
+            buffer = BytesIO(response.content)
+        else:
+            buffer = BytesIO(open(self.fname, 'rb').read())
+
+        md5 = hashlib.md5(buffer.getbuffer()).hexdigest()
+        
+        gfall = pd.read_fwf(buffer, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
+
         # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
 
-        return gfall
+        return gfall, md5
 
     def parse_gfall(self, gfall_raw=None):
         """
@@ -323,7 +339,7 @@ class GFALLReader(object):
                                  '_upper' for item in self.unique_level_identifier]
             selected_columns += ['wavelength', 'loggf']
 
-        logger.info('Extracting line data: {0}'.format(
+        logger.info('Extracting line data: {0}.'.format(
             ', '.join(selected_columns)))
         unique_level_id = ['atomic_number', 'ion_charge'] + \
             self.unique_level_identifier
@@ -364,7 +380,7 @@ class GFALLReader(object):
         lines.set_index(['atomic_number', 'ion_charge',
                          'level_index_lower', 'level_index_upper'], inplace=True)
 
-        return lines
+        return lines 
 
     def to_hdf(self, fname, key='lines', raw=True):
         """Dump the `base` attribute into an HDF5 file
@@ -457,7 +473,7 @@ class GFALLIngester(object):
                      on=["atomic_number", "ion_charge"]).\
                 set_index(["atomic_number", "ion_charge", "level_index"])
 
-        print("Ingesting levels from {}".format(self.data_source.short_name))
+        logger.info("Ingesting levels from {}.".format(self.data_source.short_name))
 
         for ion_index, ion_levels in levels.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -465,7 +481,7 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting levels for {} {}".format(
+            logger.info("Ingesting levels for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             for index, row in ion_levels.iterrows():
@@ -497,7 +513,7 @@ class GFALLIngester(object):
                 set_index(["atomic_number", "ion_charge",
                            "level_index_lower", "level_index_upper"])
 
-        print("Ingesting lines from {}".format(self.data_source.short_name))
+        logger.info("Ingesting lines from {}.".format(self.data_source.short_name))
 
         for ion_index, ion_lines in lines.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -505,7 +521,7 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            print("Ingesting lines for {} {}".format(
+            logger.info("Ingesting lines for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)

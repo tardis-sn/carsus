@@ -2,6 +2,7 @@
 Input module for the NIST Ionization Energies database
 http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 """
+
 import logging
 import requests
 import numpy as np
@@ -17,8 +18,12 @@ from carsus.io.base import BaseParser, BaseIngester
 from carsus.io.nist.ionization_grammar import level
 from carsus.util import convert_atomic_number2symbol
 
+logger = logging.getLogger(__name__)
+
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 logger = logging.getLogger(__name__)
+IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
+
 
 
 def download_ionization_energies(
@@ -317,6 +322,8 @@ class NISTIonizationEnergies(BaseParser):
         input_data = download_ionization_energies(spectra)
         self.parser = NISTIonizationEnergiesParser(input_data)
         self._prepare_data()
+        self._get_version()
+
 
     def _prepare_data(self):
         ionization_data = pd.DataFrame()
@@ -347,6 +354,21 @@ class NISTIonizationEnergies(BaseParser):
 
         return levels
 
+    def _get_version(self):
+        """Returns NIST Atomic Spectra Database version.
+        """        
+        selector = "body > div > table:nth-child(1) > tbody > \
+                        tr:nth-child(1) > td:nth-child(1) > b"
+         
+        html = requests.get(IONIZATION_ENERGIES_VERSION_URL).text
+        bs = BeautifulSoup(html, 'html5lib')
+        
+        version = bs.select(selector)
+        version = version[0].text.replace(u'\xa0', ' ')\
+                    .replace('Version', ' ')
+
+        self.version = version
+
     def to_hdf(self, fname):
         """Dump the `base` attribute into an HDF5 file
 
@@ -355,5 +377,5 @@ class NISTIonizationEnergies(BaseParser):
         fname : path
            Path to the HDF5 output file
         """
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
             f.put('/ionization_data', self.base)

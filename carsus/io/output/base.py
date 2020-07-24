@@ -2,8 +2,13 @@ import logging
 import numpy as np
 import pandas as pd
 import hashlib
+import platform
 import uuid
-from carsus.util import convert_wavelength_air2vacuum
+import pytz
+from datetime import datetime
+from carsus.util import (convert_wavelength_air2vacuum,
+                         serialize_pandas_object,
+                         hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 from astropy import units as u
 from astropy import constants as const
@@ -28,7 +33,6 @@ class TARDISAtomData:
     lines_prepared : pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
-
 
     Methods
     -------
@@ -149,10 +153,12 @@ class TARDISAtomData:
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` """
+        logger.info('Ingesting levels from GFALL.')
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
         if len(self.chianti_ions) > 0:
+            logger.info('Ingesting levels from Chianti.')
             ch_levels = self.chianti_reader.levels.reset_index()
             ch_levels['source'] = 'chianti'
         else:
@@ -220,7 +226,7 @@ class TARDISAtomData:
 
         start = 1
         gf_list = []
-        logger.info('Ingesting lines from GFALL')
+        logger.info('Ingesting lines from GFALL.')
         for ion in self.gfall_ions:
 
             try:
@@ -267,7 +273,7 @@ class TARDISAtomData:
             gf_list.append(df)
 
         ch_list = []
-        logger.info('Ingesting lines from Chianti')
+        logger.info('Ingesting lines from Chianti.')
         for ion in self.chianti_ions:
 
             df = ch.lines.loc[ion]
@@ -654,26 +660,65 @@ class TARDISAtomData:
            Path to the HDF5 output file
         """
 
-        self.atomic_weights.to_hdf(fname)
-        self.ionization_energies.to_hdf(fname)
-        self.zeta_data.to_hdf(fname)
-
-        with pd.HDFStore(fname, 'a') as f:
+        with pd.HDFStore(fname, 'w') as f:
+            f.put('/atom_data', self.atomic_weights.base)
+            f.put('/ionization_data', self.ionization_energies.base)
+            f.put('/zeta_data', self.zeta_data.base)
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
 
+            meta = []
             md5_hash = hashlib.md5()
             for key in f.keys():
-                tmp = np.ascontiguousarray(f[key].values.data)
-                md5_hash.update(tmp)
+                # Update the total MD5 sum
+                md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
+                
+                # Save the individual Series/DataFrame MD5
+                md5 = hash_pandas_object(f[key])
+                meta.append(('md5sum', key.lstrip('/'), md5[:20]))
+
+            # Save datasets versions
+            meta.append(('datasets', 'nist_weights', 
+                         self.atomic_weights.version))
+            meta.append(('datasets', 'nist_spectra', 
+                         self.ionization_energies.version))
+
+            meta.append(('datasets', 'gfall.dat',
+                         self.gfall_reader.md5[:20]))
+
+            if self.chianti_reader is not None:
+                meta.append(('datasets', 'chianti_data', 
+                             self.chianti_reader.version))
+
+            # Save relevant package versions
+            meta.append(('software', 'python', platform.python_version()))
+            imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
+                       'tables', 'ChiantiPy']
+ 
+            for package in imports:
+                meta.append(('software', package,
+                             __import__(package).__version__))
+
+            meta_df = pd.DataFrame.from_records(meta, columns=['field', 'key',
+                        'value'], index=['field', 'key'])
 
             uuid1 = uuid.uuid1().hex
 
-            print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(
-                md5_hash.hexdigest(), uuid1))
+            logger.info(f"Signing TARDISAtomData.")
+            logger.info(f"MD5: {md5_hash.hexdigest()}")
+            logger.info(f"UUID1: {uuid1}")
 
-            f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
-            f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
+            f.root._v_attrs['md5'] = md5_hash.hexdigest()
+            f.root._v_attrs['uuid1'] = uuid1
+            f.put('/meta', meta_df)
+
+            utc = pytz.timezone('UTC')
+            timestamp = datetime.now(utc).strftime("%b %d, %Y %H:%M:%S UTC")
+            f.root._v_attrs['date'] = timestamp
+
+            self.meta = meta_df
+            
+            return

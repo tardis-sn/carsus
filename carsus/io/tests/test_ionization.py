@@ -5,6 +5,7 @@ from pandas.util.testing import assert_series_equal
 from numpy.testing import assert_almost_equal
 from sqlalchemy.orm import joinedload
 from carsus.model import Ion
+
 from carsus.io.nist.ionization import (NISTIonizationEnergiesParser,
                                        NISTIonizationEnergiesIngester,
                                        NISTIonizationEnergies)
@@ -140,6 +141,7 @@ def test_ingest_nist_asd_ion_data(memory_session):
     ingester.ingest(ionization_energies=True, ground_levels=True)
 
 @pytest.mark.remote_data
+
 def test_ground_levels_missing_j():
     ionization_energies = NISTIonizationEnergies(spectra="Nd")
     ground_levels = ionization_energies.get_ground_levels()
@@ -151,3 +153,12 @@ def test_ground_levels_missing_j():
     assert ground_levels.loc[(60, 8)]['g'] == 1
     assert ground_levels.loc[(60, 9)]['g'] == 1
     assert ground_levels.loc[(60, 10)]['g'] == 1
+
+def test_nist_asd_version():
+    nist_ionization = NISTIonizationEnergies('H')
+    version = nist_ionization.version
+    version_split = version.split('.')
+
+    assert len(version_split) > 1
+    to_int = [ int(i) for i in version_split ]
+
