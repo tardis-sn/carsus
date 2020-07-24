@@ -43,7 +43,7 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
 
             # tip: check `find_row`
             except TypeError:
-                logger.warning('`TypeError` raised while parsing `{}`.')
+                logger.warning('`TypeError` raised while parsing `{fname}`.')
 
             # tip: check `to_float`
             except UnboundLocalError:
