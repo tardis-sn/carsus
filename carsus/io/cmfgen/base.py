@@ -225,29 +225,31 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         n = int(meta['Number of transitions'])
         kwargs['nrows'] = n
 
-        columns = ['State A', 'State B', 'f', 'A',
-                   'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
-
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
 
         except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=columns)
+            df = pd.DataFrame(columns=['State A', 'State B', 'f', 'A',
+                                 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
             logger.warn(f'Table is empty: `{fname}`.')
 
         # Assign column names by file content
         if df.shape[1] == 9:
-            df.columns = columns
+            df.columns = ['State A', 'State B', 'f', 'A',
+                            'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
 
+        # These files are 9-column, but for some reason the regex produces 10 columns
         elif df.shape[1] == 10:
-            df.columns = columns + ['?']
+            df.columns = ['State A', 'State B', 'f', 'A',
+                            'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc', '?']
             df = df.drop(columns=['?'])
 
         elif df.shape[1] == 8:
-            df.columns = columns[:-2] + ['#']
-            df = df.drop(columns=['#'])
+            df.columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 
+                            'i', 'j', '#']
             df['Lam(obs)'] = np.nan
             df['% Acc'] = np.nan
+            df = df.drop(columns=['#'])
 
         else:
             logger.warn(f'Inconsistent number of columns `{fname}`.')
