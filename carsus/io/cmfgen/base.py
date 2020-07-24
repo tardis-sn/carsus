@@ -154,9 +154,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         n = int(meta['Number of energy levels'])
         kwargs['nrows'] = n
 
-        columns = ['Configuration', 'g',
-                   'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)']
-
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
 
@@ -176,17 +173,13 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df.columns = columns
 
         elif df.shape[1] == 7:
-            df.columns = columns + ['#']
-            df = df.drop(columns=['#'])
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 6:
-            df.columns = ['Configuration', 'g',
-                          'E(cm^-1)', 'Hz 10^15', 'Lam(A)', '#']
-            df = df.drop(columns=['#'])
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 5:
-            df.columns = columns[:-2] + ['#']
-            df = df.drop(columns=['#'])
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
 
         else:
             logger.warn(f'Inconsistent number of columns: `{fname}`.')
