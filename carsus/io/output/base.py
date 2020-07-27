@@ -507,7 +507,8 @@ class TARDISAtomData:
             g_u = row["g_u"]
 
             ttype = row["ttype"]
-            if ttype > 5: ttype -= 5
+            if ttype > 5: 
+                ttype -= 5
 
             kt = kb_ev * temperatures
 
