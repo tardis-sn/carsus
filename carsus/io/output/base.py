@@ -479,8 +479,7 @@ class TARDISAtomData:
         # Calculate g_ratio
         collisions["g_ratio"] = collisions["g_l"] / collisions["g_u"]
 
-        # TODO: pass temperatures as a parameter
-        temperatures = np.arange(2000, 50000, 2000)
+        temperatures = self.collisions_param['temperatures']
 
         # Derive columns for collisional strenghts
         c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
