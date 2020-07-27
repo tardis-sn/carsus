@@ -628,7 +628,6 @@ class ChiantiReader:
             collisions = collisions.rename(columns={'lower_level_index': 'level_index_lower',
                                                     'upper_level_index': 'level_index_upper',
                                                     'gf_value': 'gf',})
-            # Do we need to fix level indexes here too ?
             collisions['level_index_lower'] -= 1
             collisions['level_index_upper'] -= 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
