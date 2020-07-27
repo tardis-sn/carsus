@@ -618,9 +618,6 @@ class TARDISAtomData:
 
         collisions_prepared = self.collisions.loc[:, collisions_columns].copy()
 
-        # collisions_prepared = collisions_prepared.reset_index(drop=True)
-
-        # ToDo: maybe set multiindex
         collisions_prepared.set_index([
                     "atomic_number",
                     "ion_number",
