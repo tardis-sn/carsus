@@ -1,22 +1,22 @@
 import re
 import logging
-import numpy as np
-import pandas as pd
 import hashlib
-import platform
 import uuid
 import pytz
+import platform
+import numpy as np
+import pandas as pd
+import astropy.units as u
+import astropy.constants as const
+from scipy import interpolate
 from datetime import datetime
 from carsus.util import (convert_wavelength_air2vacuum,
                          serialize_pandas_object,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
-from astropy import units as u
-from astropy import constants as const
-from scipy import interpolate
 
-# [nm], wavelengths above this value are given in air
 # TODO: pass GFALL_AIR_THRESHOLD as parameter
+# [nm] wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 200
 
 P_EMISSION_DOWN = -1
