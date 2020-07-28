@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 class TARDISAtomData:
-
     """
     Attributes
     ----------
@@ -143,7 +142,8 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_artificial_fully_ionized(levels):
-        """ Create artificial levels for fully ionized ions """
+        """ Create artificial levels for fully ionized ions. """
+
         fully_ionized_levels = list()
 
         for atomic_number, _ in levels.groupby("atomic_number"):
@@ -196,10 +196,11 @@ class TARDISAtomData:
 
     @staticmethod
     def calculate_collisional_strength(row, temperatures, 
-                                        kb_ev, c_ul_temperature_cols):
+                                       kb_ev, c_ul_temperature_cols):
         """
-            Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38)
+        Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38).
         """
+
         c = row["cups"]
         x_knots = np.linspace(0, 1, len(row["btemp"]))
         y_knots = row["bscups"]
@@ -246,6 +247,7 @@ class TARDISAtomData:
         """ Returns the same output than `AtomData._get_all_levels_data()` 
         with `reset_index` method applied.
         """
+
         gf_levels = self.gfall_reader.levels.reset_index()
         gf_levels['source'] = 'gfall'
 
@@ -316,6 +318,7 @@ class TARDISAtomData:
 
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
+
         gf = self.gfall_reader
         ch = self.chianti_reader
 
@@ -396,8 +399,8 @@ class TARDISAtomData:
 
     def _create_levels_lines(self, lines_loggf_threshold=-3,
                              levels_metastable_loggf_threshold=-3):
-        """ Returns almost the same output than
-        `AtomData.create_levels_lines` method """
+        """ Returns almost the same output than`AtomData.create_levels_lines` method """
+
         levels_all = self.levels_all
         lines_all = self.lines_all
         ionization_energies = self.ionization_energies.base.reset_index()
@@ -556,21 +559,17 @@ class TARDISAtomData:
     @property
     def levels_prepared(self):
         """
-        Prepare the DataFrame with levels for TARDIS
+        Prepare the DataFrame with levels for TARDIS.
+
         Returns
         -------
-        levels_prepared: pandas.DataFrame
-            DataFrame with:
-                index: none;
-                columns: atomic_number, ion_number, level_number,
-                            energy[eV], g[1], metastable.
+        pandas.DataFrame
         """
 
         levels_prepared = self.levels.loc[:, [
             "atomic_number", "ion_number", "level_number",
             "energy", "g", "metastable"]].copy()
 
-        # Set index
         levels_prepared.set_index(
             ["atomic_number", "ion_number", "level_number"], inplace=True)
 
@@ -579,17 +578,11 @@ class TARDISAtomData:
     @property
     def lines_prepared(self):
         """
-            Prepare the DataFrame with lines for TARDIS
-            Returns
-            -------
-            lines_prepared : pandas.DataFrame
-                DataFrame with:
-                    index: none;
-                    columns: line_id, atomic_number, ion_number,
-                             level_number_lower, level_number_upper,
-                             wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
-                             B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1],
-                             A_ul[1/s].
+        Prepare the DataFrame with lines for TARDIS.
+
+        Returns
+        -------
+        pandas.DataFrame
         """
 
         lines_prepared = self.lines.loc[:, [
@@ -597,7 +590,11 @@ class TARDISAtomData:
             "f_ul", "f_lu", "level_number_lower", "level_number_upper",
             "nu", "B_lu", "B_ul", "A_ul"]].copy()
 
-        # Set the index
+        # TODO: store units in metadata
+        # wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
+        # B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1],
+        # A_ul[1/s].
+
         lines_prepared.set_index([
             "atomic_number", "ion_number",
             "level_number_lower", "level_number_upper"], inplace=True)
@@ -607,13 +604,11 @@ class TARDISAtomData:
     @property
     def collisions_prepared(self):
         """
-            Prepare the DataFrame with electron collisions for TARDIS
-            Returns
-            -------
-            collisions_prepared : pandas.DataFrame
-                DataFrame with:
-                    index: atomic_number, ion_number, level_number_lower, level_number_upper;
-                    columns: e_col_id, delta_e, g_ratio, [collision strengths].
+        Prepare the DataFrame with electron collisions for TARDIS.
+
+        Returns
+        -------
+        pandas.DataFrame
         """
 
         collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
@@ -633,19 +628,17 @@ class TARDISAtomData:
 
     def _create_macro_atom(self):
         """
-            Create a DataFrame containing *macro atom* data.
-            Returns
-            -------
-            macro_atom: pandas.DataFrame
-                DataFrame with:
-                    index: none;
-                    columns: atomic_number, ion_number, source_level_number,
-                             target_level_number, transition_line_id,
-                             transition_type, transition_probability.
-            Notes:
-                Refer to the docs:
-                https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+        Create a DataFrame containing macro atom data.
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        Notes
+        -----
+        Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
         """
+
         # Exclude artificially created levels from levels
         levels = self.levels.loc[self.levels["level_id"]
                                  != -1].set_index("level_id")
@@ -675,7 +668,7 @@ class TARDISAtomData:
             f_ul, f_lu = row["f_ul"], row["f_lu"]
             e_lower, e_upper = row["energy_lower"], row["energy_upper"]
 
-            transition_probabilities_dict = dict()  # type : probability
+            transition_probabilities_dict = dict()
             transition_probabilities_dict[P_EMISSION_DOWN] = 2 * \
                 nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
             transition_probabilities_dict[P_INTERNAL_DOWN] = 2 * \
@@ -704,18 +697,15 @@ class TARDISAtomData:
     @property
     def macro_atom_prepared(self):
         """
-            Prepare the DataFrame with macro atom data for TARDIS
-            Returns
-            -------
-            macro_atom_prepared : pandas.DataFrame
-                DataFrame with the *macro atom data* with:
-                    index: none;
-                    columns: atomic_number, ion_number, source_level_number,
-                             destination_level_number, transition_line_id
-                             transition_type, transition_probability.
-            Notes:
-                Refer to the docs:
-                https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+        Prepare the DataFrame with macro atom data for TARDIS
+        
+        Returns
+        -------
+        macro_atom_prepared : pandas.DataFrame
+        
+        Notes
+        -----
+        Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
         """
 
         macro_atom_prepared = self.macro_atom.loc[:, [
@@ -733,14 +723,11 @@ class TARDISAtomData:
 
     def _create_macro_atom_references(self):
         """
-            Create a DataFrame containing *macro atom reference* data.
-            Returns
-            -------
-            macro_atom_reference : pandas.DataFrame
-                DataFrame with:
-                index: no index;
-                and columns: atomic_number, ion_number, source_level_number,
-                count_down, count_up, count_total
+        Create a DataFrame containing macro atom reference data.
+    
+        Returns
+        -------
+        pandas.DataFrame
         """
         macro_atom_references = self.levels.rename(
             columns={"level_number": "source_level_number"}).\
@@ -762,7 +749,6 @@ class TARDISAtomData:
             macro_atom_references["count_down"] + \
             macro_atom_references["count_up"]
 
-        # Convert to int
         macro_atom_references["count_down"] = \
             macro_atom_references["count_down"].astype(np.int)
         macro_atom_references["count_up"] = \
@@ -775,14 +761,11 @@ class TARDISAtomData:
     @property
     def macro_atom_references_prepared(self):
         """
-            Prepare the DataFrame with macro atom references for TARDIS
-            Returns
-            -------
-            macro_atom_references_prepared : pandas.DataFrame
-                DataFrame with:
-                    index: none;
-                    columns: atomic_number, ion_number, source_level_number,
-                             count_down, count_up, count_total.
+        Prepare the DataFrame with macro atom references for TARDIS
+
+        Returns
+        -------
+        pandas.DataFrame
         """
         macro_atom_references_prepared = self.macro_atom_references.loc[:, [
             "atomic_number", "ion_number", "source_level_number", "count_down",
@@ -795,7 +778,9 @@ class TARDISAtomData:
         return macro_atom_references_prepared
 
     def to_hdf(self, fname):
-        """Dump the `base` attribute into an HDF5 file
+        """
+        Dump the `base` attribute into an HDF5 file
+        
         Parameters
         ----------
         fname : path
