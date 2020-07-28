@@ -523,13 +523,16 @@ class ChiantiIngester(object):
 
 class ChiantiReader:
     """
-        Class for extracting lines and levels data from Chianti.
+        Class for extracting levels, lines and collisional data 
+        from Chianti.
+        
         Mimics the GFALLReader class.
 
         Attributes
         ----------
         levels : DataFrame
         lines : DataFrame
+        collisions: DataFrame
         version : str
     """
 
