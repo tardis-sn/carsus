@@ -239,9 +239,9 @@ class TARDISAtomData:
             raise ValueError('Not sure what to do with ttype=5')
 
         #### 1992A&A...254..436B Equation 20 & 22 #####
-        c_ul = 8.63e-6 * upsilon / (g_u * temperatures**.5)
+        c_ul_factor = 8.63e-6 * upsilon / (g_u * temperatures**.5)
 
-        return pd.Series(data=c_ul, index=c_ul_temperature_cols)
+        return pd.Series(data=c_ul_factor, index=c_ul_temperature_cols)
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` 
