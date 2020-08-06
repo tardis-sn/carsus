@@ -9,7 +9,7 @@ Datasets
 
 .. toctree::
 
-    nist/index.rst
+    nist
     gfall
     chianti
     cmfgen/index.rst
