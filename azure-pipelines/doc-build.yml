@@ -10,6 +10,7 @@ pr:
 variables:
   system.debug: 'true'
   CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0_data.tar.gz"
+  CMFGEN_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
   XUVTOP: "/usr/share/chianti"
 
 jobs:
@@ -69,6 +70,12 @@ jobs:
           wget $CHIANTI_DATA_URL -O /usr/share/chianti/CHIANTI_9.0_data.tar.gz
           tar -zxvf /usr/share/chianti/CHIANTI_9.0_data.tar.gz -C /usr/share/chianti
     displayName: "Fetch Chianti Data"
+
+  - bash: |
+          wget $CMFGEN_DATA_URL -O /tmp/atomic_data_15nov16.tar.gz
+          cd /tmp
+          tar -zxvf atomic_data_15nov16.tar.gz
+    displayName: "Fetch CMFGEN Data"
 
 # Activate the environment, use sphinx to make the html documentation of the build, and deploy to gh-pages
   - bash: |

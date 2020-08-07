@@ -12,5 +12,5 @@ Datasets
     nist
     gfall
     chianti
-    cmfgen/index.rst
+    cmfgen
     zeta
