@@ -1,9 +1,12 @@
 import logging
 import numpy as np
 import pandas as pd
+import astropy.units as u
+import astropy.constants as const
 import itertools
 import gzip
 from carsus.io.base import BaseParser
+from carsus.util import parse_selected_species
 
 logger = logging.getLogger(__name__)
 
@@ -467,4 +470,69 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
 
 class CMFGENReader:
-    pass
+    """ Docstring """
+
+    def __init__(self, data, priority=10):
+        """ Docstring """
+
+        self.priority = priority
+        self._get_levels_lines(data)
+    
+    def _get_levels_lines(self, data):
+        """ Docstring """
+
+        lvl_list = []
+        lns_list = []
+        for ion, parser in data.items():
+
+            atomic_number = parse_selected_species(ion)[0][0]
+            ion_charge = parse_selected_species(ion)[0][1]
+            
+            lvl = parser['levels'].base
+            # some ID's have negative values (theoretical?)
+            lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
+            lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
+            lvl['ID'] = lvl['ID'].apply(np.abs)
+            lvl_id = lvl.set_index('ID')
+            lvl['atomic_number'] = atomic_number
+            lvl['ion_charge'] =  ion_charge
+            lvl_list.append(lvl)
+
+            lns = parser['lines'].base
+            lns = lns.set_index(['i', 'j'])
+            lns['energy_lower'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=0).values
+            lns['energy_upper'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=1).values
+            lns['g_lower'] = lvl_id['g'].reindex(lns.index, level=0).values
+            lns['g_upper'] = lvl_id['g'].reindex(lns.index, level=1).values
+            lns['j_lower'] = (lns['g_lower'] -1)/2
+            lns['j_upper'] = (lns['g_upper'] -1)/2
+            lns['atomic_number'] = atomic_number
+            lns['ion_charge'] = ion_charge
+            lns = lns.reset_index()
+            lns_list.append(lns)
+
+        levels = pd.concat(lvl_list)
+        levels['priority'] = self.priority
+        levels = levels.reset_index(drop=False)
+        levels = levels.rename(columns={'Configuration': 'label', 
+                                        'E(cm^-1)': 'energy', 
+                                        'index': 'level_index'})
+        levels['j'] = (levels['g'] -1)/2
+        levels = levels.set_index(['atomic_number', 'ion_charge', 'level_index'])
+        levels = levels[['energy', 'j', 'label', 'method', 'priority']]
+        
+        lines = pd.concat(lns_list)
+        lines = lines.rename(columns={'Lam(A)': 'wavelength'})
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: (x*u.AA).to('nm').value)
+        lines['level_index_lower'] = lines['i'] -1
+        lines['level_index_upper'] = lines['j'] -1
+        lines['gf'] = lines['f']*lines['g_lower']
+        lines = lines.set_index(['atomic_number', 'ion_charge', 
+                                 'level_index_lower', 'level_index_upper'])
+        lines = lines[['energy_lower', 'energy_upper', 
+                       'gf', 'j_lower', 'j_upper', 'wavelength']]
+
+        self.levels = levels
+        self.lines = lines
+
+        return
