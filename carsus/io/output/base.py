@@ -532,7 +532,7 @@ class TARDISAtomData:
 
         temperatures = self.collisions_param['temperatures']
 
-        # Derive columns for collisional strenghts
+        # Derive columns for collisional strengths
         c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
 
         collisions = collisions.rename(columns={'ion_charge': 'ion_number',
