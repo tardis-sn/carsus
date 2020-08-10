@@ -547,11 +547,11 @@ class TARDISAtomData:
                                  'g_u', 'energy_upper', 'delta_e', 
                                     'g_ratio']]
 
-        collisional_strengths = collisions.apply(self.calculate_collisional_strength, 
-                                                 axis=1, args=(temperatures, kb_ev, 
-                                                               c_ul_temperature_cols))
+        collisional_ul_factors = collisions.apply(self.calculate_collisional_strength, 
+                                                  axis=1, args=(temperatures, kb_ev, 
+                                                                c_ul_temperature_cols))
 
-        collisions = collisions.join(collisional_strengths)
+        collisions = collisions.join(collisional_ul_factors)
         collisions = collisions.set_index('e_col_id')
 
         return collisions
