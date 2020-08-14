@@ -90,7 +90,13 @@ class TARDISAtomData:
         self.zeta_data = zeta_data
 
     def _manage_priorities(self):
-        """ Docstring """
+        """This method grabs all the levels from every available reader and 
+        looks for the source with the highest priority, one ion at a time.
+        
+        Finally, sets an attribute for every source with a list of ions that
+        have passed this "filter". The intersection of these attributes is 
+        the empty set.
+        """
 
         # Source ID's:
         # 1: NIST
@@ -124,9 +130,16 @@ class TARDISAtomData:
             df_list.append(df)
 
         levels_uq = pd.concat(df_list)
-        self.gfall_ions = levels_uq[ levels_uq['source'] == 2 ].index.unique()
-        self.chianti_ions = levels_uq[ levels_uq['source'] == 4 ].index.unique()
-        self.cmfgen_ions = levels_uq[ levels_uq['source'] == 5 ].index.unique()
+        gfall_ions = levels_uq[ levels_uq['source'] == 2 ].index.unique()
+        chianti_ions = levels_uq[ levels_uq['source'] == 4 ].index.unique()
+        cmfgen_ions = levels_uq[ levels_uq['source'] == 5 ].index.unique()
+
+        assert set(gfall_ions).intersection(set(chianti_ions))\
+                                .intersection(set(cmfgen_ions)) == set([])
+
+        self.gfall_ions = gfall_ions
+        self.chianti_ions = chianti_ions
+        self.cmfgen_ions = cmfgen_ions
 
     @staticmethod
     def get_lvl_index2id(df, levels_all, ion):
