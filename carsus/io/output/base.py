@@ -84,7 +84,7 @@ class TARDISAtomData:
         self._create_macro_atom()
         self._create_macro_atom_references()
 
-        if not self.chianti_reader.collisions.empty:
+        if chianti_reader is not None and not chianti_reader.collisions.empty:
             self.collisions = self._create_collisions()
 
         self.zeta_data = zeta_data
