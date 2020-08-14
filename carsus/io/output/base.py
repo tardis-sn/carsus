@@ -48,6 +48,7 @@ class TARDISAtomData:
                  gfall_reader,
                  zeta_data,
                  chianti_reader=None,
+                 cmfgen_reader=None,
                  lines_loggf_threshold=-3,
                  levels_metastable_loggf_threshold=-3,
                  collisions_temperatures=None):
@@ -72,36 +73,10 @@ class TARDISAtomData:
         self.ionization_energies = ionization_energies
         self.ground_levels = ionization_energies.get_ground_levels()
 
-        # TODO: make this piece of code more readable 
-        gfall_ions = gfall_reader.levels.index.tolist()
-       
-        # Remove last element from tuple (MultiIndex has 3 elements)
-        gfall_ions = [x[:-1] for x in gfall_ions]
-
-        # Keep unique tuples, list and sort them
-        gfall_ions = sorted(list(set(gfall_ions)))
         self.gfall_reader = gfall_reader
-        self.gfall_ions = gfall_ions
-
-        # TODO: priorities should not be managed by the `init` method.
         self.chianti_reader = chianti_reader
-        if chianti_reader is not None:
-            chianti_lvls = chianti_reader.levels.reset_index()
-            chianti_lvls = chianti_lvls.set_index(
-                ['atomic_number', 'ion_charge', 'priority'])
-
-            mask = chianti_lvls.index.get_level_values(
-                'priority') > self.gfall_reader.priority
-
-            # TODO: make this piece of code more readable
-            chianti_lvls = chianti_lvls[mask]
-            chianti_ions = chianti_lvls.index.tolist()
-            chianti_ions = [x[:-1] for x in chianti_ions]
-            chianti_ions = sorted(list(set(chianti_ions)))
-            self.chianti_ions = chianti_ions
-
-        else:
-            self.chianti_ions = []
+        self.cmfgen_reader = cmfgen_reader
+        self._manage_priorities()
 
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
@@ -113,6 +88,45 @@ class TARDISAtomData:
             self.collisions = self._create_collisions()
 
         self.zeta_data = zeta_data
+
+    def _manage_priorities(self):
+        """ Docstring """
+
+        # Source ID's:
+        # 1: NIST
+        # 2: GFALL
+        # 3: Knox Long's zeta
+        # 4: Chianti Database
+        # 5: CMFGEN
+
+        gf_levels = self.gfall_reader.levels
+        gf_levels['source'] = 2
+        levels_ls = [gf_levels]
+
+        if self.chianti_reader is not None:
+            ch_levels = self.chianti_reader.levels
+            ch_levels['source'] = 4
+            levels_ls.append(ch_levels)
+
+        if self.cmfgen_reader is not None:
+            cf_levels = self.cmfgen_reader.levels
+            cf_levels['source'] = 5
+            levels_ls.append(cf_levels)
+
+        levels = pd.concat(levels_ls)
+        levels = levels.reset_index()
+        levels = levels.set_index(['atomic_number', 'ion_charge'])
+        
+        df_list = []
+        for ion in levels.index.unique():
+            max_priority = levels.loc[ion]['priority'].max()
+            df = levels.loc[ion][ levels.loc[ion]['priority'] == max_priority ]
+            df_list.append(df)
+
+        levels_uq = pd.concat(df_list)
+        self.gfall_ions = levels_uq[ levels_uq['source'] == 2 ].index.unique()
+        self.chianti_ions = levels_uq[ levels_uq['source'] == 4 ].index.unique()
+        self.cmfgen_ions = levels_uq[ levels_uq['source'] == 5 ].index.unique()
 
     @staticmethod
     def get_lvl_index2id(df, levels_all, ion):
