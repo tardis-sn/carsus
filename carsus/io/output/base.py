@@ -72,57 +72,26 @@ class TARDISAtomData:
         self.atomic_weights = atomic_weights
         self.ionization_energies = ionization_energies
         self.ground_levels = ionization_energies.get_ground_levels()
-
         self.gfall_reader = gfall_reader
+        self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
-        self._manage_priorities()
-
         self.levels_all = self._get_all_levels_data()
-        self.lines_all = self._get_all_lines_data()
-        self._create_levels_lines(**self.levels_lines_param)
-        self._create_macro_atom()
-        self._create_macro_atom_references()
+        #self.lines_all = self._get_all_lines_data()
+        #self._create_levels_lines(**self.levels_lines_param)
+        #self._create_macro_atom()
+        #self._create_macro_atom_references()
 
-        if chianti_reader is not None and not chianti_reader.collisions.empty:
-            self.collisions = self._create_collisions()
+        #if chianti_reader is not None and not chianti_reader.collisions.empty:
+        #    self.collisions = self._create_collisions()
 
-        self.zeta_data = zeta_data
 
-    def _manage_priorities(self):
-        """This method grabs all the levels from every available reader and 
-        looks for the source with the highest priority, one ion at a time.
+    @staticmethod
+    def manage_priorities(levels):
+        """ Docstring """
         
-        Finally, sets an attribute for every source with a list of ions that
-        have passed this "filter". The intersection of these attributes is 
-        the empty set.
-        """
+        levels = levels.set_index(['atomic_number', 'ion_number'])
 
-        # Source ID's:
-        # 1: NIST
-        # 2: GFALL
-        # 3: Knox Long's zeta
-        # 4: Chianti Database
-        # 5: CMFGEN
-
-        gf_levels = self.gfall_reader.levels
-        gf_levels['source'] = 2
-        levels_ls = [gf_levels]
-
-        if self.chianti_reader is not None:
-            ch_levels = self.chianti_reader.levels
-            ch_levels['source'] = 4
-            levels_ls.append(ch_levels)
-
-        if self.cmfgen_reader is not None:
-            cf_levels = self.cmfgen_reader.levels
-            cf_levels['source'] = 5
-            levels_ls.append(cf_levels)
-
-        levels = pd.concat(levels_ls)
-        levels = levels.reset_index()
-        levels = levels.set_index(['atomic_number', 'ion_charge'])
-        
         df_list = []
         for ion in levels.index.unique():
             max_priority = levels.loc[ion]['priority'].max()
@@ -130,16 +99,14 @@ class TARDISAtomData:
             df_list.append(df)
 
         levels_uq = pd.concat(df_list)
-        gfall_ions = levels_uq[ levels_uq['source'] == 2 ].index.unique()
-        chianti_ions = levels_uq[ levels_uq['source'] == 4 ].index.unique()
-        cmfgen_ions = levels_uq[ levels_uq['source'] == 5 ].index.unique()
+        gfall_ions = levels_uq[ levels_uq['ds_id'] == 2 ].index.unique()
+        chianti_ions = levels_uq[ levels_uq['ds_id'] == 4 ].index.unique()
+        cmfgen_ions = levels_uq[ levels_uq['ds_id'] == 5 ].index.unique()
 
         assert set(gfall_ions).intersection(set(chianti_ions))\
                                 .intersection(set(cmfgen_ions)) == set([])
 
-        self.gfall_ions = gfall_ions
-        self.chianti_ions = chianti_ions
-        self.cmfgen_ions = cmfgen_ions
+        return gfall_ions, chianti_ions, cmfgen_ions
 
     @staticmethod
     def get_lvl_index2id(df, levels_all, ion):
@@ -274,71 +241,77 @@ class TARDISAtomData:
         """ Returns the same output than `AtomData._get_all_levels_data()` 
         with `reset_index` method applied.
         """
+        ground_levels = self.ground_levels
+        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
+        ground_levels['ds_id'] = 1
 
-        gf_levels = self.gfall_reader.levels.reset_index()
-        gf_levels['source'] = 'gfall'
+        gf_levels = self.gfall_reader.levels
+        gf_levels['ds_id'] = 2
 
-        if len(self.chianti_ions) > 0:
-            logger.info('Ingesting levels from Chianti.')
-            ch_levels = self.chianti_reader.levels.reset_index()
-            ch_levels['source'] = 'chianti'
-        else:
-            ch_levels = pd.DataFrame(columns=gf_levels.columns)
+        if self.chianti_reader is not None:
+            ch_levels = self.chianti_reader.levels
+            ch_levels['ds_id'] = 4
 
-        levels = pd.concat([gf_levels, ch_levels], sort=True)
+        if self.cmfgen_reader is not None:
+            cf_levels = self.cmfgen_reader.levels
+            cf_levels['ds_id'] = 5
+
+        levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
+        levels = levels.reset_index()
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels = levels.reset_index(drop=True)
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
-        levels = levels[['atomic_number',
-                         'ion_number', 'g', 'energy', 'source']]
+        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
+                         'ds_id', 'priority']]
 
         levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
         levels['energy'] = levels['energy'].apply(
             lambda x: x.to(u.eV, equivalencies=u.spectral()))
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
-        ground_levels = self.ground_levels
-        ground_levels.rename(
-            columns={'ion_charge': 'ion_number'}, inplace=True)
-        ground_levels['source'] = 'nist'
+        # Solve priorities
+        gfall_ions, chianti_ions, cmfgen_ions = self.manage_priorities(levels)
 
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
 
         # Deliberately keep the "duplicated" Chianti levels.
-        # These levels are not strictly duplicated: same energy
-        # for different configurations. 
         # 
         # e.g. ChiantiIonReader('h_1')
+        #
+        # These levels are not strictly duplicated (same energy
+        # for different configurations).
         #
         # In fact, the following code should only remove the du-
         # plicated ground levels. Other duplicated levels should
         # be removed at the reader stage.
-        #
-        # TODO: a more clear way to get the same result could be: 
-        # "keep only zero energy levels from NIST source".
 
-        mask = (levels['source'] != 'chianti') & (
-            levels[['atomic_number', 'ion_number',
-                    'energy', 'g']].duplicated(keep='last'))	
+        mask = (levels['ds_id'] != 4) & (levels[['atomic_number', 
+                'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
-        # Keep higher priority levels over GFALL: if levels with
-        # different source than 'gfall' made to this point should
-        # be kept.
-        for ion in self.chianti_ions:
-            mask = (levels['source'] == 'gfall') & (
-                levels['atomic_number'] == ion[0]) & (
-                    levels['ion_number'] == ion[1])
-            levels.drop(levels[mask].index, inplace=True)
+        for ion in chianti_ions:
+            mask = (levels['ds_id'] != 4) & (
+                        levels['atomic_number'] == ion[0]) & (
+                            levels['ion_number'] == ion[1])
+            levels = levels.drop(levels[mask].index)
 
-        levels = levels[['atomic_number',
-                         'ion_number', 'g', 'energy', 'source']]
+        for ion in cmfgen_ions:
+            mask = (levels['ds_id'] != 5) & (
+                        levels['atomic_number'] == ion[0]) & (
+                            levels['ion_number'] == ion[1])
+            levels = levels.drop(levels[mask].index)
 
+        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
+                         'ds_id']]
         levels = levels.reset_index()
+
+        self.gfall_ions = gfall_ions
+        self.chianti_ions = chianti_ions
+        self.cmfgen_ions = cmfgen_ions
 
         return levels
 
@@ -372,7 +345,7 @@ class TARDISAtomData:
                 continue
 
             df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['source'] = 'gfall'
+            df['ds_id'] = 'gfall'
             gf_list.append(df)
 
         ch_list = []
@@ -384,7 +357,7 @@ class TARDISAtomData:
             start = len(df) + start
 
             df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['source'] = 'chianti'
+            df['ds_id'] = 'chianti'
             ch_list.append(df)
 
         df_list = gf_list + ch_list
@@ -402,8 +375,8 @@ class TARDISAtomData:
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
         air_mask = lines['medium'] == MEDIUM_AIR
-        gfall_mask = lines['source'] == 'gfall'
-        chianti_mask = lines['source'] == 'chianti'
+        gfall_mask = lines['ds_id'] == 'gfall'
+        chianti_mask = lines['ds_id'] == 'chianti'
 
         lines.loc[gfall_mask, 'wavelength'] = lines.loc[
             gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
@@ -420,7 +393,7 @@ class TARDISAtomData:
 
         lines.drop(columns=['medium'], inplace=True)
         lines = lines[['lower_level_id', 'upper_level_id',
-                       'wavelength', 'gf', 'loggf', 'source']]
+                       'wavelength', 'gf', 'loggf', 'ds_id']]
 
         return lines
 
@@ -531,7 +504,7 @@ class TARDISAtomData:
             ch_list.append(df)
 
         collisions = pd.concat(ch_list, sort=True)
-        collisions['source'] = 'chianti'
+        collisions['ds_id'] = 'chianti'
 
         # Keep this value to compare against SQL
         collisions['ds_id'] = 4
