@@ -77,13 +77,13 @@ class TARDISAtomData:
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
         self.levels_all = self._get_all_levels_data()
-        #self.lines_all = self._get_all_lines_data()
-        #self._create_levels_lines(**self.levels_lines_param)
-        #self._create_macro_atom()
-        #self._create_macro_atom_references()
+        self.lines_all = self._get_all_lines_data()
+        self._create_levels_lines(**self.levels_lines_param)
+        self._create_macro_atom()
+        self._create_macro_atom_references()
 
-        #if chianti_reader is not None and not chianti_reader.collisions.empty:
-        #    self.collisions = self._create_collisions()
+        if chianti_reader is not None and not chianti_reader.collisions.empty:
+            self.collisions = self._create_collisions()
 
 
     @staticmethod
@@ -319,20 +319,25 @@ class TARDISAtomData:
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
 
-        gf = self.gfall_reader
-        ch = self.chianti_reader
+        gf_lines = self.gfall_reader.lines
+
+        if self.chianti_reader is not None:
+            ch_lines = self.chianti_reader.lines
+        
+        if self.cmfgen_reader is not None:
+            cf_lines = self.cmfgen_reader.lines
 
         start = 1
         gf_list = []
         logger.info('Ingesting lines from GFALL.')
-        for ion in self.gfall_ions:
+        for ion in self.gfall_reader.levels.droplevel(2).index.unique():
 
             try:
-                df = gf.lines.loc[ion]
+                df = gf_lines.loc[ion]
 
                 # To match `line_id` field with the old API we keep
                 # track of how many GFALL lines we are skipping.
-                if ion in self.chianti_ions:
+                if ion in set(self.chianti_ions).union(set(self.cmfgen_ions)):
                     df['line_id'] = range(start, len(df) + start)
                     start += len(df)
                     continue
@@ -345,25 +350,37 @@ class TARDISAtomData:
                 continue
 
             df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['ds_id'] = 'gfall'
+            df['ds_id'] = 2
             gf_list.append(df)
 
         ch_list = []
         logger.info('Ingesting lines from Chianti.')
         for ion in self.chianti_ions:
 
-            df = ch.lines.loc[ion]
+            df = ch_lines.loc[ion]
             df['line_id'] = range(start, len(df) + start)
             start = len(df) + start
 
             df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['ds_id'] = 'chianti'
+            df['ds_id'] = 4
             ch_list.append(df)
 
-        df_list = gf_list + ch_list
-        lines = pd.concat(df_list, sort=True)
-        lines['loggf'] = lines['gf'].apply(np.log10)
+        cf_list = []
+        logger.info('Ingesting lines from CMFGEN.')
+        for ion in self.cmfgen_ions:
 
+            df = cf_lines.loc[ion]
+            df['line_id'] = range(start, len(df) + start)
+            start = len(df) + start
+
+            df = self.get_lvl_index2id(df, self.levels_all, ion)
+            df['ds_id'] = 5
+            cf_list.append(df)
+
+        df_list = gf_list + ch_list + cf_list
+        lines = pd.concat(df_list, sort=True)
+
+        lines['loggf'] = lines['gf'].apply(np.log10)
         lines.set_index('line_id', inplace=True)
         lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
                             'j_lower', 'level_index_lower',
@@ -375,15 +392,21 @@ class TARDISAtomData:
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
         air_mask = lines['medium'] == MEDIUM_AIR
-        gfall_mask = lines['ds_id'] == 'gfall'
-        chianti_mask = lines['ds_id'] == 'chianti'
+        gfall_mask = lines['ds_id'] == 2
+        chianti_mask = lines['ds_id'] == 4
+        cmfgen_mask = lines['ds_id'] == 5
 
+        # TODO: manage units consistently across all readers
         lines.loc[gfall_mask, 'wavelength'] = lines.loc[
             gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
+
         lines.loc[chianti_mask, 'wavelength'] = lines.loc[
             chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
-        lines['wavelength'] = lines['wavelength'].apply(
-            lambda x: x.to('angstrom'))
+
+        lines.loc[cmfgen_mask, 'wavelength'] = lines.loc[
+            cmfgen_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
+
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
         # Why not for Chianti?
@@ -494,12 +517,12 @@ class TARDISAtomData:
         levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
 
         ch_list = []
-        ch = self.chianti_reader
+        ch_collisions = self.chianti_reader.collisions
 
         logger.info('Ingesting collisions from Chianti')
         for ion in self.chianti_ions:
 
-            df = ch.collisions.loc[ion]
+            df = ch_collisions.loc[ion]
             df = self.get_lvl_index2id(df, self.levels_all, ion)
             ch_list.append(df)
 
