@@ -251,10 +251,14 @@ class TARDISAtomData:
         if self.chianti_reader is not None:
             ch_levels = self.chianti_reader.levels
             ch_levels['ds_id'] = 4
+        else:
+            ch_levels = pd.DataFrame(columns=gf_levels.columns)
 
         if self.cmfgen_reader is not None:
             cf_levels = self.cmfgen_reader.levels
             cf_levels['ds_id'] = 5
+        else:
+            cf_levels = pd.DataFrame(columns=gf_levels.columns)
 
         levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
         levels = levels.reset_index()
@@ -330,8 +334,9 @@ class TARDISAtomData:
         start = 1
         gf_list = []
         logger.info('Ingesting lines from GFALL.')
-        for ion in self.gfall_reader.levels.droplevel(2).index.unique():
 
+        gfall_ions_all = self.gfall_reader.levels.droplevel(2).index.unique()
+        for ion in gfall_ions_all:
             try:
                 df = gf_lines.loc[ion]
 
