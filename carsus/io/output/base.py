@@ -529,9 +529,6 @@ class TARDISAtomData:
             ch_list.append(df)
 
         collisions = pd.concat(ch_list, sort=True)
-        collisions['ds_id'] = 'chianti'
-
-        # Keep this value to compare against SQL
         collisions['ds_id'] = 4
 
         # `e_col_id` number starts after the last line id
