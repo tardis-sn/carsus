@@ -275,8 +275,8 @@ class TARDISAtomData:
             lambda x: x.to(u.eV, equivalencies=u.spectral()))
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
-        # Solve priorities
-        gfall_ions, chianti_ions, cmfgen_ions = self.manage_priorities(levels)
+        # Solve priorities and set attributes for later use.
+        self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.manage_priorities(levels)
 
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
@@ -297,13 +297,13 @@ class TARDISAtomData:
                 'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
-        for ion in chianti_ions:
+        for ion in self.chianti_ions:
             mask = (levels['ds_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
                             levels['ion_number'] == ion[1])
             levels = levels.drop(levels[mask].index)
 
-        for ion in cmfgen_ions:
+        for ion in self.cmfgen_ions:
             mask = (levels['ds_id'] != 5) & (
                         levels['atomic_number'] == ion[0]) & (
                             levels['ion_number'] == ion[1])
@@ -313,16 +313,12 @@ class TARDISAtomData:
                          'ds_id']]
         levels = levels.reset_index()
 
-        self.gfall_ions = gfall_ions
-        self.chianti_ions = chianti_ions
-        self.cmfgen_ions = cmfgen_ions
-
         return levels
 
 
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()` """
-
+        gf_levels = self.gfall_reader.levels
         gf_lines = self.gfall_reader.lines
 
         if self.chianti_reader is not None:
@@ -335,7 +331,7 @@ class TARDISAtomData:
         gf_list = []
         logger.info('Ingesting lines from GFALL.')
 
-        gfall_ions_all = self.gfall_reader.levels.droplevel(2).index.unique()
+        gfall_ions_all = gf_levels.droplevel(2).index.unique()
         for ion in gfall_ions_all:
             try:
                 df = gf_lines.loc[ion]
