@@ -35,6 +35,7 @@ class TARDISAtomData:
     collisions_prepared: pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
+    
 
     Methods
     -------
@@ -569,7 +570,7 @@ class TARDISAtomData:
                                  'level_number_lower', 'g_l',
                                  'energy_lower', 'level_number_upper', 
                                  'g_u', 'energy_upper', 'delta_e', 
-                                    'g_ratio']]
+                                 'g_ratio']]
 
         collisional_ul_factors = collisions.apply(self.calculate_collisional_strength, 
                                                   axis=1, args=(temperatures, kb_ev, 
@@ -693,19 +694,24 @@ class TARDISAtomData:
             e_lower, e_upper = row["energy_lower"], row["energy_upper"]
 
             transition_probabilities_dict = dict()
+            
             transition_probabilities_dict[P_EMISSION_DOWN] = 2 * \
                 nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
+
             transition_probabilities_dict[P_INTERNAL_DOWN] = 2 * \
                 nu**2 * f_ul / const.c.cgs.value**2 * e_lower
+
             transition_probabilities_dict[P_INTERNAL_UP] = f_lu * \
                 e_lower / (const.h.cgs.value * nu)
 
             macro_atom.append((atomic_number, ion_number, level_number_upper,
                                level_number_lower, line_id, P_EMISSION_DOWN,
                                transition_probabilities_dict[P_EMISSION_DOWN]))
+
             macro_atom.append((atomic_number, ion_number, level_number_upper,
                                level_number_lower, line_id, P_INTERNAL_DOWN,
                                transition_probabilities_dict[P_INTERNAL_DOWN]))
+
             macro_atom.append((atomic_number, ion_number, level_number_lower,
                                level_number_upper, line_id, P_INTERNAL_UP,
                                transition_probabilities_dict[P_INTERNAL_UP]))
@@ -817,12 +823,16 @@ class TARDISAtomData:
             f.put('/zeta_data', self.zeta_data.base)
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
-            f.put('/collision_data', self.collisions_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
-            f.put('collision_data_temperatures', 
-                   pd.Series(self.collisions_param['temperatures']))
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
+
+            try:
+                f.put('/collision_data', self.collisions_prepared)
+                f.put('collision_data_temperatures', 
+                      pd.Series(self.collisions_param['temperatures']))
+            except AttributeError:
+                pass
 
             meta = []
             md5_hash = hashlib.md5()
