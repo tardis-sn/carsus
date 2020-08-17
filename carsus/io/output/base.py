@@ -89,8 +89,7 @@ class TARDISAtomData:
 
 
     @staticmethod
-    def manage_priorities(levels):
-        """ Docstring """
+    def manage_priorities(levels):     
         levels = levels.set_index(['atomic_number', 'ion_number'])
 
         df_list = []
@@ -137,9 +136,7 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_artificial_fully_ionized(levels):
-        """ Create artificial levels for fully ionized ions. """
-
-        fully_ionized_levels = list()
+        fully_ionized_levels = []
 
         for atomic_number, _ in levels.groupby("atomic_number"):
             fully_ionized_levels.append(
@@ -190,7 +187,7 @@ class TARDISAtomData:
             const.c.cgs.value ** 2 * lines['f_ul']
 
     @staticmethod
-    def calculate_collisional_strength(row, temperatures, 
+    def _calculate_collisional_strength(row, temperatures, 
                                        kb_ev, c_ul_temperature_cols):
         """
         Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38).
@@ -240,8 +237,9 @@ class TARDISAtomData:
 
     def _get_all_levels_data(self):
         """ Returns the same output than `AtomData._get_all_levels_data()` 
-        with `reset_index` method applied.
+        with `level_id` as index.
         """
+
         gf_levels = self.gfall_reader.levels
         gf_levels['ds_id'] = 2
 
@@ -320,6 +318,7 @@ class TARDISAtomData:
 
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()`. """
+
         gf_lines = self.gfall_reader.lines
         gf_lines['ds_id'] = 2
 
@@ -550,7 +549,7 @@ class TARDISAtomData:
                                  'g_u', 'energy_upper', 'delta_e', 
                                  'g_ratio']]
 
-        collisional_ul_factors = collisions.apply(self.calculate_collisional_strength, 
+        collisional_ul_factors = collisions.apply(self._calculate_collisional_strength, 
                                                   axis=1, args=(temperatures, kb_ev, 
                                                                 c_ul_temperature_cols))
 
