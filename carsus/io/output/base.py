@@ -279,7 +279,6 @@ class TARDISAtomData:
 
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
-        levels = levels.set_index('level_id')
 
         # Deliberately keep the "duplicated" Chianti levels.
         # 
@@ -309,9 +308,8 @@ class TARDISAtomData:
                             levels['ion_number'] == ion[1])
             levels = levels.drop(levels[mask].index)
 
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
-                         'ds_id']]
-        levels = levels.reset_index()
+        levels = levels[['level_id', 'atomic_number', 'ion_number', 'g',
+                         'energy', 'ds_id']]
 
         return levels
 
@@ -353,6 +351,7 @@ class TARDISAtomData:
 
         lines = lines.set_index(['atomic_number', 'ion_number'])
 
+        # TODO: this extremely complicated for nothing. Re-write `get_lvl_index2id`.
         df_list = []
         for ion in self.gfall_ions:
             df = lines.loc[ion]
