@@ -89,7 +89,8 @@ class TARDISAtomData:
 
 
     @staticmethod
-    def manage_priorities(levels):     
+    def resolve_priorities(levels):     
+        logger.info('Resolving priorities.')
         levels = levels.set_index(['atomic_number', 'ion_number'])
 
         df_list = []
@@ -105,6 +106,14 @@ class TARDISAtomData:
 
         assert set(gfall_ions).intersection(set(chianti_ions))\
                                 .intersection(set(cmfgen_ions)) == set([])
+
+        logger.info(f'Selected species from GFALL: {sorted(gfall_ions)}')
+        
+        if len(chianti_ions) > 0:
+            logger.info(f'Selected species from Chianti: {sorted(chianti_ions)}')
+        
+        if len(cmfgen_ions) > 0: 
+            logger.info(f'Selected species from CMFGEN: {sorted(cmfgen_ions)}')
 
         return gfall_ions, chianti_ions, cmfgen_ions
 
@@ -245,15 +254,18 @@ class TARDISAtomData:
         """
 
         gf_levels = self.gfall_reader.levels
+        logger.info('Ingesting levels from GFALL.')
         gf_levels['ds_id'] = 2
 
         if self.chianti_reader is not None:
+            logger.info('Ingesting levels from Chianti.')
             ch_levels = self.chianti_reader.levels
             ch_levels['ds_id'] = 4
         else:
             ch_levels = pd.DataFrame(columns=gf_levels.columns)
 
         if self.cmfgen_reader is not None:
+            logger.info('Ingesting levels from CMFGEN.')
             cf_levels = self.cmfgen_reader.levels
             cf_levels['ds_id'] = 5
         else:
@@ -274,7 +286,7 @@ class TARDISAtomData:
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
         # Solve priorities and set attributes for later use.
-        self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.manage_priorities(levels)
+        self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.resolve_priorities(levels)
 
         ground_levels = self.ground_levels
         ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
@@ -300,6 +312,7 @@ class TARDISAtomData:
         levels = levels[~mask]
 
         # TODO: rewrite these filters
+        logger.info('Filtering levels by priority.')
         for ion in self.chianti_ions:
             mask = (levels['ds_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
@@ -322,16 +335,19 @@ class TARDISAtomData:
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()`. """
 
+        logger.info('Ingesting lines from GFALL.')
         gf_lines = self.gfall_reader.lines
         gf_lines['ds_id'] = 2
 
         if self.chianti_reader is not None:
+            logger.info('Ingesting lines from Chianti.')
             ch_lines = self.chianti_reader.lines
             ch_lines['ds_id'] = 4
         else:
             ch_lines = pd.DataFrame(columns=gf_lines.columns)
 
         if self.cmfgen_reader is not None:
+            logger.info('Ingesting lines from CMFGEN.')
             cf_lines = self.cmfgen_reader.lines
             cf_lines['ds_id'] = 5
         else:
@@ -342,6 +358,7 @@ class TARDISAtomData:
         lines = lines.rename(columns={'ion_charge': 'ion_number'})
         lines['line_id'] = range(1, len(lines)+1)
 
+        logger.info('Filtering lines by priority.')
         for ion in self.chianti_ions:
             mask = (lines['ds_id'] != 4) & (
                         lines['atomic_number'] == ion[0]) & (
@@ -505,9 +522,9 @@ class TARDISAtomData:
         levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
 
         ch_list = []
+        logger.info('Ingesting collisions from Chianti.')
         ch_collisions = self.chianti_reader.collisions
 
-        logger.info('Ingesting collisions from Chianti')
         for ion in self.chianti_ions:
 
             df = ch_collisions.loc[ion]

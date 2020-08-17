@@ -136,7 +136,7 @@ class GFALLReader(object):
         if fname is None:
             fname = self.fname
 
-        logger.info(f'Parsing GFALL: {fname}')
+        logger.info(f'Parsing GFALL from: {fname}')
 
         # FORMAT(F11.4,F7.3,F6.2,F12.3,F5.2,1X,A10,F12.3,F5.2,1X,A10,
         # 3F6.2,A4,2I2,I3,F6.3,I3,F6.3,2I5,1X,A1,A1,1X,A1,A1,i1,A3,2I5,I6)
