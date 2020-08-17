@@ -146,6 +146,7 @@ class TARDISAtomData:
         levels_columns = ["level_id", "atomic_number",
                           "ion_number", "level_number",
                           "energy", "g", "metastable"]
+
         fully_ionized_levels_dtypes = [
             (key, levels.dtypes[key]) for key in levels_columns]
 
@@ -179,10 +180,13 @@ class TARDISAtomData:
     def _create_einstein_coeff(lines):
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
+
         lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
             (const.h.cgs.value * lines['nu'])
+
         lines['B_ul'] = einstein_coeff * lines['f_ul'] / \
             (const.h.cgs.value * lines['nu'])
+
         lines['A_ul'] = 2 * einstein_coeff * lines['nu'] ** 2 / \
             const.c.cgs.value ** 2 * lines['f_ul']
 
@@ -650,6 +654,7 @@ class TARDISAtomData:
 
         lvl_energy_lower = levels.rename(
             columns={"energy": "energy_lower"}).loc[:, ["energy_lower"]]
+
         lvl_energy_upper = levels.rename(
             columns={"energy": "energy_upper"}).loc[:, ["energy_upper"]]
 
@@ -761,8 +766,10 @@ class TARDISAtomData:
 
         macro_atom_references["count_down"] = \
             macro_atom_references["count_down"].astype(np.int)
+
         macro_atom_references["count_up"] = \
             macro_atom_references["count_up"].astype(np.int)
+
         macro_atom_references["count_total"] = \
             macro_atom_references["count_total"].astype(np.int)
 
