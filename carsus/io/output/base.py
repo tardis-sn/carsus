@@ -362,6 +362,10 @@ class TARDISAtomData:
             df = lines.loc[ion]
             df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
 
+        for ion in self.cmfgen_ions:
+            df = lines.loc[ion]
+            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
+
         lines = pd.concat(df_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 
