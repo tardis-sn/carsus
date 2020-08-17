@@ -256,11 +256,10 @@ class TARDISAtomData:
             cf_levels = pd.DataFrame(columns=gf_levels.columns)
 
         levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
-        levels = levels.reset_index()
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
-        levels = levels.reset_index(drop=True)
+        levels = levels.reset_index()
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
                          'ds_id', 'priority']]
