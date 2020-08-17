@@ -512,6 +512,7 @@ class TARDISAtomData:
             ch_list.append(df)
 
         collisions = pd.concat(ch_list, sort=True)
+        collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
         collisions['ds_id'] = 4
 
         # `e_col_id` number starts after the last line id
