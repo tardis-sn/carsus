@@ -242,10 +242,6 @@ class TARDISAtomData:
         """ Returns the same output than `AtomData._get_all_levels_data()` 
         with `reset_index` method applied.
         """
-        ground_levels = self.ground_levels
-        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
-        ground_levels['ds_id'] = 1
-
         gf_levels = self.gfall_reader.levels
         gf_levels['ds_id'] = 2
 
@@ -279,6 +275,10 @@ class TARDISAtomData:
         # Solve priorities and set attributes for later use.
         self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.manage_priorities(levels)
 
+        ground_levels = self.ground_levels
+        ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
+        ground_levels['ds_id'] = 1
+
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
@@ -298,6 +298,7 @@ class TARDISAtomData:
                 'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
+        # TODO: rewrite these filters
         for ion in self.chianti_ions:
             mask = (levels['ds_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
@@ -318,72 +319,54 @@ class TARDISAtomData:
 
 
     def _get_all_lines_data(self):
-        """ Returns the same output than `AtomData._get_all_lines_data()` """
-        gf_levels = self.gfall_reader.levels
+        """ Returns the same output than `AtomData._get_all_lines_data()`. """
         gf_lines = self.gfall_reader.lines
+        gf_lines['ds_id'] = 2
 
         if self.chianti_reader is not None:
             ch_lines = self.chianti_reader.lines
-        
+            ch_lines['ds_id'] = 4
+        else:
+            ch_lines = pd.DataFrame(columns=gf_lines.columns)
+
         if self.cmfgen_reader is not None:
             cf_lines = self.cmfgen_reader.lines
+            cf_lines['ds_id'] = 5
+        else:
+            cf_lines = pd.DataFrame(columns=gf_lines.columns)
 
-        start = 1
-        gf_list = []
-        logger.info('Ingesting lines from GFALL.')
+        lines = pd.concat([gf_lines, ch_lines, cf_lines], sort=True)
+        lines = lines.reset_index()
+        lines = lines.rename(columns={'ion_charge': 'ion_number'})
+        lines['line_id'] = range(1, len(lines)+1)
 
-        gfall_ions_all = gf_levels.droplevel(2).index.unique()
-        for ion in gfall_ions_all:
-            try:
-                df = gf_lines.loc[ion]
-
-                # To match `line_id` field with the old API we keep
-                # track of how many GFALL lines we are skipping.
-                if ion in set(self.chianti_ions).union(set(self.cmfgen_ions)):
-                    df['line_id'] = range(start, len(df) + start)
-                    start += len(df)
-                    continue
-
-                else:
-                    df['line_id'] = range(start, len(df) + start)
-                    start += len(df)
-
-            except (KeyError, TypeError):
-                continue
-
-            df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['ds_id'] = 2
-            gf_list.append(df)
-
-        ch_list = []
-        logger.info('Ingesting lines from Chianti.')
         for ion in self.chianti_ions:
+            mask = (lines['ds_id'] != 4) & (
+                        lines['atomic_number'] == ion[0]) & (
+                            lines['ion_number'] == ion[1])
+            lines = lines.drop(lines[mask].index)
 
-            df = ch_lines.loc[ion]
-            df['line_id'] = range(start, len(df) + start)
-            start = len(df) + start
-
-            df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['ds_id'] = 4
-            ch_list.append(df)
-
-        cf_list = []
-        logger.info('Ingesting lines from CMFGEN.')
         for ion in self.cmfgen_ions:
+            mask = (lines['ds_id'] != 5) & (
+                        lines['atomic_number'] == ion[0]) & (
+                            lines['ion_number'] == ion[1])
+            lines = lines.drop(lines[mask].index)
 
-            df = cf_lines.loc[ion]
-            df['line_id'] = range(start, len(df) + start)
-            start = len(df) + start
+        lines = lines.set_index(['atomic_number', 'ion_number'])
 
-            df = self.get_lvl_index2id(df, self.levels_all, ion)
-            df['ds_id'] = 5
-            cf_list.append(df)
+        df_list = []
+        for ion in self.gfall_ions:
+            df = lines.loc[ion]
+            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
 
-        df_list = gf_list + ch_list + cf_list
+        for ion in self.chianti_ions:
+            df = lines.loc[ion]
+            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
+
         lines = pd.concat(df_list, sort=True)
+        lines = lines.set_index('line_id').sort_index()
 
         lines['loggf'] = lines['gf'].apply(np.log10)
-        lines.set_index('line_id', inplace=True)
         lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
                             'j_lower', 'level_index_lower',
                             'level_index_upper'], inplace=True)
@@ -393,7 +376,6 @@ class TARDISAtomData:
         lines.loc[lines['wavelength'] >
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
-        air_mask = lines['medium'] == MEDIUM_AIR
         gfall_mask = lines['ds_id'] == 2
         chianti_mask = lines['ds_id'] == 4
         cmfgen_mask = lines['ds_id'] == 5
@@ -412,6 +394,7 @@ class TARDISAtomData:
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
         # Why not for Chianti?
+        air_mask = lines['medium'] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask,
                   'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
@@ -468,8 +451,8 @@ class TARDISAtomData:
             transform(lambda x: np.arange(len(x))).values
         levels["level_number"] = levels["level_number"].astype(np.int)
 
-        levels = levels[['atomic_number', 'energy', 'g', 'ion_number',
-                         'level_number', 'metastable']]
+        levels = levels[['atomic_number', 'ion_number', 'g', 'energy',
+                         'metastable', 'level_number']]
 
         # Join atomic_number, ion_number, level_number_lower,
         # level_number_upper on lines
