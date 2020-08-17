@@ -77,20 +77,20 @@ class TARDISAtomData:
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
+
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
-        self._create_levels_lines(**self.levels_lines_param)
-        self._create_macro_atom()
-        self._create_macro_atom_references()
+        self.levels, self.lines = self.create_levels_lines(**self.levels_lines_param)
+        self.create_macro_atom()
+        self.create_macro_atom_references()
 
         if chianti_reader is not None and not chianti_reader.collisions.empty:
-            self.collisions = self._create_collisions()
+            self.collisions = self.create_collisions()
 
 
     @staticmethod
     def manage_priorities(levels):
         """ Docstring """
-        
         levels = levels.set_index(['atomic_number', 'ion_number'])
 
         df_list = []
@@ -405,17 +405,15 @@ class TARDISAtomData:
 
         return lines
 
-    def _create_levels_lines(self, lines_loggf_threshold=-3,
+    def create_levels_lines(self, lines_loggf_threshold=-3,
                              levels_metastable_loggf_threshold=-3):
-        """ Returns almost the same output than`AtomData.create_levels_lines` method """
+        """ Returns the same output than `AtomData.create_levels_lines` method. """
 
-        levels_all = self.levels_all
-        lines_all = self.lines_all
         ionization_energies = self.ionization_energies.base.reset_index()
         ionization_energies['ion_number'] -= 1
 
         # Culling autoionization levels
-        levels_w_ionization_energies = pd.merge(levels_all,
+        levels_w_ionization_energies = pd.merge(self.levels_all,
                                                 ionization_energies,
                                                 how='left',
                                                 on=["atomic_number",
@@ -428,8 +426,8 @@ class TARDISAtomData:
         levels = levels.drop(columns='ionization_energy')
 
         # Clean lines
-        lines = lines_all.join(pd.DataFrame(index=levels.index),
-                               on="lower_level_id", how="inner").\
+        lines = self.lines_all.join(pd.DataFrame(index=levels.index),
+                                    on="lower_level_id", how="inner").\
             join(pd.DataFrame(index=levels.index),
                  on="upper_level_id", how="inner")
 
@@ -440,7 +438,7 @@ class TARDISAtomData:
 
         # Create the metastable flags for levels
         levels["metastable"] = \
-            self._create_metastable_flags(levels, lines_all,
+            self._create_metastable_flags(levels, self.lines_all,
                                           levels_metastable_loggf_threshold)
 
         # Create levels numbers
@@ -452,7 +450,7 @@ class TARDISAtomData:
         levels["level_number"] = levels["level_number"].astype(np.int)
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy',
-                         'metastable', 'level_number']]
+                         'metastable', 'level_number', 'ds_id']]
 
         # Join atomic_number, ion_number, level_number_lower,
         # level_number_upper on lines
@@ -494,10 +492,9 @@ class TARDISAtomData:
         levels = levels.sort_values(
             ["atomic_number", "ion_number", "level_number"])
 
-        self.lines = lines
-        self.levels = levels
+        return levels, lines
 
-    def _create_collisions(self):
+    def create_collisions(self):
         # Exclude artificially created levels from levels
         levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
 
@@ -632,7 +629,7 @@ class TARDISAtomData:
 
         return collisions_prepared
 
-    def _create_macro_atom(self):
+    def create_macro_atom(self):
         """
         Create a DataFrame containing macro atom data.
 
@@ -732,7 +729,7 @@ class TARDISAtomData:
 
         return macro_atom_prepared
 
-    def _create_macro_atom_references(self):
+    def create_macro_atom_references(self):
         """
         Create a DataFrame containing macro atom reference data.
     
