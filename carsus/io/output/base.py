@@ -98,7 +98,7 @@ class TARDISAtomData:
             df = levels.loc[ion][ levels.loc[ion]['priority'] == max_priority ]
             df_list.append(df)
 
-        levels_uq = pd.concat(df_list)
+        levels_uq = pd.concat(df_list, sort=True)
         gfall_ions = levels_uq[ levels_uq['ds_id'] == 2 ].index.unique()
         chianti_ions = levels_uq[ levels_uq['ds_id'] == 4 ].index.unique()
         cmfgen_ions = levels_uq[ levels_uq['ds_id'] == 5 ].index.unique()
