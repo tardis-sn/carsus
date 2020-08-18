@@ -194,7 +194,7 @@ class TARDISAtomData:
 
     @staticmethod
     def _calculate_collisional_strength(row, temperatures, 
-                                       kb_ev, c_ul_temperature_cols):
+                                        kb_ev, c_ul_temperature_cols):
         """
         Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38).
         """
@@ -292,6 +292,7 @@ class TARDISAtomData:
             cmfgen_str = ', '.join(to_string(self.cmfgen_ions))
             logger.info(f'CMFGEN selected species: {cmfgen_str}.')
 
+        # Concatenate ground levels from NIST
         ground_levels = self.ground_levels
         ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
         ground_levels['ds_id'] = 1
@@ -315,7 +316,6 @@ class TARDISAtomData:
                 'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
-        # TODO: rewrite these filters
         for ion in self.chianti_ions:
             mask = (levels['ds_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
@@ -372,7 +372,7 @@ class TARDISAtomData:
 
         lines = lines.set_index(['atomic_number', 'ion_number'])
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
-                        .union((set(self.gfall_ions)))
+                    .union((set(self.gfall_ions)))
 
         df_list = []
         for ion in ions:
@@ -519,7 +519,6 @@ class TARDISAtomData:
         ch_collisions = self.chianti_reader.collisions
 
         for ion in self.chianti_ions:
-
             df = ch_collisions.loc[ion]
             df = self.get_lvl_index2id(df, self.levels_all, ion)
             ch_list.append(df)
