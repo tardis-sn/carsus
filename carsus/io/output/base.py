@@ -371,17 +371,11 @@ class TARDISAtomData:
             lines = lines.drop(lines[mask].index)
 
         lines = lines.set_index(['atomic_number', 'ion_number'])
+        ions = set(self.gfall_ions).union(set(self.chianti_ions))\
+                        .union((set(self.gfall_ions)))
 
         df_list = []
-        for ion in self.gfall_ions:
-            df = lines.loc[ion]
-            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
-
-        for ion in self.chianti_ions:
-            df = lines.loc[ion]
-            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
-
-        for ion in self.cmfgen_ions:
+        for ion in ions:
             df = lines.loc[ion]
             df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
 
