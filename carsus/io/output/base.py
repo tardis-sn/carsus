@@ -94,13 +94,13 @@ class TARDISAtomData:
     def solve_priorities(levels):     
         levels = levels.set_index(['atomic_number', 'ion_number'])
 
-        df_list = []
+        lvl_list = []
         for ion in levels.index.unique():
             max_priority = levels.loc[ion]['priority'].max()
-            df = levels.loc[ion][ levels.loc[ion]['priority'] == max_priority ]
-            df_list.append(df)
+            lvl = levels.loc[ion][ levels.loc[ion]['priority'] == max_priority ]
+            lvl_list.append(lvl)
 
-        levels_uq = pd.concat(df_list, sort=True)
+        levels_uq = pd.concat(lvl_list, sort=True)
         gfall_ions = levels_uq[ levels_uq['ds_id'] == 2 ].index.unique()
         chianti_ions = levels_uq[ levels_uq['ds_id'] == 4 ].index.unique()
         cmfgen_ions = levels_uq[ levels_uq['ds_id'] == 5 ].index.unique()
@@ -316,6 +316,7 @@ class TARDISAtomData:
                 'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
+        # Filter levels by priority
         for ion in self.chianti_ions:
             mask = (levels['ds_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
@@ -358,6 +359,7 @@ class TARDISAtomData:
         lines = lines.rename(columns={'ion_charge': 'ion_number'})
         lines['line_id'] = range(1, len(lines)+1)
 
+        # Filter lines by priority
         for ion in self.chianti_ions:
             mask = (lines['ds_id'] != 4) & (
                         lines['atomic_number'] == ion[0]) & (
@@ -374,12 +376,12 @@ class TARDISAtomData:
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
                     .union((set(self.gfall_ions)))
 
-        df_list = []
+        lns_list = []
         for ion in ions:
-            df = lines.loc[ion]
-            df_list.append(self.get_lvl_index2id(df, self.levels_all, ion))
+            lns = lines.loc[ion]
+            lns_list.append(self.get_lvl_index2id(lns, self.levels_all, ion))
 
-        lines = pd.concat(df_list, sort=True)
+        lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 
         lines['loggf'] = lines['gf'].apply(np.log10)
