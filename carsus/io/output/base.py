@@ -85,8 +85,8 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        #if chianti_reader is not None and not chianti_reader.collisions.empty:
-        #    self.collisions = self.create_collisions()
+        if chianti_reader is not None and not chianti_reader.collisions.empty:
+            self.collisions = self.create_collisions()
 
         logger.info('Finished.')
 
@@ -511,30 +511,37 @@ class TARDISAtomData:
 
     def create_collisions(self):
 
-        # Exclude artificially created levels from levels
-        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
-
-        ch_list = []
         ch_collisions = self.chianti_reader.collisions
+        ch_collisions['ds_id'] = 4
 
-        for ion in self.chianti_ions:
-            df = ch_collisions.loc[ion]
-            df = self.get_lvl_index2id(df, self.levels_all, ion)
-            ch_list.append(df)
+        # Not really needed because we have only one source of collisions
+        collisions = pd.concat([ch_collisions], sort=True)
+        ions = self.chianti_ions
 
-        collisions = pd.concat(ch_list, sort=True)
+        collisions = collisions.reset_index()
+        collisions = collisions.rename(columns={'ion_charge': 'ion_number'})
+        collisions = collisions.set_index(['atomic_number', 'ion_number'])
+
+        col_list = [ self.get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions]
+        collisions = pd.concat(col_list, sort=True)
         collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
-        collisions['ds_id'] = 4
 
         # `e_col_id` number starts after the last line id
         start = self.lines_all.index[-1] + 1
         collisions['e_col_id'] = range(start, start + len(collisions))
-        collisions = collisions.reset_index()
+
+        # Exclude artificially created levels from levels
+        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
 
         # Join atomic_number, ion_number, level_number_lower, level_number_upper
-        lower_levels = levels.rename(columns={"level_number": "level_number_lower", "g": "g_l", "energy": "energy_lower"}). \
-                              loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
-        upper_levels = levels.rename(columns={"level_number": "level_number_upper", "g": "g_u", "energy": "energy_upper"}). \
+        collisions = collisions.set_index(['atomic_number', 'ion_number'])
+        lower_levels = levels.rename(columns={"level_number": "level_number_lower", 
+                                              "g": "g_l", "energy": "energy_lower"}). \
+                              loc[:, ["atomic_number", "ion_number", "level_number_lower",
+                                      "g_l", "energy_lower"]]
+
+        upper_levels = levels.rename(columns={"level_number": "level_number_upper",
+                                              "g": "g_u", "energy": "energy_upper"}). \
                               loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
         collisions = collisions.join(lower_levels, on="lower_level_id").join(
@@ -552,9 +559,9 @@ class TARDISAtomData:
         # Derive columns for collisional strengths
         c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
 
-        collisions = collisions.rename(columns={'ion_charge': 'ion_number',
-                                                'temperatures': 'btemp',
+        collisions = collisions.rename(columns={'temperatures': 'btemp',
                                                 'collision_strengths': 'bscups'})
+
         collisions = collisions[['e_col_id', 'lower_level_id',
                                  'upper_level_id', 'ds_id',
                                  'btemp', 'bscups', 'ttype', 'cups',
