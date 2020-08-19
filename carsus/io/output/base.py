@@ -113,8 +113,9 @@ class TARDISAtomData:
     @staticmethod
     def get_lvl_index2id(df, levels_all):
         # TODO: re-write this method without a for loop
+        ion = df.index.unique()
         lvl_index2id = levels_all.set_index(
-                            ['atomic_number', 'ion_number']).loc[df.index]
+                            ['atomic_number', 'ion_number']).loc[ion]
         lvl_index2id = lvl_index2id.reset_index()
 
         lower_level_id = []
@@ -380,8 +381,7 @@ class TARDISAtomData:
 
         logger.info('Matching lines and levels.')
         lns_list = [ self.get_lvl_index2id(lines.loc[ion], self.levels_all)
-                        for ion in ions ]
-
+                        for ion in ions]
         lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 
@@ -528,7 +528,8 @@ class TARDISAtomData:
         collisions = collisions.set_index(['atomic_number', 'ion_number'])
 
         logger.info('Matching collisions and levels.')
-        col_list = [ self.get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions]
+        col_list = [ self.get_lvl_index2id(collisions.loc[ion], self.levels_all)
+                        for ion in ions]
         collisions = pd.concat(col_list, sort=True)
         collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
 
