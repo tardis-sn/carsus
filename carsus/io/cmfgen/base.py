@@ -470,8 +470,16 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
 
 class CMFGENReader:
-    """ Docstring """
+    """
+        Class for extracting levels and lines from CMFGEN.
+        
+        Mimics the GFALLReader class.
 
+        Attributes
+        ----------
+        levels : DataFrame
+        lines : DataFrame
+    """
     def __init__(self, data, priority=10):
         """ Docstring """
 
