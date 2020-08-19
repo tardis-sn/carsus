@@ -247,7 +247,6 @@ class TARDISAtomData:
         """
 
         logger.info('Ingesting energy levels.')
-
         gf_levels = self.gfall_reader.levels
         gf_levels['ds_id'] = 2
 
@@ -342,7 +341,6 @@ class TARDISAtomData:
         """ Returns the same output than `AtomData._get_all_lines_data()`. """
 
         logger.info('Ingesting transition lines.')
-
         gf_lines = self.gfall_reader.lines
         gf_lines['ds_id'] = 2
 
@@ -518,7 +516,6 @@ class TARDISAtomData:
     def create_collisions(self):
 
         logger.info('Ingesting collisional strengths.')
-
         ch_collisions = self.chianti_reader.collisions
         ch_collisions['ds_id'] = 4
 
