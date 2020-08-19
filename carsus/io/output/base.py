@@ -112,6 +112,7 @@ class TARDISAtomData:
 
     @staticmethod
     def get_lvl_index2id(df, levels_all):
+        # TODO: re-write this method without a for loop
         lvl_index2id = levels_all.set_index(
                             ['atomic_number', 'ion_number']).loc[df.index]
         lvl_index2id = lvl_index2id.reset_index()
@@ -122,8 +123,8 @@ class TARDISAtomData:
         df = df.reset_index()
         for i, row in df.iterrows():
 
-            llid = row['level_index_lower']
-            ulid = row['level_index_upper']
+            llid = int(row['level_index_lower'])
+            ulid = int(row['level_index_upper'])
 
             upper = lvl_index2id.at[ulid, 'level_id']
             lower = lvl_index2id.at[llid, 'level_id']
@@ -245,6 +246,8 @@ class TARDISAtomData:
         with `level_id` as index.
         """
 
+        logger.info('Ingesting energy levels.')
+
         gf_levels = self.gfall_reader.levels
         gf_levels['ds_id'] = 2
 
@@ -338,6 +341,8 @@ class TARDISAtomData:
     def _get_all_lines_data(self):
         """ Returns the same output than `AtomData._get_all_lines_data()`. """
 
+        logger.info('Ingesting transition lines.')
+
         gf_lines = self.gfall_reader.lines
         gf_lines['ds_id'] = 2
 
@@ -375,8 +380,10 @@ class TARDISAtomData:
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
                     .union((set(self.gfall_ions)))
 
+        logger.info('Matching lines and levels.')
         lns_list = [ self.get_lvl_index2id(lines.loc[ion], self.levels_all)
                         for ion in ions ]
+
         lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 
@@ -510,6 +517,8 @@ class TARDISAtomData:
 
     def create_collisions(self):
 
+        logger.info('Ingesting collisional strengths.')
+
         ch_collisions = self.chianti_reader.collisions
         ch_collisions['ds_id'] = 4
 
@@ -521,6 +530,7 @@ class TARDISAtomData:
         collisions = collisions.rename(columns={'ion_charge': 'ion_number'})
         collisions = collisions.set_index(['atomic_number', 'ion_number'])
 
+        logger.info('Matching collisions and levels.')
         col_list = [ self.get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions]
         collisions = pd.concat(col_list, sort=True)
         collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
