@@ -238,7 +238,6 @@ class TARDISAtomData:
 
         #### 1992A&A...254..436B Equation 20 & 22 #####
         collisional_ul_factor = 8.63e-6 * upsilon / (g_u * temperatures**.5)
-
         return pd.Series(data=collisional_ul_factor, index=c_ul_temperature_cols)
 
     def _get_all_levels_data(self):
@@ -545,7 +544,7 @@ class TARDISAtomData:
                               loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
         collisions = collisions.join(lower_levels, on="lower_level_id").join(
-                                            upper_levels, on="upper_level_id")
+                                     upper_levels, on="upper_level_id")
 
         # Calculate delta_e
         kb_ev = const.k_B.cgs.to('eV / K').value
@@ -575,7 +574,7 @@ class TARDISAtomData:
                                                   axis=1, args=(temperatures, kb_ev, 
                                                                 c_ul_temperature_cols))
 
-        collisions = collisions.join(collisional_ul_factors)
+        collisions = pd.concat([collisions, collisional_ul_factors], axis=1)
         collisions = collisions.set_index('e_col_id')
 
         return collisions
