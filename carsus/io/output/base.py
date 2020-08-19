@@ -85,8 +85,8 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        if chianti_reader is not None and not chianti_reader.collisions.empty:
-            self.collisions = self.create_collisions()
+        #if chianti_reader is not None and not chianti_reader.collisions.empty:
+        #    self.collisions = self.create_collisions()
 
         logger.info('Finished.')
 
@@ -111,22 +111,22 @@ class TARDISAtomData:
         return gfall_ions, chianti_ions, cmfgen_ions
 
     @staticmethod
-    def get_lvl_index2id(df, levels_all, ion):
-        df = df.reset_index()
+    def get_lvl_index2id(df, levels_all):
         lvl_index2id = levels_all.set_index(
-                            ['atomic_number', 'ion_number']).loc[ion]
+                            ['atomic_number', 'ion_number']).loc[df.index]
         lvl_index2id = lvl_index2id.reset_index()
-        lvl_index2id = lvl_index2id[['level_id']]
 
         lower_level_id = []
         upper_level_id = []
+        
+        df = df.reset_index()
         for i, row in df.iterrows():
 
-            llid = int(row['level_index_lower'])
-            ulid = int(row['level_index_upper'])
+            llid = row['level_index_lower']
+            ulid = row['level_index_upper']
 
-            upper = int(lvl_index2id.loc[ulid])
-            lower = int(lvl_index2id.loc[llid])
+            upper = lvl_index2id.at[ulid, 'level_id']
+            lower = lvl_index2id.at[llid, 'level_id']
 
             lower_level_id.append(lower)
             upper_level_id.append(upper)
@@ -376,11 +376,8 @@ class TARDISAtomData:
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
                     .union((set(self.gfall_ions)))
 
-        lns_list = []
-        for ion in ions:
-            lns = lines.loc[ion]
-            lns_list.append(self.get_lvl_index2id(lns, self.levels_all, ion))
-
+        lns_list = [ self.get_lvl_index2id(lines.loc[ion], self.levels_all)
+                        for ion in ions ]
         lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 

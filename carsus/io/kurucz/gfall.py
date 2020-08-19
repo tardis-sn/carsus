@@ -293,14 +293,14 @@ class GFALLReader(object):
         
         # TODO: move to a staticmethod
         if self.ions is not None:
-            df_list = []
+            lvl_list = []
             for ion in self.ions:
                 mask = (levels['atomic_number'] == ion[0]) & (
-                    levels['ion_charge'] == ion[1])
-                df = levels[mask]
-                df_list.append(df)
+                            levels['ion_charge'] == ion[1])
+                lvl = levels[mask]
+                lvl_list.append(lvl)
 
-            levels = pd.concat(df_list, sort=True)
+            levels = pd.concat(lvl_list, sort=True)
 
         levels.set_index(["atomic_number", "ion_charge",
                           "level_index"], inplace=True)
@@ -351,7 +351,6 @@ class GFALLReader(object):
         lines = lines.drop(["loggf"], 1)
 
         # Assigning levels to lines
-
         levels_unique_idxed = self.levels.reset_index().set_index(
             ['atomic_number', 'ion_charge'] + self.unique_level_identifier)
 
@@ -366,17 +365,19 @@ class GFALLReader(object):
         lines_upper_idx['level_index_upper'] = levels_unique_idxed['level_index']
         lines = lines_upper_idx.reset_index()
 
-        #TODO: move to staticmethod
+        # TODO: move to a staticmethod
         if self.ions is not None:
-            df_list = []
+            lns_list = []
             for ion in self.ions:
                 mask = (lines['atomic_number'] == ion[0]) & (
-                    lines['ion_charge'] == ion[1])
-                df = lines[mask]
-                df_list.append(df)
+                            lines['ion_charge'] == ion[1])
+                lns = lines[mask]
+                lns_list.append(lns)
 
-            lines = pd.concat(df_list, sort=True)
+            lines = pd.concat(lns_list, sort=True)
 
+        lines['level_index_lower'] = lines['level_index_lower'].astype('int')
+        lines['level_index_upper'] = lines['level_index_upper'].astype('int')
         lines.set_index(['atomic_number', 'ion_charge',
                          'level_index_lower', 'level_index_upper'], inplace=True)
 
