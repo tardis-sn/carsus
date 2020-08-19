@@ -91,7 +91,8 @@ class TARDISAtomData:
         logger.info('Finished.')
 
     @staticmethod
-    def solve_priorities(levels):     
+    def solve_priorities(levels):
+        """ Returns a list of unique species per data source. """
         levels = levels.set_index(['atomic_number', 'ion_number'])
 
         lvl_list = []
@@ -112,6 +113,7 @@ class TARDISAtomData:
 
     @staticmethod
     def get_lvl_index2id(df, levels_all):
+        """ Matches level indexes with level IDs for a given DataFrame. """
         # TODO: re-write this method without a for loop
         ion = df.index.unique()
         lvl_index2id = levels_all.set_index(
@@ -243,9 +245,7 @@ class TARDISAtomData:
         return pd.Series(data=collisional_ul_factor, index=c_ul_temperature_cols)
 
     def _get_all_levels_data(self):
-        """ Returns the same output than `AtomData._get_all_levels_data()` 
-        with `level_id` as index.
-        """
+        """ Returns the same output than `AtomData._get_all_levels_data()`. """
 
         logger.info('Ingesting energy levels.')
         gf_levels = self.gfall_reader.levels
@@ -514,6 +514,7 @@ class TARDISAtomData:
         return levels, lines
 
     def create_collisions(self):
+        """ Returns the same output than `AtomData.create_collisions` method. """
 
         logger.info('Ingesting collisional strengths.')
         ch_collisions = self.chianti_reader.collisions
