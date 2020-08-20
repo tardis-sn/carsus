@@ -94,11 +94,12 @@ class TARDISAtomData:
     def solve_priorities(levels):
         """ Returns a list of unique species per data source. """
         levels = levels.set_index(['atomic_number', 'ion_number'])
+        levels = levels.sort_index()  # To supress warnings
 
         lvl_list = []
         for ion in levels.index.unique():
-            max_priority = levels.loc[ion]['priority'].max()
-            lvl = levels.loc[ion][ levels.loc[ion]['priority'] == max_priority ]
+            max_priority = levels.loc[ion, 'priority'].max()
+            lvl = levels.loc[ion][ levels.loc[ion, 'priority'] == max_priority ]
             lvl_list.append(lvl)
 
         levels_uq = pd.concat(lvl_list, sort=True)
@@ -376,6 +377,7 @@ class TARDISAtomData:
             lines = lines.drop(lines[mask].index)
 
         lines = lines.set_index(['atomic_number', 'ion_number'])
+        lines = lines.sort_index()  # To supress warnings
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
                     .union((set(self.gfall_ions)))
 
