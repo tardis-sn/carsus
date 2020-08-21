@@ -304,19 +304,12 @@ class TARDISAtomData:
         levels['level_id'] = range(1, len(levels)+1)
         levels = levels.set_index('level_id')
 
-        # Deliberately keep the "duplicated" Chianti levels.
-        # 
-        # e.g. ChiantiIonReader('h_1')
-        #
-        # These levels are not strictly duplicated (same energy
-        # for different configurations).
-        #
-        # In fact, the following code should only remove the du-
-        # plicated ground levels. Other duplicated levels should
-        # be removed at the reader stage.
+        # The following code should only remove the duplicated
+        # ground levels. Other duplicated levels should be re-
+        # moved at the reader stage.
 
-        mask = (levels['ds_id'] != 4) & (levels[['atomic_number', 
-                'ion_number', 'energy', 'g']].duplicated(keep='last'))
+        mask = (levels['energy'] == 0.) & (levels[['atomic_number',
+                    'ion_number', 'energy', 'g']].duplicated(keep='last'))
         levels = levels[~mask]
 
         # Filter levels by priority
