@@ -125,10 +125,10 @@ class TARDISAtomData:
         upper_level_id = []
         
         df = df.reset_index()
-        for i, row in df.iterrows():
+        for row in df.itertuples():
 
-            llid = int(row['level_index_lower'])
-            ulid = int(row['level_index_upper'])
+            llid = row.level_index_lower
+            ulid = row.level_index_upper
 
             upper = lvl_index2id.at[ulid, 'level_id']
             lower = lvl_index2id.at[llid, 'level_id']
