@@ -411,11 +411,13 @@ class TARDISAtomData:
                                                 how='left',
                                                 on=["atomic_number",
                                                     "ion_number"])
+
         mask = levels_w_ionization_energies["energy"] < \
             levels_w_ionization_energies["ionization_energy"]
+
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index('level_id').sort_values(
-            by=['atomic_number', 'ion_number'])
+                    by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
 
         # Clean lines
@@ -437,9 +439,11 @@ class TARDISAtomData:
         # Create levels numbers
         levels = levels.sort_values(
             ["atomic_number", "ion_number", "energy", "g"])
+
         levels["level_number"] = levels.groupby(['atomic_number',
                                                  'ion_number'])['energy']. \
             transform(lambda x: np.arange(len(x))).values
+
         levels["level_number"] = levels["level_number"].astype(np.int)
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy',
@@ -452,11 +456,13 @@ class TARDISAtomData:
                 "level_number": "level_number_lower",
                 "g": "g_l"}
         ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
+
         upper_levels = levels.rename(
             columns={
                 "level_number": "level_number_upper",
                 "g": "g_u"}
         ).loc[:, ["level_number_upper", "g_u"]]
+
         lines = lines.join(lower_levels, on="lower_level_id").join(
             upper_levels, on="upper_level_id")
 
