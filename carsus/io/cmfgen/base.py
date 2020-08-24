@@ -479,16 +479,32 @@ class CMFGENReader:
         ----------
         levels : DataFrame
         lines : DataFrame
-    """
-    def __init__(self, data, priority=10):
-        """ Docstring """
 
+    """
+
+    def __init__(self, data, priority=10):
+        """
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing one dictionary per specie with 
+            keys `levels` and `lines`.
+
+        priority: int, optional
+            Priority of the current data source, by default 10.
+        """
         self.priority = priority
         self._get_levels_lines(data)
     
     def _get_levels_lines(self, data):
-        """ Docstring """
+        """ Generates `levels` and `lines` DataFrames.
 
+        Parameters
+        ----------
+        data : dict
+            Dictionary containing one dictionary per specie with 
+            keys `levels` and `lines`.
+        """
         lvl_list = []
         lns_list = []
         for ion, parser in data.items():

@@ -54,20 +54,24 @@ class GFALLReader(object):
 
     def __init__(self, ions=None, 
                  fname='http://kurucz.harvard.edu/linelists/gfall/gfall.dat',
-                 priority=10, unique_level_identifier=None):
+                 unique_level_identifier=None,
+                 priority=10
+                ):
         """
-
         Parameters
         ----------
         fname: str
-            path to the gfall file (http or local file)
+            Path to the gfall file (http or local file).
 
         ions: str, optional
-            ions to extract, by default None
+            Ions to extract, by default None.
 
         unique_level_identifier: list
-            list of attributes to identify unique levels from. Will always use
+            List of attributes to identify unique levels from. Will always use
             atomic_number and ion charge in addition.
+
+        priority: int, optional
+            Priority of the current data source.
         """
         self.fname = fname
         self.priority = priority

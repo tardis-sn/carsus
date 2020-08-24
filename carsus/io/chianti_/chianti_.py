@@ -522,10 +522,10 @@ class ChiantiIngester(object):
 
 
 class ChiantiReader:
-    """
+    """ 
         Class for extracting levels, lines and collisional data 
         from Chianti.
-        
+
         Mimics the GFALLReader class.
 
         Attributes
@@ -534,6 +534,7 @@ class ChiantiReader:
         lines : DataFrame
         collisions: DataFrame
         version : str
+
     """
 
     def __init__(self, ions, collisions=False, priority=10):
@@ -544,7 +545,10 @@ class ChiantiReader:
             Selected Chianti ions.
 
         collisions: bool, optional
-            Grab collisional data (default is False).
+            Grab collisional data, by default False.
+
+        priority: int
+            Priority of the current data source.        
         """
         self.ions = parse_selected_species(ions)
         self.priority = priority
