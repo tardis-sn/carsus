@@ -629,6 +629,7 @@ class ChiantiReader:
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf']]
 
+        col_columns = ['temperatures', 'collision_strengths', 'gf', 'energy', 'ttype', 'cups']
         if get_collisions:
             collisions = pd.concat(col_list, sort=True)
             collisions = collisions.reset_index()
@@ -639,17 +640,14 @@ class ChiantiReader:
             collisions['level_index_upper'] -= 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
                                                'level_index_lower', 'level_index_upper'])
-            collisions = collisions[['temperatures', 'collision_strengths', 'gf', 'energy',
-                                     'ttype', 'cups']]
+            collisions = collisions[col_columns]
+            self.collisions = collisions
+
+        else:
+            self.collisions = pd.DataFrame(columns=[col_columns])
 
         self.levels = levels
         self.lines = lines
-
-        if get_collisions:
-            self.collisions = collisions
-        else:
-            self.collisions = pd.DataFrame()
-
         self.version = versionRead()
 
     def to_hdf(self, fname):

@@ -69,7 +69,7 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        if chianti_reader is not None and not chianti_reader.collisions.empty:
+        if (chianti_reader is not None) and (not chianti_reader.collisions.empty):
             self.collisions = self.create_collisions(**collisions_param)
 
         logger.info('Finished.')
@@ -882,8 +882,9 @@ class TARDISAtomData:
 
             try:
                 f.put('/collision_data', self.collisions_prepared)
-                f.put('collision_data_temperatures', 
+                f.put('/collision_data_temperatures', 
                       pd.Series(self.collisions_param['temperatures']))
+
             except AttributeError:
                 pass
 
