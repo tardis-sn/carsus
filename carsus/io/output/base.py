@@ -51,7 +51,7 @@ class TARDISAtomData:
                  chianti_reader=None,
                  cmfgen_reader=None,
                  levels_lines_param={"levels_metastable_loggf_threshold": -3,
-                                      "lines_loggf_threshold": -3},
+                                     "lines_loggf_threshold": -3},
                  collisions_param={"temperatures": np.arange(2000, 50000, 2000)}
                 ):
 
