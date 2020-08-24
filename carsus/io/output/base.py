@@ -79,6 +79,18 @@ class TARDISAtomData:
         """ 
         Returns a list of unique species per data source. 
         
+
+        Notes
+        -----
+
+        The `ds_id` field is the data source identifier.
+
+        1 : NIST
+        2 : GFALL
+        3 : Knox Long's Zeta
+        4 : Chianti Database
+        5 : CMFGEN
+
         """
         levels = levels.set_index(['atomic_number', 'ion_number'])
         levels = levels.sort_index()  # To supress warnings
@@ -251,7 +263,11 @@ class TARDISAtomData:
     def _get_all_levels_data(self):
         """ 
         Returns the same output than `AtomData._get_all_levels_data()`.
-        
+
+        The resulting DataFrame contains stacked energy levels from GFALL,
+        Chianti (optional), CMFGEN (optional) and NIST ground levels. Only
+        one source of levels is kept based on priorities.
+
         """
 
         logger.info('Ingesting energy levels.')
@@ -342,6 +358,9 @@ class TARDISAtomData:
         """
         Returns the same output than `AtomData._get_all_lines_data()`.
         
+        The resulting DataFrame contains stacked transition lines for 
+        GFALL, Chianti (optional) and CMFGEN (optional).
+
         """
 
         logger.info('Ingesting transition lines.')
@@ -428,6 +447,9 @@ class TARDISAtomData:
                             levels_metastable_loggf_threshold=-3):
         """
         Returns the same output than `AtomData.create_levels_lines` method.
+
+        Generates the definitive `lines` and `levels` DataFrames by adding
+        new columns and making some calculations.
         
         """
 
@@ -525,7 +547,10 @@ class TARDISAtomData:
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """
         Returns the same output than `AtomData.create_collisions` method.
-        
+
+        Generates the definitive `collisions` DataFrame by adding new columns
+        and making some calculations.
+
         """
 
         logger.info('Ingesting collisional strengths.')
