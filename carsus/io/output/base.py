@@ -16,9 +16,8 @@ from carsus.util import (convert_atomic_number2symbol,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 
-# [AA] wavelengths above this value are given in air
+# Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000*u.AA
-
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
 P_INTERNAL_UP = 1
