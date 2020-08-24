@@ -16,8 +16,8 @@ from carsus.util import (convert_atomic_number2symbol,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 
-# [nm] wavelengths above this value are given in air
-GFALL_AIR_THRESHOLD = 200
+# [AA] wavelengths above this value are given in air
+GFALL_AIR_THRESHOLD = 2000*u.AA
 
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
@@ -369,11 +369,6 @@ class TARDISAtomData:
                             'j_lower', 'level_index_lower',
                             'level_index_upper'], inplace=True)
 
-        lines.loc[lines['wavelength'] <=
-                  GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
-        lines.loc[lines['wavelength'] >
-                  GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
-
         gfall_mask = lines['ds_id'] == 2
         chianti_mask = lines['ds_id'] == 4
         cmfgen_mask = lines['ds_id'] == 5
@@ -383,13 +378,18 @@ class TARDISAtomData:
             gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
 
         lines.loc[chianti_mask, 'wavelength'] = lines.loc[
-            chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
+            chianti_mask, 'wavelength'].apply(lambda x: x*u.AA)
 
         lines.loc[cmfgen_mask, 'wavelength'] = lines.loc[
-            cmfgen_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
+            cmfgen_mask, 'wavelength'].apply(lambda x: x*u.nm)
 
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
+
+        lines.loc[lines['wavelength'] <=
+                  GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
+        lines.loc[lines['wavelength'] >
+                  GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
         air_mask = lines['medium'] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask,
