@@ -169,12 +169,12 @@ class TARDISAtomData:
         return pd.DataFrame(data=fully_ionized_levels)
 
     @staticmethod
-    """
-    Returns metastable flag column for the `levels` DataFrame.
-
-    """
     def _create_metastable_flags(levels, lines,
                                  levels_metastable_loggf_threshold=-3):
+        """
+        Returns metastable flag column for the `levels` DataFrame.
+
+        """
         # Filter lines on the loggf threshold value
         metastable_lines = lines.loc[lines["loggf"]
                                      > levels_metastable_loggf_threshold]
@@ -194,11 +194,11 @@ class TARDISAtomData:
         return metastable_flags
 
     @staticmethod
-    """
-    Create Einstein coefficients columns for the `lines` DataFrame.
-
-    """
     def _create_einstein_coeff(lines):
+        """
+        Create Einstein coefficients columns for the `lines` DataFrame.
+
+        """
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
 
