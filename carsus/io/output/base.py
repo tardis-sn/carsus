@@ -16,7 +16,6 @@ from carsus.util import (convert_atomic_number2symbol,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 
-# TODO: pass GFALL_AIR_THRESHOLD as parameter
 # [nm] wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 200
 
@@ -51,25 +50,10 @@ class TARDISAtomData:
                  zeta_data,
                  chianti_reader=None,
                  cmfgen_reader=None,
-                 lines_loggf_threshold=-3,
-                 levels_metastable_loggf_threshold=-3,
-                 collisions_temperatures=None):
-
-        # TODO: pass these params to the function as `gfall_params`
-        self.levels_lines_param = {
-            "levels_metastable_loggf_threshold":
-            levels_metastable_loggf_threshold,
-            "lines_loggf_threshold": lines_loggf_threshold
-        }
-
-        if collisions_temperatures is None:
-            collisions_temperatures = np.arange(2000, 50000, 2000)
-        else:
-            collisions_temperatures = np.array(collisions_temperatures)
-
-        self.collisions_param = {
-            "temperatures": collisions_temperatures
-        }
+                 gfall_params={"levels_metastable_loggf_threshold": -3,
+                               "lines_loggf_threshold": -3},
+                 collisions_params={"temperatures": np.arange(2000, 50000, 2000)}
+                ):
 
         self.atomic_weights = atomic_weights
         self.ionization_energies = ionization_energies
@@ -81,12 +65,12 @@ class TARDISAtomData:
 
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
-        self.levels, self.lines = self.create_levels_lines(**self.levels_lines_param)
+        self.levels, self.lines = self.create_levels_lines(**gfall_params)
         self.create_macro_atom()
         self.create_macro_atom_references()
 
         if chianti_reader is not None and not chianti_reader.collisions.empty:
-            self.collisions = self.create_collisions()
+            self.collisions = self.create_collisions(**collisions_params)
 
         logger.info('Finished.')
 
@@ -407,7 +391,6 @@ class TARDISAtomData:
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.to('angstrom'))
         lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
 
-        # Why not for Chianti?
         air_mask = lines['medium'] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask,
                   'wavelength'] = convert_wavelength_air2vacuum(
@@ -420,7 +403,7 @@ class TARDISAtomData:
         return lines
 
     def create_levels_lines(self, lines_loggf_threshold=-3,
-                             levels_metastable_loggf_threshold=-3):
+                            levels_metastable_loggf_threshold=-3):
         """ Returns the same output than `AtomData.create_levels_lines` method. """
 
         ionization_energies = self.ionization_energies.base.reset_index()
@@ -508,7 +491,7 @@ class TARDISAtomData:
 
         return levels, lines
 
-    def create_collisions(self):
+    def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """ Returns the same output than `AtomData.create_collisions` method. """
 
         logger.info('Ingesting collisional strengths.')
@@ -556,8 +539,6 @@ class TARDISAtomData:
 
         # Calculate g_ratio
         collisions["g_ratio"] = collisions["g_l"] / collisions["g_u"]
-
-        temperatures = self.collisions_param['temperatures']
 
         # Derive columns for collisional strengths
         c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
@@ -835,7 +816,7 @@ class TARDISAtomData:
             try:
                 f.put('/collision_data', self.collisions_prepared)
                 f.put('collision_data_temperatures', 
-                      pd.Series(self.collisions_param['temperatures']))
+                      pd.Series(self.collisions_params['temperatures']))
             except AttributeError:
                 pass
 
