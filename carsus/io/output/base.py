@@ -393,7 +393,6 @@ class TARDISAtomData:
                   'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
 
-        lines = lines.drop(columns=['medium'])
         lines = lines[['lower_level_id', 'upper_level_id',
                        'wavelength', 'gf', 'loggf', 'ds_id']]
 
