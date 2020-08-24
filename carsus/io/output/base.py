@@ -372,7 +372,7 @@ class TARDISAtomData:
         lines = lines.set_index(['atomic_number', 'ion_number'])
         lines = lines.sort_index()  # To supress warnings
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
-                    .union((set(self.gfall_ions)))
+                    .union((set(self.cmfgen_ions)))
 
         logger.info('Matching lines and levels.')
         lns_list = [ self.get_lvl_index2id(lines.loc[ion], self.levels_all)
