@@ -370,20 +370,16 @@ class TARDISAtomData:
 
         gfall_mask = lines['ds_id'] == 2
         chianti_mask = lines['ds_id'] == 4
-        cmfgen_mask = lines['ds_id'] == 5
 
         # TODO: manage units consistently across all readers
-        lines.loc[gfall_mask, 'wavelength'] = lines.loc[
+        lines.loc[~chianti_mask, 'wavelength'] = lines.loc[
             gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
 
         lines.loc[chianti_mask, 'wavelength'] = lines.loc[
             chianti_mask, 'wavelength'].apply(lambda x: x*u.AA)
 
-        lines.loc[cmfgen_mask, 'wavelength'] = lines.loc[
-            cmfgen_mask, 'wavelength'].apply(lambda x: x*u.nm)
-
-        lines['wavelength'] = lines['wavelength'].apply(lambda x: x.to('angstrom'))
-        lines['wavelength'] = lines['wavelength'].apply(lambda x: x.value)
+        lines['wavelength'] = lines['wavelength'].apply(lambda x: \
+                                    x.to('angstrom').value)
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
