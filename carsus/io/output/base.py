@@ -29,6 +29,7 @@ class TARDISAtomData:
     """
     Attributes
     ----------
+
     levels : pandas.DataFrame
     lines : pandas.DataFrame
     collisions : pandas.DataFrame
@@ -75,7 +76,10 @@ class TARDISAtomData:
 
     @staticmethod
     def solve_priorities(levels):
-        """ Returns a list of unique species per data source. """
+        """ 
+        Returns a list of unique species per data source. 
+        
+        """
         levels = levels.set_index(['atomic_number', 'ion_number'])
         levels = levels.sort_index()  # To supress warnings
 
@@ -97,7 +101,10 @@ class TARDISAtomData:
 
     @staticmethod
     def get_lvl_index2id(df, levels_all):
-        """ Matches level indexes with level IDs for a given DataFrame. """
+        """
+        Matches level indexes with level IDs for a given DataFrame. 
+        
+        """
         # TODO: re-write this method without a for loop
         ion = df.index.unique()
         lvl_index2id = levels_all.set_index(
@@ -126,6 +133,10 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_artificial_fully_ionized(levels):
+        """
+        Returns a DataFrame with fully ionized levels.
+
+        """
         fully_ionized_levels = []
 
         for atomic_number, _ in levels.groupby("atomic_number"):
@@ -146,6 +157,10 @@ class TARDISAtomData:
         return pd.DataFrame(data=fully_ionized_levels)
 
     @staticmethod
+    """
+    Returns metastable flag column for the `levels` DataFrame.
+
+    """
     def _create_metastable_flags(levels, lines,
                                  levels_metastable_loggf_threshold=-3):
         # Filter lines on the loggf threshold value
@@ -167,6 +182,10 @@ class TARDISAtomData:
         return metastable_flags
 
     @staticmethod
+    """
+    Create Einstein coefficients columns for the `lines` DataFrame.
+
+    """
     def _create_einstein_coeff(lines):
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
@@ -185,6 +204,7 @@ class TARDISAtomData:
                                         kb_ev, c_ul_temperature_cols):
         """
         Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38).
+
         """
 
         c = row["cups"]
@@ -229,7 +249,10 @@ class TARDISAtomData:
         return pd.Series(data=collisional_ul_factor, index=c_ul_temperature_cols)
 
     def _get_all_levels_data(self):
-        """ Returns the same output than `AtomData._get_all_levels_data()`. """
+        """ 
+        Returns the same output than `AtomData._get_all_levels_data()`.
+        
+        """
 
         logger.info('Ingesting energy levels.')
         gf_levels = self.gfall_reader.levels
@@ -316,7 +339,10 @@ class TARDISAtomData:
 
 
     def _get_all_lines_data(self):
-        """ Returns the same output than `AtomData._get_all_lines_data()`. """
+        """
+        Returns the same output than `AtomData._get_all_lines_data()`.
+        
+        """
 
         logger.info('Ingesting transition lines.')
         gf_lines = self.gfall_reader.lines
@@ -400,7 +426,10 @@ class TARDISAtomData:
 
     def create_levels_lines(self, lines_loggf_threshold=-3,
                             levels_metastable_loggf_threshold=-3):
-        """ Returns the same output than `AtomData.create_levels_lines` method. """
+        """
+        Returns the same output than `AtomData.create_levels_lines` method.
+        
+        """
 
         ionization_energies = self.ionization_energies.base.reset_index()
         ionization_energies['ion_number'] -= 1
@@ -494,7 +523,10 @@ class TARDISAtomData:
         return levels, lines
 
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
-        """ Returns the same output than `AtomData.create_collisions` method. """
+        """
+        Returns the same output than `AtomData.create_collisions` method.
+        
+        """
 
         logger.info('Ingesting collisional strengths.')
         ch_collisions = self.chianti_reader.collisions
@@ -574,6 +606,7 @@ class TARDISAtomData:
         Returns
         -------
         pandas.DataFrame
+
         """
 
         levels_prepared = self.levels.loc[:, [
@@ -593,6 +626,7 @@ class TARDISAtomData:
         Returns
         -------
         pandas.DataFrame
+
         """
 
         lines_prepared = self.lines.loc[:, [
@@ -619,6 +653,7 @@ class TARDISAtomData:
         Returns
         -------
         pandas.DataFrame
+
         """
 
         collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
@@ -647,6 +682,7 @@ class TARDISAtomData:
         Notes
         -----
         Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+
         """
         
         # Exclude artificially created levels from levels
@@ -722,6 +758,7 @@ class TARDISAtomData:
         Notes
         -----
         Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+
         """
 
         macro_atom_prepared = self.macro_atom.loc[:, [
@@ -744,6 +781,7 @@ class TARDISAtomData:
         Returns
         -------
         pandas.DataFrame
+
         """
         macro_atom_references = self.levels.rename(
             columns={"level_number": "source_level_number"}).\
@@ -784,6 +822,7 @@ class TARDISAtomData:
         Returns
         -------
         pandas.DataFrame
+
         """
         macro_atom_references_prepared = self.macro_atom_references.loc[:, [
             "atomic_number", "ion_number", "source_level_number", "count_down",
@@ -803,6 +842,7 @@ class TARDISAtomData:
         ----------
         fname : path
            Path to the HDF5 output file.
+
         """
 
         with pd.HDFStore(fname, 'w') as f:
