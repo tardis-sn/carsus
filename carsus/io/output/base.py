@@ -29,17 +29,17 @@ class TARDISAtomData:
     """
     Attributes
     ----------
+    levels : pandas.DataFrame
+    lines : pandas.DataFrame
+    collisions : pandas.DataFrame
+    macro_atom : pandas.DataFrame
+    macro_atom_references : pandas.DataFrame
     levels_prepared : pandas.DataFrame
     lines_prepared : pandas.DataFrame
     collisions_prepared: pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
-    
 
-    Methods
-    -------
-    to_hdf(fname)
-        Dump all attributes into an HDF5 file
     """
 
     def __init__(self,
@@ -797,12 +797,12 @@ class TARDISAtomData:
 
     def to_hdf(self, fname):
         """
-        Dump the `base` attribute into an HDF5 file
+        Dump `prepared` attributes into an HDF5 file.
         
         Parameters
         ----------
         fname : path
-           Path to the HDF5 output file
+           Path to the HDF5 output file.
         """
 
         with pd.HDFStore(fname, 'w') as f:
