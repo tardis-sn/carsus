@@ -50,9 +50,9 @@ class TARDISAtomData:
                  zeta_data,
                  chianti_reader=None,
                  cmfgen_reader=None,
-                 gfall_params={"levels_metastable_loggf_threshold": -3,
-                               "lines_loggf_threshold": -3},
-                 collisions_params={"temperatures": np.arange(2000, 50000, 2000)}
+                 levels_lines_param={"levels_metastable_loggf_threshold": -3,
+                                      "lines_loggf_threshold": -3},
+                 collisions_param={"temperatures": np.arange(2000, 50000, 2000)}
                 ):
 
         self.atomic_weights = atomic_weights
@@ -65,12 +65,12 @@ class TARDISAtomData:
 
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
-        self.levels, self.lines = self.create_levels_lines(**gfall_params)
+        self.levels, self.lines = self.create_levels_lines(**levels_lines_param)
         self.create_macro_atom()
         self.create_macro_atom_references()
 
         if chianti_reader is not None and not chianti_reader.collisions.empty:
-            self.collisions = self.create_collisions(**collisions_params)
+            self.collisions = self.create_collisions(**collisions_param)
 
         logger.info('Finished.')
 
@@ -816,7 +816,7 @@ class TARDISAtomData:
             try:
                 f.put('/collision_data', self.collisions_prepared)
                 f.put('collision_data_temperatures', 
-                      pd.Series(self.collisions_params['temperatures']))
+                      pd.Series(self.collisions_param['temperatures']))
             except AttributeError:
                 pass
 
