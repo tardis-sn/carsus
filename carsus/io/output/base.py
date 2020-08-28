@@ -929,8 +929,10 @@ class TARDISAtomData:
             logger.info(f"MD5: {md5_hash.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
 
-            f.root._v_attrs['md5'] = md5_hash.hexdigest()
-            f.root._v_attrs['uuid1'] = uuid1
+            # TARDIS tries to decode MD5 and UUID, then it's necessary
+            # to store these strings encoded (or change TARDIS code).
+            f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
+            f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
             f.put('/meta', meta_df)
 
             utc = pytz.timezone('UTC')
