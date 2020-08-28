@@ -62,6 +62,8 @@ class TARDISAtomData:
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
+        self.levels_lines_param = levels_lines_param
+        self.collisions_param = collisions_param
 
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
