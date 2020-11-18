@@ -9,12 +9,12 @@ import pandas as pd
 
 #getting the data_path
 
-from tardisnuclear.config import get_data_dir
-from tardisnuclear.io.nndc.parsers import decay_radiation_parsers
+from nuclear.config import get_data_dir
+from nuclear.io.nndc.parsers import decay_radiation_parsers
 TARDISNUCLEAR_DATA_DIR = get_data_dir()
 
 from pyne import nucname
-from abc import ABCMeta
+
 NNDC_DECAY_RADIATION_BASE_URL = 'http://www.nndc.bnl.gov/nudat2/' \
                                 'decaysearchdirect.jsp?nuc={nucname}&unc=nds'
 
