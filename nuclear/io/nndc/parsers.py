@@ -26,9 +26,7 @@ class BaseParser(metaclass=ABCMeta):
             unc_str = value[:exp_pos] + f"({unc})" + value[exp_pos:]
         else:
             unc_str = value + f"({unc})"
-        print(unc_str)
         parsed_uncertainty = ufloat_fromstr(unc_str)
-        print(parsed_uncertainty)
         return parsed_uncertainty.nominal_value, parsed_uncertainty.std_dev
 
     @staticmethod
