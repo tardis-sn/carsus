@@ -51,6 +51,14 @@ class BaseParser(metaclass=ABCMeta):
             df.loc[:, "energy"] = [item[0] for item in energy]
             df.loc[:, "energy_unc"] = [item[1] for item in energy]
 
+        if "end_point_energy" in df.columns:
+            end_point_energy = df["end_point_energy"].apply(
+                BaseParser._parse_uncertainties, split_unc_symbol=' ')
+            df.loc[:, "end_point_energy"] = [
+                item[0] for item in end_point_energy]
+            df.loc[:, "end_point_energy_unc"] = [
+                item[1] for item in end_point_energy]
+
         if "dose" in df.columns:
             del df["dose"]
         df['heading'] = self.html_name

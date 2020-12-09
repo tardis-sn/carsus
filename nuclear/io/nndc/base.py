@@ -203,7 +203,7 @@ def store_decay_radiation(isotope_string, force_update=False):
         data_exists = False
     else:
         decay_radiation_db = pd.read_hdf(db_fname, 'decay_radiation')
-        if isotope_string in decay_radiation_db['isotope']:
+        if isotope_string in decay_radiation_db.index:
             data_exists = True
         else:
             data_exists = False
@@ -216,7 +216,7 @@ def store_decay_radiation(isotope_string, force_update=False):
 
     if data_exists:
         decay_radiation = pd.read_hdf(db_fname, "decay_radiation")
-        meta = pd.read_hdf(db_fname, "meta")
+        meta = pd.read_hdf(db_fname, "metadata")
 
         decay_radiation.drop(isotope_string, axis=0, inplace=True)
         meta.drop(isotope_string, axis=0, inplace=True)
@@ -228,7 +228,7 @@ def store_decay_radiation(isotope_string, force_update=False):
         meta = new_meta
 
     with pd.HDFStore(db_fname, mode='w') as decay_radiation_db:
-        decay_radiation_db['meta'] = meta
+        decay_radiation_db['metadata'] = meta
         decay_radiation_db['decay_radiation'] = decay_radiation
 
 
@@ -245,7 +245,7 @@ def get_decay_radiation_database():
 
     decay_radiation_db = pd.read_hdf(_get_nuclear_database_path(),
                                      'decay_radiation')
-    meta = pd.read_hdf(_get_nuclear_database_path, 'meta')
+    meta = pd.read_hdf(_get_nuclear_database_path(), 'metadata')
 
     return decay_radiation_db, meta
 
