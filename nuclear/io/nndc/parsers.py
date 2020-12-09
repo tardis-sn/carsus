@@ -16,10 +16,17 @@ class BaseParser(metaclass=ABCMeta):
         return df
 
     @staticmethod
-    def _parse_uncertainties(unc_raw_str):
+    def _parse_uncertainties(unc_raw_str, split_unc_symbol='%'):
         unc_raw_str = unc_raw_str.lower()
-        value, unc = [item.strip() for item in unc_raw_str.split("%")]
-        if unc == "":
+
+        value_unc_pair = [item.strip()
+                      for item in unc_raw_str.split(split_unc_symbol)]
+
+        if len(value_unc_pair) == 1:  # if no uncertainty given
+            return float(value_unc_pair[0]), np.nan
+        else:
+            value, unc = value_unc_pair
+        if unc == "":  # if uncertainty_str is empty
             unc = np.nan
         if "e" in value:
             exp_pos = value.find("e")
@@ -29,33 +36,31 @@ class BaseParser(metaclass=ABCMeta):
         parsed_uncertainty = ufloat_fromstr(unc_str)
         return parsed_uncertainty.nominal_value, parsed_uncertainty.std_dev
 
-    @staticmethod
-    def _sanititze_table(df):
-        df = df.dropna()
-        if "energy" in df.columns:
-            df.loc[:, "energy"] = df.energy.apply(
-                lambda x: u.Quantity(float(x.split()[0]), u.keV).to(u.erg).value
-            )
-        if "end_point_energy" in df.columns:
-            df.loc[:, "end_point_energy"] = df.end_point_energy.apply(
-                lambda x: u.Quantity(float(x.split()[0]), u.keV).to(u.erg).value
-            )
+    def _sanititze_table(self, df):
+        df.dropna(inplace=True)
 
         if "intensity" in df.columns:
-            intensity_raw = df["intensity"].apply(BaseParser._parse_uncertainties)
+            intensity_raw = df["intensity"].apply(
+                BaseParser._parse_uncertainties)
             df.loc[:, "intensity"] = [item[0] for item in intensity_raw]
-            df.loc[:, "intensity_unc"] = [item[1] for item in intensity_raw]
+            df.loc[:, "intensity_unc"] = [item[1]
+                                          for item in intensity_raw]
+        if "energy" in df.columns:
+            energy = df["energy"].apply(
+                BaseParser._parse_uncertainties, split_unc_symbol=' ')
+            df.loc[:, "energy"] = [item[0] for item in energy]
+            df.loc[:, "energy_unc"] = [item[1] for item in energy]
 
         if "dose" in df.columns:
             del df["dose"]
-
+        df['heading'] = self.html_name
         return df
 
     def _default_parse(self, html_table):
         df = self._convert_html_to_df(html_table, self.columns)
         df = self._sanititze_table(df)
-
-        return {self.name: df}
+        df['type'] = self.type
+        return df
 
     def parse(self, html_table):
         return self._default_parse(html_table)
@@ -63,19 +68,20 @@ class BaseParser(metaclass=ABCMeta):
 
 class ElectronTableParser(BaseParser):
     html_name = "Electrons"
-    name = "electrons"
+    type = "e-"
     columns = ["type", "energy", "intensity", "dose"]
+
 
 
 class BetaPlusTableParser(BaseParser):
     html_name = "Beta+"
-    name = "beta_plus"
+    type = "e+"
     columns = ["energy", "end_point_energy", "intensity", "dose"]
 
 
 class BetaMinusTableParser(BaseParser):
     html_name = "Beta-"
-    name = "beta_minus"
+    type = "e-"
     columns = ["energy", "end_point_energy", "intensity", "dose"]
 
 
@@ -89,10 +95,9 @@ class XGammaRayParser(BaseParser):
 
         x_ray_mask = df.type.str.startswith("XR")
 
-        results = {}
-        results["x_rays"] = df[x_ray_mask]
-        results["gamma_rays"] = df[~x_ray_mask]
-        return results
+        df['type'] = 'x_rays'
+        df.loc[~x_ray_mask, 'type'] = 'gamma_rays'
+        return df
 
 
 decay_radiation_parsers = {
