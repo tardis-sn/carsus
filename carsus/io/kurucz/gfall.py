@@ -14,8 +14,8 @@ from carsus.io.base import IngesterError
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
 
 
-# [nm], wavelengths above this value are given in air
-GFALL_AIR_THRESHOLD = 200
+GFALL_URL = 'https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/gfall/gfall_latest.dat'
+GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class GFALLReader(object):
     default_unique_level_identifier = ['energy', 'j']
 
     def __init__(self, ions=None, 
-                 fname='http://kurucz.harvard.edu/linelists/gfall/gfall.dat',
+                 fname=GFALL_URL,
                  unique_level_identifier=None,
                  priority=10
                 ):
