@@ -471,14 +471,14 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
 class CMFGENReader:
     """
-        Class for extracting levels and lines from CMFGEN.
-        
-        Mimics the GFALLReader class.
+    Class for extracting levels and lines from CMFGEN.
+    
+    Mimics the GFALLReader class.
 
-        Attributes
-        ----------
-        levels : DataFrame
-        lines : DataFrame
+    Attributes
+    ----------
+    levels : DataFrame
+    lines : DataFrame
 
     """
 
@@ -487,7 +487,7 @@ class CMFGENReader:
         Parameters
         ----------
         data : dict
-            Dictionary containing one dictionary per specie with 
+            Dictionary containing one dictionary per species with 
             keys `levels` and `lines`.
 
         priority: int, optional
@@ -519,7 +519,7 @@ class CMFGENReader:
             lvl['ID'] = lvl['ID'].apply(np.abs)
             lvl_id = lvl.set_index('ID')
             lvl['atomic_number'] = atomic_number
-            lvl['ion_charge'] =  ion_charge
+            lvl['ion_charge'] =  ion_charge  # i.e. Si I = (14,0) then `ion_charge` = 0 
             lvl_list.append(lvl)
 
             lns = parser['lines'].base
