@@ -17,7 +17,7 @@ from carsus.util import (convert_atomic_number2symbol,
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
 
 # Wavelengths above this value are given in air
-GFALL_AIR_THRESHOLD = 2000*u.AA
+GFALL_AIR_THRESHOLD = 2000 * u.AA
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
 P_INTERNAL_UP = 1
@@ -176,6 +176,17 @@ class TARDISAtomData:
         """
         Returns metastable flag column for the `levels` DataFrame.
 
+        Parameters
+        ----------
+        levels : pandas.DataFrame
+           Energy levels dataframe.
+
+        lines : pandas.DataFrame
+           Transition lines dataframe.
+
+        levels_metastable_loggf_threshold : int
+           loggf threshold value.
+
         """
         # Filter lines on the loggf threshold value
         metastable_lines = lines.loc[lines["loggf"]
@@ -199,6 +210,11 @@ class TARDISAtomData:
     def _create_einstein_coeff(lines):
         """
         Create Einstein coefficients columns for the `lines` DataFrame.
+
+        Parameters
+        ----------
+        lines : pandas.DataFrame
+           Transition lines dataframe.
 
         """
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
@@ -887,6 +903,7 @@ class TARDISAtomData:
                 f.put('/collision_data_temperatures', 
                       pd.Series(self.collisions_param['temperatures']))
 
+            # Do not try to store collisions if collisions do not exist.
             except AttributeError:
                 pass
 
@@ -942,5 +959,4 @@ class TARDISAtomData:
             f.root._v_attrs['date'] = timestamp
 
             self.meta = meta_df
-            
-            return
+
