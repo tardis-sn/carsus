@@ -541,7 +541,7 @@ class CMFGENReader:
         levels = levels.rename(columns={'Configuration': 'label', 
                                         'E(cm^-1)': 'energy', 
                                         'index': 'level_index'})
-        levels['j'] = (levels['g'] -1)/2
+        levels['j'] = (levels['g'] -1) / 2
         levels = levels.set_index(['atomic_number', 'ion_charge', 'level_index'])
         levels = levels[['energy', 'j', 'label', 'method', 'priority']]
         
@@ -550,7 +550,7 @@ class CMFGENReader:
         lines['wavelength'] = lines['wavelength'].apply(lambda x: (x*u.AA).to('nm').value)
         lines['level_index_lower'] = lines['i'] -1
         lines['level_index_upper'] = lines['j'] -1
-        lines['gf'] = lines['f']*lines['g_lower']
+        lines['gf'] = lines['f'] * lines['g_lower']
         lines = lines.set_index(['atomic_number', 'ion_charge', 
                                  'level_index_lower', 'level_index_upper'])
         lines = lines[['energy_lower', 'energy_upper', 
