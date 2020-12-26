@@ -9,19 +9,23 @@ from carsus.model import (
     DataSource
 )
 
-ZETA_PATH = os.path.join(os.path.dirname(carsus.__file__), 
-                        'data', 
-                        'knox_long_recombination_zeta.dat')
+ZETA_DATA_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/zeta/knox_long_recombination_zeta.dat"
 
 class KnoxLongZetaIngester(object):
 
-    def __init__(self, session, data_fn, ds_name='knox_long'):
+    def __init__(self, session, fname=None, ds_name='knox_long'):
         self.session = session
-        self.data_fn = data_fn
+
+        if fname is None:
+            self.fname = ZETA_DATA_URL
+        else:
+            self.fname = fname
+
         self.data_source = DataSource.as_unique(
             self.session,
             short_name=ds_name
         )
+        
         if self.data_source.data_source_id is None:
             self.session.flush()
 
@@ -32,7 +36,7 @@ class KnoxLongZetaIngester(object):
         names += [str(i) for i in t_values]
 
         zeta = np.recfromtxt(
-            self.data_fn,
+            self.fname,
             usecols=range(1, 23),
             names=names)
 
@@ -79,7 +83,7 @@ class KnoxLongZeta(BaseParser):
     def __init__(self, fname=None):
 
         if fname is None:
-            self.fname = ZETA_PATH
+            self.fname = ZETA_DATA_URL
         else:
             self.fname = fname
 
