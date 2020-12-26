@@ -410,13 +410,14 @@ class GFALLIngester(object):
         session: SQLAlchemy session
         fname: str
             The name of the gfall file to read
+        unique_level_identifier: list
+            List of attributes to identify unique levels from. Will always use
+            atomic_number and ion charge in addition.
         ions: str
             Ingest levels and lines only for these ions. If set to None then ingest all.
             (default: None)
         data_source: DataSource instance
             The data source of the ingester
-
-        gfall_reader : GFALLReaderinstance
 
         Methods
         -------
@@ -424,10 +425,10 @@ class GFALLIngester(object):
             Persists data into the database
     """
 
-    def __init__(self, session, fname=GFALL_URL, ions=None, ds_short_name="ku_latest"):
+    def __init__(self, session, fname=GFALL_URL, ions=None, unique_level_identifier=None, ds_short_name="ku_latest"):
         self.session = session
-        self.gfall_reader = GFALLReader(ions, fname)
-        
+        self.gfall_reader = GFALLReader(ions, fname, unique_level_identifier)
+
         if ions is not None:
             try:
                 ions = parse_selected_species(ions)
