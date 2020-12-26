@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import pandas as pd
 import hashlib
@@ -45,6 +46,7 @@ from carsus.util import (
         serialize_pandas_object
         )
 
+logger = logging.getLogger(__name__)
 
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
@@ -274,7 +276,7 @@ class AtomData(object):
             try:
                 weight = atom.weights[0].quantity
             except IndexError:
-                print("No weight is available for atom {0}".format(atom.symbol))
+                logger.info("No weight is available for atom {0}".format(atom.symbol))
                 continue
             atom_masses.append((atom.atomic_number, atom.symbol, atom.name, weight.value))
 
@@ -327,7 +329,7 @@ class AtomData(object):
             try:
                 ionization_energy = ion.ionization_energies[0].quantity
             except IndexError:
-                print("No ionization energy is available for ion {0} {1}".format(
+                logger.info("No ionization energy is available for ion {0} {1}".format(
                     convert_atomic_number2symbol(ion.atomic_number), ion.ion_charge
                 ))
                 continue
@@ -812,7 +814,7 @@ class AtomData(object):
             try:
                 gf = e_col.gf_values[0].quantity
             except IndexError:
-                print("No gf is available for electron collision {0}".format(e_col.e_col_id))
+                logger.info("No gf is available for electron collision {0}".format(e_col.e_col_id))
                 continue
 
             btemp, bscups = (list(ts) for ts in zip(*e_col.temp_strengths_tuple))
@@ -1175,7 +1177,7 @@ class AtomData(object):
 
             uuid1 = uuid.uuid1().hex
 
-            print("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
+            logger.info("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
 
             store.root._v_attrs['md5'] = md5_hash.hexdigest()
             store.root._v_attrs['uuid1'] = uuid1

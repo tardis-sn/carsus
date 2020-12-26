@@ -318,7 +318,7 @@ class ChiantiIngester(object):
             if ion in self.masterlist_ions:
                 self.ion_readers.append(ChiantiIonReader(ion))
             else:
-                print("Ion {0} is not available".format(ion))
+                logger.info("Ion {0} is not available.".format(ion))
 
         self.data_source = DataSource.as_unique(
             self.session, short_name=ds_short_name)
@@ -346,7 +346,7 @@ class ChiantiIngester(object):
 
     def ingest_levels(self):
 
-        print("Ingesting levels from {}".format(self.data_source.short_name))
+        logger.info("Ingesting levels from `{}`.".format(self.data_source.short_name))
 
         for rdr in self.ion_readers:
 
@@ -359,11 +359,11 @@ class ChiantiIngester(object):
             try:
                 bound_levels = rdr.bound_levels
             except ChiantiIonReaderError:
-                print("Levels not found for ion {} {}".format(
+                logger.info("Levels not found for ion {} {}.".format(
                     convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting levels for {} {}".format(
+            logger.info("Ingesting levels for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             # ToDo: Determine parity from configuration
@@ -388,7 +388,7 @@ class ChiantiIngester(object):
 
     def ingest_lines(self):
 
-        print("Ingesting lines from {}".format(self.data_source.short_name))
+        logger.info("Ingesting lines from `{}`.".format(self.data_source.short_name))
 
         for rdr in self.ion_readers:
 
@@ -401,11 +401,11 @@ class ChiantiIngester(object):
             try:
                 bound_lines = rdr.bound_lines
             except ChiantiIonReaderError:
-                print("Lines not found for ion {} {}".format(
+                logger.info("Lines not found for ion {} {}.".format(
                     convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting lines for {} {}".format(
+            logger.info("Ingesting lines for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)
@@ -447,7 +447,7 @@ class ChiantiIngester(object):
 
     def ingest_collisions(self):
 
-        print("Ingesting collisions from {}".format(
+        logger.info("Ingesting collisions from `{}`.".format(
             self.data_source.short_name))
 
         for rdr in self.ion_readers:
@@ -461,11 +461,11 @@ class ChiantiIngester(object):
             try:
                 bound_collisions = rdr.bound_collisions
             except ChiantiIonReaderError:
-                print("Collisions not found for ion {} {}".format(
+                logger.info("Collisions not found for ion {} {}.".format(
                     convert_atomic_number2symbol(atomic_number), ion_charge))
                 continue
 
-            print("Ingesting collisions for {} {}".format(
+            logger.info("Ingesting collisions for {} {}.".format(
                 convert_atomic_number2symbol(atomic_number), ion_charge))
 
             lvl_index2id = self.get_lvl_index2id(ion)

@@ -1,9 +1,10 @@
 import os
+import logging
 import pandas as pd
 import carsus
-
 from carsus.model import Atom, setup
 
+logger = logging.getLogger(__name__)
 
 basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data',
                                        'basic_atomic_data.csv')
@@ -28,7 +29,7 @@ def init_db(db_url='sqlite://', **kwargs):
     an instance of the sqlalchemy.orm.session.Session class
 
     """
-    print("Initializing the database at {}".format(db_url))
+    logger.info("Initializing the database at {}".format(db_url))
 
     session = setup(db_url, **kwargs)
 
@@ -41,7 +42,7 @@ def init_db(db_url='sqlite://', **kwargs):
 def _init_empty_db(session):
     """ Ingests basic atomic data to an empty database """
     basic_atomic_data = pd.read_csv(basic_atomic_data_fname)
-    print("Ingesting basic atomic data")
+    logger.info("Ingesting basic atomic data.")
     for i, row in basic_atomic_data.iterrows():
         session.add(Atom(atomic_number=row['atomic_number'], name=row['name'],
                           symbol=row['symbol'], group=row['group'],

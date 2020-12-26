@@ -171,7 +171,7 @@ class NISTWeightsCompIngester(BaseIngester):
         if atomic_weights is None:
             atomic_weights = self.parser.prepare_atomic_dataframe()
 
-        print("Ingesting atomic weights from {}".format(self.data_source.short_name))
+        logger.info("Ingesting atomic weights from `{}`.".format(self.data_source.short_name))
 
         for atomic_number, row in atomic_weights.iterrows():
             weight = AtomWeight(atomic_number=atomic_number,

@@ -236,7 +236,7 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         if ioniz_energies is None:
             ioniz_energies = self.parser.prepare_ioniz_energies()
 
-        logger.info(f"Ingesting ionization energies from {self.data_source.short_name}.")
+        logger.info(f"Ingesting ionization energies from `{self.data_source.short_name}`.")
 
         for index, row in ioniz_energies.iterrows():
             atomic_number, ion_charge = index
@@ -258,7 +258,7 @@ class NISTIonizationEnergiesIngester(BaseIngester):
         if ground_levels is None:
             ground_levels = self.parser.prepare_ground_levels()
 
-        logger.info(f"Ingesting ground levels from {self.data_source.short_name}.")
+        logger.info(f"Ingesting ground levels from `{self.data_source.short_name}`.")
 
         for index, row in ground_levels.iterrows():
             atomic_number, ion_charge = index

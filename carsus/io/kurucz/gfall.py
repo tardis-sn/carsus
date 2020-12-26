@@ -427,6 +427,7 @@ class GFALLIngester(object):
     def __init__(self, session, fname=GFALL_URL, ions=None, ds_short_name="ku_latest"):
         self.session = session
         self.gfall_reader = GFALLReader(ions, fname)
+        
         if ions is not None:
             try:
                 ions = parse_selected_species(ions)
@@ -474,7 +475,7 @@ class GFALLIngester(object):
                      on=["atomic_number", "ion_charge"]).\
                 set_index(["atomic_number", "ion_charge", "level_index"])
 
-        logger.info("Ingesting levels from {}.".format(self.data_source.short_name))
+        logger.info("Ingesting levels from `{}`.".format(self.data_source.short_name))
 
         for ion_index, ion_levels in levels.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -514,7 +515,7 @@ class GFALLIngester(object):
                 set_index(["atomic_number", "ion_charge",
                            "level_index_lower", "level_index_upper"])
 
-        logger.info("Ingesting lines from {}.".format(self.data_source.short_name))
+        logger.info("Ingesting lines from `{}`.".format(self.data_source.short_name))
 
         for ion_index, ion_lines in lines.groupby(level=["atomic_number", "ion_charge"]):
 
