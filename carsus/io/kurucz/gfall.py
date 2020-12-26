@@ -53,7 +53,7 @@ class GFALLReader(object):
     default_unique_level_identifier = ['energy', 'j']
 
     def __init__(self, ions=None, 
-                 fname=GFALL_URL,
+                 fname=None,
                  unique_level_identifier=None,
                  priority=10
                 ):
@@ -73,7 +73,12 @@ class GFALLReader(object):
         priority: int, optional
             Priority of the current data source.
         """
-        self.fname = fname
+
+        if fname is None:
+            self.fname = GFALL_URL
+        else:
+            self.fname = fname
+
         self.priority = priority
 
         if ions is not None:
@@ -425,9 +430,15 @@ class GFALLIngester(object):
             Persists data into the database
     """
 
-    def __init__(self, session, fname=GFALL_URL, ions=None, unique_level_identifier=None, ds_short_name="ku_latest"):
+    def __init__(self, session, fname=None, ions=None, unique_level_identifier=None, ds_short_name="ku_latest"):
         self.session = session
-        self.gfall_reader = GFALLReader(ions, fname, unique_level_identifier)
+        
+        if fname is None:
+            self.fname = GFALL_URL
+        else:
+            self.fname = fname
+        
+        self.gfall_reader = GFALLReader(ions, self.fname, unique_level_identifier)
 
         if ions is not None:
             try:

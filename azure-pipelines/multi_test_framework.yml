@@ -10,7 +10,6 @@ variables:
   carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
   carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
 
-  # Chianti
   chianti.db.version: "9.0.1"
   chianti.data.url: "https://download.chiantidatabase.org"
   chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
@@ -50,17 +49,17 @@ jobs:
         displayName: "Setup environment"
 
       - bash: |
+          mkdir -p $(xuvtop)
+          cd $(xuvtop)
+          curl -O $(chianti.db.url)
+          tar -zxvf CHIANTI_v$(chianti.db.version)_database.tar.gz -C $(xuvtop)
+        displayName: "Fetch Chianti database"
+
+      - bash: |
           GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
           cd $(build.dir)/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
-
-      - bash: |
-          mkdir -p $(xuvtop)
-          cd $(xuvtop)
-          curl -O $CHIANTI_DB_URL
-          tar -zxvf CHIANTI_v$(chianti.db.version)_database.tar.gz -C $(xuvtop)
-        displayName: "Fetch Chianti database"
 
       - bash: git clone $(carsus.refdata.url) $(build.dir)/carsus-refdata
         displayName: "Fetch reference data"
