@@ -25,8 +25,8 @@ class BaseParser(metaclass=ABCMeta):
         if len(value_unc_pair) == 1:  # if no uncertainty given
             return float(value_unc_pair[0]), np.nan
         else:
-            value, unc = value_unc_pair
-        if unc == "":  # if uncertainty_str is empty
+            value, unc = value_unc_pair[:2]  # limit to two
+        if unc == "" or unc == "?":  # if uncertainty_str is empty or unknown
             unc = np.nan
         if "e" in value:
             exp_pos = value.find("e")
