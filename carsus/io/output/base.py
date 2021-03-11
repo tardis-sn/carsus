@@ -60,6 +60,7 @@ class TARDISAtomData:
         }
 
         if collisions_temperatures is None:
+            # If not sp
             collisions_temperatures = np.arange(2000, 50000, 2000)
         else:
             collisions_temperatures = np.array(collisions_temperatures)
@@ -185,6 +186,18 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_einstein_coeff(lines):
+        """
+        Function to create Einstein Coefficients which are a measure of the 
+        probability of absorption or emission of light by an atom or molecule.
+        
+        Link for formula reference:
+        https://en.wikipedia.org/wiki/Einstein_coefficients#Various_formulations
+
+        Args: lines (pandas.DataFrame)
+
+        Returns: None
+
+        """
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
         lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
