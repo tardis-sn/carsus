@@ -158,7 +158,9 @@ class AtomData(object):
         }
 
         if collisions_temperatures is None:
-            collisions_temperatures = np.arange(2000, 50000, 2000)
+            # Collision temperatures range
+            min_temp, max_temp, diff = 2000, 50000, 2000
+            collisions_temperatures = np.arange(min_temp, max_temp, diff)
         else:
             collisions_temperatures = np.array(collisions_temperatures, dtype=np.int64)
 
