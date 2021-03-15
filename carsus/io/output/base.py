@@ -60,7 +60,6 @@ class TARDISAtomData:
         }
 
         if collisions_temperatures is None:
-            # If not sp
             collisions_temperatures = np.arange(2000, 50000, 2000)
         else:
             collisions_temperatures = np.array(collisions_temperatures)
