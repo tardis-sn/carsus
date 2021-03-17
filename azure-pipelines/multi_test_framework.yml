@@ -6,13 +6,15 @@ variables:
   build.dir: $(Agent.BuildDirectory)
   carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
   carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
-  chianti.data.url: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
+  chianti.data.url: "https://download.chiantidatabase.org"
+  chianti.db.version: "9.0.1"
+  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
   xuvtop: "$(build.dir)/chianti"
   codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
   system.debug: "false"
 
 jobs:
-  - job: "Test"
+  - job:
     pool:
       vmImage: "ubuntu-latest"
 
@@ -24,7 +26,7 @@ jobs:
 
         remote_data:
           SETUP_CMD: "--remote-data"
-          TEST_MODE: "remote_data"
+          TEST_MODE: "remote data"
 
         runslow:
           SETUP_CMD: "--runslow"
@@ -60,8 +62,9 @@ jobs:
 
       - bash: |
           mkdir -p $XUVTOP
-          wget $CHIANTI_DATA_URL -O $XUVTOP/CHIANTI_9.0.1_data.tar.gz
-          tar -zxvf $XUVTOP/CHIANTI_9.0.1_data.tar.gz -C $XUVTOP
+          cd $XUVTOP
+          curl -O $CHIANTI_DB_URL
+          tar -zxvf CHIANTI_v*_database.tar.gz -C $XUVTOP
         displayName: "Fetch Chianti database"
 
       - bash: |

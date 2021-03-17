@@ -9,8 +9,7 @@ pr:
 # Variables we can reference later
 variables:
   system.debug: 'true'
-  CHIANTI_DATA_URL: "http://www.chiantidatabase.org/download/CHIANTI_9.0.1_data.tar.gz"
-  CMFGEN_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
+  CHIANTI_DATA_URL: "https://download.chiantidatabase.org/CHIANTI_v9.0.1_database.tar.gz"
   XUVTOP: "/usr/share/chianti"
 
 jobs:
@@ -67,8 +66,8 @@ jobs:
 # Download chianti data for tests
   - bash: |
           mkdir /usr/share/chianti
-          wget $CHIANTI_DATA_URL -O /usr/share/chianti/CHIANTI_9.0.1_data.tar.gz
-          tar -zxvf /usr/share/chianti/CHIANTI_9.0.1_data.tar.gz -C /usr/share/chianti
+          wget $CHIANTI_DATA_URL -O /usr/share/chianti/CHIANTI_v9.0.1_database.tar.gz
+          tar -zxvf /usr/share/chianti/CHIANTI_v9.0.1_database.tar.gz -C /usr/share/chianti
     displayName: "Fetch Chianti Data"
 
   - bash: |
