@@ -10,6 +10,7 @@ pr:
 variables:
   system.debug: 'true'
   CHIANTI_DATA_URL: "https://download.chiantidatabase.org/CHIANTI_v9.0.1_database.tar.gz"
+  CMFGEN_DATA_URL: "http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz"
   XUVTOP: "/usr/share/chianti"
 
 jobs:
