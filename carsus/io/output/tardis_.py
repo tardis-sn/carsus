@@ -316,7 +316,7 @@ class AtomData(object):
         ionization_energies : pandas.DataFrame
             DataFrame with:
                 index: none;
-                columns: atomic_number, ion_charge, ionization_energy[eV]
+                columns: atomic_number, ion_number, ionization_energy[eV]
         """
         ionization_energies_q = self.session.query(Ion).\
             filter(Ion.atomic_number.in_(self.selected_atomic_numbers)).\
@@ -333,7 +333,7 @@ class AtomData(object):
                 continue
             ionization_energies.append((ion.atomic_number, ion.ion_charge, ionization_energy.value))
 
-        ionization_dtype = [("atomic_number", np.int), ("ion_charge", np.int), ("ionization_energy", np.float)]
+        ionization_dtype = [("atomic_number", np.int), ("ion_number", np.int), ("ionization_energy", np.float)]
         ionization_energies = np.array(ionization_energies, dtype=ionization_dtype)
 
         ionization_energies = pd.DataFrame.from_records(ionization_energies)
@@ -349,27 +349,27 @@ class AtomData(object):
         -------
         ionization_energies : pandas.DataFrame
             DataFrame with:
-                index: atomic_number, ion_charge;
+                index: atomic_number, ion_number;
                 columns: ionization_energy[eV].
 
         Notes
         ------
-        In TARDIS `ion_charge` describes the final ion state, e.g. H I - H II
-        is described with ion_charge = 1 On the other hand, in carsus
-        `ion_charge` describes the lower ion state, e.g. H I - H II is
-        described with ion_charge = 0 For this reason we add 1 to `ion_charge`
+        In TARDIS `ion_number` describes the final ion state, e.g. H I - H II
+        is described with ion_number = 1 On the other hand, in carsus
+        `ion_number` describes the lower ion state, e.g. H I - H II is
+        described with ion_number = 0 For this reason we add 1 to `ion_number`
         in this prepare method.
         """
         ionization_energies_prepared = (
                 self.ionization_energies.loc[:, [
                     "atomic_number",
-                    "ion_charge",
+                    "ion_number",
                     "ionization_energy"]].copy()
                 )
-        ionization_energies_prepared.loc[:, "ion_charge"] += 1
+        ionization_energies_prepared.loc[:, "ion_number"] += 1
 
         ionization_energies_prepared = ionization_energies_prepared.set_index(
-                ["atomic_number", "ion_charge"])
+                ["atomic_number", "ion_number"])
 
 # Quick hack to do DataFrame -> Series conversion
         return ionization_energies_prepared.squeeze()
@@ -457,7 +457,7 @@ class AtomData(object):
         This function returns level data about the selected atoms from the selected
         DataSources. The data is returned in a pandas DataFrame.  The index is
         'level_id' and the following columns exist:
-        atomic_number, ion_charge, g, energy [eV]
+        atomic_number, ion_number, g, energy [eV]
 
         Note about the energy: The database has three different values for the
         method of determining the energy: meas(ured), theor(etical) and None
@@ -472,7 +472,7 @@ class AtomData(object):
                 query(
                     Level.level_id.label('level_id'),
                     Level.atomic_number.label('atomic_number'),
-                    Level.ion_charge.label('ion_charge'),
+                    Level.ion_charge.label('ion_number'),
                     Level.g.label('g'),
                     ).
                 join(
@@ -611,7 +611,7 @@ class AtomData(object):
                 (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
             )
 
-        levels_columns = ["level_id", "atomic_number", "ion_charge", "level_number", "energy", "g", "metastable"]
+        levels_columns = ["level_id", "atomic_number", "ion_number", "level_number", "energy", "g", "metastable"]
         fully_ionized_levels_dtypes = [(key, levels.dtypes[key]) for key in levels_columns]
 
         fully_ionized_levels = np.array(fully_ionized_levels, dtype=fully_ionized_levels_dtypes)
@@ -637,12 +637,12 @@ class AtomData(object):
         levels: pandas.DataFrame
             DataFrame with:
                 index: level_id
-                columns: atomic_number, ion_charge, level_number, energy[eV], g[1]
+                columns: atomic_number, ion_number, level_number, energy[eV], g[1]
 
         lines: pandas.DataFrame
             DataFrame with:
                 index: line_id;
-                columns: atomic_number, ion_charge, level_number_lower, level_number_upper,
+                columns: atomic_number, ion_number, level_number_lower, level_number_upper,
                          wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1], B_ul[?], B_ul[?], A_ul[1/s].
         """
 
@@ -651,8 +651,8 @@ class AtomData(object):
         lines_all = self._get_all_lines_data()
 
         # Culling autoionization levels
-        ionization_energies = self.ionization_energies.set_index(["atomic_number", "ion_charge"])
-        levels_w_ionization_energies = levels_all.join(ionization_energies, on=["atomic_number", "ion_charge"])
+        ionization_energies = self.ionization_energies.set_index(["atomic_number", "ion_number"])
+        levels_w_ionization_energies = levels_all.join(ionization_energies, on=["atomic_number", "ion_number"])
         levels = levels_all.loc[
             levels_w_ionization_energies["energy"] < levels_w_ionization_energies["ionization_energy"]
         ].copy()
@@ -670,17 +670,17 @@ class AtomData(object):
         levels["metastable"] = self._create_metastable_flags(levels, lines_all, levels_metastable_loggf_threshold)
 
         # Create level numbers
-        levels.sort_values(["atomic_number", "ion_charge", "energy", "g"], inplace=True)
-        levels["level_number"] = levels.groupby(['atomic_number', 'ion_charge'])['energy']. \
+        levels.sort_values(["atomic_number", "ion_number", "energy", "g"], inplace=True)
+        levels["level_number"] = levels.groupby(['atomic_number', 'ion_number'])['energy']. \
             transform(lambda x: np.arange(len(x))).values
         levels["level_number"] = levels["level_number"].astype(np.int)
 
-        # Join atomic_number, ion_charge, level_number_lower, level_number_upper on lines
+        # Join atomic_number, ion_number, level_number_lower, level_number_upper on lines
         lower_levels = levels.rename(
                 columns={
                     "level_number": "level_number_lower",
                     "g": "g_l"}
-                ).loc[:, ["atomic_number", "ion_charge", "level_number_lower", "g_l"]]
+                ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
         upper_levels = levels.rename(
                 columns={
                     "level_number": "level_number_upper",
@@ -709,7 +709,7 @@ class AtomData(object):
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
-        levels = levels.sort_values(["atomic_number", "ion_charge", "level_number"])
+        levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
 
         return levels, lines
 
@@ -723,16 +723,16 @@ class AtomData(object):
         levels_prepared: pandas.DataFrame
             DataFrame with:
                 index: none;
-                columns: atomic_number, ion_charge, level_number, energy[eV], g[1], metastable.
+                columns: atomic_number, ion_number, level_number, energy[eV], g[1], metastable.
         """
 
         levels_prepared = self.levels.loc[:, [
-            "atomic_number", "ion_charge", "level_number",
+            "atomic_number", "ion_number", "level_number",
             "energy", "g", "metastable"]].copy()
 
         # Set index
         levels_prepared.set_index(
-                ["atomic_number", "ion_charge", "level_number"], inplace=True)
+                ["atomic_number", "ion_number", "level_number"], inplace=True)
 
         return levels_prepared
 
@@ -746,18 +746,18 @@ class AtomData(object):
             lines_prepared : pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: line_id, atomic_number, ion_charge, level_number_lower, level_number_upper,
+                    columns: line_id, atomic_number, ion_number, level_number_lower, level_number_upper,
                              wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1], B_ul[?], B_ul[?], A_ul[1/s].
         """
 
         lines_prepared = self.lines.loc[:, [
-            "line_id", "wavelength", "atomic_number", "ion_charge",
+            "line_id", "wavelength", "atomic_number", "ion_number",
             "f_ul", "f_lu", "level_number_lower", "level_number_upper",
             "nu", "B_lu", "B_ul", "A_ul"]].copy()
 
         # Set the index
         lines_prepared.set_index([
-                    "atomic_number", "ion_charge",
+                    "atomic_number", "ion_number",
                     "level_number_lower", "level_number_upper"], inplace=True)
 
         return lines_prepared
@@ -827,9 +827,9 @@ class AtomData(object):
         collisions = np.array(collisions, dtype=collisions_dtype)
         collisions = pd.DataFrame.from_records(collisions, index="e_col_id")
 
-        # Join atomic_number, ion_charge, level_number_lower, level_number_upper
+        # Join atomic_number, ion_number, level_number_lower, level_number_upper
         lower_levels = levels.rename(columns={"level_number": "level_number_lower", "g": "g_l", "energy": "energy_lower"}). \
-                              loc[:, ["atomic_number", "ion_charge", "level_number_lower", "g_l", "energy_lower"]]
+                              loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
         upper_levels = levels.rename(columns={"level_number": "level_number_upper", "g": "g_u", "energy": "energy_upper"}). \
                               loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
@@ -904,11 +904,11 @@ class AtomData(object):
             -------
             collisions_prepared : pandas.DataFrame
                 DataFrame with:
-                    index: atomic_number, ion_charge, level_number_lower, level_number_upper;
+                    index: atomic_number, ion_number, level_number_lower, level_number_upper;
                     columns: e_col_id, delta_e, g_ratio, [collision strengths].
         """
 
-        collisions_columns = ['atomic_number', 'ion_charge', 'level_number_upper',
+        collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
                               'level_number_lower', 'g_ratio', 'delta_e'] + \
                               sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
 
@@ -919,7 +919,7 @@ class AtomData(object):
         # ToDo: maybe set multiindex
         collisions_prepared.set_index([
                     "atomic_number",
-                    "ion_charge",
+                    "ion_number",
                     "level_number_lower",
                     "level_number_upper"],
                     inplace=True)
@@ -941,7 +941,7 @@ class AtomData(object):
             macro_atom: pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: atomic_number, ion_charge, source_level_number, target_level_number,
+                    columns: atomic_number, ion_number, source_level_number, target_level_number,
                         transition_line_id, transition_type, transition_probability.
 
             Notes:
@@ -958,12 +958,12 @@ class AtomData(object):
         lines = lines.join(lvl_energy_lower, on="lower_level_id").join(lvl_energy_upper, on="upper_level_id")
 
         macro_atom = list()
-        macro_atom_dtype = [("atomic_number", np.int), ("ion_charge", np.int),
+        macro_atom_dtype = [("atomic_number", np.int), ("ion_number", np.int),
                             ("source_level_number", np.int), ("target_level_number", np.int),
                             ("transition_line_id", np.int), ("transition_type", np.int), ("transition_probability", np.float)]
 
         for line_id, row in lines.iterrows():
-            atomic_number, ion_charge = row["atomic_number"], row["ion_charge"]
+            atomic_number, ion_number = row["atomic_number"], row["ion_number"]
             level_number_lower, level_number_upper = row["level_number_lower"], row["level_number_upper"]
             nu = row["nu"]
             f_ul, f_lu = row["f_ul"], row["f_lu"]
@@ -974,17 +974,17 @@ class AtomData(object):
             transition_probabilities_dict[P_INTERNAL_DOWN] = 2 * nu**2 * f_ul / const.c.cgs.value**2 * e_lower
             transition_probabilities_dict[P_INTERNAL_UP] = f_lu * e_lower / (const.h.cgs.value * nu)
 
-            macro_atom.append((atomic_number, ion_charge, level_number_upper, level_number_lower,
+            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
                                     line_id, P_EMISSION_DOWN, transition_probabilities_dict[P_EMISSION_DOWN]))
-            macro_atom.append((atomic_number, ion_charge, level_number_upper, level_number_lower,
+            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
                                     line_id, P_INTERNAL_DOWN, transition_probabilities_dict[P_INTERNAL_DOWN]))
-            macro_atom.append((atomic_number, ion_charge, level_number_lower, level_number_upper,
+            macro_atom.append((atomic_number, ion_number, level_number_lower, level_number_upper,
                                     line_id, P_INTERNAL_UP, transition_probabilities_dict[P_INTERNAL_UP]))
 
         macro_atom = np.array(macro_atom, dtype=macro_atom_dtype)
         macro_atom = pd.DataFrame(macro_atom)
 
-        macro_atom = macro_atom.sort_values(["atomic_number", "ion_charge", "source_level_number"])
+        macro_atom = macro_atom.sort_values(["atomic_number", "ion_number", "source_level_number"])
 
         return macro_atom
 
@@ -997,7 +997,7 @@ class AtomData(object):
             macro_atom_prepared : pandas.DataFrame
                 DataFrame with the *macro atom data* with:
                     index: none;
-                    columns: atomic_number, ion_charge, source_level_number, destination_level_number,
+                    columns: atomic_number, ion_number, source_level_number, destination_level_number,
                         transition_line_id, transition_type, transition_probability.
             Notes:
                 Refer to the docs: http://tardis.readthedocs.io/en/latest/physics/plasma/macroatom.html
@@ -1005,7 +1005,7 @@ class AtomData(object):
 
         macro_atom_prepared = self.macro_atom.loc[:, [
             "atomic_number",
-            "ion_charge", "source_level_number", "target_level_number",
+            "ion_number", "source_level_number", "target_level_number",
             "transition_type", "transition_probability",
             "transition_line_id"]].copy()
 
@@ -1035,10 +1035,10 @@ class AtomData(object):
             macro_atom_reference : pandas.DataFrame
                 DataFrame with:
                 index: no index;
-                and columns: atomic_number, ion_charge, source_level_number, count_down, count_up, count_total
+                and columns: atomic_number, ion_number, source_level_number, count_down, count_up, count_total
         """
         macro_atom_references = self.levels.rename(columns={"level_number": "source_level_number"}).\
-                                       loc[:, ["atomic_number", "ion_charge", "source_level_number", "level_id"]]
+                                       loc[:, ["atomic_number", "ion_number", "source_level_number", "level_id"]]
 
         count_down = self.lines.groupby("upper_level_id").size()
         count_down.name = "count_down"
@@ -1069,14 +1069,14 @@ class AtomData(object):
             macro_atom_references_prepared : pandas.DataFrame
                 DataFrame with:
                     index: none;
-                    columns: atomic_number, ion_charge, source_level_number, count_down, count_up, count_total.
+                    columns: atomic_number, ion_number, source_level_number, count_down, count_up, count_total.
         """
         macro_atom_references_prepared = self.macro_atom_references.loc[:, [
-            "atomic_number", "ion_charge", "source_level_number", "count_down",
+            "atomic_number", "ion_number", "source_level_number", "count_down",
             "count_up", "count_total"]].copy()
 
         macro_atom_references_prepared.set_index(
-                ['atomic_number', 'ion_charge', 'source_level_number'],
+                ['atomic_number', 'ion_number', 'source_level_number'],
                 inplace=True)
 
         return macro_atom_references_prepared
