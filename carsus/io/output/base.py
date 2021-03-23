@@ -118,7 +118,7 @@ class TARDISAtomData:
     def get_lvl_index2id(df, levels_all, ion):
         df = df.reset_index()
         lvl_index2id = levels_all.set_index(
-                            ['atomic_number', 'ion_charge']).loc[ion]
+                            ['atomic_number', 'ion_number']).loc[ion]
         lvl_index2id = lvl_index2id.reset_index()
         lvl_index2id = lvl_index2id[['level_id']]
 
@@ -152,7 +152,7 @@ class TARDISAtomData:
             )
 
         levels_columns = ["level_id", "atomic_number",
-                          "ion_charge", "level_number",
+                          "ion_number", "level_number",
                           "energy", "g", "metastable"]
         fully_ionized_levels_dtypes = [
             (key, levels.dtypes[key]) for key in levels_columns]
@@ -185,18 +185,6 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_einstein_coeff(lines):
-        """
-        Function to create Einstein Coefficients which are a measure of the 
-        probability of absorption or emission of light by an atom or molecule.
-        
-        Link for formula reference:
-        https://en.wikipedia.org/wiki/Einstein_coefficients#Various_formulations
-
-        Args: lines (pandas.DataFrame)
-
-        Returns: None
-
-        """
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
         lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
@@ -275,8 +263,9 @@ class TARDISAtomData:
         levels['g'] = levels['g'].astype(np.int)
         levels = levels.drop(columns=['j', 'label', 'method'])
         levels = levels.reset_index(drop=True)
+        levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number',
-                         'ion_charge', 'g', 'energy', 'source']]
+                         'ion_number', 'g', 'energy', 'source']]
 
         levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
         levels['energy'] = levels['energy'].apply(
@@ -284,6 +273,8 @@ class TARDISAtomData:
         levels['energy'] = levels['energy'].apply(lambda x: x.value)
 
         ground_levels = self.ground_levels
+        ground_levels.rename(
+            columns={'ion_charge': 'ion_number'}, inplace=True)
         ground_levels['source'] = 'nist'
 
         levels = pd.concat([ground_levels, levels], sort=True)
@@ -304,7 +295,7 @@ class TARDISAtomData:
         # "keep only zero energy levels from NIST source".
 
         mask = (levels['source'] != 'chianti') & (
-            levels[['atomic_number', 'ion_charge',
+            levels[['atomic_number', 'ion_number',
                     'energy', 'g']].duplicated(keep='last'))	
         levels = levels[~mask]
 
@@ -314,11 +305,11 @@ class TARDISAtomData:
         for ion in self.chianti_ions:
             mask = (levels['source'] == 'gfall') & (
                 levels['atomic_number'] == ion[0]) & (
-                    levels['ion_charge'] == ion[1])
+                    levels['ion_number'] == ion[1])
             levels.drop(levels[mask].index, inplace=True)
 
         levels = levels[['atomic_number',
-                         'ion_charge', 'g', 'energy', 'source']]
+                         'ion_number', 'g', 'energy', 'source']]
 
         levels = levels.reset_index()
 
@@ -413,19 +404,19 @@ class TARDISAtomData:
         levels_all = self.levels_all
         lines_all = self.lines_all
         ionization_energies = self.ionization_energies.base.reset_index()
-        ionization_energies['ion_charge'] -= 1
+        ionization_energies['ion_number'] -= 1
 
         # Culling autoionization levels
         levels_w_ionization_energies = pd.merge(levels_all,
                                                 ionization_energies,
                                                 how='left',
                                                 on=["atomic_number",
-                                                    "ion_charge"])
+                                                    "ion_number"])
         mask = levels_w_ionization_energies["energy"] < \
             levels_w_ionization_energies["ionization_energy"]
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index('level_id').sort_values(
-            by=['atomic_number', 'ion_charge'])
+            by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
 
         # Clean lines
@@ -446,22 +437,22 @@ class TARDISAtomData:
 
         # Create levels numbers
         levels = levels.sort_values(
-            ["atomic_number", "ion_charge", "energy", "g"])
+            ["atomic_number", "ion_number", "energy", "g"])
         levels["level_number"] = levels.groupby(['atomic_number',
-                                                 'ion_charge'])['energy']. \
+                                                 'ion_number'])['energy']. \
             transform(lambda x: np.arange(len(x))).values
         levels["level_number"] = levels["level_number"].astype(np.int)
 
-        levels = levels[['atomic_number', 'energy', 'g', 'ion_charge',
+        levels = levels[['atomic_number', 'energy', 'g', 'ion_number',
                          'level_number', 'metastable']]
 
-        # Join atomic_number, ion_charge, level_number_lower,
+        # Join atomic_number, ion_number, level_number_lower,
         # level_number_upper on lines
         lower_levels = levels.rename(
             columns={
                 "level_number": "level_number_lower",
                 "g": "g_l"}
-        ).loc[:, ["atomic_number", "ion_charge", "level_number_lower", "g_l"]]
+        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
         upper_levels = levels.rename(
             columns={
                 "level_number": "level_number_upper",
@@ -493,7 +484,7 @@ class TARDISAtomData:
         levels = levels.append(
             artificial_fully_ionized_levels, ignore_index=True)
         levels = levels.sort_values(
-            ["atomic_number", "ion_charge", "level_number"])
+            ["atomic_number", "ion_number", "level_number"])
 
         self.lines = lines
         self.levels = levels
@@ -523,9 +514,9 @@ class TARDISAtomData:
         collisions['e_col_id'] = range(start, start + len(collisions))
         collisions = collisions.reset_index()
 
-        # Join atomic_number, ion_charge, level_number_lower, level_number_upper
+        # Join atomic_number, ion_number, level_number_lower, level_number_upper
         lower_levels = levels.rename(columns={"level_number": "level_number_lower", "g": "g_l", "energy": "energy_lower"}). \
-                              loc[:, ["atomic_number", "ion_charge", "level_number_lower", "g_l", "energy_lower"]]
+                              loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
         upper_levels = levels.rename(columns={"level_number": "level_number_upper", "g": "g_u", "energy": "energy_upper"}). \
                               loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
@@ -544,12 +535,13 @@ class TARDISAtomData:
         # Derive columns for collisional strengths
         c_ul_temperature_cols = ['t{:06d}'.format(t) for t in temperatures]
 
-        collisions = collisions.rename(columns={'temperatures': 'btemp',
+        collisions = collisions.rename(columns={'ion_charge': 'ion_number',
+                                                'temperatures': 'btemp',
                                                 'collision_strengths': 'bscups'})
         collisions = collisions[['e_col_id', 'lower_level_id',
                                  'upper_level_id', 'ds_id',
                                  'btemp', 'bscups', 'ttype', 'cups',
-                                 'gf', 'atomic_number', 'ion_charge',
+                                 'gf', 'atomic_number', 'ion_number',
                                  'level_number_lower', 'g_l',
                                  'energy_lower', 'level_number_upper', 
                                  'g_u', 'energy_upper', 'delta_e', 
@@ -575,11 +567,11 @@ class TARDISAtomData:
         """
 
         levels_prepared = self.levels.loc[:, [
-            "atomic_number", "ion_charge", "level_number",
+            "atomic_number", "ion_number", "level_number",
             "energy", "g", "metastable"]].copy()
 
         levels_prepared.set_index(
-            ["atomic_number", "ion_charge", "level_number"], inplace=True)
+            ["atomic_number", "ion_number", "level_number"], inplace=True)
 
         return levels_prepared
 
@@ -594,7 +586,7 @@ class TARDISAtomData:
         """
 
         lines_prepared = self.lines.loc[:, [
-            "line_id", "wavelength", "atomic_number", "ion_charge",
+            "line_id", "wavelength", "atomic_number", "ion_number",
             "f_ul", "f_lu", "level_number_lower", "level_number_upper",
             "nu", "B_lu", "B_ul", "A_ul"]].copy()
 
@@ -604,7 +596,7 @@ class TARDISAtomData:
         # A_ul[1/s].
 
         lines_prepared.set_index([
-            "atomic_number", "ion_charge",
+            "atomic_number", "ion_number",
             "level_number_lower", "level_number_upper"], inplace=True)
 
         return lines_prepared
@@ -619,7 +611,7 @@ class TARDISAtomData:
         pandas.DataFrame
         """
 
-        collisions_columns = ['atomic_number', 'ion_charge', 'level_number_upper',
+        collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
                               'level_number_lower', 'g_ratio', 'delta_e'] + \
                               sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
 
@@ -627,7 +619,7 @@ class TARDISAtomData:
 
         collisions_prepared.set_index([
                     "atomic_number",
-                    "ion_charge",
+                    "ion_number",
                     "level_number_lower",
                     "level_number_upper"],
                     inplace=True)
@@ -661,7 +653,7 @@ class TARDISAtomData:
             lvl_energy_upper, on="upper_level_id")
 
         macro_atom = list()
-        macro_atom_dtype = [("atomic_number", np.int), ("ion_charge", np.int),
+        macro_atom_dtype = [("atomic_number", np.int), ("ion_number", np.int),
                             ("source_level_number",
                              np.int), ("target_level_number", np.int),
                             ("transition_line_id",
@@ -669,7 +661,7 @@ class TARDISAtomData:
                             ("transition_probability", np.float)]
 
         for line_id, row in lines.iterrows():
-            atomic_number, ion_charge = row["atomic_number"], row["ion_charge"]
+            atomic_number, ion_number = row["atomic_number"], row["ion_number"]
             level_number_lower, level_number_upper = \
                 row["level_number_lower"], row["level_number_upper"]
             nu = row["nu"]
@@ -684,13 +676,13 @@ class TARDISAtomData:
             transition_probabilities_dict[P_INTERNAL_UP] = f_lu * \
                 e_lower / (const.h.cgs.value * nu)
 
-            macro_atom.append((atomic_number, ion_charge, level_number_upper,
+            macro_atom.append((atomic_number, ion_number, level_number_upper,
                                level_number_lower, line_id, P_EMISSION_DOWN,
                                transition_probabilities_dict[P_EMISSION_DOWN]))
-            macro_atom.append((atomic_number, ion_charge, level_number_upper,
+            macro_atom.append((atomic_number, ion_number, level_number_upper,
                                level_number_lower, line_id, P_INTERNAL_DOWN,
                                transition_probabilities_dict[P_INTERNAL_DOWN]))
-            macro_atom.append((atomic_number, ion_charge, level_number_lower,
+            macro_atom.append((atomic_number, ion_number, level_number_lower,
                                level_number_upper, line_id, P_INTERNAL_UP,
                                transition_probabilities_dict[P_INTERNAL_UP]))
 
@@ -698,7 +690,7 @@ class TARDISAtomData:
         macro_atom = pd.DataFrame(macro_atom)
 
         macro_atom = macro_atom.sort_values(
-            ["atomic_number", "ion_charge", "source_level_number"])
+            ["atomic_number", "ion_number", "source_level_number"])
 
         self.macro_atom = macro_atom
 
@@ -718,7 +710,7 @@ class TARDISAtomData:
 
         macro_atom_prepared = self.macro_atom.loc[:, [
             "atomic_number",
-            "ion_charge", "source_level_number", "target_level_number",
+            "ion_number", "source_level_number", "target_level_number",
             "transition_type", "transition_probability",
             "transition_line_id"]].copy()
 
@@ -739,7 +731,7 @@ class TARDISAtomData:
         """
         macro_atom_references = self.levels.rename(
             columns={"level_number": "source_level_number"}).\
-            loc[:, ["atomic_number", "ion_charge",
+            loc[:, ["atomic_number", "ion_number",
                     "source_level_number", "level_id"]]
 
         count_down = self.lines.groupby("upper_level_id").size()
@@ -776,11 +768,11 @@ class TARDISAtomData:
         pandas.DataFrame
         """
         macro_atom_references_prepared = self.macro_atom_references.loc[:, [
-            "atomic_number", "ion_charge", "source_level_number", "count_down",
+            "atomic_number", "ion_number", "source_level_number", "count_down",
             "count_up", "count_total"]].copy()
 
         macro_atom_references_prepared.set_index(
-            ['atomic_number', 'ion_charge', 'source_level_number'],
+            ['atomic_number', 'ion_number', 'source_level_number'],
             inplace=True)
 
         return macro_atom_references_prepared
