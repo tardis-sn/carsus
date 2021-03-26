@@ -185,6 +185,22 @@ class TARDISAtomData:
 
     @staticmethod
     def _create_einstein_coeff(lines):
+        """
+        Function to create Einstein Co-efficients which are a measure of the 
+        probability of absorption or emission of light by an atom or molecule
+
+        Args
+        -------
+        pandas.DataFrame
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Refer to the link: http://electron6.phys.utk.edu/qm2/modules/m10/einstein.htm
+        """
         einstein_coeff = (4 * np.pi ** 2 * const.e.gauss.value **
                           2) / (const.m_e.cgs.value * const.c.cgs.value)
         lines['B_lu'] = einstein_coeff * lines['f_lu'] / \
