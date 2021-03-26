@@ -379,7 +379,7 @@ class TARDISAtomData:
         chianti_mask = lines['source'] == 'chianti'
 
         lines.loc[gfall_mask, 'wavelength'] = lines.loc[
-            gfall_mask, 'wavelength'].apply(lambda x: x*u.nm)
+            gfall_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
         lines.loc[chianti_mask, 'wavelength'] = lines.loc[
             chianti_mask, 'wavelength'].apply(lambda x: x*u.angstrom)
         lines['wavelength'] = lines['wavelength'].apply(
