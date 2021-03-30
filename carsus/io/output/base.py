@@ -186,16 +186,19 @@ class TARDISAtomData:
     @staticmethod
     def _create_einstein_coeff(lines):
         """
-        Function to create Einstein Co-efficients which are a measure of the 
-        probability of absorption or emission of light by an atom or molecule
+        Create Einstein Co-efficients
 
-        Args
+        Einstein Co-efficients are a measure of the probability of absorption or emission of light.
+
+        Parameters
         -------
-        pandas.DataFrame
+        lines: pandas.DataFrame
+            Lines of data.
 
         Returns
         -------
         None
+            Einstein Co-efficients generated and saved.
 
         Notes
         -----
