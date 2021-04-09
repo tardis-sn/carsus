@@ -312,12 +312,9 @@ class TARDISAtomData:
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
                          'ds_id', 'priority']]
-
-        levels['energy'] = levels['energy'].apply(lambda x: x*u.Unit('cm-1'))
-        levels['energy'] = levels['energy'].apply(
-            lambda x: x.to(u.eV, equivalencies=u.spectral()))
-        levels['energy'] = levels['energy'].apply(lambda x: x.value)
-
+        levels['energy'] = u.Quantity(levels['energy'], u.Unit('cm-1')).to(
+            u.eV, equivalencies=u.spectral()).value
+ 
         # Solve priorities and set attributes for later use.
         self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.solve_priorities(levels)
 
