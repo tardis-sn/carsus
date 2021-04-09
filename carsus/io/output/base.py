@@ -423,7 +423,7 @@ class TARDISAtomData:
         lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index('line_id').sort_index()
 
-        lines['loggf'] = lines['gf'].apply(np.log10)
+        lines['loggf'] = np.log10(lines['gf'])
         lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
                             'j_lower', 'level_index_lower',
                             'level_index_upper'], inplace=True)
@@ -433,17 +433,14 @@ class TARDISAtomData:
 
         # TODO: manage units consistently across all readers (this 
         # could break compatibility with SQL)
-        lines.loc[~chianti_mask, 'wavelength'] = lines.loc[
-            ~chianti_mask, 'wavelength'].apply(lambda x: x*u.nm)
 
-        lines.loc[chianti_mask, 'wavelength'] = lines.loc[
-            chianti_mask, 'wavelength'].apply(lambda x: x*u.AA)
-
-        lines['wavelength'] = lines['wavelength'].apply(lambda x: \
-                                    x.to('angstrom').value)
+        # Chianti wavelengths are already given in AA
+        lines.loc[~chianti_mask, 'wavelength'] = u.Quantity(lines.loc[
+            ~chianti_mask, 'wavelength'], u.nm).to('angstrom').value
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
+
         lines.loc[lines['wavelength'] >
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
