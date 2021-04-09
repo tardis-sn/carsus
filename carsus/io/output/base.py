@@ -424,9 +424,9 @@ class TARDISAtomData:
         lines = lines.set_index('line_id').sort_index()
 
         lines['loggf'] = np.log10(lines['gf'])
-        lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
+        lines = lines.drop(columns=['energy_upper', 'j_upper', 'energy_lower',
                             'j_lower', 'level_index_lower',
-                            'level_index_upper'], inplace=True)
+                            'level_index_upper'])
 
         gfall_mask = lines['ds_id'] == 2
         chianti_mask = lines['ds_id'] == 4
@@ -765,8 +765,8 @@ class TARDISAtomData:
             "atomic_number", "ion_number", "level_number",
             "energy", "g", "metastable"]].copy()
 
-        levels_prepared.set_index(
-            ["atomic_number", "ion_number", "level_number"], inplace=True)
+        levels_prepared = levels_prepared.set_index(
+            ["atomic_number", "ion_number", "level_number"])
 
         return levels_prepared
 
@@ -791,9 +791,9 @@ class TARDISAtomData:
         # B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1],
         # A_ul[1/s].
 
-        lines_prepared.set_index([
+        lines_prepared = lines_prepared.set_index([
             "atomic_number", "ion_number",
-            "level_number_lower", "level_number_upper"], inplace=True)
+            "level_number_lower", "level_number_upper"])
 
         return lines_prepared
 
@@ -814,12 +814,11 @@ class TARDISAtomData:
 
         collisions_prepared = self.collisions.loc[:, collisions_columns].copy()
 
-        collisions_prepared.set_index([
+        collisions_prepared = collisions_prepared.set_index([
                     "atomic_number",
                     "ion_number",
                     "level_number_lower",
-                    "level_number_upper"],
-                    inplace=True)
+                    "level_number_upper"])
 
         return collisions_prepared
 
@@ -865,9 +864,8 @@ class TARDISAtomData:
             "atomic_number", "ion_number", "source_level_number", "count_down",
             "count_up", "count_total"]].copy()
 
-        macro_atom_references_prepared.set_index(
-            ['atomic_number', 'ion_number', 'source_level_number'],
-            inplace=True)
+        macro_atom_references_prepared = macro_atom_references_prepared.set_index(
+            ['atomic_number', 'ion_number', 'source_level_number'])
 
         return macro_atom_references_prepared
 
