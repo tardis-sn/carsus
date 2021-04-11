@@ -428,15 +428,8 @@ class TARDISAtomData:
                             'j_lower', 'level_index_lower',
                             'level_index_upper'])
 
-        gfall_mask = lines['ds_id'] == 2
-        chianti_mask = lines['ds_id'] == 4
-
-        # TODO: manage units consistently across all readers (this 
-        # could break compatibility with SQL)
-
-        # Chianti wavelengths are already given in AA
-        lines.loc[~chianti_mask, 'wavelength'] = u.Quantity(lines.loc[
-            ~chianti_mask, 'wavelength'], u.nm).to('angstrom').value
+        lines['wavelength'] = u.Quantity(lines['wavelength'], u.nm).to(
+            'angstrom').value
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
@@ -445,6 +438,7 @@ class TARDISAtomData:
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
         # Chianti wavelengths are already given in vacuum
+        gfall_mask = lines['ds_id'] == 2
         air_mask = lines['medium'] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask,
                   'wavelength'] = convert_wavelength_air2vacuum(

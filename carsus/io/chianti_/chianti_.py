@@ -629,6 +629,8 @@ class ChiantiReader:
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf']]
 
+        lines['wavelength'] = u.Quantity(lines['wavelength'], u.AA).to('nm').value
+
         col_columns = ['temperatures', 'collision_strengths', 'gf', 'energy', 'ttype', 'cups']
         if get_collisions:
             collisions = pd.concat(col_list, sort=True)
