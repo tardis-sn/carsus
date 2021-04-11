@@ -516,7 +516,7 @@ class CMFGENReader:
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
-            lvl['ID'] = lvl['ID'].apply(np.abs)
+            lvl['ID'] = np.abs(lvl['ID'])
             lvl_id = lvl.set_index('ID')
             lvl['atomic_number'] = atomic_number
             lvl['ion_charge'] =  ion_charge  # i.e. Si I = (14,0) then `ion_charge` = 0 
@@ -547,7 +547,7 @@ class CMFGENReader:
         
         lines = pd.concat(lns_list)
         lines = lines.rename(columns={'Lam(A)': 'wavelength'})
-        lines['wavelength'] = lines['wavelength'].apply(lambda x: (x*u.AA).to('nm').value)
+        lines['wavelength'] = u.Quantity(lines['wavelength'], u.AA).to('nm').value
         lines['level_index_lower'] = lines['i'] -1
         lines['level_index_upper'] = lines['j'] -1
         lines['gf'] = lines['f'] * lines['g_lower']
