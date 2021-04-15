@@ -50,6 +50,11 @@ jobs:
         displayName: "Install Carsus environment"
 
       - bash: |
+          locate libopenblas.dylib
+          locate libopenblas.0.dylib
+        displayName: "Debug step"
+
+      - bash: |
           GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
           cd $(build.dir)/carsus-db
           git lfs pull --include="test_databases/test.db"
