@@ -16,7 +16,7 @@ variables:
 jobs:
   - job:
     pool:
-      vmImage: "ubuntu-latest"
+      vmImage: $[variables.vm_Image]
 
     strategy:
       matrix:
