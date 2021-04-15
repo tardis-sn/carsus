@@ -42,27 +42,12 @@ jobs:
         displayName: 'Take ownership of conda installation'
         condition: eq(variables['Agent.OS'], 'Darwin')
 
-      - bash: |
-          sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.locate.plist
-          locate libopenblas.dylib
-          locate libopenblas.0.dylib
-        displayName: "Debug step"
-        condition: eq(variables['Agent.OS'], 'Darwin')
-
       - bash: conda install mamba -c conda-forge -y
         displayName: "Install Mamba"
         condition: eq(variables['package.manager'], 'mamba')
 
       - bash: $(package.manager) env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
-
-      - bash: |
-          source activate carsus
-          sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.locate.plist
-          locate libopenblas.dylib
-          locate libopenblas.0.dylib
-        displayName: "Debug step"
-        condition: eq(variables['Agent.OS'], 'Darwin')
 
       - bash: |
           GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
