@@ -11,6 +11,7 @@ dependencies:
   - astropy=3
   - uncertainties
   - pip
+  - libopenblas=0.3.3
 
   # I/O
   - beautifulsoup4
