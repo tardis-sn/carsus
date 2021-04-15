@@ -50,6 +50,7 @@ jobs:
         displayName: "Install Carsus environment"
 
       - bash: |
+          source activate carsus
           locate libopenblas.dylib
           locate libopenblas.0.dylib
         displayName: "Debug step"
