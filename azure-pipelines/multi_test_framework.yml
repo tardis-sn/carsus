@@ -5,11 +5,11 @@ variables:
   package.manager: "mamba"
   build.dir: $(Agent.BuildDirectory)
   carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
-  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
+  xuvtop: "$(build.dir)/chianti"
   chianti.data.url: "https://download.chiantidatabase.org"
   chianti.db.version: "9.0.1"
   chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
-  xuvtop: "$(build.dir)/chianti"
+  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
   codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
   system.debug: "false"
 
@@ -20,6 +20,12 @@ jobs:
 
     strategy:
       matrix:
+        Linux:
+          vm_Image: 'ubuntu-latest'
+
+        macOS:
+          vm_Image: 'macOS-latest'
+        
         simple:
           SETUP_CMD: ""
           TEST_MODE: "simple"
