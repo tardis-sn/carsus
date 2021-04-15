@@ -32,7 +32,7 @@ except ImportError:
         versionStr = vFile.readline()
         vFile.close()
         return versionStr.strip()
-    import chianti.core as ch
+    import ChiantiPy.core as ch
 
 
 logger = logging.getLogger(__name__)
