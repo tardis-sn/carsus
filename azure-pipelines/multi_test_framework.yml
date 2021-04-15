@@ -43,7 +43,6 @@ jobs:
         condition: eq(variables['Agent.OS'], 'Darwin')
 
       - bash: |
-          source activate carsus
           sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.locate.plist
           locate libopenblas.dylib
           locate libopenblas.0.dylib
