@@ -4,14 +4,17 @@ trigger:
 variables:
   package.manager: "mamba"
   build.dir: $(Agent.BuildDirectory)
-  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
-  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
-  xuvtop: "$(build.dir)/chianti"
-  chianti.data.url: "https://download.chiantidatabase.org"
-  chianti.db.version: "9.0.1"
-  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
   codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
   system.debug: "false"
+
+  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
+  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
+
+  # Chianti
+  chianti.db.version: "9.0.1"
+  chianti.data.url: "https://download.chiantidatabase.org"
+  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
+  xuvtop: "$(build.dir)/chianti"
 
 jobs:
   - job:
@@ -35,12 +38,23 @@ jobs:
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
 
+      - bash: sudo chown -R $USER $CONDA
+        displayName: 'Take ownership of conda installation'
+        condition: eq(variables['Agent.OS'], 'Darwin')
+
       - bash: conda install mamba -c conda-forge -y
-        displayName: "Install Mamba package manager"
+        displayName: "Install Mamba"
         condition: eq(variables['package.manager'], 'mamba')
 
       - bash: $PACKAGE_MANAGER env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
+
+      - bash: |
+          source activate carsus
+          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $BUILD_DIR/carsus-db
+          cd $BUILD_DIR/carsus-db
+          git lfs pull --include="test_databases/test.db"
+        displayName: "Fetch testing database"
 
       - bash: |
           mkdir -p $XUVTOP
@@ -51,40 +65,8 @@ jobs:
 
       - bash: |
           source activate carsus
-          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $BUILD_DIR/carsus-db
-          cd $BUILD_DIR/carsus-db
-          git lfs pull --include="test_databases/test.db"
-        displayName: "Fetch testing database"
-
-      - bash: |
-          source activate carsus
           git clone $CARSUS_REFDATA_URL $BUILD_DIR/carsus-refdata
         displayName: "Fetch reference data"
-
-      - bash: |
-          source activate carsus
-          pytest carsus
-        displayName: "Test simple"
-
-      - bash: |
-          source activate carsus
-          pytest carsus --remote-data
-        displayName: "Test remote data"
-
-      - bash: |
-          source activate carsus
-          pytest carsus --runslow
-        displayName: "Test runslow"
-
-      - bash: |
-          source activate carsus
-          pytest carsus --test-db=$BUILD_DIR/carsus-db/test_databases/test.db
-        displayName: "Test database"
-
-      - bash: |
-          source activate carsus
-          pytest carsus --refdata=$BUILD_DIR/carsus-refdata
-        displayName: "Test refdata"
 
       - bash: |
           source activate carsus
