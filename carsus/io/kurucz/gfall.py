@@ -424,7 +424,7 @@ class GFALLIngester(object):
             Persists data into the database
     """
 
-    def __init__(self, session, fname, ions=None, ds_short_name="ku_latest"):
+    def __init__(self, session, fname=GFALL_URL, ions=None, ds_short_name="ku_latest"):
         self.session = session
         self.gfall_reader = GFALLReader(ions, fname)
         if ions is not None:
