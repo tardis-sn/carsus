@@ -4,47 +4,32 @@ trigger:
 variables:
   package.manager: "mamba"
   build.dir: $(Agent.BuildDirectory)
-  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
-  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
-  chianti.data.url: "https://download.chiantidatabase.org"
-  chianti.db.version: "9.0.1"
-  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
-  xuvtop: "$(build.dir)/chianti"
   codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
   system.debug: "false"
+
+  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
+  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
+
+  # Chianti
+  chianti.db.version: "9.0.1"
+  chianti.data.url: "https://download.chiantidatabase.org"
+  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
+  xuvtop: "$(build.dir)/chianti"
 
 jobs:
   - job:
     pool:
-      vmImage: "ubuntu-latest"
+      vmImage: $[variables.vm_Image]
 
     strategy:
       matrix:
-        simple:
-          SETUP_CMD: ""
-          TEST_MODE: "simple"
+        Linux:
+          vm_Image: 'ubuntu-latest'
 
-        remote_data:
-          SETUP_CMD: "--remote-data"
-          TEST_MODE: "remote data"
+        #macOS:
+        #  vm_Image: 'macOS-latest'
 
-        runslow:
-          SETUP_CMD: "--runslow"
-          TEST_MODE: "runslow"
-
-        database:
-          SETUP_CMD: "--test-db=$BUILD_DIR/carsus-db/test_databases/test.db"
-          TEST_MODE: "database"
-
-        refdata:
-          SETUP_CMD: "--refdata=$BUILD_DIR/carsus-refdata"
-          TEST_MODE: "refdata"
-
-        coverage:
-          SETUP_CMD: "--remote-data --runslow --test-db=$BUILD_DIR/carsus-db/test_databases/test.db --refdata=$BUILD_DIR/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html"
-          TEST_MODE: "coverage"
-
-      maxParallel: 6
+      maxParallel: 2
 
     steps:
       - bash: echo "##vso[task.setvariable variable=shellopts]errexit"
@@ -53,48 +38,43 @@ jobs:
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: "Add conda to PATH"
 
+      - bash: sudo chown -R $USER $CONDA
+        displayName: 'Take ownership of conda installation'
+        condition: eq(variables['Agent.OS'], 'Darwin')
+
       - bash: conda install mamba -c conda-forge -y
-        displayName: "Install Mamba package manager"
+        displayName: "Install Mamba"
         condition: eq(variables['package.manager'], 'mamba')
 
-      - bash: $PACKAGE_MANAGER env create -f carsus_env3.yml
+      - bash: $(package.manager) env create -f carsus_env3.yml
         displayName: "Install Carsus environment"
 
       - bash: |
-          mkdir -p $XUVTOP
-          cd $XUVTOP
-          curl -O $CHIANTI_DB_URL
-          tar -zxvf CHIANTI_v*_database.tar.gz -C $XUVTOP
-        displayName: "Fetch Chianti database"
-
-      - bash: |
-          source activate carsus
-          GIT_LFS_SKIP_SMUDGE=1 git clone $CARSUS_DB_URL $BUILD_DIR/carsus-db
-          cd $BUILD_DIR/carsus-db
+          GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
+          cd $(build.dir)/carsus-db
           git lfs pull --include="test_databases/test.db"
         displayName: "Fetch testing database"
-        condition: or(eq(variables['TEST_MODE'], 'database'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
-          source activate carsus
-          git clone $CARSUS_REFDATA_URL $BUILD_DIR/carsus-refdata
+          mkdir -p $(xuvtop)
+          cd $(xuvtop)
+          curl -O $CHIANTI_DB_URL
+          tar -zxvf CHIANTI_v$(chianti.db.version)_database.tar.gz -C $(xuvtop)
+        displayName: "Fetch Chianti database"
+
+      - bash: git clone $(carsus.refdata.url) $(build.dir)/carsus-refdata
         displayName: "Fetch reference data"
-        condition: or(eq(variables['TEST_MODE'], 'refdata'), eq(variables['TEST_MODE'], 'coverage'))
 
       - bash: |
           source activate carsus
-          pytest carsus $SETUP_CMD
-        displayName: "Carsus test"
-        condition: ne(variables['TEST_MODE'], 'coverage')
+          python setup.py install
+        displayName: "Install package"
 
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
-          pytest carsus $SETUP_CMD
-        displayName: "Carsus test (with coverage)"
-        condition: eq(variables['TEST_MODE'], 'coverage')
+          pytest carsus --remote-data --runslow --test-db=$(build.dir)/carsus-db/test_databases/test.db --refdata=$(build.dir)/carsus-refdata --nbval-lax --cov=carsus --cov-report=xml --cov-report=html
+        displayName: "Run tests"
 
-      - bash: |
-          bash <(curl -s https://codecov.io/bash)
+      - bash: bash <(curl -s https://codecov.io/bash)
         displayName: "Upload to codecov.io"
-        condition: eq(variables['TEST_MODE'], 'coverage')
