@@ -47,7 +47,7 @@ jobs:
         condition: eq(variables['package.manager'], 'mamba')
 
       - bash: $(package.manager) env create -f carsus_env3.yml
-        displayName: "Install Carsus environment"
+        displayName: "Setup environment"
 
       - bash: |
           GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
