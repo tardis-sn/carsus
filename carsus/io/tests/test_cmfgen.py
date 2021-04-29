@@ -2,19 +2,42 @@ import os
 import glob
 import pytest
 import numpy as np
+import pandas as pd
+from io import StringIO
 from numpy.testing import assert_allclose
+from pandas.testing import assert_frame_equal
 from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENOscillatorStrengthsParser,
                               CMFGENCollisionalStrengthsParser,
                               CMFGENPhotoionizationCrossSectionParser,
+<<<<<<< HEAD
                               CMFGENHydLParser,
                               CMFGENHydGauntBfParser,
+=======
+                              CMFGENReader
+>>>>>>> e4ab99b (add cmfgen reader tests)
                              )
 
 with_refdata = pytest.mark.skipif(
     not pytest.config.getoption("--refdata"),
     reason="--refdata folder not specified"
 )
+
+si2_levels_head = """
+0.00      0.5  3s2_3p_2Po[1/2]   meas        10
+287.24    1.5  3s2_3p_2Po[3/2]   meas        10
+42824.29  0.5  3s_3p2_4Pe[1/2]   meas        10
+42932.62  1.5  3s_3p2_4Pe[3/2]   meas        10
+43107.91  2.5  3s_3p2_4Pe[5/2]   meas        10
+"""
+
+si2_lines_head = """
+0.0      42824.29  1.148200e-05      0.5      0.5    233.5123
+0.0      42932.62  7.128000e-08      0.5      1.5    232.9231
+0.0      55309.35  1.527600e-03      0.5      1.5    180.8013
+0.0      65500.47  2.558000e-01      0.5      0.5    152.6707
+0.0      76665.35  2.124000e-01      0.5      0.5    130.4370
+"""
 
 @with_refdata
 @pytest.fixture()
@@ -78,6 +101,29 @@ def gbf_n_fname(refdata_path):
         "gbf_n_data.dat",
     )
 
+
+@with_refdata
+@pytest.fixture()
+def si1_data_dict(si2_osc_kurucz_fname):
+    si1_levels = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)  #  (carsus) Si 1 == Si II
+    si1_lines = CMFGENOscillatorStrengthsParser(si2_osc_kurucz_fname)
+    return {'Si 1': dict(levels = si1_levels, lines = si1_lines)}
+
+@with_refdata
+@pytest.fixture()
+def si1_reader(si1_data_dict):
+    return CMFGENReader(si1_data_dict)
+
+@with_refdata
+@pytest.fixture()
+def si2_levels_head_df():
+    return pd.read_csv(StringIO(si2_levels_head), delim_whitespace=True, names=['energy', 'j', 'label', 'method', 'priority'])
+
+@with_refdata
+@pytest.fixture()
+def si2_lines_head_df():
+    return pd.read_csv(StringIO(si2_lines_head),delim_whitespace=True, names=['energy_lower', 'energy_upper', 'gf', 'j_lower', 
+                                                                                'j_upper', 'wavelength'])
 
 @with_refdata
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
@@ -166,3 +212,20 @@ def test_gbf_n(gbf_n_fname):
     assert_allclose(
         parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
+@with_refdata
+def test_reader_levels_shape(si1_reader):
+    assert si1_reader.levels.shape == (157, 5)
+
+@with_refdata
+def test_reader_lines_shape(si1_reader):
+    assert si1_reader.lines.shape == (4196, 6)
+
+@with_refdata
+def test_reader_levels_head(si1_reader, si2_levels_head_df):
+    assert_frame_equal(si1_reader.levels.head(5).reset_index(drop=True), 
+                        si2_levels_head_df)
+
+@with_refdata
+def test_reader_lines_head(si1_reader, si2_lines_head_df):
+    assert_frame_equal(si1_reader.lines.head(5).reset_index(drop=True), 
+                        si2_lines_head_df)
