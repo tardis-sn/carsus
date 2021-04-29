@@ -49,10 +49,9 @@ jobs:
         displayName: "Setup environment"
 
       - bash: |
-          mkdir -p $(xuvtop)
-          cd $(xuvtop)
-          curl -O $(chianti.db.url)
-          tar -zxvf CHIANTI_v$(chianti.db.version)_database.tar.gz -C $(xuvtop)
+          mkdir $(xuvtop)
+          wget -q $(chianti.db.url) -O $(xuvtop)/chianti_db.tar.gz
+          tar -zxvf $(xuvtop)/chianti_db.tar.gz -C $(xuvtop)
         displayName: "Fetch Chianti database"
 
       - bash: |
@@ -72,8 +71,14 @@ jobs:
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
-          pytest carsus --remote-data --runslow --test-db=$(build.dir)/carsus-db/test_databases/test.db --refdata=$(build.dir)/carsus-refdata --nbval-lax --cov=carsus --cov-report=xml --cov-report=html
+          pytest carsus --remote-data --runslow --test-db=$(build.dir)/carsus-db/test_databases/test.db --refdata=$(build.dir)/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html
         displayName: "Run tests"
+        condition: False
+
+      - bash: |
+          source activate carsus
+          pytest carsus/io/tests/test_legacy_consistency.ipynb --nb-test-files --nb-exec-timeout 600
+        displayName: "Run tests (notebooks)"
 
       - bash: bash <(curl -s https://codecov.io/bash)
         displayName: "Upload to codecov.io"

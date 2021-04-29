@@ -46,8 +46,8 @@ dependencies:
   - pytest=4
   - pytest-cov
   - pytest-astropy
+  - pytest-notebook
   - coverage
-  - nbval
   - requests
 
   # ChiantiPy dependencies
