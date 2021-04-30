@@ -13,6 +13,7 @@ dependencies:
   - pip
 
   # I/O
+  - requests
   - beautifulsoup4
   - pyparsing=2.2
   - html5lib
@@ -28,7 +29,7 @@ dependencies:
 
   # Documentation
   - sphinx
-  - nbconvert
+  - nbconvert=5
   - numpydoc
   - docutils
   - nbformat
@@ -47,8 +48,7 @@ dependencies:
   - pytest-cov
   - pytest-astropy
   - pytest-notebook
-  - coverage
-  - requests
+  - coverage=4
 
   # ChiantiPy dependencies
   - scipy

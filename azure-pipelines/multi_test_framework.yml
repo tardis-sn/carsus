@@ -72,12 +72,11 @@ jobs:
           source activate carsus
           pip install pytest-azurepipelines
           pytest carsus --remote-data --runslow --test-db=$(build.dir)/carsus-db/test_databases/test.db --refdata=$(build.dir)/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html
-        displayName: "Run tests"
-        condition: False
+        displayName: "Run tests (coverage)"
 
       - bash: |
           source activate carsus
-          pytest carsus/io/tests/test_legacy_consistency.ipynb --nb-test-files --nb-exec-timeout 600
+          pytest carsus --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600 
         displayName: "Run tests (notebooks)"
 
       - bash: bash <(curl -s https://codecov.io/bash)
