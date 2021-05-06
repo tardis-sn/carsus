@@ -51,10 +51,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/atomic
-          key: ${{ env.CMFGEN_DATA_URL }}
+          key: cmfgen-${{ env.CMFGEN_DB_VERSION }}
 
       - name: Download CMFGEN database
-        if: steps.cache-chianti.outputs.cache-hit != 'true'
+        if: steps.cache-cmfgen.outputs.cache-hit != 'true'
         run: |
             wget -q $CMFGEN_DB_URL -O /tmp/atomic.tar.gz
             tar -zxvf /tmp/atomic.tar.gz -C /tmp
