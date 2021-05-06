@@ -61,23 +61,23 @@ jobs:
         env:
           CMFGEN_DB_URL: ${{ env.CMFGEN_DATA_URL }}/atomic_data_${{ env.CMFGEN_DB_VERSION }}.tar.gz
 
-      #- name: Setup environment
-      #  uses: conda-incubator/setup-miniconda@v2
-      #  with:
-      #      miniforge-variant: Mambaforge
-      #      miniforge-version: latest
-      #      environment-file: carsus_env3.yml
-      #      activate-environment: carsus
-      #      use-mamba: true
-#
-      #- name: Install package
-      #  shell: bash -l {0}
-      #  run: python setup.py install
-#
-      #- name: Build documentation
-      #  shell: bash -l {0}
-      #  run: cd docs/; make html
-#
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            environment-file: carsus_env3.yml
+            activate-environment: carsus
+            use-mamba: true
+
+      - name: Install package
+        shell: bash -l {0}
+        run: python setup.py install
+
+      - name: Build documentation
+        shell: bash -l {0}
+        run: cd docs/; make html
+
       #- name: Deploy site
       #  uses: peaceiris/actions-gh-pages@v3
       #  with:
