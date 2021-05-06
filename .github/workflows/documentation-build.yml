@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/atomic
-          key: ${{ CMFGEN_DATA_URL }}
+          key: ${{ env.CMFGEN_DATA_URL }}
 
       - name: Download CMFGEN database
         if: steps.cache-chianti.outputs.cache-hit != 'true'
