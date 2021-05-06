@@ -2,18 +2,22 @@ trigger:
   - master
 
 variables:
-  package.manager: "mamba"
-  build.dir: $(Agent.BuildDirectory)
-  codecov.token: "bd02b09d-d24f-45a3-8c0b-25eec64a29e7"
-  system.debug: "false"
+  package.manager: 'mamba'
+  build.dir: '$(Agent.BuildDirectory)'
 
-  carsus.db.url: "https://github.com/tardis-sn/carsus-db.git"
-  carsus.refdata.url: "https://github.com/tardis-sn/carsus-refdata.git"
+  carsus.db.url: 'https://github.com/tardis-sn/carsus-db.git'
+  carsus.db: '$(build.dir)/carsus-db'
 
-  chianti.db.version: "9.0.1"
-  chianti.data.url: "https://download.chiantidatabase.org"
-  chianti.db.url: "$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz"
-  xuvtop: "$(build.dir)/chianti"
+  carsus.refdata.url: 'https://github.com/tardis-sn/carsus-refdata.git'
+  carsus.refdata: '$(build.dir)/carsus-refdata'
+
+  chianti.db.version: '9.0.1'
+  chianti.data.url: 'https://download.chiantidatabase.org'
+  chianti.db.url: '$(chianti.data.url)/CHIANTI_v$(chianti.db.version)_database.tar.gz'
+  xuvtop: '$(build.dir)/chianti'
+
+  codecov.token: 'bd02b09d-d24f-45a3-8c0b-25eec64a29e7'
+  system.debug: 'false'
 
 jobs:
   - job:
@@ -32,52 +36,51 @@ jobs:
 
     steps:
       - bash: echo "##vso[task.setvariable variable=shellopts]errexit"
-        displayName: "Force exit on error (bash)"
+        displayName: 'Force BASH exit on error'
 
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
-        displayName: "Add conda to PATH"
+        displayName: 'Add conda to PATH'
 
       - bash: sudo chown -R $USER $CONDA
         displayName: 'Take ownership of conda installation'
         condition: eq(variables['Agent.OS'], 'Darwin')
 
-      - bash: conda install mamba -c conda-forge -y
-        displayName: "Install Mamba"
-        condition: eq(variables['package.manager'], 'mamba')
-
-      - bash: $(package.manager) env create -f carsus_env3.yml
-        displayName: "Setup environment"
-
       - bash: |
           mkdir $(xuvtop)
           wget -q $(chianti.db.url) -O $(xuvtop)/chianti_db.tar.gz
           tar -zxvf $(xuvtop)/chianti_db.tar.gz -C $(xuvtop)
-        displayName: "Fetch Chianti database"
+        displayName: 'Fetch Chianti database'
 
       - bash: |
-          GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(build.dir)/carsus-db
-          cd $(build.dir)/carsus-db
-          git lfs pull --include="test_databases/test.db"
-        displayName: "Fetch testing database"
+          GIT_LFS_SKIP_SMUDGE=1 git clone $(carsus.db.url) $(carsus.db)
+          cd $(carsus.db); git lfs pull --include="test_databases/test.db"
+        displayName: 'Fetch testing database'
 
-      - bash: git clone $(carsus.refdata.url) $(build.dir)/carsus-refdata
-        displayName: "Fetch reference data"
+      - bash: git clone $(carsus.refdata.url) $(carsus.refdata)
+        displayName: 'Fetch reference data'
+
+      - bash: conda install mamba -c conda-forge -y
+        displayName: 'Install Mamba'
+        condition: eq(variables['package.manager'], 'mamba')
+
+      - bash: $(package.manager) env create -f carsus_env3.yml
+        displayName: 'Setup environment'
 
       - bash: |
           source activate carsus
           python setup.py install
-        displayName: "Install package"
+        displayName: 'Install package'
 
       - bash: |
           source activate carsus
           pip install pytest-azurepipelines
-          pytest carsus --remote-data --runslow --test-db=$(build.dir)/carsus-db/test_databases/test.db --refdata=$(build.dir)/carsus-refdata --cov=carsus --cov-report=xml --cov-report=html
-        displayName: "Run tests (coverage)"
+          pytest carsus --remote-data --runslow --test-db=$(carsus.db)/test_databases/test.db --refdata=$(carsus.refdata) --cov=carsus --cov-report=xml --cov-report=html
+        displayName: 'Run tests (coverage)'
 
       - bash: |
           source activate carsus
           pytest carsus --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600 
-        displayName: "Run tests (notebooks)"
+        displayName: 'Run tests (notebooks)'
 
       - bash: bash <(curl -s https://codecov.io/bash)
-        displayName: "Upload to codecov.io"
+        displayName: 'Upload to codecov.io'

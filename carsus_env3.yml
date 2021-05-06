@@ -9,14 +9,14 @@ dependencies:
   - numpy=1.15
   - pandas=1.0
   - astropy=3
-  - uncertainties
   - pip
 
   # I/O
   - requests
+  - uncertainties
   - beautifulsoup4
-  - pyparsing=2.2
   - html5lib
+  - pyparsing=2.2
   - SQLAlchemy=1.0
   - PyYAMl
   - h5py
@@ -28,8 +28,13 @@ dependencies:
   - matplotlib
 
   # Documentation
-  - sphinx
+  - sphinx=3
+  - sphinx_rtd_theme
+  - sphinx_bootstrap_theme
+  - sphinxcontrib-bibtex=1.0
   - nbconvert=5
+  - nbformat
+  - nbsphinx=0.8.4
   - numpydoc
   - docutils
   - nbformat
@@ -42,17 +47,19 @@ dependencies:
   - nbsphinx
   - recommonmark
 
-  # Test/Coverage requirements
-  - git-lfs
+  # Test/Coverage
   - pytest=4
   - pytest-cov
   - pytest-astropy
   - pytest-notebook
-  - coverage=4
+  - coverage
 
-  # ChiantiPy dependencies
+  # ChiantiPy
   - scipy
   - ipyparallel
+
+  # Other
+  - git-lfs
 
   # Pip
   - pip:
