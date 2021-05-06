@@ -5,6 +5,10 @@ on:
     branches:
     - master
 
+  pull_request:
+    branches:
+    - master
+
   schedule:
     - cron: '10 0 * * 0'
 
@@ -25,7 +29,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cache Chianti database
+        id: cache-chianti
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.XUVTOP }}
+          key: chianti-v${{ env.CHIANTI_DB_VERSION }}
+
       - name: Download Chianti database
+        if: steps.cache-chianti.outputs.cache-hit != 'true'
         run: |
             mkdir ${{ env.XUVTOP }}
             wget -q $CHIANTI_DB_URL -O ${{ env.XUVTOP }}/chianti_db.tar.gz
@@ -33,32 +45,40 @@ jobs:
         env:
           CHIANTI_DB_URL: ${{ env.CHIANTI_DATA_URL }}/CHIANTI_v${{ env.CHIANTI_DB_VERSION }}_database.tar.gz
 
+      - name: Cache CMFGEN database
+        id: cache-cmfgen
+        uses: actions/cache@v2
+        with:
+          path: /tmp/atomic
+          key: ${{ CMFGEN_DATA_URL }}
+
       - name: Download CMFGEN database
+        if: steps.cache-chianti.outputs.cache-hit != 'true'
         run: |
             wget -q $CMFGEN_DATA_URL -O /tmp/atomic.tar.gz
             tar -zxvf /tmp/atomic.tar.gz -C /tmp
 
-      - name: Setup environment
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            environment-file: carsus_env3.yml
-            activate-environment: carsus
-            use-mamba: true
-
-      - name: Install package
-        shell: bash -l {0}
-        run: python setup.py install
-
-      - name: Build documentation
-        shell: bash -l {0}
-        run: cd docs/; make html
-
-      - name: Deploy site
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: docs/_build/html
-          force_orphan: true
+      #- name: Setup environment
+      #  uses: conda-incubator/setup-miniconda@v2
+      #  with:
+      #      miniforge-variant: Mambaforge
+      #      miniforge-version: latest
+      #      environment-file: carsus_env3.yml
+      #      activate-environment: carsus
+      #      use-mamba: true
+#
+      #- name: Install package
+      #  shell: bash -l {0}
+      #  run: python setup.py install
+#
+      #- name: Build documentation
+      #  shell: bash -l {0}
+      #  run: cd docs/; make html
+#
+      #- name: Deploy site
+      #  uses: peaceiris/actions-gh-pages@v3
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    publish_branch: gh-pages
+      #    publish_dir: docs/_build/html
+      #    force_orphan: true
