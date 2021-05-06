@@ -18,7 +18,8 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DB_VERSION: 9.0.1
   CHIANTI_DATA_URL: https://download.chiantidatabase.org
-  CMFGEN_DATA_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz
+  CMFGEN_DB_VERSION: 15nov16
+  CMFGEN_DATA_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
 
 jobs:
   documentation_build:
@@ -29,7 +30,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Chianti database
+      - name: Cache task
         id: cache-chianti
         uses: actions/cache@v2
         with:
@@ -45,7 +46,7 @@ jobs:
         env:
           CHIANTI_DB_URL: ${{ env.CHIANTI_DATA_URL }}/CHIANTI_v${{ env.CHIANTI_DB_VERSION }}_database.tar.gz
 
-      - name: Cache CMFGEN database
+      - name: Cache task
         id: cache-cmfgen
         uses: actions/cache@v2
         with:
@@ -55,8 +56,10 @@ jobs:
       - name: Download CMFGEN database
         if: steps.cache-chianti.outputs.cache-hit != 'true'
         run: |
-            wget -q $CMFGEN_DATA_URL -O /tmp/atomic.tar.gz
+            wget -q $CMFGEN_DB_URL -O /tmp/atomic.tar.gz
             tar -zxvf /tmp/atomic.tar.gz -C /tmp
+        env:
+          CMFGEN_DB_URL: ${{ env.CMFGEN_DATA_URL }}/atomic_data_${{ env.CMFGEN_DB_VERSION }}.tar.gz
 
       #- name: Setup environment
       #  uses: conda-incubator/setup-miniconda@v2
