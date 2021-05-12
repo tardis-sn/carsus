@@ -121,7 +121,7 @@ def parse_decay_radiation_dataset(decay_rad_dataset_dict):
     -------
 
     """
-
+    
     meta = {
         "energy_column_unit": u.keV,
         "end_point_energy_column_unit": u.keV,
@@ -192,7 +192,8 @@ def download_decay_radiation(isotope_string):
     """
     isotope_string = _sanitize_isotope_string(isotope_string)
     raw_datasets = download_raw_decay_radiation(isotope_string)
-    decay_radiation, meta = parse_decay_radiation_dataset(raw_datasets[0])
+    # print(raw_datasets)
+    decay_radiation, meta = parse_decay_radiation_dataset(raw_datasets[-1])
     meta = pd.Series(meta).to_frame().reset_index()
     meta.columns = ["key", "value"]
     meta["isotope"] = isotope_string
@@ -235,8 +236,8 @@ def store_decay_radiation(isotope_string, force_update=False):
 
     isotope_string = _sanitize_isotope_string(isotope_string)
     db_fname = _get_nuclear_database_path()
-
     if not db_fname.exists():
+        file_exists = False
         data_exists = False
     else:
         decay_radiation_db = pd.read_hdf(db_fname, "decay_radiation")
@@ -246,19 +247,16 @@ def store_decay_radiation(isotope_string, force_update=False):
             data_exists = False
 
     if data_exists and not force_update:
-        raise IOError(
-            f"{isotope_string} is already in the database "
-            "(force_update to overwrite)"
-        )
-
+        logger.warning(f"{isotope_string} is already in the database "
+            "(force_update to overwrite)")
     new_decay_radiation, new_meta = download_decay_radiation(isotope_string)
 
-    if data_exists:
+    if file_exists:
         decay_radiation = pd.read_hdf(db_fname, "decay_radiation")
         meta = pd.read_hdf(db_fname, "metadata")
-
-        decay_radiation.drop(isotope_string, axis=0, inplace=True)
-        meta.drop(isotope_string, axis=0, inplace=True)
+        if data_exists and force_update:
+            decay_radiation.drop(isotope_string, axis=0, inplace=True)
+            meta.drop(isotope_string, axis=0, inplace=True)
 
         decay_radiation = decay_radiation.append(new_decay_radiation)
         meta = meta.append(new_meta)
