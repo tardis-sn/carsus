@@ -28,13 +28,13 @@ dependencies:
   - matplotlib
 
   # Documentation
-  - sphinx=3
+  - sphinx
   - sphinx_rtd_theme
   - sphinx_bootstrap_theme
-  - sphinxcontrib-bibtex=1.0
-  - nbconvert=5
+  - sphinxcontrib-bibtex=1.0  # tardis-sn/tardis/pull/1392
+  - nbconvert=5  # chrisjsewell/pytest-notebook/issues/10
   - nbformat
-  - nbsphinx=0.8.4
+  - nbsphinx
   - numpydoc
   - docutils
   - nbformat
@@ -52,7 +52,8 @@ dependencies:
   - pytest-cov
   - pytest-astropy
   - pytest-notebook
-  - coverage
+  - coverage=4  # chrisjsewell/pytest-notebook/issues/6
+  - attrs=20  # chrisjsewell/pytest-notebook/issues/16
 
   # ChiantiPy
   - scipy
