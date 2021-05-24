@@ -15,6 +15,7 @@ __pycache__
 htmlcov
 .coverage
 MANIFEST
+.ipynb_checkpoints
 
 # Sphinx
 docs/api
@@ -28,12 +29,20 @@ docs/_build
 # Pycharm editor project files
 .idea
 
+# Floobits project files
+.floo
+.flooignore
+
+# Visual Studio Code project files
+.vscode
+
 # Packages/installer info
 *.egg
 *.egg-info
 dist
 build
 eggs
+.eggs
 parts
 bin
 var
@@ -43,13 +52,18 @@ develop-eggs
 distribute-*.tar.gz
 
 # Other
-.ipynb_checkpoints
-carsus/tests/data/*.db
-carsus/model/tests/data/*.db
 .cache
 .tox
 .*.sw[op]
 *~
+.project
+.pydevproject
+.settings
+pip-wheel-metadata/
 
 # Mac OSX
 .DS_Store
+
+# Carsus
+carsus/tests/data/*.db
+carsus/model/tests/data/*.db
