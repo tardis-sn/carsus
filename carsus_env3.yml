@@ -33,7 +33,7 @@ dependencies:
   - docutils
   - nbformat
   - sphinx_bootstrap_theme
-  - sphinxcontrib-bibtex=1.0
+  #- sphinxcontrib-bibtex=1.0
   - sphinx_rtd_theme
   - nbsphinx
   - recommonmark
