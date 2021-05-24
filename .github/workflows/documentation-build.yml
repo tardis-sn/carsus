@@ -1,4 +1,4 @@
-name: documentation-build
+name: docs
 
 on:
   push:
@@ -17,7 +17,7 @@ env:
   CMFGEN_DATA_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files/atomic_data_15nov16.tar.gz
 
 jobs:
-  documentation_build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
