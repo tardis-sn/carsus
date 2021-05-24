@@ -8,7 +8,7 @@ dependencies:
   - setuptools
   - numpy=1.15
   - pandas=1.0
-  - astropy=4
+  - astropy=3
   - uncertainties
   - pip
 
@@ -33,7 +33,7 @@ dependencies:
   - docutils
   - nbformat
   - sphinx_bootstrap_theme
-  #- sphinxcontrib-bibtex=1.0
+  - sphinxcontrib-bibtex=1.0
   - sphinx_rtd_theme
   - nbsphinx
   - recommonmark
