@@ -58,6 +58,7 @@ highlight_language = 'python3'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns.append('_templates')
+exclude_patterns.append('_build')
 
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
@@ -68,13 +69,16 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinxcontrib.bibtex',
+    'sphinx_copybutton',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
-    'matplotlib.sphinxext.plot_directive',
+    'matplotlib.sphinxext.plot_directive',  # not working
     'nbsphinx',
     'numpydoc',
 ]
+
+nbsphinx_allow_errors = False  # use for debugging purposes only
 
 # -- Project information ------------------------------------------------------
 

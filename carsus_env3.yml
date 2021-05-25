@@ -35,6 +35,7 @@ dependencies:
   - sphinx-astropy
   - sphinx_bootstrap_theme
   - sphinxcontrib-bibtex=1.0
+  - sphinx-copybutton
   - sphinx_rtd_theme
   - nbsphinx
   - recommonmark
