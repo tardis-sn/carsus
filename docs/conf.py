@@ -64,6 +64,18 @@ exclude_patterns.append('_templates')
 rst_epilog += """
 """
 
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinxcontrib.bibtex',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.todo',
+    'matplotlib.sphinxext.plot_directive',
+    'nbsphinx',
+    'numpydoc',
+]
+
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -97,13 +109,13 @@ release = package.__version__
 
 # Add any paths that contain custom themes here, relative to this directory.
 # To use a different custom theme, add the directory containing the theme.
-#html_theme_path = []
+import sphinx_rtd_theme
+html_theme_path = sphinx_rtd_theme.get_html_theme_path()
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes. To override the custom theme, set this to the
 # name of a builtin theme or the name of a custom theme in html_theme_path.
-#html_theme = None
-
+html_theme = 'sphinx_rtd_theme'
 
 html_theme_options = {
     'logotext1': 'carsus',  # white,  semi-bold
@@ -122,7 +134,7 @@ html_theme_options = {
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = ''
+html_favicon = 'tardis_logo.ico'
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
