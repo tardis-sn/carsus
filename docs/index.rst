@@ -8,9 +8,10 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Getting started
     :hidden:
 
-    installation
+    installation.rst
     quickstart
 
 .. toctree::
