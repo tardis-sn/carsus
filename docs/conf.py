@@ -68,11 +68,12 @@ rst_epilog += """
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.bibtex',
-    'sphinx_copybutton',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
+    'sphinx_copybutton',
+    'sphinxcontrib.apidoc',
+    'sphinxcontrib.bibtex',
     'matplotlib.sphinxext.plot_directive',  # not working
     'nbsphinx',
     'numpydoc',
@@ -228,3 +229,9 @@ linkcheck_anchors = False
 #     dtype, target = line.split(None, 1)
 #     target = target.strip()
 #     nitpick_ignore.append((dtype, six.u(target)))
+
+# -- APIDoc configuration -----------------------------------------------------
+apidoc_module_dir = "../carsus"
+apidoc_output_dir = "api"
+apidoc_excluded_paths = ["*tests*", "*setup_package*"]
+apidoc_separate_modules = True

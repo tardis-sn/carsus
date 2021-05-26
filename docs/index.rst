@@ -42,6 +42,13 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
 
 .. toctree::
     :maxdepth: 2
+    :caption: API
+    :hidden:
+
+    api/modules
+
+.. toctree::
+    :maxdepth: 2
     :caption: Legacy code
     :hidden:
 
