@@ -7,11 +7,13 @@ Prerequisites
 =============
 
 #. Requires a valid Anaconda `or Miniconda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html>`_ installation.
-#. Download and extract the `Chianti atomic database <https://www.chiantidatabase.org/chianti_download.html>`_ and set the following environment variable in your shell configuration file:
+#. Download and extract the `Chianti Atomic Database <https://www.chiantidatabase.org/chianti_download.html>`_ and set the following environment variable in your shell configuration file:
 
-.. code ::
+    .. code ::
 
-    export XUVTOP=/path/to/chianti/root
+        export XUVTOP=/path/to/chianti/root
+
+#. *(optional)*. Download and extract the `CMFGEN Atomic Data <http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm>`_.  
 
 ====================
 Clone the repository
