@@ -40,6 +40,7 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
     :caption: Contributing to Carsus
     :hidden:
 
+    physics/index.rst
     development/index.rst
 
 .. toctree::
