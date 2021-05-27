@@ -2,6 +2,6 @@
 References
 **********
 
-.. bibliography:: carsus.bib
+.. bibliography:: ../carsus.bib
     :encoding: utf8
     :all:

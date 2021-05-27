@@ -31,8 +31,8 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
     :caption: Research with Carsus
     :hidden:
 
-    publications.rst
-    references.rst
+    research/publications.rst
+    research/references.rst
 
 
 .. toctree::
