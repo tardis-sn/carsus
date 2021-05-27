@@ -74,11 +74,12 @@ extensions = [
     'sphinx_copybutton',
     'sphinxcontrib.apidoc',
     'sphinxcontrib.bibtex',
-    'matplotlib.sphinxext.plot_directive',  # not working
+    'matplotlib.sphinxext.plot_directive',
     'nbsphinx',
     'numpydoc',
 ]
 
+bibtex_bibfiles = ['references.bib', 'publications.bib']
 nbsphinx_allow_errors = False  # use for debugging purposes only
 
 # -- Project information ------------------------------------------------------

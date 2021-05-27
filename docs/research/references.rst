@@ -2,6 +2,7 @@
 References
 **********
 
-.. bibliography:: ../carsus.bib
-    :encoding: utf8
+.. bibliography:: ../references.bib
+    :list: enumerated
+    :enumtype: upperroman
     :all:
