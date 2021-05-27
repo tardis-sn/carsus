@@ -7,7 +7,7 @@ Prerequisites
 =============
 
 #. Requires a valid Anaconda `or Miniconda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html>`_ installation.
-#. Download and extract the `Chianti Atomic Database <https://www.chiantidatabase.org/chianti_download.html>`_ and set the following environment variable in your shell configuration file:
+#. Download and extract the `Chianti Atomic Database <https://download.chiantidatabase.org/>`_ **v9.0.1** and set the following environment variable in your shell configuration file:
 
     .. code ::
 
