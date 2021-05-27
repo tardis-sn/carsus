@@ -1,5 +1,5 @@
 *************
-SQL interface
+SQL Interface
 *************
 
 In the past, Carsus relied on SQL databases to perform its operations. To make our code

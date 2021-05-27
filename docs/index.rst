@@ -25,6 +25,16 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
     io/cmfgen
     io/zeta
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Research with Carsus
+    :hidden:
+
+    publications.rst
+    references.rst
+
+
 .. toctree::
     :maxdepth: 2
     :caption: Contributing to Carsus
@@ -45,11 +55,3 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
     :hidden:
 
     legacy/legacy.rst
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Research with Carsus
-    :hidden:
-
-    publications.rst
-    references.rst
