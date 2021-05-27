@@ -1,7 +1,7 @@
-Database models in Carsus
+Database Models in Carsus
 ===========================
 
-Atomic models in Carsus
+Atomic Models in Carsus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: carsus.model.atomic
     :members:
@@ -9,7 +9,7 @@ Atomic models in Carsus
 ..    :inherited-members:
 ..    :undoc-members:
 
-Base classes and helpers
+Base Classes and Helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: carsus.model.meta.base

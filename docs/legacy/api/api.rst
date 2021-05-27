@@ -1,6 +1,6 @@
 .. _api:
 
-API reference
+API Reference
 =================
 
 carsus.io.base Module
