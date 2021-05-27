@@ -54,4 +54,4 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
     :caption: Legacy code
     :hidden:
 
-    legacy/legacy.rst
+    legacy/index.rst
