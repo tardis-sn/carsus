@@ -16,7 +16,7 @@ Prerequisites
 #. *(optional)*. Download and extract the `CMFGEN Atomic Data <http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm>`_.  
 
 ====================
-Clone the repository
+Clone the Repository
 ====================
 
 .. code ::
@@ -25,7 +25,7 @@ Clone the repository
 
 
 =====================
-Setup the environment
+Setup the Environment
 =====================
 
 .. code ::
@@ -35,7 +35,7 @@ Setup the environment
 
 
 ===================
-Install the package
+Install the Package
 ===================
 
 .. code ::
