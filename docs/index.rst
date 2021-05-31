@@ -1,15 +1,12 @@
 **********************************
-Welcome to Carsus's documentation!
+Welcome to Carsus's Documentation!
 **********************************
 
 Carsus is a package to manage atomic datasets. It can read data from a variety of sources and output them to file formats readable by radiative transfer codes.
 
-Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
-
 .. toctree::
-    :maxdepth: 2
-    :caption: Getting started
-    :hidden:
+    :maxdepth: 1
+    :caption: Getting Started
 
     installation.rst
     quickstart
@@ -52,7 +49,11 @@ Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Legacy code
+    :caption: Legacy Code
     :hidden:
 
     legacy/index.rst
+
+
+.. seealso::
+    Need help? Contact us `on Gitter <https://gitter.im/tardis-sn/carsus/>`_.
