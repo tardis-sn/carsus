@@ -9,6 +9,7 @@ easier to mantain we moved to a pure Pandas engine.
 
 
 .. toctree::
+    :maxdepth: 1
     quickstart_legacy
     model/model.rst
     api/api.rst
