@@ -234,5 +234,5 @@ linkcheck_anchors = False
 # -- APIDoc configuration -----------------------------------------------------
 apidoc_module_dir = "../carsus"
 apidoc_output_dir = "api"
-apidoc_excluded_paths = ["*tests*", "*setup_package*"]
+apidoc_excluded_paths = ["*tests*", "*setup_package*", "*conftest*", "*version*" ]
 apidoc_separate_modules = True
