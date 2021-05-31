@@ -2,29 +2,29 @@
 Introduction
 ============
 
-`Carsus` uses sqlalchemy to associate (experimental) data about real objects,
+Carsus uses `sqlalchemy` to associate (experimental) data about real objects,
 such as atoms, with tables in a database. This allows us to store all data in
-one big database but we can use it as if it were simple python objects.
+one big database, but we can use it as if it were simple Python objects.
 Additionally, operations like filtering the data are performed on the database
-instead of in python which is a lot better for the performance.
+instead of in Python which is a lot better for performance.
 
-At the core of this system are the database models. These are python classes
+At the core of this system are the database models. These are Python classes
 with special class attributes that are mapped to database columns by
-sqlalchemy.  In the database, each class has its own table and instances of the
-class represent one specific row of that table.  All models have to inherit
-from Base which is defined in `carsus.model.meta`.  Each model has a "Primary
-Key" which has to be unique for each object and is used to identify it.
+`sqlalchemy`. In the database, each class has its own table and instances of the
+class represent one specific row of that table. All models have to inherit
+from `Base` which is defined in `carsus.model.meta`. Each model has a "primary
+key" which has to be unique for each object and is used to identify it.
 Typically this is an integer but it is also possible to use a combination of
-multiple values to form the primary key (see IonQuantity for example).  If the
-primary key is a single integer, it should be called 'id'.
+multiple values to form the primary key (see `IonQuantity` for example). If the
+primary key is a single integer, it should be called ``id``.
 
-Attributes of instances are declared as instances of
-:class:`~sqlalchemy.Column` which is a special class attribute pointing to a
-column in a table.  Relationships between models are defined with
-:func:`~sqlalchemy.orm.relationship` linking two instances of an object
-together where usually one column points to the primary key of another table.
-Defining the relationships is important so sqlalchemy can automatically join
-the models together if a join operation is added to the query.
+Attributes of instances are declared as instances of `sqlalchemy.Column` 
+which is a special class attribute pointing to a column in a table. 
+Relationships between models are defined with `sqlalchemy.orm.relationship`
+linking two instances of an object together where usually one column points
+to the primary key of another table. Defining the relationships is important 
+so `sqlalchemy` can automatically join the models together if a join operation
+is added to the query.
 
 We have several types of models for the atomic data. First, we have general
 models, like :class:`~carsus.model.atomic.Atom` and
