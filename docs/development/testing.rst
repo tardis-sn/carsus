@@ -2,26 +2,37 @@
 Running Tests
 *************
 
-.. code ::
-
-    pytest carsus <flags>
-
-**Flags:**
-
-- `pytest carsus --remote-data`
+Carsus's tests are based on the 
+`AstroPy Package Template <https://docs.astropy.org/projects/package-template/en/latest/index.html>`_ 
+and `pytest <https://pytest.org/en/latest>`_. Then, running simple tests on your machine is 
+straightforward:
 
 .. code ::
 
-    pytest carsus --runslow 
+    $ pytest carsus
 
-.. code ::
+==============
+Optional Flags
+==============
 
-    pytest carsus --test-db=$BUILD_DIR/carsus-db/test_databases/test.db 
+A set of flags can be appended to the above command to run different kinds of tests:
 
-.. code ::
+- `--remote-data`
+    Run tests marked with the ``@pytest.mark.remote_data`` decorator. Requires an internet connection.
 
-    pytest carsus --refdata=$BUILD_DIR/carsus-refdata 
+- `--runslow`
+    Run tests marked with the ``@slow`` decorator.
 
-.. code ::
+- `--test-db=/path/to/carsus-db/test_databases/test.db`
+    Run test for the Carsus SQL output module. Requires data from the
+    `tardis-sn/carsus-db <https://github.com/tardis-sn/carsus-refdata>`_ repository.
 
-    pytest carsus --cov=carsus --cov-report=xml --cov-report=html
+- `--refdata=/path/to/carsus-refdata`
+    Run tests marked with the ``@with_refdata`` decorator. Requires the
+    `tardis-sn/carsus-refdata <https://github.com/tardis-sn/carsus-refdata>`_ repository.
+
+- `--ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600`
+    Run notebook tests using the `pytest-notebook <https://pytest-notebook.readthedocs.io/en/latest/>`_ plugin.
+  
+- `--cov=carsus --cov-report=xml --cov-report=html`
+    Get code coverage results using the `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/>`_ plugin.
