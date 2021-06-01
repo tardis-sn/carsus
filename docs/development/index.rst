@@ -3,6 +3,8 @@ Developer Notes
 ***************
 
 .. toctree::
+    :maxdepth: 1
+
     notation.rst
     units.rst
     testing.rst
