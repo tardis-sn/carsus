@@ -129,15 +129,6 @@ html_theme_options = {
     'logotext3': ':docs'   # white,  light
     }
 
-
-
-html_theme_options = {
-    'logotext1': 'carsus',  # white,  semi-bold
-    'logotext2': '',  # orange, light
-    'logotext3': ':docs'   # white,  light
-    }
-
-
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
 
