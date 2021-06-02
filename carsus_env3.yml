@@ -29,22 +29,16 @@ dependencies:
 
   # Documentation
   - sphinx
-  - sphinx_rtd_theme
+  - sphinx-astropy
   - sphinx_bootstrap_theme
+  - sphinx-copybutton
+  - sphinx_rtd_theme
   - sphinxcontrib-bibtex=1.0  # tardis-sn/tardis/pull/1392
   - nbconvert=5  # chrisjsewell/pytest-notebook/issues/10
   - nbformat
   - nbsphinx
   - numpydoc
   - docutils
-  - nbformat
-  - sphinx-astropy
-  - sphinx_bootstrap_theme
-  - sphinxcontrib-apidoc
-  - sphinxcontrib-bibtex
-  - sphinx-copybutton
-  - sphinx_rtd_theme
-  - nbsphinx
   - recommonmark
 
   # Test/Coverage
