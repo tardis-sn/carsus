@@ -1,8 +1,5 @@
 # .coveragerc to control coverage.py
 
-[run]
-source = tardis
-
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
@@ -24,6 +21,7 @@ exclude_lines =
 omit =
     *__init__*
     *_astropy_init*
+    *version*
     *tests*
     *conftest*
     *setup_package*
