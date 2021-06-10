@@ -469,6 +469,109 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 f.root._v_attrs['metadata'] = self.meta
 
 
+class CMFGENHydLParser(BaseParser):
+    """
+    Parser for the CMFGEN hydrogen photoionization cross sections.
+
+    Attributes
+    ----------
+    base : pandas.DataFrame, dtype float
+        Photoionization cross section table for hydrogen. Values are the
+        common logarithm (i.e. base 10) of the cross section in units cm^2.
+        Indexed by the principal quantum number n and orbital quantum
+        number l.
+    columns : list of float
+        The frequencies for the cross sections. Given in units of the threshold
+        frequency for photoionization.
+    meta : dict
+        Metadata parsed from file header.
+
+    Methods
+    -------
+    load(fname)
+        Parses the input data and stores the results in the `base` attribute.
+    """
+
+    keys = [
+        '!Maximum principal quantum number',
+        '!Number of values per cross-section',
+        '!L_ST_U',
+        '!L_DEL_U'
+    ]
+
+    def load(self, fname):
+        meta = parse_header(fname, self.keys)
+        self.meta = meta
+        self.max_l = int(self.meta['Maximum principal quantum number']) - 1
+
+        self.num_xsect_nus = int(meta['Number of values per cross-section'])
+        nu_ratio = 10**float(meta['L_DEL_U'])
+        nus = np.power(
+            nu_ratio,
+            np.arange(self.num_xsect_nus)
+        )  # in units of the threshold frequency
+
+        skiprows = find_row(fname, "!L_DEL_U", num_row=True) + 1
+
+        data = []
+        indexes = []
+        with open(fname, mode='r') as f:
+            for i in range(skiprows):
+                f.readline()
+            while True:
+                n, l, log10x_sect = next(self._table_gen(f), None)
+                indexes.append((n, l))
+                data.append(log10x_sect)
+                if l == self.max_l:
+                    break
+
+        index = pd.MultiIndex.from_tuples(indexes, names=['n', 'l'])
+        self.base = pd.DataFrame(data, index=index, columns=nus)
+        self.base.columns.name = 'nu / nu_0'
+
+        self.base -= 10.  # Convert from cmfgen units to log10(cm^2)
+        self.columns = self.base.columns.tolist()
+
+    def _table_gen(self, f):
+        """Yields a logarithmic cross section table for a hydrogen level.
+
+        Parameters
+        ----------
+        f : file buffer
+
+        Yields
+        -------
+        int
+            Principal quantum number n.
+        int
+            Principal quantum number l.
+        numpy.ndarray, dtype float
+            Photoionization cross section table. Values are the common
+            logarithm (i.e. base 10) of the cross section in units cm^2.
+        """
+        line = f.readline()
+        n, l, num_entries = [int(entry) for entry in line.split()]
+        assert(num_entries == self.num_xsect_nus)
+
+        log10_xsect = []
+        while True:
+            line = f.readline()
+            if not line.strip():  # This is the end of the current table
+                break
+            log10_xsect += [float(entry) for entry in line.split()]
+
+        log10_xsect = np.array(log10_xsect)
+        assert(len(log10_xsect) == self.num_xsect_nus)
+
+        yield n, l, log10_xsect
+
+    def to_hdf(self, key='/hyd_l_data'):
+        if not self.base.empty:
+            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
+                f.put(key, self.base)
+                f.get_storer(key).attrs.metadata = self.meta
+
+
 class CMFGENReader:
     """
     Class for extracting levels and lines from CMFGEN.
