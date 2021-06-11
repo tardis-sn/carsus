@@ -7,6 +7,7 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENOscillatorStrengthsParser,
                               CMFGENCollisionalStrengthsParser,
                               CMFGENPhotoionizationCrossSectionParser,
+                              CMFGENHydLParser,
                              )
 
 with_refdata = pytest.mark.skipif(
@@ -53,6 +54,18 @@ def si2_pho_fname(refdata_path):
 @pytest.fixture()
 def coiv_pho_fname(refdata_path):
     return os.path.join(refdata_path, 'cmfgen', 'photoionization_cross_sections', 'phot_data_gs')
+
+
+@with_refdata
+@pytest.fixture()
+def hyd_l_fname(refdata_path):
+    return os.path.join(
+        refdata_path,
+        "cmfgen",
+        "photoionization_cross_sections",
+        "hyd_l_data.dat",
+    )
+
 
 @with_refdata
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
@@ -115,3 +128,15 @@ def test_coiv_pho(coiv_pho_fname):
     n = int(parser.meta['Number of energy levels'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (3, 8)
+
+
+@with_refdata
+def test_hyd_l(hyd_l_fname):
+    parser = CMFGENHydLParser(hyd_l_fname)
+    assert parser.meta["Maximum principal quantum number"] == "30"
+    assert parser.base.shape == (465, 97)
+    assert parser.base.loc[(11, 3)].values[5] == -16.226968
+    assert parser.base.loc[(21, 20)].values[2] == -19.897289
+    assert_allclose(
+        parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
+    )
