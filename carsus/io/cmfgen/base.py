@@ -531,6 +531,7 @@ class CMFGENHydLParser(BaseParser):
 
         self.base -= 10.  # Convert from cmfgen units to log10(cm^2)
         self.columns = self.base.columns.tolist()
+        self.fname = fname
 
     def _table_gen(self, f):
         """Yields a logarithmic cross section table for a hydrogen level.
