@@ -136,7 +136,7 @@ def test_hyd_l(hyd_l_fname):
     assert parser.meta["Maximum principal quantum number"] == "30"
     assert parser.base.shape == (465, 97)
     assert parser.base.loc[(11, 3)].values[5] == -16.226968
-    assert parser.base.loc[(21, 20)].values[2] == -19.897289
+    assert parser.base.loc[(21, 20)].values[2] == -20.3071
     assert_allclose(
         parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
