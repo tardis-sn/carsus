@@ -498,20 +498,21 @@ class CMFGENHydLParser(BaseParser):
         '!L_ST_U',
         '!L_DEL_U'
     ]
+    nu_ratio_key = 'L_DEL_U'
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
         self.meta = meta
-        self.max_l = int(self.meta['Maximum principal quantum number']) - 1
+        self.max_l = self.get_max_l()
 
         self.num_xsect_nus = int(meta['Number of values per cross-section'])
-        nu_ratio = 10**float(meta['L_DEL_U'])
+        nu_ratio = 10**float(meta[self.nu_ratio_key])
         nus = np.power(
             nu_ratio,
             np.arange(self.num_xsect_nus)
         )  # in units of the threshold frequency
 
-        skiprows = find_row(fname, "!L_DEL_U", num_row=True) + 1
+        skiprows = find_row(fname, self.nu_ratio_key, num_row=True) + 1
 
         data = []
         indexes = []
@@ -551,7 +552,7 @@ class CMFGENHydLParser(BaseParser):
             logarithm (i.e. base 10) of the cross section in units cm^2.
         """
         line = f.readline()
-        n, l, num_entries = [int(entry) for entry in line.split()]
+        n, l, num_entries = self.parse_table_header_line(line)
         assert(num_entries == self.num_xsect_nus)
 
         log10_xsect = []
@@ -565,6 +566,13 @@ class CMFGENHydLParser(BaseParser):
         assert(len(log10_xsect) == self.num_xsect_nus)
 
         yield n, l, log10_xsect
+
+    @staticmethod
+    def parse_table_header_line(line):
+        return [int(entry) for entry in line.split()]
+
+    def get_max_l(self):
+        return int(self.meta['Maximum principal quantum number']) - 1
 
     def to_hdf(self, key='/hyd_l_data'):
         if not self.base.empty:
