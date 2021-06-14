@@ -68,6 +68,17 @@ def hyd_l_fname(refdata_path):
 
 
 @with_refdata
+@pytest.fixture()
+def gbf_n_fname(refdata_path):
+    return os.path.join(
+        refdata_path,
+        "cmfgen",
+        "photoionization_cross_sections",
+        "gbf_n_data.dat",
+    )
+
+
+@with_refdata
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
     parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
     n = int(parser.meta['Number of energy levels'])
@@ -137,6 +148,20 @@ def test_hyd_l(hyd_l_fname):
     assert parser.base.shape == (465, 97)
     assert parser.base.loc[(11, 3)].values[5] == -16.226968
     assert parser.base.loc[(21, 20)].values[2] == -20.3071
+    assert_allclose(
+        parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
+    )
+
+
+@with_refdata
+def test_gbf_n(gbf_n_fname):
+    parser = CMFGENHydGauntBfParser(gbf_n_fname)
+    assert parser.meta["Maximum principal quantum number"] == "30"
+    assert parser.base.shape == (30, 145)
+    assert (
+        round(parser.base.loc[3].values[3], 7) == 0.9433558
+    )  # Rounding is needed as a result of undoing the unit conversion
+    assert round(parser.base.loc[18].values[11], 7) == 1.008855
     assert_allclose(
         parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
