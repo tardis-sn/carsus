@@ -8,6 +8,7 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENCollisionalStrengthsParser,
                               CMFGENPhotoionizationCrossSectionParser,
                               CMFGENHydLParser,
+                              CMFGENHydGauntBfParser,
                              )
 
 with_refdata = pytest.mark.skipif(
