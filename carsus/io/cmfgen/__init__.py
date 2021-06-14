@@ -3,5 +3,6 @@ from carsus.io.cmfgen.base import (CMFGENOscillatorStrengthsParser,
                                    CMFGENCollisionalStrengthsParser,
                                    CMFGENPhotoionizationCrossSectionParser,
                                    CMFGENHydLParser,
+                                   CMFGENHydGauntBfParser,
                                    CMFGENReader)
 from carsus.io.cmfgen.hdfgen import hdf_dump

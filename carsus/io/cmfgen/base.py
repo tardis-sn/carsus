@@ -581,6 +581,57 @@ class CMFGENHydLParser(BaseParser):
                 f.get_storer(key).attrs.metadata = self.meta
 
 
+class CMFGENHydGauntBfParser(CMFGENHydLParser):
+    """
+    Parser for the CMFGEN hydrogen bound-free gaunt factors.
+
+    Attributes
+    ----------
+    base : pandas.DataFrame, dtype float
+        Bound-free gaunt factors for hydrogen.
+        Indexed by the principal quantum number n.
+    columns : list of float
+        The frequencies for the gaunt factors. Given in units of the threshold
+        frequency for photoionization.
+    meta : dict
+        Metadata parsed from file header.
+
+    Methods
+    -------
+    load(fname)
+        Parses the input data and stores the results in the `base` attribute.
+    """
+
+    keys = [
+        "!Maximum principal quantum number",
+        "!Number of values per cross-section",
+        "!N_ST_U",
+        "!N_DEL_U",
+    ]
+    nu_ratio_key = "N_DEL_U"
+
+    @staticmethod
+    def parse_table_header_line(line):
+        line_split = [int(entry) for entry in line.split()]
+        n, l, num_entries = (
+            line_split[0],
+            line_split[0],
+            line_split[1],
+        )  # use n as mock l value
+        return n, l, num_entries
+
+    def load(self, fname):
+        super().load(fname)
+        self.base.index = self.base.index.droplevel("l")
+        self.base += 10.0  # undo unit conversion used in CMFGENHydLParser
+
+    def get_max_l(self):
+        return int(self.meta["Maximum principal quantum number"])
+
+    def to_hdf(self, key="/gbf_n_data"):
+        super().to_hdf(key)
+
+
 class CMFGENReader:
     """
     Class for extracting levels and lines from CMFGEN.
