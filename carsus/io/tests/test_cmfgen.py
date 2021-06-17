@@ -125,9 +125,9 @@ def si2_lines_head_df():
 @with_refdata
 @pytest.fixture()
 def si1_data_dict(si2_osc_kurucz_fname):
-    si1_levels = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)  #  (carsus) Si 1 == Si II
-    si1_lines = CMFGENOscillatorStrengthsParser(si2_osc_kurucz_fname)
-    return {'Si 1': dict(levels = si1_levels, lines = si1_lines)}
+    si1_levels = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname).base  #  (carsus) Si 1 == Si II
+    si1_lines = CMFGENOscillatorStrengthsParser(si2_osc_kurucz_fname).base
+    return {(14,1): dict(levels = si1_levels, lines = si1_lines)}
 
 @with_refdata
 @pytest.fixture()
@@ -196,7 +196,7 @@ def test_ariii_col(ariii_col_fname):
 def test_si2_pho(si2_pho_fname):
     parser = CMFGENPhotoionizationCrossSectionParser(si2_pho_fname)
     n = int(parser.meta['Number of energy levels'])
-    m = int(parser.base[0]._meta['Points'])
+    m = int(parser.base[0].attrs['Points'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (m, 2)
 

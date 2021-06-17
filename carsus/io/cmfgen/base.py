@@ -1,4 +1,7 @@
 import logging
+import pathlib
+import yaml
+import roman
 import numpy as np
 import pandas as pd
 import astropy.units as u
@@ -6,10 +9,19 @@ import astropy.constants as const
 import itertools
 import gzip
 from carsus.io.base import BaseParser
-from carsus.util import parse_selected_species
+from carsus.util import parse_selected_species, convert_atomic_number2symbol
 
 logger = logging.getLogger(__name__)
 
+CMFGEN_DICT = {
+    'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
+    'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
+    'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
+    'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
+    'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
+    'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
+    'Ni': 'NICK'
+}
 
 # TODO: add `skiprows` parameter
 def find_row(fname, string1, string2='', how='both', num_row=False):
@@ -363,6 +375,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         load(fname)
             Parses the input data and stores the results in the `base` attribute.
     """
+
     keys = ['!Date',
             '!Number of energy levels',
             '!Number of photoionization routes',
@@ -420,7 +433,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 break
 
         df = pd.DataFrame.from_records(data)
-        df._meta = meta
+        df.attrs = meta
 
         yield df
 
@@ -464,7 +477,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 for i in range(0, len(self.base)-1):
                     subkey = '{0}/{1}'.format(key, i)
                     f.put(subkey, self.base[i])
-                    f.get_storer(subkey).attrs.metadata = self.base[i]._meta
+                    f.get_storer(subkey).attrs.metadata = self.base[i].attrs
 
                 f.root._v_attrs['metadata'] = self.meta
 
@@ -657,8 +670,40 @@ class CMFGENReader:
             Priority of the current data source, by default 10.
         """
         self.priority = priority
+        self.ions = list(data.keys())
         self._get_levels_lines(data)
-    
+
+    @classmethod
+    def from_config(cls, ions, CMFGEN_ROOT, CONFIG_YAML):
+
+        CMFGEN_ROOT = pathlib.Path(CMFGEN_ROOT)
+        CONFIG_YAML = pathlib.Path(CONFIG_YAML)
+        ions = parse_selected_species(ions)
+
+        with open(CMFGEN_ROOT.joinpath(CONFIG_YAML)) as f:
+
+            conf = yaml.load(f, Loader=yaml.FullLoader)
+            data = {}
+
+            for i in ions:
+                sym = convert_atomic_number2symbol(i[0])
+                try:
+                    fname = CMFGEN_ROOT.joinpath(CMFGEN_DICT[sym],
+                                                 roman.toRoman(i[1]+1),
+                                                 conf['atom'][sym]['ion_number'][i[1]]['date'],
+                                                 conf['atom'][sym]['ion_number'][i[1]]['osc']
+                                                 ).as_posix()
+
+                except KeyError:
+                    logger.warning(f'No specified \'osc\' data for {sym} {i[1]} in `{CONFIG_YAML}`.')
+                    continue
+
+                data[i] = {}
+                data[i]['levels'] = CMFGENEnergyLevelsParser(fname).base
+                data[i]['lines'] = CMFGENOscillatorStrengthsParser(fname).base
+
+        return cls(data)
+
     def _get_levels_lines(self, data):
         """ Generates `levels` and `lines` DataFrames.
 
@@ -670,12 +715,13 @@ class CMFGENReader:
         """
         lvl_list = []
         lns_list = []
-        for ion, parser in data.items():
+        for ion, parser_base in data.items():
 
-            atomic_number = parse_selected_species(ion)[0][0]
-            ion_charge = parse_selected_species(ion)[0][1]
+            atomic_number = ion[0]
+            ion_charge = ion[1]
             
-            lvl = parser['levels'].base
+            lvl = parser_base['levels']
+
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
@@ -685,7 +731,7 @@ class CMFGENReader:
             lvl['ion_charge'] =  ion_charge  # i.e. Si I = (14,0) then `ion_charge` = 0 
             lvl_list.append(lvl)
 
-            lns = parser['lines'].base
+            lns = parser_base['lines']
             lns = lns.set_index(['i', 'j'])
             lns['energy_lower'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=0).values
             lns['energy_upper'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=1).values
