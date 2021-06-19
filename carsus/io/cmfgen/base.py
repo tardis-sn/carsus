@@ -10,6 +10,7 @@ import itertools
 import gzip
 from carsus.io.base import BaseParser
 from carsus.util import parse_selected_species, convert_atomic_number2symbol
+from carsus import __path__ as CARSUS_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -674,28 +675,31 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, CMFGEN_ROOT, CONFIG_YAML):
+    def from_config(cls, ions, atomic_path, config_yaml=None):
 
-        CMFGEN_ROOT = pathlib.Path(CMFGEN_ROOT)
-        CONFIG_YAML = pathlib.Path(CONFIG_YAML)
-        ions = parse_selected_species(ions)
+        ATOMIC_PATH = pathlib.Path(atomic_path)
 
-        with open(CMFGEN_ROOT.joinpath(CONFIG_YAML)) as f:
+        if config_yaml is not None:
+            YAML_PATH = pathlib.Path(config_yaml).as_posix()
+        else:
+            YAML_PATH = pathlib.Path(CARSUS_PATH[0]).joinpath('data', 'config.yml').as_posix()
 
+        with open(YAML_PATH) as f:
             conf = yaml.load(f, Loader=yaml.FullLoader)
             data = {}
 
+            ions = parse_selected_species(ions)
             for i in ions:
                 sym = convert_atomic_number2symbol(i[0])
                 try:
-                    fname = CMFGEN_ROOT.joinpath(CMFGEN_DICT[sym],
+                    fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
                                                  roman.toRoman(i[1]+1),
                                                  conf['atom'][sym]['ion_number'][i[1]]['date'],
                                                  conf['atom'][sym]['ion_number'][i[1]]['osc']
                                                  ).as_posix()
 
                 except KeyError:
-                    logger.warning(f'No specified \'osc\' data for {sym} {i[1]} in `{CONFIG_YAML}`.')
+                    logger.warning(f'No specified \'osc\' data for {sym} {i[1]} in `{YAML_PATH}`.')
                     continue
 
                 data[i] = {}

@@ -1,0 +1,85 @@
+atom:
+  H: 
+    dir: HYD
+    ion_number:
+      0:
+        date: 18oct00
+        osc: hiosc_a4.dat
+        pho: 
+          - hiphot.dat
+
+  He:
+    dir: HE
+    ion_number:
+      0: 
+        date: 15jul15
+        osc: hei_osc
+        pho:
+          - phot_hei
+
+      1:
+        date: 5dec96
+        osc: he2_osc.dat
+        pho: 
+          - he2phot.dat
+
+  C:
+    dir: CARB
+    ion_number:
+      0: 
+        date: 12dec04
+        osc: ci_split_osc
+        pho: 
+          - phot_smooth_50
+
+      1: 
+        date: 30oct12
+        osc: c2osc_rev.dat
+        pho:
+          - ciiiphot_sm_b_500.dat
+
+      2: 
+        date: 23dec04
+        osc: ciiiosc_st_split_big.dat
+        pho:
+          - ciiiphot_sm_a_500.dat
+          - ciiiphot_sm_b_500.dat
+        
+  Si:
+    dir: SIL
+    ion_number:
+      0: 
+        date: 23nov11
+        osc: SiI_OSC
+        pho:
+          - SiI_PHOT_DATA
+
+      1: 
+        date: 16sep15
+        osc: si2_osc_kurucz
+        pho:
+          - phot_data_zw
+
+#      AL
+#      ARG
+#      BAR
+#      CA
+#      CHL
+#      CHRO
+#      COB
+#      FE
+#      FLU
+#      MAN
+#      MG
+#      NA
+#      NEON
+#      NICK
+#      NIT
+#      OXY
+#      PHOS
+#      POT
+#      SCAN
+#      SIL
+#      SUL
+#      TIT
+#      VAN
