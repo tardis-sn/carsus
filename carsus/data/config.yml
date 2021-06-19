@@ -36,7 +36,7 @@ atom:
         date: 30oct12
         osc: c2osc_rev.dat
         pho:
-          - ciiiphot_sm_b_500.dat
+          - phot_sm_3000.dat
 
       2: 
         date: 23dec04
