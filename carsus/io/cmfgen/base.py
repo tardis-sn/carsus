@@ -452,10 +452,10 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     break
 
                 if df.shape[1] == 2:
-                    df.columns = ['Energy', 'Sigma']
+                    df.columns = ['energy', 'sigma']
 
                 elif df.shape[1] == 1:
-                    df.columns = ['Fit coefficients']
+                    df.columns = ['fit_coeff']
 
                 elif df.shape[1] == 8:  # Verner ground state fits. TODO: add units
                     df.columns = ['n', 'l', 'E', 'E_0',
@@ -688,8 +688,10 @@ class CMFGENReader:
         with open(YAML_PATH) as f:
             conf = yaml.load(f, Loader=yaml.FullLoader)
             ions = parse_selected_species(ions)
+
             for i in ions:
                 sym = convert_atomic_number2symbol(i[0])
+                
                 try:
                     osc_fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
                                                      roman.toRoman(i[1]+1),
@@ -698,12 +700,22 @@ class CMFGENReader:
                                                      ).as_posix()
 
                 except KeyError:
-                    logger.warning(f'No specified \'osc\' data for {sym} {i[1]} in `{YAML_PATH}`.')
+                    logger.warning(f'No configuration for {sym} {i[1]} in `{YAML_PATH}`.')
                     continue
 
                 data[i] = {}
                 data[i]['levels'] = CMFGENEnergyLevelsParser(osc_fname).base
                 data[i]['lines'] = CMFGENOscillatorStrengthsParser(osc_fname).base
+
+                pho_flist = []
+                for j, k in enumerate(conf['atom'][sym]['ion_number'][i[1]]['pho']):
+                    pho_fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
+                                                     roman.toRoman(i[1]+1),
+                                                     conf['atom'][sym]['ion_number'][i[1]]['date'],
+                                                     conf['atom'][sym]['ion_number'][i[1]]['pho'][j]
+                                                     ).as_posix()
+                    pho_flist.append(pho_fname)
+                data[i]['phixs'] = [CMFGENPhotoionizationCrossSectionParser(l).base for l in pho_flist]
 
         return cls(data)
 
@@ -770,5 +782,6 @@ class CMFGENReader:
 
         self.levels = levels
         self.lines = lines
+        self.data = data
 
         return
