@@ -1,13 +1,13 @@
 import logging
-import pathlib
-import yaml
-import roman
 import numpy as np
 import pandas as pd
 import astropy.units as u
 import astropy.constants as const
 import itertools
 import gzip
+import pathlib
+import roman
+import yaml
 from carsus.io.base import BaseParser
 from carsus.util import parse_selected_species, convert_atomic_number2symbol
 from carsus import __path__ as CARSUS_PATH
@@ -245,23 +245,23 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df = pd.read_csv(fname, **kwargs, engine='python')
 
         except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=['State A', 'State B', 'f', 'A',
+            df = pd.DataFrame(columns=['label_lower', 'label_upper', 'f', 'A',
                                  'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
             logger.warn(f'Table is empty: `{fname}`.')
 
         # Assign column names by file content
         if df.shape[1] == 9:
-            df.columns = ['State A', 'State B', 'f', 'A',
+            df.columns = ['label_lower', 'label_upper', 'f', 'A',
                             'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
 
         # These files are 9-column, but for some reason the regex produces 10 columns
         elif df.shape[1] == 10:
-            df.columns = ['State A', 'State B', 'f', 'A',
+            df.columns = ['label_lower', 'label_upper', 'f', 'A',
                             'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc', '?']
             df = df.drop(columns=['?'])
 
         elif df.shape[1] == 8:
-            df.columns = ['State A', 'State B', 'f', 'A', 'Lam(A)', 
+            df.columns = ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 
                             'i', 'j', '#']
             df['Lam(obs)'] = np.nan
             df['% Acc'] = np.nan
@@ -330,7 +330,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             # Comment next line when trying new regexes!
             names = [np.format_float_scientific(
                 to_float(x)*1e+04, precision=4) for x in names[1:]]
-            kwargs['names'] = ['State A', 'State B'] + names
+            kwargs['names'] = ['label_lower', 'label_upper'] + names
 
         except AttributeError:
             # TODO: some files have no column names nor header
@@ -683,28 +683,27 @@ class CMFGENReader:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
         else:
             YAML_PATH = pathlib.Path(CARSUS_PATH[0]).joinpath('data', 'config.yml').as_posix()
-
+            
+        data = {}
         with open(YAML_PATH) as f:
             conf = yaml.load(f, Loader=yaml.FullLoader)
-            data = {}
-
             ions = parse_selected_species(ions)
             for i in ions:
                 sym = convert_atomic_number2symbol(i[0])
                 try:
-                    fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
-                                                 roman.toRoman(i[1]+1),
-                                                 conf['atom'][sym]['ion_number'][i[1]]['date'],
-                                                 conf['atom'][sym]['ion_number'][i[1]]['osc']
-                                                 ).as_posix()
+                    osc_fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
+                                                     roman.toRoman(i[1]+1),
+                                                     conf['atom'][sym]['ion_number'][i[1]]['date'],
+                                                     conf['atom'][sym]['ion_number'][i[1]]['osc']
+                                                     ).as_posix()
 
                 except KeyError:
                     logger.warning(f'No specified \'osc\' data for {sym} {i[1]} in `{YAML_PATH}`.')
                     continue
 
                 data[i] = {}
-                data[i]['levels'] = CMFGENEnergyLevelsParser(fname).base
-                data[i]['lines'] = CMFGENOscillatorStrengthsParser(fname).base
+                data[i]['levels'] = CMFGENEnergyLevelsParser(osc_fname).base
+                data[i]['lines'] = CMFGENOscillatorStrengthsParser(osc_fname).base
 
         return cls(data)
 

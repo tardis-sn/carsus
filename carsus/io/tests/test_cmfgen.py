@@ -157,7 +157,7 @@ def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
     parser = CMFGENOscillatorStrengthsParser(fevi_osc_kb_rk_fname)
     n = int(parser.meta['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isclose(parser.base.iloc[0,2], 1.94e-02)
 
 @with_refdata
@@ -165,7 +165,7 @@ def test_p2_osc(p2_osc_fname):
     parser = CMFGENOscillatorStrengthsParser(p2_osc_fname)
     n = int(parser.meta['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['State A', 'State B', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isnan(parser.base.iloc[0,7])
     assert np.isclose(parser.base.iloc[0,8], 3.)
     assert np.isnan(parser.base.iloc[1,7])
