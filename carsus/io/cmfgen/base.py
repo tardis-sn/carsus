@@ -675,12 +675,13 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, atomic_path, config_yaml=None):
+    def from_config(cls, ions, atomic_path, phixs=False, config_yaml=None,):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
 
         if config_yaml is not None:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
+
         else:
             YAML_PATH = pathlib.Path(CARSUS_PATH[0]).joinpath('data', 'config.yml').as_posix()
             
@@ -691,31 +692,34 @@ class CMFGENReader:
 
             for i in ions:
                 sym = convert_atomic_number2symbol(i[0])
-                
+
                 try:
-                    osc_fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
+                    BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
                                                      roman.toRoman(i[1]+1),
-                                                     conf['atom'][sym]['ion_number'][i[1]]['date'],
-                                                     conf['atom'][sym]['ion_number'][i[1]]['osc']
-                                                     ).as_posix()
+                                                     conf['atom'][sym]['ion_number'][i[1]]['date'])
 
                 except KeyError:
-                    logger.warning(f'No configuration for {sym} {i[1]} in `{YAML_PATH}`.')
+                    logger.warning(f'No configuration found for {sym} {i[1]}.')
                     continue
 
+                osc_fname = BASE_PATH.joinpath(conf['atom'][sym]['ion_number'][i[1]]['osc']
+                                                ).as_posix()
                 data[i] = {}
                 data[i]['levels'] = CMFGENEnergyLevelsParser(osc_fname).base
                 data[i]['lines'] = CMFGENOscillatorStrengthsParser(osc_fname).base
 
-                pho_flist = []
-                for j, k in enumerate(conf['atom'][sym]['ion_number'][i[1]]['pho']):
-                    pho_fname = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
-                                                     roman.toRoman(i[1]+1),
-                                                     conf['atom'][sym]['ion_number'][i[1]]['date'],
-                                                     conf['atom'][sym]['ion_number'][i[1]]['pho'][j]
-                                                     ).as_posix()
-                    pho_flist.append(pho_fname)
-                data[i]['phixs'] = [CMFGENPhotoionizationCrossSectionParser(l).base for l in pho_flist]
+                if phixs:
+                    pho_flist = []
+                    try:
+                        for j, k in enumerate(conf['atom'][sym]['ion_number'][i[1]]['pho']):
+                            pho_fname = BASE_PATH.joinpath(conf['atom'][sym]['ion_number'][i[1]]['pho'][j]
+                                                            ).as_posix()
+                            pho_flist.append(pho_fname)
+
+                    except KeyError:
+                        logger.warning(f'No `pho` data for {sym} {i[1]}.')
+
+                    data[i]['phixs'] = [CMFGENPhotoionizationCrossSectionParser(l).base for l in pho_flist]
 
         return cls(data)
 
