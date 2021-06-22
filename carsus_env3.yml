@@ -25,6 +25,7 @@ dependencies:
   - h5py
   - pytables
   - pyarrow=0.14
+  - roman
 
 # --- Not required for conda-forge package ---
 
