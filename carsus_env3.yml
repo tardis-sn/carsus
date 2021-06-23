@@ -57,6 +57,11 @@ dependencies:
   - coverage=4  # chrisjsewell/pytest-notebook/issues/6
   - attrs=20  # chrisjsewell/pytest-notebook/issues/16
 
+  # ChiantiPy
+  - scipy
+  - ipyparallel
+  - blas=1.1  # numpy/numpy/issues/14165
+
   # Other
   - git-lfs
   
