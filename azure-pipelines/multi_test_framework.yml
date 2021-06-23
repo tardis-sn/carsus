@@ -1,5 +1,12 @@
 trigger:
-  - master
+  branches:
+    include:
+    - '*'
+
+pr:
+  branches:
+    include:
+    - '*'
 
 variables:
   package.manager: 'mamba'
@@ -29,8 +36,8 @@ jobs:
         Linux:
           vm_Image: 'ubuntu-latest'
 
-        #macOS:
-        #  vm_Image: 'macOS-latest'
+        macOS:
+          vm_Image: 'macOS-latest'
 
       maxParallel: 2
 

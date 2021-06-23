@@ -4,12 +4,12 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3
-  - setuptools
+  - python=3.6
   - numpy=1.15
   - pandas=1.0
   - astropy=3
   - pip
+  - setuptools_scm
 
   # I/O
   - requests
@@ -52,6 +52,7 @@ dependencies:
   # ChiantiPy
   - scipy
   - ipyparallel
+  - blas=1.1  # numpy/numpy/issues/14165
 
   # Other
   - git-lfs
