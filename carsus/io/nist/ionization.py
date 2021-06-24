@@ -147,7 +147,7 @@ class NISTIonizationEnergiesParser(BaseParser):
 
         def parse_ground_level(row):
             ground_level = row["ground_level"]
-            lvl = pd.Series(index=["term", "spin_multiplicity", "L", "parity", "J"])
+            lvl = pd.Series(index=["term", "spin_multiplicity", "L", "parity", "J"], dtype='float64')
 
             try:
                 lvl_tokens = level.parseString(ground_level)
