@@ -16,7 +16,7 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                              )
 
 with_refdata = pytest.mark.skipif(
-    not pytest.config.getoption("--refdata"),
+    not request.config.getoption("--refdata"),
     reason="--refdata folder not specified"
 )
 
