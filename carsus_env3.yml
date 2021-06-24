@@ -38,7 +38,7 @@ dependencies:
   - sphinx-copybutton
   - sphinx_rtd_theme
   - sphinxcontrib-apidoc
-  - sphinxcontrib-bibtex=1.0  # tardis-sn/tardis/pull/1392
+  - sphinxcontrib-bibtex
   - nbconvert=5  # chrisjsewell/pytest-notebook/issues/10
   - nbformat
   - nbsphinx
