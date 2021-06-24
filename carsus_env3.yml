@@ -14,16 +14,18 @@ dependencies:
   - setuptools_scm
 
   # I/O
+  - pyyaml
   - requests
   - uncertainties
   - beautifulsoup4
   - html5lib
   - pyparsing=2.2
-  - SQLAlchemy=1.0
-  - PyYAMl
+  - sqlalchemy=1.0
   - h5py
   - pytables
   - pyarrow=0.14
+
+# --- Not required for conda-forge package ---
 
   # Analysis
   - jupyter
