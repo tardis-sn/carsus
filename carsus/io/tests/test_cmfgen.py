@@ -199,7 +199,6 @@ def test_hyd_l(hyd_l_fname):
         parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
 
-
 @with_refdata
 def test_gbf_n(gbf_n_fname):
     parser = CMFGENHydGauntBfParser(gbf_n_fname)
@@ -212,6 +211,7 @@ def test_gbf_n(gbf_n_fname):
     assert_allclose(
         parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
+
 @with_refdata
 def test_reader_levels_shape(si1_reader):
     assert si1_reader.levels.shape == (157, 5)
