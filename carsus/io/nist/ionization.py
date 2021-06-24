@@ -165,7 +165,7 @@ class NISTIonizationEnergiesParser(BaseParser):
             # Take as assumption J=0
             if (np.isnan(lvl["J"])):
                 lvl["J"] = '0'
-                logger.warn(f"Set `J=0` for ground state of species `{convert_atomic_number2symbol(row['atomic_number'])} {row['ion_charge']}`.")
+                logger.warning(f"Set `J=0` for ground state of species `{convert_atomic_number2symbol(row['atomic_number'])} {row['ion_charge']}`.")
             
             try:
                 lvl["term"] = "".join([str(_) for _ in lvl_tokens["ls_term"]])

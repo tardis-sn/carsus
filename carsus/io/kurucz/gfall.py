@@ -92,7 +92,7 @@ class GFALLReader(object):
         self._levels = None
         self._lines = None
         if unique_level_identifier is None:
-            logger.warn('A specific combination to identify unique levels from '
+            logger.warning('A specific combination to identify unique levels from '
                         'GFALL data has not been given. Defaulting to '
                         '["energy", "j"].')
             self.unique_level_identifier = self.default_unique_level_identifier
