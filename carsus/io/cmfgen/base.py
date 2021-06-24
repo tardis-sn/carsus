@@ -405,7 +405,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         data = []
 
         for line in f:
-
             if '!Configuration name' in line:
                 meta['Configuration'] = line.split()[0]
 
@@ -419,9 +418,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 for i in range(p):
 
                     values = f.readline().split()
-                    # Verner ground state fits
-                    if len(values) == 8:
-
+                    if len(values) == 8:  # Verner ground state fits
                         data.append(
                             list(map(int, values[:2])) + list(map(float, values[2:])))
 
@@ -445,7 +442,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f:
 
             while True:
-
                 df = next(self._table_gen(f), None)
 
                 if df.empty:
