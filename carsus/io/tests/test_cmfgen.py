@@ -10,12 +10,9 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENOscillatorStrengthsParser,
                               CMFGENCollisionalStrengthsParser,
                               CMFGENPhotoionizationCrossSectionParser,
-<<<<<<< HEAD
                               CMFGENHydLParser,
                               CMFGENHydGauntBfParser,
-=======
                               CMFGENReader
->>>>>>> e4ab99b (add cmfgen reader tests)
                              )
 
 with_refdata = pytest.mark.skipif(
