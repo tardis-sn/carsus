@@ -6,7 +6,7 @@ from carsus.model import Level, Ion, Line, ECollision
 
 
 slow = pytest.mark.skipif(
-    not request.config.getoption("--runslow"),
+    not pytest.config.getoption("--runslow"),
     reason="need --runslow option to run"
 )
 

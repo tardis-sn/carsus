@@ -64,6 +64,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
 
+
 def pytest_addoption(parser):
     parser.addoption("--runslow", action="store_true",
                      help="include running slow tests during run")
@@ -71,6 +72,7 @@ def pytest_addoption(parser):
                      help="filename for the testing database")
     parser.addoption("--refdata", dest='refdata', default=None,
                      help="carsus-refdata folder location")
+
 
 @pytest.fixture
 def memory_session():
@@ -102,11 +104,13 @@ def test_db_url(test_db_fname):
 def gfall_fname(data_dir):
     return os.path.join(data_dir, 'gftest.all')  # Be III, B IV, N VI
 
+
 @pytest.fixture(scope="session")
 def gfall_http(data_dir):
     url = "https://raw.githubusercontent.com/tardis-sn/carsus/"
     url += "master/carsus/tests/data/gftest.all"
     return url
+
 
 @pytest.fixture(scope="session")
 def test_engine(test_db_url):
