@@ -74,5 +74,7 @@ except Exception:
     version = '{version}'
 """.lstrip()
 
-setup(use_scm_version={'write_to': os.path.join('carsus', 'version.py'),
-                       'write_to_template': VERSION_TEMPLATE})
+setup(use_scm_version={'write_to': os.path.join('tardis', 'version.py'),
+                       'write_to_template': VERSION_TEMPLATE,
+                       #'version_scheme': 'calver-by-date'},
+                    })
