@@ -59,6 +59,8 @@ highlight_language = 'python3'
 # directories to ignore when looking for source files.
 exclude_patterns.append('_templates')
 exclude_patterns.append('_build')
+exclude_patterns.append('**.ipynb_checkpoints')
+
 
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
@@ -79,15 +81,27 @@ extensions = [
     'numpydoc',
 ]
 
+apidoc_output_dir = "api"
+apidoc_excluded_paths = ["*tests*", "*setup_package*", "*conftest*", "*version*" ]
+apidoc_separate_modules = True
+
 bibtex_bibfiles = ['references.bib', 'publications.bib']
+
+## https://github.com/phn/pytpm/issues/3#issuecomment-12133978
+numpydoc_show_class_members = False
+
 nbsphinx_allow_errors = False  # use for debugging purposes only
+if os.getenv("DISABLE_NBSPHINX") == "1":
+    nbsphinx_execute = "never"
+else:
+    nbsphinx_execute = "auto"
 
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
 project = setup_cfg['name']
 author = setup_cfg['author']
-copyright = '{0}, {1}'.format(
+copyright = '2016-{0}, {1}'.format(
     datetime.datetime.now().year, setup_cfg['author'])
 
 # The version info for the project you're documenting, acts as replacement for
@@ -131,6 +145,8 @@ html_theme_options = {
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
+html_static_path = ["_static"]
+templates_path = ["_templates"]
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -221,9 +237,3 @@ linkcheck_anchors = False
 #     dtype, target = line.split(None, 1)
 #     target = target.strip()
 #     nitpick_ignore.append((dtype, six.u(target)))
-
-# -- APIDoc configuration -----------------------------------------------------
-apidoc_module_dir = "../carsus"
-apidoc_output_dir = "api"
-apidoc_excluded_paths = ["*tests*", "*setup_package*", "*conftest*", "*version*" ]
-apidoc_separate_modules = True
