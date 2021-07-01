@@ -5,13 +5,14 @@ channels:
 
 dependencies:
   - python=3.6
+  - setuptools
+  - setuptools_scm
+  - pip
   - numpy=1.15
   - pandas=1.0
   - astropy=3
   - chiantipy=0.8.4
   - blas=1.1 # numpy/numpy/issues/14165
-  - pip
-  - setuptools_scm
 
   # I/O
   - pyyaml
