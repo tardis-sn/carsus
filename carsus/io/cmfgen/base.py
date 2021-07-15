@@ -716,6 +716,7 @@ class CMFGENReader:
                         logger.warning(f'No `pho` data for {sym} {i[1]}.')
 
                     data[i]['phixs'] = [CMFGENPhotoionizationCrossSectionParser(l).base for l in pho_flist]
+                    data[i]['phixs_meta'] = [CMFGENPhotoionizationCrossSectionParser(l).meta for l in pho_flist]
 
         return cls(data)
 
