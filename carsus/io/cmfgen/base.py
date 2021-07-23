@@ -406,15 +406,15 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
         for line in f:
             if '!Configuration name' in line:
-                meta['Configuration'] = line.split()[0]
+                meta['Configuration name'] = line.split()[0]
 
             if '!Type of cross-section' in line:
                 meta['Type of cross-section'] = int(line.split()[0])
 
             if '!Number of cross-section points' in line:
-                meta['Points'] = int(line.split()[0])
+                meta['Number of cross-section points'] = int(line.split()[0])
 
-                p = meta['Points']
+                p = meta['Number of cross-section points']
                 for i in range(p):
 
                     values = f.readline().split()
@@ -715,8 +715,9 @@ class CMFGENReader:
                     except KeyError:
                         logger.warning(f'No `pho` data for {sym} {i[1]}.')
 
-                    data[i]['phixs'] = [CMFGENPhotoionizationCrossSectionParser(l).base for l in pho_flist]
-                    data[i]['phixs_meta'] = [CMFGENPhotoionizationCrossSectionParser(l).meta for l in pho_flist]
+                    data[i]['phixs'] = [{'base': CMFGENPhotoionizationCrossSectionParser(l).base,
+                                         'meta': CMFGENPhotoionizationCrossSectionParser(l).meta,
+                                        } for l in pho_flist]
 
         return cls(data)
 

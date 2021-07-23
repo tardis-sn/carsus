@@ -56,9 +56,10 @@ atom:
 
       1: 
         date: 16sep15
-        osc: si2_osc_kurucz
+        osc: si2_osc_nahar
         pho:
-          - phot_data_zw
+          - phot_nahar_A
+          - phot_nahar_B
 
 #      AL
 #      ARG
