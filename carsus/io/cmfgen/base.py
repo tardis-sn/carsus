@@ -674,7 +674,6 @@ class CMFGENReader:
     def from_config(cls, ions, atomic_path, phixs=False, config_yaml=None,):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
-
         if config_yaml is not None:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
 
@@ -690,9 +689,9 @@ class CMFGENReader:
                 sym = convert_atomic_number2symbol(i[0])
 
                 try:
+                    date = conf['atom'][sym]['ion_number'][i[1]]['date']
                     BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
-                                                     roman.toRoman(i[1]+1),
-                                                     conf['atom'][sym]['ion_number'][i[1]]['date'])
+                                                     roman.toRoman(i[1]+1), date)
 
                 except KeyError:
                     logger.warning(f'No configuration found for {sym} {i[1]}.')
@@ -700,9 +699,12 @@ class CMFGENReader:
 
                 osc_fname = BASE_PATH.joinpath(conf['atom'][sym]['ion_number'][i[1]]['osc']
                                                 ).as_posix()
+
                 data[i] = {}
-                data[i]['levels'] = CMFGENEnergyLevelsParser(osc_fname).base
-                data[i]['lines'] = CMFGENOscillatorStrengthsParser(osc_fname).base
+                lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
+                lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
+                data[i]['levels'] = lvl_parser.base
+                data[i]['lines'] = lns_parser.base
 
                 if phixs:
                     pho_flist = []
@@ -715,9 +717,24 @@ class CMFGENReader:
                     except KeyError:
                         logger.warning(f'No `pho` data for {sym} {i[1]}.')
 
-                    data[i]['phixs'] = [{'base': CMFGENPhotoionizationCrossSectionParser(l).base,
-                                         'meta': CMFGENPhotoionizationCrossSectionParser(l).meta,
-                                        } for l in pho_flist]
+                    data[i]['phixs'] = []
+                    for l in pho_flist:
+                        pho_parser = CMFGENPhotoionizationCrossSectionParser(l)
+                        data[i]['phixs'].append({'base': pho_parser.base,
+                                                 'meta': pho_parser.meta})
+
+                    if i == (1,0) and date == '5dec96':
+                        hyd_fname = BASE_PATH.joinpath('hyd_l_data.dat').as_posix()
+                        gbf_fname = BASE_PATH.joinpath('gbf_n_data.dat').as_posix()
+
+                        hyd_parser = CMFGENHydLParser(hyd_fname)
+                        gbf_parser = CMFGENHydGauntBfParser(gbf_fname)
+
+                        data[i]['hyd'] = {'base': hyd_parser.base, 
+                                          'meta': hyd_parser.meta}
+
+                        data[i]['gbf'] = {'base': gbf_parser.base, 
+                                          'meta': gbf_parser.meta}
 
         return cls(data)
 
