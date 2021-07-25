@@ -145,7 +145,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
     Methods
     -------
     load(fname)
-        Parses the input data and stores the results in the `base` attribute.
+        Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = ['!Date',
@@ -216,7 +216,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute.
+            Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = CMFGENEnergyLevelsParser.keys
@@ -287,7 +287,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute.
+            Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = ['!Number of transitions',
@@ -298,8 +298,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-
-        skiprows = find_row(fname, "ransition\T", row_number=True)  # Not a typo!
+        skiprows = find_row(fname, "ransition\T", row_number=True)
         kwargs = {'header': None,
                   'index_col': False,
                   'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
@@ -307,30 +306,26 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         # FIXME: expensive solution for two files containing more than one 
         # table: `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
-        footer = find_row(fname, "Johnson values:",
-                          "dln_OMEGA_dlnT", how='OR', row_number=True)
-
-        if footer is not None:
-            kwargs['nrows'] = footer - kwargs['skiprows'] -2
+        end = find_row(fname, "Johnson values:", 
+                        "dln_OMEGA_dlnT", how='OR', row_number=True)
+        if end is not None:
+            kwargs['nrows'] = end - kwargs['skiprows'] -2
 
         try:
-            names = find_row(fname, 'ransition\T').split()  
+            columns = find_row(fname, 'ransition\T').split()
             
-            # Comment next line when trying new regexes.
-            names = [np.format_float_scientific(
-                to_float(x)*1e+04, precision=4) for x in names[1:]]
+            # NOTE: Comment next line when trying new regexes
+            columns = [np.format_float_scientific(
+                to_float(x)*1e+04, precision=4) for x in columns[1:]]
+            kwargs['names'] = ['label_lower', 'label_upper'] + columns
 
-            kwargs['names'] = ['label_lower', 'label_upper'] + names
-
-        # TODO: some files have no column names nor header
+        # FIXME: some files have no column names nor header
         except AttributeError:
-            logger.warning(f'Column names not found: `{fname}`.')
+            logger.warning(f'Unknown column format: `{fname}`.')
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
-
-            # This is done column-wise on purpose
-            for c in df.columns[2:]:  
+            for c in df.columns[2:]:  # This is done column-wise on purpose
                 try:
                     df[c] = df[c].astype('float64')
 
@@ -365,7 +360,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         Methods
         -------
         load(fname)
-            Parses the input data and stores the results in the `base` attribute.
+            Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = ['!Date',
@@ -501,7 +496,7 @@ class CMFGENHydLParser(BaseParser):
     Methods
     -------
     load(fname)
-        Parses the input data and stores the results in the `base` attribute.
+        Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = [
@@ -611,7 +606,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
     Methods
     -------
     load(fname)
-        Parses the input data and stores the results in the `base` attribute.
+        Parses the input file and stores the result in the `base` attribute.
     """
 
     keys = [
