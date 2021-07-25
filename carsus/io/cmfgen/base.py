@@ -20,6 +20,34 @@ def open_cmfgen_file(fname, encoding='ISO-8859-1'):
     return gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding=encoding) 
 
 
+def to_float(string):
+    """
+    String to float, also deals with Fortran 'D' type.
+
+    Parameters
+    ----------
+    string : str
+
+    Returns
+    -------
+    float
+    """
+    try:
+        value = float(string.replace('D', 'E'))
+
+    except ValueError:
+
+        # Typo in `MG/VIII/23oct02/phot_sm_3000`, line 23340
+        if string == '1-.00':
+            value = 10.00
+
+        # Typo in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
+        if string == '*********':
+            value = np.nan
+
+    return value
+
+
 def find_row(fname, string1, string2=None, how='AND', row_number=False):
     """
     Search for strings in plain text files and returns the matching\
@@ -105,34 +133,6 @@ def parse_header(fname, keys, start=0, stop=50):
     return meta
 
 
-def to_float(string):
-    """
-    String to float, also deals with Fortran 'D' type.
-
-    Parameters
-    ----------
-    string : str
-
-    Returns
-    -------
-    float
-    """
-    try:
-        value = float(string.replace('D', 'E'))
-
-    except ValueError:
-
-        # Typo in `MG/VIII/23oct02/phot_sm_3000`, line 23340
-        if string == '1-.00':
-            value = 10.00
-
-        # Typo in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
-        if string == '*********':
-            value = np.nan
-
-    return value
-
-
 class CMFGENEnergyLevelsParser(BaseParser):
     """
     Description
@@ -140,7 +140,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
     base : pandas.DataFrame
     columns : list of str
     meta : dict
-        Metadata parsed from file header.
+        Metadata extracted from file header.
 
     Methods
     -------
@@ -171,36 +171,30 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
-            logger.warning(f'Table is empty: `{fname}`.')
+            logger.warning(f'Empty table: `{fname}`.')
 
-        # Assign column names by file content
         if df.shape[1] == 10:
-            # Read column names and split them keeping one space (e.g. '10^15 Hz')
+            # Read column names and split them keeping just one space (e.g. '10^15 Hz')
             columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
-
-            # Filter list elements containing empty strings
-            columns = [c for c in columns if c != '']
-
-            # Remove left spaces and newlines
-            columns = [c.rstrip().lstrip() for c in columns]
+            columns = [c.rstrip().lstrip() for c in columns if c != '']
             columns = ['Configuration'] + columns
+            df.columns = columns
 
         elif df.shape[1] == 7:
-            columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 6:
-            columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 5:
-            columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
+            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
 
         else:
-            logger.warning(f'Inconsistent number of columns: `{fname}`.')
+            logger.warning(f'Unknown column format: `{fname}`.')
 
-        df.columns = columns
         self.fname = fname
         self.base = df
-        self.columns = columns
+        self.columns = df.columns.tolist()
         self.meta = meta
 
     def to_hdf(self, key='/energy_levels'):
@@ -217,7 +211,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         base : pandas.DataFrame
         columns : list of str
         meta : dict
-            Metadata parsed from file header.
+            Metadata extracted from file header.
 
         Methods
         -------
@@ -229,7 +223,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        
         skiprows = find_row(fname, "Transition", "Lam", row_number=True) +1
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
         nrows = int(meta['Number of transitions'])
@@ -239,36 +232,33 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
                   'skiprows': skiprows,
                   'nrows': nrows}
 
+        columns = ['label_lower', 'label_upper', 'f', 'A',
+                    'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
 
         except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=['label_lower', 'label_upper', 'f', 'A',
-                                 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc'])
-            logger.warning(f'Table is empty: `{fname}`.')
+            df = pd.DataFrame(columns=columns)
+            logger.warning(f'Empty table: `{fname}`.')
 
-        # Assign column names by file content
         if df.shape[1] == 9:
-            df.columns = ['label_lower', 'label_upper', 'f', 'A',
-                            'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+            df.columns = columns
 
-        # These files are 9-column, but for some reason the regex produces 10 columns
+        # These files have 9-column, but the current regex produces 10 columns
         elif df.shape[1] == 10:
-            df.columns = ['label_lower', 'label_upper', 'f', 'A',
-                            'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc', '?']
+            df.columns = columns + ['?']
             df = df.drop(columns=['?'])
 
         elif df.shape[1] == 8:
-            df.columns = ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 
-                            'i', 'j', '#']
+            df.columns = columns[:7] + ['#']
+            df = df.drop(columns=['#'])
             df['Lam(obs)'] = np.nan
             df['% Acc'] = np.nan
-            df = df.drop(columns=['#'])
 
         else:
-            logger.warning(f'Inconsistent number of columns `{fname}`.')
+            logger.warning(f'Unknown column format: `{fname}`.')
 
-        # Fix Fortran float type 'D'
         if df.shape[0] > 0 and 'D' in str(df['f'][0]):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
@@ -292,7 +282,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         base : pandas.DataFrame
         columns : list of str
         meta : dict
-            Metadata parsed from file header.
+            Metadata extracted from file header.
 
         Methods
         -------
@@ -349,7 +339,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame()
-            logger.warning(f'Table is empty: `{fname}`.')
+            logger.warning(f'Empty table: `{fname}`.')
 
         self.fname = fname
         self.base = df
@@ -370,7 +360,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         base : list of pandas.DataFrame
         columns : list of str
         meta : dict
-            Metadata parsed from file header.
+            Metadata extracted from file header.
 
         Methods
         -------
@@ -468,7 +458,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     columns = ['n', 'l', 'E', 'E_0', 'sigma_0', 'y(a)', 'P', 'y(w)']
 
                 else:
-                    logger.warning(f'Inconsistent number of columns: `{fname}`.')
+                    logger.warning(f'Unknown column format: `{fname}`.')
 
                 column_types.add(tuple(columns))
                 df.columns = columns
@@ -506,7 +496,7 @@ class CMFGENHydLParser(BaseParser):
         The frequencies for the cross sections. Given in units of the threshold
         frequency for photoionization.
     meta : dict
-        Metadata parsed from file header.
+        Metadata extracted from file header.
 
     Methods
     -------
@@ -616,7 +606,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
         The frequencies for the gaunt factors. Given in units of the threshold
         frequency for photoionization.
     meta : dict
-        Metadata parsed from file header.
+        Metadata extracted from file header.
 
     Methods
     -------
