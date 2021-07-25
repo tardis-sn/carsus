@@ -107,7 +107,7 @@ def parse_header(fname, keys, start=0, stop=50):
 
 
 def to_float(string):
-    """ String to float, useful to work with Fortran 'D' type.
+    """ String to float, also deals with Fortran 'D' type.
 
     Parameters
     ----------
@@ -361,7 +361,6 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
                 f.get_storer(key).attrs.metadata = self.meta
 
 
-# TODO: inherit from `BaseParser` class seems a bit forced
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     """
         Description
@@ -390,7 +389,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             ]
 
     def _table_gen(self, f):
-        """Yields a cross section table for an energy level.
+        """Yields a cross section table for a single energy level target.
 
         Parameters
         ----------
@@ -399,35 +398,42 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         Yields
         -------
         pd.DataFrame
-            DataFrame with metadata.
-        """        
-        meta = {}
+            DataFrame with attached metadata.
+        """
         data = []
+        meta = {}
 
         for line in f:
+            
+            try:
+                value = line.split()[0]
+
+            except IndexError:
+                continue
+
             if '!Configuration name' in line:
-                meta['Configuration name'] = line.split()[0]
+                meta['Configuration'] = value
 
             if '!Type of cross-section' in line:
-                meta['Type of cross-section'] = int(line.split()[0])
+                meta['Type of cross-section'] = int(value)
 
             if '!Number of cross-section points' in line:
-                meta['Number of cross-section points'] = int(line.split()[0])
-
-                p = meta['Number of cross-section points']
-                for i in range(p):
+                n_points = int(value)
+                for i in range(n_points):
 
                     values = f.readline().split()
-                    if len(values) == 8:  # Verner ground state fits
-                        data.append(
-                            list(map(int, values[:2])) + list(map(float, values[2:])))
+                    if len(values) == 8:  # Verner & Yakolev (1995) ground state fits
 
-                        if i == p/len(values) - 1:
+                        data.append(
+                            list(map(int, values[:2])) + list(map(to_float, values[2:])))
+
+                        if i == n_points/len(values) -1:
                             break
 
                     else:
                         data.append(map(to_float, values))
 
+                meta['Number of cross-section points'] = n_points
                 break
 
         df = pd.DataFrame.from_records(data)
