@@ -192,9 +192,9 @@ class CMFGENEnergyLevelsParser(BaseParser):
         else:
             logger.warning(f'Unknown column format: `{fname}`.')
 
-        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
+        self.fname = fname
         self.meta = meta
 
     def to_hdf(self, key='/energy_levels'):
@@ -263,9 +263,9 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['f'] = df['f'].map(to_float)
             df['A'] = df['A'].map(to_float)
 
-        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
+        self.fname = fname
         self.meta = meta
 
     def to_hdf(self, key='/oscillator_strengths'):
@@ -336,9 +336,9 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             df = pd.DataFrame()
             logger.warning(f'Empty table: `{fname}`.')
 
-        self.fname = fname
         self.base = df
         self.columns = df.columns.tolist()
+        self.fname = fname
         self.meta = meta
 
     def to_hdf(self, key='/collisional_strengths'):
@@ -399,7 +399,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 continue
 
             if '!Configuration name' in line:
-                meta['Configuration'] = value
+                meta['Configuration name'] = value
 
             if '!Type of cross-section' in line:
                 meta['Type of cross-section'] = int(value)
@@ -436,9 +436,9 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
             while True:
 
-                arr, meta = next(self._table_gen(f), None)
+                arr, meta_ = next(self._table_gen(f), None)
                 df = pd.DataFrame.from_records(arr)
-                df.attrs = meta
+                df.attrs = meta_
 
                 if df.empty:
                     break
@@ -459,9 +459,9 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 df.columns = columns
                 data.append(df)
 
-        self.fname = fname
         self.base = data
         self.columns = sorted(column_types)
+        self.fname = fname
         self.meta = meta
 
     def to_hdf(self, key='/photoionization_cross_sections'):

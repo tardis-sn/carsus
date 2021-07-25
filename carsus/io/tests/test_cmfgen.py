@@ -196,7 +196,7 @@ def test_ariii_col(ariii_col_fname):
 def test_si2_pho(si2_pho_fname):
     parser = CMFGENPhotoionizationCrossSectionParser(si2_pho_fname)
     n = int(parser.meta['Number of energy levels'])
-    m = int(parser.base[0].attrs['Points'])
+    m = int(parser.base[0].attrs['Number of cross-section points'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (m, 2)
 
