@@ -1,76 +1,77 @@
+import gzip
+import itertools
 import logging
+import pathlib
+
+import astropy.units as u
 import numpy as np
 import pandas as pd
-import astropy.units as u
-import astropy.constants as const
-import itertools
-import gzip
-import pathlib
 import roman
 import yaml
-from carsus.io.base import BaseParser
-from carsus.util import parse_selected_species, convert_atomic_number2symbol
+
 from carsus import __path__ as CARSUS_PATH
+from carsus.io.base import BaseParser
+from carsus.util import convert_atomic_number2symbol, parse_selected_species
 
 logger = logging.getLogger(__name__)
 
-CMFGEN_DICT = {
-    'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
-    'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
-    'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
-    'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
-    'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
-    'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
-    'Ni': 'NICK'
-}
 
-# TODO: add `skiprows` parameter
-def find_row(fname, string1, string2='', how='both', num_row=False):
-    """Search strings inside plain text files and returns matching\
-    line or row number.
+def open_cmfgen_file(fname, encoding='ISO-8859-1'):
+    return gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding=encoding) 
+
+
+def find_row(fname, string1, string2=None, how='AND', row_number=False):
+    """Search for strings in plain text files and returns the matching\
+    line (or row number).
 
     Parameters
     ----------
     fname : str
         Path to plain text file.
+
     string1 : str
         String to search.
+
     string2 : str
-        Extra string to search (default is '').
-    how : {'one', 'both', 'first'}
-        If 'both' search for string1 AND string2. If 'one' search for string1\
-            OR string2. If 'first' searches for 'string1' AND NOT string2\
-            (default is 'both').
-    num_row : bool
-        If true, returns row number instead (default is False).
+        Secondary string to search (default is None).
+
+    how : {'OR', 'AND', 'AND NOT'}
+        Search method: `string1` <method> `string2`
+            (default is 'AND').
+
+    row_number : bool
+        If true, returns row number (default is False).
 
     Returns
     -------
     str or int
         Returns matching line or match row number.
     """
-    with open(fname, encoding='ISO-8859-1') as f:
+
+    if string2 is None:
+        string2 = ''
+
+    with open_cmfgen_file(fname) as f:
         n = 0
         for line in f:
+
             n += 1
-            if how == 'one':
+            if how == 'OR':
                 if string1 in line or string2 in line:
                     break
 
-            if how == 'both':
+            if how == 'AND':
                 if string1 in line and string2 in line:
                     break
 
-            if how == 'first':
+            if how == 'AND NOT':
                 if string1 in line and string2 not in line:
                     break
 
-        # In case there's no match
         else:
-            n = None
-            line = None
+            n, line = None, None
 
-    if num_row is True:
+    if row_number is True:
         return n
 
     return line
@@ -97,7 +98,7 @@ def parse_header(fname, keys, start=0, stop=50):
     """
     meta = {k.strip('!'): None for k in keys}
 
-    with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname, encoding='ISO-8859-1') as f:
+    with open_cmfgen_file(fname) as f:
         for line in itertools.islice(f, start, stop):
             for k in keys:
                 if k.lower() in line.lower():
@@ -147,8 +148,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
             Parses the input data and stores the results in the `base` attribute.
     """
 
-    # Metadata to parse from header. 
-    # TODO: look for more keys
     keys = ['!Date',
             '!Format date',
             '!Number of energy levels',
@@ -164,7 +163,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         kwargs['index_col'] = False
         kwargs['sep'] = '\s+'
         kwargs['skiprows'] = find_row(
-            fname, "Number of transitions", num_row=True)
+            fname, "Number of transitions", row_number=True)
 
         n = int(meta['Number of energy levels'])
         kwargs['nrows'] = n
@@ -180,28 +179,31 @@ class CMFGENEnergyLevelsParser(BaseParser):
         if df.shape[1] == 10:
             # Read column names and split them keeping one space (e.g. '10^15 Hz')
             columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
+
             # Filter list elements containing empty strings
             columns = [c for c in columns if c != '']
+
             # Remove left spaces and newlines
             columns = [c.rstrip().lstrip() for c in columns]
             columns = ['Configuration'] + columns
-            df.columns = columns
 
         elif df.shape[1] == 7:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
+            columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 6:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
+            columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 5:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
+            columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
 
         else:
             logger.warning(f'Inconsistent number of columns: `{fname}`.')
 
+        df.columns = columns
+
         self.fname = fname
         self.base = df
-        self.columns = df.columns.tolist()
+        self.columns = columns
         self.meta = meta
 
     def to_hdf(self, key='/energy_levels'):
@@ -235,7 +237,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         kwargs['index_col'] = False
         kwargs['sep'] = '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])'
         kwargs['skiprows'] = find_row(
-            fname, "Transition", "Lam", num_row=True) + 1
+            fname, "Transition", "Lam", row_number=True) + 1
 
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
         n = int(meta['Number of transitions'])
@@ -310,35 +312,39 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-'
-        kwargs['skiprows'] = find_row(fname, "ransition\T", num_row=True)
 
-        # FIXME: expensive solution for two files with more than one table
-        # `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
+        skiprows = find_row(fname, "ransition\T", row_number=True)  # Not a typo!
+        kwargs = {'header': None,
+                  'index_col': False,
+                  'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
+                  'skiprows': skiprows}
+
+        # FIXME: expensive solution for two files containing more than one 
+        # table: `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
         footer = find_row(fname, "Johnson values:",
-                          "dln_OMEGA_dlnT", how='one', num_row=True)
+                          "dln_OMEGA_dlnT", how='OR', row_number=True)
 
         if footer is not None:
-            kwargs['nrows'] = footer - kwargs['skiprows'] - 2
+            kwargs['nrows'] = footer - kwargs['skiprows'] -2
 
         try:
-            names = find_row(fname, 'ransition\T').split()  # Not a typo!
+            names = find_row(fname, 'ransition\T').split()  
             
-            # Comment next line when trying new regexes!
+            # Comment next line when trying new regexes.
             names = [np.format_float_scientific(
                 to_float(x)*1e+04, precision=4) for x in names[1:]]
+
             kwargs['names'] = ['label_lower', 'label_upper'] + names
 
+        # TODO: some files have no column names nor header
         except AttributeError:
-            # TODO: some files have no column names nor header
             logger.warning(f'Column names not found: `{fname}`.')
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
-            for c in df.columns[2:]:  # This is done column-wise on purpose
+
+            # This is done column-wise on purpose
+            for c in df.columns[2:]:  
                 try:
                     df[c] = df[c].astype('float64')
 
@@ -436,41 +442,45 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 meta['Number of cross-section points'] = n_points
                 break
 
-        df = pd.DataFrame.from_records(data)
-        df.attrs = meta
-
-        yield df
+        arr = np.array(data)
+        yield arr, meta
 
     def load(self, fname):
 
+        data = []
+        column_types = set()
         meta = parse_header(fname, self.keys)
-        tables = []
-        with gzip.open(fname, 'rt') if fname.endswith('.gz') else open(fname) as f:
+
+        with open_cmfgen_file(fname) as f:
 
             while True:
-                df = next(self._table_gen(f), None)
+
+                arr, meta = next(self._table_gen(f), None)
+                df = pd.DataFrame.from_records(arr)
+                df.attrs = meta
 
                 if df.empty:
                     break
-
-                if df.shape[1] == 2:
-                    df.columns = ['energy', 'sigma']
+                
+                elif df.shape[1] == 2:
+                    columns = ['energy', 'sigma']
 
                 elif df.shape[1] == 1:
-                    df.columns = ['fit_coeff']
+                    columns = ['fit_coeff']
 
-                elif df.shape[1] == 8:  # Verner ground state fits. TODO: add units
-                    df.columns = ['n', 'l', 'E', 'E_0',
-                                  'sigma_0', 'y(a)', 'P', 'y(w)']
+                elif df.shape[1] == 8:  # Verner & Yakolev (1995) ground state fits
+                    columns = ['n', 'l', 'E', 'E_0', 'sigma_0', 'y(a)', 'P', 'y(w)']
 
                 else:
                     logger.warning(f'Inconsistent number of columns: `{fname}`.')
 
-                tables.append(df)
+                column_types.add(tuple(columns))
+                df.columns = columns
+                data.append(df)
 
         self.fname = fname
-        self.base = tables
-        self.columns = []
+        self.base = data
+        self.columns = sorted(column_types)
         self.meta = meta
 
     def to_hdf(self, key='/photoionization_cross_sections'):
@@ -528,7 +538,7 @@ class CMFGENHydLParser(BaseParser):
             np.arange(self.num_xsect_nus)
         )  # in units of the threshold frequency
 
-        skiprows = find_row(fname, self.nu_ratio_key, num_row=True) + 1
+        skiprows = find_row(fname, self.nu_ratio_key, row_number=True) + 1
 
         data = []
         indexes = []
@@ -678,6 +688,16 @@ class CMFGENReader:
 
     @classmethod
     def from_config(cls, ions, atomic_path, phixs=False, config_yaml=None,):
+
+        CMFGEN_DICT = {
+            'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
+            'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
+            'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
+            'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
+            'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
+            'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
+            'Ni': 'NICK'
+        }
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
