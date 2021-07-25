@@ -21,24 +21,21 @@ def open_cmfgen_file(fname, encoding='ISO-8859-1'):
 
 
 def find_row(fname, string1, string2=None, how='AND', row_number=False):
-    """Search for strings in plain text files and returns the matching\
+    """
+    Search for strings in plain text files and returns the matching\
     line (or row number).
 
     Parameters
     ----------
     fname : str
         Path to plain text file.
-
     string1 : str
         String to search.
-
     string2 : str
         Secondary string to search (default is None).
-
     how : {'OR', 'AND', 'AND NOT'}
         Search method: `string1` <method> `string2`
             (default is 'AND').
-
     row_number : bool
         If true, returns row number (default is False).
 
@@ -78,7 +75,8 @@ def find_row(fname, string1, string2=None, how='AND', row_number=False):
 
 
 def parse_header(fname, keys, start=0, stop=50):
-    """Parse header from CMFGEN files.
+    """
+    Parse header from CMFGEN files.
 
     Parameters
     ----------
@@ -108,7 +106,8 @@ def parse_header(fname, keys, start=0, stop=50):
 
 
 def to_float(string):
-    """ String to float, also deals with Fortran 'D' type.
+    """
+    String to float, also deals with Fortran 'D' type.
 
     Parameters
     ----------
@@ -122,11 +121,12 @@ def to_float(string):
         value = float(string.replace('D', 'E'))
 
     except ValueError:
-        # Weird value in `MG/VIII/23oct02/phot_sm_3000`, line 23340
+
+        # Typo in `MG/VIII/23oct02/phot_sm_3000`, line 23340
         if string == '1-.00':
             value = 10.00
 
-        # Weird values in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
+        # Typo in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
         if string == '*********':
             value = np.nan
 
@@ -135,17 +135,17 @@ def to_float(string):
 
 class CMFGENEnergyLevelsParser(BaseParser):
     """
-        Description
-        ----------
-        base : pandas.DataFrame
-        columns : list of str
-        meta : dict
-            Metadata parsed from file header.
+    Description
+    ----------
+    base : pandas.DataFrame
+    columns : list of str
+    meta : dict
+        Metadata parsed from file header.
 
-        Methods
-        -------
-        load(fname)
-            Parses the input data and stores the results in the `base` attribute.
+    Methods
+    -------
+    load(fname)
+        Parses the input data and stores the results in the `base` attribute.
     """
 
     keys = ['!Date',
@@ -158,15 +158,13 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s+'
-        kwargs['skiprows'] = find_row(
-            fname, "Number of transitions", row_number=True)
-
-        n = int(meta['Number of energy levels'])
-        kwargs['nrows'] = n
+        skiprows = find_row(fname, "Number of transitions", row_number=True)
+        nrows = int(meta['Number of energy levels'])
+        kwargs = {'header': None,
+                  'index_col': False,
+                  'sep': '\s+',
+                  'skiprows': skiprows,
+                  'nrows': nrows}
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
@@ -200,7 +198,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
             logger.warning(f'Inconsistent number of columns: `{fname}`.')
 
         df.columns = columns
-
         self.fname = fname
         self.base = df
         self.columns = columns
@@ -232,16 +229,15 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        kwargs = {}
-        kwargs['header'] = None
-        kwargs['index_col'] = False
-        kwargs['sep'] = '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])'
-        kwargs['skiprows'] = find_row(
-            fname, "Transition", "Lam", row_number=True) + 1
-
+        
+        skiprows = find_row(fname, "Transition", "Lam", row_number=True) +1
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
-        n = int(meta['Number of transitions'])
-        kwargs['nrows'] = n
+        nrows = int(meta['Number of transitions'])
+        kwargs = {'header': None,
+                  'index_col': False,
+                  'sep': '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])',
+                  'skiprows': skiprows,
+                  'nrows': nrows}
 
         try:
             df = pd.read_csv(fname, **kwargs, engine='python')
