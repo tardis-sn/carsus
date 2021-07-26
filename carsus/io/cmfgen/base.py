@@ -696,15 +696,16 @@ class CMFGENReader:
                 sym = convert_atomic_number2symbol(i[0])
 
                 try:
-                    date = conf['atom'][sym]['ion_number'][i[1]]['date']
+                    ion_keys = conf['atom'][sym]['ion_number'][i[1]]
                     BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
-                                                     roman.toRoman(i[1]+1), date)
+                                                     roman.toRoman(i[1]+1),
+                                                     ion_keys['date'])
 
                 except KeyError:
                     logger.warning(f'No configuration found for {sym} {i[1]}.')
                     continue
 
-                osc_fname = BASE_PATH.joinpath(conf['atom'][sym]['ion_number'][i[1]]['osc']
+                osc_fname = BASE_PATH.joinpath(ion_keys['osc']
                                                 ).as_posix()
 
                 data[i] = {}
@@ -716,9 +717,8 @@ class CMFGENReader:
                 if phixs:
                     pho_flist = []
                     try:
-                        for j, k in enumerate(conf['atom'][sym]['ion_number'][i[1]]['pho']):
-                            pho_fname = BASE_PATH.joinpath(conf['atom'][sym]['ion_number'][i[1]]['pho'][j]
-                                                            ).as_posix()
+                        for j, k in enumerate(ion_keys['pho']):
+                            pho_fname = BASE_PATH.joinpath(ion_keys['pho'][j]).as_posix()
                             pho_flist.append(pho_fname)
 
                     except KeyError:
