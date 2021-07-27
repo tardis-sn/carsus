@@ -727,8 +727,7 @@ class CMFGENReader:
                     data[ion]['phixs'] = []
                     for l in pho_flist:
                         pho_parser = CMFGENPhotoionizationCrossSectionParser(l)
-                        data[ion]['phixs'].append({'base': pho_parser.base,
-                                                 'meta': pho_parser.meta})
+                        data[ion]['phixs'].append(pho_parser.base)
 
                     if ion == (1,0):
                         hyd_fname = BASE_PATH.joinpath('hyd_l_data.dat').as_posix()
@@ -737,10 +736,8 @@ class CMFGENReader:
                         hyd_parser = CMFGENHydLParser(hyd_fname)
                         gbf_parser = CMFGENHydGauntBfParser(gbf_fname)
 
-                        data[ion]['hyd'] = {'base': hyd_parser.base,
-                                          'meta': hyd_parser.meta}
-                        data[ion]['gbf'] = {'base': gbf_parser.base,
-                                          'meta': gbf_parser.meta}
+                        data[ion]['hyd'] = hyd_parser.base
+                        data[ion]['gbf'] =  gbf_parser.base
 
         return cls(data)
 
