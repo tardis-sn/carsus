@@ -104,7 +104,7 @@ def find_row(fname, string1, string2=None, how='AND', row_number=False):
 
 def parse_header(fname, keys, start=0, stop=50):
     """
-    Parse header from CMFGEN files.
+    Parse header information from CMFGEN files.
 
     Parameters
     ----------
@@ -537,7 +537,7 @@ class CMFGENHydLParser(BaseParser):
         self.base = pd.DataFrame(data, index=index, columns=nus)
         self.base.columns.name = 'nu / nu_0'
 
-        self.base -= 10.  # Convert from cmfgen units to log10(cm^2)
+        # self.base -= 10.  # Convert from cmfgen units to log10(cm^2)
         self.columns = self.base.columns.tolist()
         self.fname = fname
 
@@ -630,7 +630,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
     def load(self, fname):
         super().load(fname)
         self.base.index = self.base.index.droplevel("l")
-        self.base += 10.0  # undo unit conversion used in CMFGENHydLParser
+        # self.base += 10.0  # undo unit conversion used in CMFGENHydLParser
 
     def get_max_l(self):
         return int(self.meta["Maximum principal quantum number"])
@@ -730,17 +730,16 @@ class CMFGENReader:
                         data[i]['phixs'].append({'base': pho_parser.base,
                                                  'meta': pho_parser.meta})
 
-                    if i == (1,0) and date == '5dec96':
+                    if i == (1,0):
                         hyd_fname = BASE_PATH.joinpath('hyd_l_data.dat').as_posix()
                         gbf_fname = BASE_PATH.joinpath('gbf_n_data.dat').as_posix()
 
                         hyd_parser = CMFGENHydLParser(hyd_fname)
                         gbf_parser = CMFGENHydGauntBfParser(gbf_fname)
 
-                        data[i]['hyd'] = {'base': hyd_parser.base, 
+                        data[i]['hyd'] = {'base': hyd_parser.base,
                                           'meta': hyd_parser.meta}
-
-                        data[i]['gbf'] = {'base': gbf_parser.base, 
+                        data[i]['gbf'] = {'base': gbf_parser.base,
                                           'meta': gbf_parser.meta}
 
         return cls(data)
