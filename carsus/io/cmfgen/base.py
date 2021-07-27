@@ -765,7 +765,7 @@ class CMFGENReader:
             lvl['ID'] = np.abs(lvl['ID'])
             lvl_id = lvl.set_index('ID')
             lvl['atomic_number'] = atomic_number
-            lvl['ion_charge'] =  ion_charge  # i.e. Si I = (14,0) then `ion_charge` = 0 
+            lvl['ion_charge'] =  ion_charge 
             lvl_list.append(lvl)
 
             lns = parser_base['lines']
