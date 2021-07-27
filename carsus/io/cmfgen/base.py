@@ -652,6 +652,16 @@ class CMFGENReader:
 
     """
 
+    CMFGEN_DICT = {
+        'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
+        'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
+        'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
+        'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
+        'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
+        'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
+        'Ni': 'NICK'
+    }
+
     def __init__(self, data, priority=10):
         """
         Parameters
@@ -670,16 +680,6 @@ class CMFGENReader:
     @classmethod
     def from_config(cls, ions, atomic_path, phixs=False, config_yaml=None,):
 
-        CMFGEN_DICT = {
-            'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
-            'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
-            'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
-            'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
-            'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
-            'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
-            'Ni': 'NICK'
-        }
-
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
@@ -697,7 +697,7 @@ class CMFGENReader:
 
                 try:
                     ion_keys = conf['atom'][sym]['ion_number'][i[1]]
-                    BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[sym],
+                    BASE_PATH = ATOMIC_PATH.joinpath(cls.CMFGEN_DICT[sym],
                                                      roman.toRoman(i[1]+1),
                                                      ion_keys['date'])
 
