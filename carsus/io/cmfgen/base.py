@@ -692,27 +692,27 @@ class CMFGENReader:
             conf = yaml.load(f, Loader=yaml.FullLoader)
             ions = parse_selected_species(ions)
 
-            for i in ions:
-                sym = convert_atomic_number2symbol(i[0])
+            for ion in ions:
+                sym = convert_atomic_number2symbol(ion[0])
 
                 try:
-                    ion_keys = conf['atom'][sym]['ion_number'][i[1]]
+                    ion_keys = conf['atom'][sym]['ion_number'][ion[1]]
                     BASE_PATH = ATOMIC_PATH.joinpath(cls.CMFGEN_DICT[sym],
-                                                     roman.toRoman(i[1]+1),
+                                                     roman.toRoman(ion[1]+1),
                                                      ion_keys['date'])
 
                 except KeyError:
-                    logger.warning(f'No configuration found for {sym} {i[1]}.')
+                    logger.warning(f'No configuration found for {sym} {ion[1]}.')
                     continue
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
                                                 ).as_posix()
 
-                data[i] = {}
+                data[ion] = {}
                 lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
-                data[i]['levels'] = lvl_parser.base
-                data[i]['lines'] = lns_parser.base
+                data[ion]['levels'] = lvl_parser.base
+                data[ion]['lines'] = lns_parser.base
 
                 if phixs:
                     pho_flist = []
@@ -722,24 +722,24 @@ class CMFGENReader:
                             pho_flist.append(pho_fname)
 
                     except KeyError:
-                        logger.warning(f'No `pho` data for {sym} {i[1]}.')
+                        logger.warning(f'No `pho` data for {sym} {ion[1]}.')
 
-                    data[i]['phixs'] = []
+                    data[ion]['phixs'] = []
                     for l in pho_flist:
                         pho_parser = CMFGENPhotoionizationCrossSectionParser(l)
-                        data[i]['phixs'].append({'base': pho_parser.base,
+                        data[ion]['phixs'].append({'base': pho_parser.base,
                                                  'meta': pho_parser.meta})
 
-                    if i == (1,0):
+                    if ion == (1,0):
                         hyd_fname = BASE_PATH.joinpath('hyd_l_data.dat').as_posix()
                         gbf_fname = BASE_PATH.joinpath('gbf_n_data.dat').as_posix()
 
                         hyd_parser = CMFGENHydLParser(hyd_fname)
                         gbf_parser = CMFGENHydGauntBfParser(gbf_fname)
 
-                        data[i]['hyd'] = {'base': hyd_parser.base,
+                        data[ion]['hyd'] = {'base': hyd_parser.base,
                                           'meta': hyd_parser.meta}
-                        data[i]['gbf'] = {'base': gbf_parser.base,
+                        data[ion]['gbf'] = {'base': gbf_parser.base,
                                           'meta': gbf_parser.meta}
 
         return cls(data)
