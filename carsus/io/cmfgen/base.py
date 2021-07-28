@@ -678,7 +678,7 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, atomic_path, phixs=False, config_yaml=None,):
+    def from_config(cls, ions, atomic_path, cross_sections=False, config_yaml=None):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -714,7 +714,7 @@ class CMFGENReader:
                 data[ion]['levels'] = lvl_parser.base
                 data[ion]['lines'] = lns_parser.base
 
-                if phixs:
+                if cross_sections:
                     pho_flist = []
                     try:
                         for j, k in enumerate(ion_keys['pho']):
