@@ -752,23 +752,24 @@ class CMFGENReader:
         """
         lvl_list = []
         lns_list = []
-        for ion, parser_base in data.items():
+        for ion, reader in data.items():
 
             atomic_number = ion[0]
             ion_charge = ion[1]
             
-            lvl = parser_base['levels']
+            lvl = reader['levels']
 
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
             lvl['ID'] = np.abs(lvl['ID'])
             lvl_id = lvl.set_index('ID')
+            lvl['Configuration'] = lvl['Configuration'].str.rstrip(']').str.split('[', expand=True)
             lvl['atomic_number'] = atomic_number
             lvl['ion_charge'] =  ion_charge 
             lvl_list.append(lvl)
 
-            lns = parser_base['lines']
+            lns = reader['lines']
             lns = lns.set_index(['i', 'j'])
             lns['energy_lower'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=0).values
             lns['energy_upper'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=1).values
