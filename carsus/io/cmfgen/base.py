@@ -166,7 +166,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
     return phixs_table
 
 
-def get_hydrogenic_n_phixstable(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
+def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
     """ Docstring """
     energy_grid = hyd_gaunt_energy_grid_ryd[n]
     phixs_table = np.empty((len(energy_grid), 2))
@@ -180,8 +180,32 @@ def get_hydrogenic_n_phixstable(threshold_energy_ryd, n, hyd_gaunt_energy_grid_r
         else:
             cross_section = 0.0
 
-        phixs_table[index][0] = energy_div_threshold * threshold_energy_ryd  # / ryd_to_ev
+        phixs_table[index][0] = energy_div_threshold * threshold_energy_ryd
         phixs_table[index][1] = cross_section
+
+    return phixs_table
+
+
+def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points=1000):
+    """ 
+    Only applies to `He`. The threshold cross sections seems ok, but energy 
+    dependence could be slightly wrong. What is the `h` parameter that is 
+    not used?.
+    """
+    energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
+    phixs_table = np.empty((len(energy_grid), 2))
+
+    for index, c in enumerate(energy_grid):
+        energy_div_threshold = 1 + 20 * (c ** 2)
+
+        x = np.log10(energy_div_threshold)
+        if x < e:
+            cross_section = 10 ** (((d * x + c) * x + b) * x + a)
+
+        else:
+            cross_section = 10 ** (f + g * x)
+
+        phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
 
@@ -839,7 +863,18 @@ class CMFGENReader:
                     continue
                 
                 scale, n = fit_coeff_list
-                phixs_table = scale * get_hydrogenic_n_phixstable(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
+                phixs_table = scale * get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
+                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+            # elif cross_section_type == 2: ...
+
+            elif cross_section_type == 6:
+                fit_coeff_list = target['fit_coeff'].to_list()
+
+                if len(fit_coeff_list) < 8:
+                    continue
+
+                phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
@@ -946,8 +981,5 @@ class CMFGENReader:
         self.levels = levels
         self.lines = lines
         self.cross_sections = cross_sections
-
-        # just for the notebook
-        self.data = data
 
         return
