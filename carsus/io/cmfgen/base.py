@@ -781,11 +781,12 @@ class CMFGENReader:
         lines = lines[['energy_lower', 'energy_upper', 
                        'gf', 'j_lower', 'j_upper', 'wavelength']]
 
-        cross_sections = pd.concat(pxs_list)
-        cross_sections = cross_sections.set_index(['atomic_number', 'ion_charge', 'level_index'])
+        if 'phixs' in reader.keys():
+            cross_sections = pd.concat(pxs_list)
+            cross_sections = cross_sections.set_index(['atomic_number', 'ion_charge', 'level_index'])
+            self.cross_sections = cross_sections
 
         self.levels = levels
         self.lines = lines
-        self.cross_sections = cross_sections
 
         return
