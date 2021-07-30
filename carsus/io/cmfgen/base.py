@@ -136,12 +136,10 @@ def parse_header(fname, keys, start=0, stop=50):
 
     return meta
 
-def get_seaton_phixs_table(lambda_angstrom, sigma_t, beta, s, nu_0=None, n_points=1000):
+def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):
     """ Docstring """
     energy_grid = np.linspace(0., 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
-
-    threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom / RYD_TO_EV
 
     for index, c in enumerate(energy_grid):
         energy_div_threshold = 1 + 20 * (c ** 2)
@@ -151,7 +149,7 @@ def get_seaton_phixs_table(lambda_angstrom, sigma_t, beta, s, nu_0=None, n_point
             cross_section = sigma_t * (beta + (1 - beta) * threshold_div_energy) * (threshold_div_energy ** s)
 
         else:
-            threshold_energy_ev = HC_IN_EV_ANGSTROM / lambda_angstrom
+            threshold_energy_ev = threshold_energy_ryd * RYD_TO_EV
             energy_offset_div_threshold = energy_div_threshold + (nu_0 * 1e15 * h_in_ev_seconds) / threshold_energy_ev
             threshold_div_energy_offset = energy_offset_div_threshold ** -1
 
@@ -781,14 +779,13 @@ class CMFGENReader:
 
         df_list = []
         n_targets = len(reader_phixs)
-
         for i in range(n_targets):
 
             target = reader_phixs[i]
             lower_level_label = target.attrs['Configuration name']
             cross_section_type = target.attrs['Type of cross-section']
-
             match = ion_levels.set_index('Configuration').loc[lower_level_label]
+
             if len(match.shape) > 1:
                 lambda_angstrom = match['Lam(A)'][0]
                 level_number = match['ID'][0] -1
@@ -797,14 +794,19 @@ class CMFGENReader:
                 lambda_angstrom = match['Lam(A)']
                 level_number = match['ID'] -1
 
+            threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom / RYD_TO_EV
+
             if cross_section_type in [20, 21, 22]:
-                threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom / RYD_TO_EV
                 target['sigma'] = target['sigma']*1e-18  # Megabarns to cm²
                 target['energy'] = target['energy']*threshold_energy_ryd  # Energy in units of threshold
 
             elif cross_section_type in [1, 7]:
-                fit_coeff_list = target['fit_coeff'].to_list()                  
-                phixs_table = get_seaton_phixs_table(lambda_angstrom, *fit_coeff_list)
+                fit_coeff_list = target['fit_coeff'].to_list()
+
+                if len(fit_coeff_list) < 2:
+                    continue
+                
+                phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 target['sigma'] = target['sigma']*1e-18
                 
