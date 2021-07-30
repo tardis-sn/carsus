@@ -1,7 +1,6 @@
 import logging
 import pathlib
 
-import astropy.constants as const
 import astropy.units as u
 import numpy as np
 import pandas as pd
@@ -15,81 +14,6 @@ from carsus.util import convert_atomic_number2symbol, parse_selected_species
 from .util import *
 
 logger = logging.getLogger(__name__)
-
-RYD_TO_EV = u.rydberg.to('eV')
-HC_IN_EV_ANGSTROM = (const.h * const.c).to('eV angstrom').value
-
-def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):
-    """ Docstring """
-    energy_grid = np.linspace(0., 1.0, n_points, endpoint=False)
-    phixs_table = np.empty((len(energy_grid), 2))
-
-    for index, c in enumerate(energy_grid):
-        energy_div_threshold = 1 + 20 * (c ** 2)
-
-        if nu_0 is None:
-            threshold_div_energy = energy_div_threshold ** -1
-            cross_section = sigma_t * (beta + (1 - beta) * threshold_div_energy) * (threshold_div_energy ** s)
-
-        else:
-            threshold_energy_ev = threshold_energy_ryd * RYD_TO_EV
-            energy_offset_div_threshold = energy_div_threshold + (nu_0 * 1e15 * h_in_ev_seconds) / threshold_energy_ev
-            threshold_div_energy_offset = energy_offset_div_threshold ** -1
-
-            if threshold_div_energy_offset < 1.0:
-                cross_section = sigma_t * (beta + (1 - beta) * (threshold_div_energy_offset)) * \
-                    (threshold_div_energy_offset ** s)
-
-            else:
-                cross_section = 0.0
-
-        phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
-
-    return phixs_table
-
-
-def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
-    """ Docstring """
-    energy_grid = hyd_gaunt_energy_grid_ryd[n]
-    phixs_table = np.empty((len(energy_grid), 2))
-    scale_factor = 7.91 / threshold_energy_ryd / n
-
-    for index, energy_ryd in enumerate(energy_grid):
-        energy_div_threshold = energy_ryd / energy_grid[0]
-
-        if energy_div_threshold > 0:
-            cross_section = scale_factor * hyd_gaunt_factor[n][index] / (energy_div_threshold) ** 3
-        else:
-            cross_section = 0.0
-
-        phixs_table[index][0] = energy_div_threshold * threshold_energy_ryd
-        phixs_table[index][1] = cross_section
-
-    return phixs_table
-
-
-def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points=1000):
-    """ 
-    Only applies to `He`. The threshold cross sections seems ok, but energy 
-    dependence could be slightly wrong. What is the `h` parameter that is 
-    not used?.
-    """
-    energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
-    phixs_table = np.empty((len(energy_grid), 2))
-
-    for index, c in enumerate(energy_grid):
-        energy_div_threshold = 1 + 20 * (c ** 2)
-
-        x = np.log10(energy_div_threshold)
-        if x < e:
-            cross_section = 10 ** (((d * x + c) * x + b) * x + a)
-
-        else:
-            cross_section = 10 ** (f + g * x)
-
-        phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
-
-    return phixs_table
 
 
 class CMFGENEnergyLevelsParser(BaseParser):
