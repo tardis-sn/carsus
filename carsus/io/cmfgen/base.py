@@ -680,6 +680,15 @@ class CMFGENReader:
 
             # elif cross_section_type == 2: ...
 
+            elif cross_section_type == 5:
+                fit_coeff_list = target['fit_coeff'].to_list()
+
+                if len(fit_coeff_list) != 5:
+                    continue
+
+                phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
             elif cross_section_type == 6:
                 fit_coeff_list = target['fit_coeff'].to_list()
 

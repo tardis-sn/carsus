@@ -128,7 +128,7 @@ def parse_header(fname, keys, start=0, stop=50):
 
 def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):
     """ Docstring """
-    energy_grid = np.linspace(0., 1.0, n_points, endpoint=False)
+    energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
     for i, c in enumerate(energy_grid):
@@ -171,6 +171,28 @@ def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_
 
         phixs_table[i][0] = energy_div_threshold * threshold_energy_ryd
         phixs_table[i][1] = cross_section
+
+    return phixs_table
+
+
+def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000):
+    """
+    Peach, Sraph, and Seaton (1988).
+    """
+    energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
+    phixs_table = np.empty((len(energy_grid), 2))
+
+    for i, c in enumerate(energy_grid):
+
+        energy_div_threshold = 1 + 20 * (c ** 2)
+        u = energy_div_threshold
+        x = np.log10(min(u, e))
+
+        cross_section = 10 ** (a + x * (b + x * (c + x * d)))
+        if u > e:
+            cross_section *= (e / u) ** 2
+
+        phixs_table[i] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
 

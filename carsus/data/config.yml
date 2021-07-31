@@ -86,7 +86,16 @@ atom:
 #      NA
 #      NEON
 #      NICK
-#      NIT
+
+  N:
+    dir: NIT
+    ion_number:
+      0:
+        date: 12sep12
+        osc: ni_osc
+        pho:
+          - niphot_a.dat
+
 #      OXY
 #      PHOS
 #      POT
