@@ -73,11 +73,11 @@ atom:
   Co:
     dir: COB
     ion_number:
-      3:
-        date: 4jan12
-        osc: coiv_osc.dat
+      2:
+        date: 30oct12
+        osc: coiii_osc.dat
         pho:
-          - phot_data
+          - phot_nosm
 
 #      FE
 #      FLU

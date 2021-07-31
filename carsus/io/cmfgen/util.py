@@ -197,3 +197,28 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
         phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
+
+
+def get_vy95_phixstable(threshold_energy_ryd, fit_coeff_table, n_points=1000):
+    """
+    Verner & Yakolev (1995) ground state fits.
+    """
+    energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
+    phixs_table = np.empty((len(energy_grid), 2))
+
+    for i, c in enumerate(energy_grid):
+
+        energy_div_threshold = 1 + 20 * (c ** 2)
+        cross_section = 0.0
+
+        for index, row in fit_coeff.iterrows():
+            y = energy_div_threshold * row.at['E'] / row.at['E_0']
+            P = row.at['P']
+            Q = 5.5 + row.at['l'] - 0.5 * row.at['P']
+            y_a = row.at['y(a)']
+            y_w = row.at['y(w)']
+            cross_section += row.at['sigma_0'] * ((y - 1) ** 2 + y_w ** 2) * (y ** -Q) * ((1 + np.sqrt(y / y_a)) ** -P)
+
+        phixs_table[i] = energy_div_threshold * threshold_energy_ryd, cross_section
+
+    return phixs_table

@@ -636,7 +636,13 @@ class CMFGENReader:
             target = reader_phixs[i]
             lower_level_label = target.attrs['Configuration name']
             cross_section_type = target.attrs['Type of cross-section']
-            match = ion_levels.set_index('Configuration').loc[lower_level_label]
+
+            try:
+                match = ion_levels.set_index('Configuration').loc[lower_level_label]
+
+            except KeyError:
+                # Question:
+                continue
 
             if len(match.shape) > 1:
                 lambda_angstrom = match['Lam(A)'][0]
@@ -681,6 +687,15 @@ class CMFGENReader:
                     continue
 
                 phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+            elif cross_section_type == 9:
+                fit_coeff_table = target
+
+                if fit_coeff.shape[1] != 8:
+                    continue
+
+                phixs_table = get_vy95_phixstable(threshold_energy_ryd, fit_coeff_table)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
