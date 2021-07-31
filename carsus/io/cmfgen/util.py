@@ -131,7 +131,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
     energy_grid = np.linspace(0., 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
-    for index, c in enumerate(energy_grid):
+    for i, c in enumerate(energy_grid):
         energy_div_threshold = 1 + 20 * (c ** 2)
 
         if nu_0 is None:
@@ -150,7 +150,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
             else:
                 cross_section = 0.0
 
-        phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
+        phixs_table[i] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
 
@@ -161,16 +161,16 @@ def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_
     phixs_table = np.empty((len(energy_grid), 2))
     scale_factor = 7.91 / threshold_energy_ryd / n
 
-    for index, energy_ryd in enumerate(energy_grid):
+    for i, energy_ryd in enumerate(energy_grid):
         energy_div_threshold = energy_ryd / energy_grid[0]
 
         if energy_div_threshold > 0:
-            cross_section = scale_factor * hyd_gaunt_factor[n][index] / (energy_div_threshold) ** 3
+            cross_section = scale_factor * hyd_gaunt_factor[n][i] / (energy_div_threshold) ** 3
         else:
             cross_section = 0.0
 
-        phixs_table[index][0] = energy_div_threshold * threshold_energy_ryd
-        phixs_table[index][1] = cross_section
+        phixs_table[i][0] = energy_div_threshold * threshold_energy_ryd
+        phixs_table[i][1] = cross_section
 
     return phixs_table
 
@@ -184,7 +184,7 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
-    for index, c in enumerate(energy_grid):
+    for i, c in enumerate(energy_grid):
         energy_div_threshold = 1 + 20 * (c ** 2)
 
         x = np.log10(energy_div_threshold)
@@ -194,12 +194,12 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
         else:
             cross_section = 10 ** (f + g * x)
 
-        phixs_table[index] = energy_div_threshold * threshold_energy_ryd, cross_section
+        phixs_table[i] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
 
 
-def get_vy95_phixstable(threshold_energy_ryd, fit_coeff_table, n_points=1000):
+def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
     """
     Verner & Yakolev (1995) ground state fits.
     """
@@ -211,7 +211,7 @@ def get_vy95_phixstable(threshold_energy_ryd, fit_coeff_table, n_points=1000):
         energy_div_threshold = 1 + 20 * (c ** 2)
         cross_section = 0.0
 
-        for index, row in fit_coeff.iterrows():
+        for index, row in fit_coeff_table.iterrows():
             y = energy_div_threshold * row.at['E'] / row.at['E_0']
             P = row.at['P']
             Q = 5.5 + row.at['l'] - 0.5 * row.at['P']

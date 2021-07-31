@@ -662,18 +662,18 @@ class CMFGENReader:
             elif cross_section_type in [1, 7]:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
-                if len(fit_coeff_list) < 2:
+                if len(fit_coeff_list) not in [3,4]:
                     continue
-                
+
                 phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
             elif cross_section_type == 3:
                 fit_coeff_list = target['fit_coeff'].to_list()
-                
-                if len(fit_coeff_list) < 2:
+
+                if len(fit_coeff_list) != 2:
                     continue
-                
+
                 scale, n = fit_coeff_list
                 phixs_table = scale * get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
@@ -683,7 +683,7 @@ class CMFGENReader:
             elif cross_section_type == 6:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
-                if len(fit_coeff_list) < 8:
+                if len(fit_coeff_list) != 8:
                     continue
 
                 phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
@@ -692,10 +692,10 @@ class CMFGENReader:
             elif cross_section_type == 9:
                 fit_coeff_table = target
 
-                if fit_coeff.shape[1] != 8:
+                if fit_coeff_table.shape[1] != 8:
                     continue
 
-                phixs_table = get_vy95_phixstable(threshold_energy_ryd, fit_coeff_table)
+                phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
