@@ -95,6 +95,9 @@ atom:
         osc: ni_osc
         pho:
           - niphot_a.dat
+          - niphot_b.dat
+          - niphot_c.dat
+          - niphot_d.dat
 
 #      OXY
 #      PHOS

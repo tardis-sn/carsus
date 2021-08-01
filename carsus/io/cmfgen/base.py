@@ -678,7 +678,7 @@ class CMFGENReader:
                 phixs_table = scale * get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
-            # elif cross_section_type == 2: ...
+            # elif cross_section_type in [2,8]: ...
 
             elif cross_section_type == 5:
                 fit_coeff_list = target['fit_coeff'].to_list()
@@ -772,8 +772,10 @@ class CMFGENReader:
 
                     hyd_gaunt_energy_grid_ryd = {}
                     for i in range(1, n_levels+1):
+
                         lambda_angstrom = lvl.loc[i-1, 'Lam(A)']
                         e_threshold_ev = HC_IN_EV_ANGSTROM / lambda_angstrom
+
                         hyd_gaunt_energy_grid_ryd[i] = [e_threshold_ev / RYD_TO_EV * 10 ** (n_start_u + n_del_u * index) for index in range(n_points)]
 
                     gbf = reader['gbf']

@@ -177,7 +177,7 @@ def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_
 
 def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000):
     """
-    Peach, Sraph, and Seaton (1988).
+    Peach, Saraph, and Seaton (1988).
     """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
@@ -223,7 +223,10 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
 
 def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
     """
-    Verner & Yakolev (1995) ground state fits.
+    Analytic FITS for partial photoionization cross sections.
+    Verner, D. A. ; Yakovlev, D. G.
+
+    Astronomy and Astrophysics Suppl., Vol. 109, p.125-133 (1995)
     """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
@@ -244,3 +247,13 @@ def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
         phixs_table[i] = energy_div_threshold * threshold_energy_ryd, cross_section
 
     return phixs_table
+
+
+def get_leibowitz_phixs_table():
+    """ 
+    RADIATIVE TRANSITION PROBABILITIES AND RECOMBINATION COEFFICIENTSOF THE ION C IV
+
+    J. Quant. Spectrosc. Radiat. Transfer. Vol 12, pp. 299-306.
+    """
+
+    pass
