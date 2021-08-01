@@ -620,7 +620,7 @@ class CMFGENReader:
                         gbf_parser = CMFGENHydGauntBfParser(gbf_fname)
 
                         data[ion]['hyd'] = hyd_parser.base
-                        data[ion]['gbf'] =  gbf_parser.base
+                        data[ion]['gbf'] = gbf_parser.base
 
         return cls(data)
 
@@ -675,10 +675,16 @@ class CMFGENReader:
                     continue
 
                 scale, n = fit_coeff_list
-                phixs_table = scale * get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
+                phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
-            # elif cross_section_type in [2,8]: ...
+            elif cross_section_type in [2]:
+                fit_coeff_list = target['fit_coeff'].to_list()
+
+                if len(fit_coeff_list) not in [3,4]:
+                    continue
+
+                continue
 
             elif cross_section_type == 5:
                 fit_coeff_list = target['fit_coeff'].to_list()

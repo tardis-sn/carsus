@@ -6,6 +6,7 @@ import astropy.units as u
 import numpy as np
 
 RYD_TO_EV = u.rydberg.to('eV')
+H_IN_EV_SECONDS = const.h.to('eV s').value
 HC_IN_EV_ANGSTROM = (const.h * const.c).to('eV angstrom').value
 
 
@@ -140,7 +141,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
 
         else:
             threshold_energy_ev = threshold_energy_ryd * RYD_TO_EV
-            energy_offset_div_threshold = energy_div_threshold + (nu_0 * 1e15 * h_in_ev_seconds) / threshold_energy_ev
+            energy_offset_div_threshold = energy_div_threshold + (nu_0 * 1e15 * H_IN_EV_SECONDS) / threshold_energy_ev
             threshold_div_energy_offset = energy_offset_div_threshold ** -1
 
             if threshold_div_energy_offset < 1.0:
@@ -155,7 +156,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
     return phixs_table
 
 
-def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
+def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n):
     """ Docstring """
     energy_grid = hyd_gaunt_energy_grid_ryd[n]
     phixs_table = np.empty((len(energy_grid), 2))
@@ -166,6 +167,40 @@ def get_hydrogenic_n_phixs_table(threshold_energy_ryd, n, hyd_gaunt_energy_grid_
 
         if energy_div_threshold > 0:
             cross_section = scale_factor * hyd_gaunt_factor[n][i] / (energy_div_threshold) ** 3
+        else:
+            cross_section = 0.0
+
+        phixs_table[i][0] = energy_div_threshold * threshold_energy_ryd
+        phixs_table[i][1] = cross_section
+
+    return phixs_table
+
+
+def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0=None):
+    """ Docstring """
+
+    assert l_start >= 0
+    assert l_end <= n - 1
+
+    energy_grid = hyd_phixs_energy_grid_ryd[(n, l_start)]
+    phixs_table = np.empty((len(energy_grid), 2))
+
+    threshold_energy_ev = threshold_energy_ryd * RYD_TO_EV
+    scale_factor = 1 / threshold_energy_ryd / (n ** 2) / ((l_end - l_start + 1) * (l_end + l_start + 1))
+
+    for i, energy_ryd in enumerate(energy_grid):
+        energy_div_threshold = energy_ryd / energy_grid[0]
+        if nu_0 is None:
+            U = energy_div_threshold
+        else:
+            E_0 = (nu_0 * 1e15 * H_IN_EV_SECONDS)
+            U = threshold_energy_ev * energy_div_threshold / (E_0 + threshold_energy_ev)
+        if U > 0:
+            cross_section = 0.0
+            for l in range(l_start, l_end + 1):
+                assert not np.array_equal(hyd_phixs_energy_grid_ryd[(n, l)], energy_grid)
+                cross_section += (2 * l + 1) * hyd_phixs[(n, l)][i]
+            cross_section = cross_section * scale_factor
         else:
             cross_section = 0.0
 
@@ -250,10 +285,11 @@ def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
 
 
 def get_leibowitz_phixs_table():
-    """ 
-    RADIATIVE TRANSITION PROBABILITIES AND RECOMBINATION COEFFICIENTSOF THE ION C IV
+    """
+    Radiative Transition Probabilities and Recombination Coefficients 
+    of the Ion C IV.
 
     J. Quant. Spectrosc. Radiat. Transfer. Vol 12, pp. 299-306.
     """
 
-    pass
+    return
