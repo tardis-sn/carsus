@@ -198,7 +198,7 @@ def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshol
         if U > 0:
             cross_section = 0.0
             for l in range(l_start, l_end + 1):
-                assert not np.array_equal(hyd_phixs_energy_grid_ryd[(n, l)], energy_grid)
+                assert np.array_equal(hyd_phixs_energy_grid_ryd[(n, l)], energy_grid)
                 cross_section += (2 * l + 1) * hyd_phixs[(n, l)][i]
             cross_section = cross_section * scale_factor
         else:

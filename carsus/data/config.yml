@@ -104,6 +104,15 @@ atom:
 #      POT
 #      SCAN
 #      SIL
-#      SUL
+
+  S:
+    dir: SUL
+    ion_number:
+      1:
+        date: 30oct12
+        osc: s2_osc
+        pho:
+          - phot_sm_3000
+
 #      TIT
 #      VAN
