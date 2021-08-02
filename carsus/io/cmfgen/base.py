@@ -630,7 +630,9 @@ class CMFGENReader:
         return cls(data)
 
     @staticmethod
-    def cross_sections_squeeze(reader_phixs, ion_levels, hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
+    def cross_sections_squeeze(reader_phixs, ion_levels,
+                               hyd_phixs_energy_grid_ryd, hyd_phixs,
+                               hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
         """ Docstring """
 
         phixs_tables = []
@@ -680,7 +682,8 @@ class CMFGENReader:
                     continue
 
                 scale, n = fit_coeff_list
-                phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n)
+                phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor,
+                                                                    threshold_energy_ryd, n)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
             elif cross_section_type in [2, 8]:
@@ -690,7 +693,8 @@ class CMFGENReader:
                 if len(fit_coeff_list) not in [3,4]:
                     continue
                 
-                phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, *fit_coeff_list)
+                phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
+                                                                threshold_energy_ryd, *fit_coeff_list)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
             elif cross_section_type == 5:
@@ -776,33 +780,28 @@ class CMFGENReader:
             lns_list.append(lns)
 
             if 'phixs' in reader.keys():
-
                 if ion == (1,0):
+                    
                     n_levels = 30
-
-                    l_start_u = 0.0
-                    l_del_u = 0.041392685
-                    n_l_points = 97
-
-                    n_start_u = 0.0
-                    n_del_u = 0.041392685
-                    n_points = 145
+                    l_points, l_start_u, l_del_u = 97, 0.0, 0.041392685
+                    n_points, n_start_u, n_del_u = 145, 0.0, 0.041392685
 
                     hyd = reader['hyd'].apply(lambda x: 10 ** (8 + x))
                     gbf = reader['gbf']
 
                     hyd_phixs, hyd_phixs_energy_grid_ryd = {}, {}
                     hyd_gaunt_factor, hyd_gaunt_energy_grid_ryd = {}, {}
+
                     for n in range(1, n_levels+1):
 
                         lambda_angstrom = lvl.loc[n-1, 'Lam(A)']
                         e_threshold_ev = HC_IN_EV_ANGSTROM / lambda_angstrom
 
-                        hyd_gaunt_energy_grid_ryd[n] = [e_threshold_ev / RYD_TO_EV * 10 ** (n_start_u + n_del_u * index) for index in range(n_points)]
+                        hyd_gaunt_energy_grid_ryd[n] = [e_threshold_ev / RYD_TO_EV * 10 ** (n_start_u + n_del_u * i) for i in range(n_points)]
                         hyd_gaunt_factor[n] = gbf.loc[n].tolist()
 
                         for l in range(0, n):
-                            hyd_phixs_energy_grid_ryd[(n, l)] = [e_threshold_ev / RYD_TO_EV * 10 ** (l_start_u + l_del_u * index) for index in range(n_l_points)]
+                            hyd_phixs_energy_grid_ryd[(n, l)] = [e_threshold_ev / RYD_TO_EV * 10 ** (l_start_u + l_del_u * i) for i in range(l_points)]
                             hyd_phixs[(n,l)] = hyd.loc[(n,l)].tolist()
 
                 pxs = self.cross_sections_squeeze(reader['phixs'][0], lvl, hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)

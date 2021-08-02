@@ -116,7 +116,7 @@ def parse_header(fname, keys, start=0, stop=50):
     dict
         Dictionary containing metadata.
     """
-    meta = {k.strip('!'): None for k in keys}
+    meta = {k.strip('!'):None for k in keys}
 
     with open_cmfgen_file(fname) as f:
         for line in itertools.islice(f, start, stop):
