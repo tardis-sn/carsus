@@ -575,6 +575,10 @@ class CMFGENReader:
             conf = yaml.load(f, Loader=yaml.FullLoader)
             ions = parse_selected_species(ions)
 
+            if cross_sections and (1,0) not in ions:
+                logger.info('Selecting H 0 required to ingest cross-sections.')
+                ions.insert(0, (1,0))
+
             for ion in ions:
                 sym = convert_atomic_number2symbol(ion[0])
 
@@ -584,8 +588,9 @@ class CMFGENReader:
                                                      roman.toRoman(ion[1]+1),
                                                      ion_keys['date'])
 
+                    logger.info(f'Configuration schema found for {sym} {ion[1]}.')
+
                 except KeyError:
-                    logger.warning(f'Configuration not found for {sym} {ion[1]}.')
                     continue
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
@@ -716,7 +721,7 @@ class CMFGENReader:
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
-                logger.warning(f'Unsupported cross-section type \'{cross_section_type}\'.')
+                logger.warning(f'Unsupported cross-section type {cross_section_type}.')
                 continue
 
             target['sigma'] = target['sigma']*1e-18  # Megabarns to cm²
@@ -736,9 +741,11 @@ class CMFGENReader:
             Dictionary containing one dictionary per specie with 
             keys `levels` and `lines`.
         """
+
         lvl_list = []
         lns_list = []
         pxs_list = []
+
         for ion, reader in data.items():
             atomic_number = ion[0]
             ion_charge = ion[1]
@@ -769,9 +776,6 @@ class CMFGENReader:
             lns_list.append(lns)
 
             if 'phixs' in reader.keys():
-
-                if (1,0) not in data.keys():
-                    logger.error('`H` data is required to ingest cross-sections.')
 
                 if ion == (1,0):
                     n_levels = 30
