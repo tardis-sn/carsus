@@ -585,7 +585,7 @@ class CMFGENReader:
                                                      ion_keys['date'])
 
                 except KeyError:
-                    logger.warning(f'No configuration found for {sym} {ion[1]}.')
+                    logger.warning(f'Configuration not found for {sym} {ion[1]}.')
                     continue
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
@@ -716,6 +716,7 @@ class CMFGENReader:
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
+                logger.warning(f'Unsupported cross-section type \'{cross_section_type}\'.')
                 continue
 
             target['sigma'] = target['sigma']*1e-18  # Megabarns to cm²
