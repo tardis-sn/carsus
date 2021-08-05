@@ -644,16 +644,23 @@ class CMFGENReader:
             lower_level_label = target.attrs['Configuration name']
             cross_section_type = target.attrs['Type of cross-section']
 
+            # Remove the "[J]" term from J-splitted levels labels
+            ion_levels['Configuration'] = ion_levels['Configuration'].str.rstrip(']')
+            ion_levels['Configuration'] = ion_levels['Configuration'].str.split('[', expand=True)
+
             try:
-                match = ion_levels.set_index('Configuration').loc[lower_level_label]
+                match = ion_levels.set_index('Configuration').loc[[lower_level_label]]
 
             except KeyError:
                 logger.warning(f'Level not found: \'{lower_level_label}\'.')
                 continue
 
+            w = 1.0            
             if len(match.shape) > 1:
                 lambda_angstrom = match['Lam(A)'][0]
                 level_number = match['ID'][0] -1
+                weights = match['g']/match.sum()['g']
+                w = weights[0]
 
             else:
                 lambda_angstrom = match['Lam(A)']
@@ -738,7 +745,7 @@ class CMFGENReader:
                 logger.warning(f'Unsupported cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
                 continue
 
-            target['sigma'] = target['sigma']*1e-18  # Megabarns to cm²
+            target['sigma'] = w*target['sigma']*1e-18  # Megabarns to cm²
             target['level_index'] = level_number
             phixs_tables.append(target)
 
@@ -773,7 +780,7 @@ class CMFGENReader:
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
             lvl['ID'] = np.abs(lvl['ID'])
             lvl_id = lvl.set_index('ID')
-            lvl['Configuration'] = lvl['Configuration'].str.rstrip(']').str.split('[', expand=True)
+
             lvl['atomic_number'] = atomic_number
             lvl['ion_charge'] =  ion_charge 
             lvl_list.append(lvl)
