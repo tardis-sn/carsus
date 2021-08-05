@@ -655,13 +655,14 @@ class CMFGENReader:
                 logger.warning(f'Level not found: \'{lower_level_label}\'.')
                 continue
 
-            # Get statistical weight for J-splitted levels
-            match['w'] = match['g']/match.sum()['g']
-
             lambda_angstrom = match['Lam(A)'].tolist()
             level_number = (match['ID'] -1).tolist()
+
+            # Get statistical weights for J-splitted levels
+            match['w'] = match['g']/match.sum()['g']
             w = match['w'].tolist()
 
+            # match is > 1 just for J-splitted levels
             for j in range(len(match)):
                 threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
 
