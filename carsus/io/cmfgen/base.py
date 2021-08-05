@@ -655,99 +655,98 @@ class CMFGENReader:
                 logger.warning(f'Level not found: \'{lower_level_label}\'.')
                 continue
 
-            w = 1.0            
-            if len(match.shape) > 1:
-                lambda_angstrom = match['Lam(A)'][0]
-                level_number = match['ID'][0] -1
-                weights = match['g']/match.sum()['g']
-                w = weights[0]
+            # Get statistical weight for J-splitted levels
+            match['w'] = match['g']/match.sum()['g']
 
-            else:
-                lambda_angstrom = match['Lam(A)']
-                level_number = match['ID'] -1
+            lambda_angstrom = match['Lam(A)'].tolist()
+            level_number = (match['ID'] -1).tolist()
+            w = match['w'].tolist()
 
-            threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom / RYD_TO_EV
+            for j in range(len(match)):
+                threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
 
-            if cross_section_type in [20, 21, 22]:
-                diff = target['energy'].diff().dropna()
-                assert (diff >= 0).all()
+                if cross_section_type in [20, 21, 22]:
+                    diff = target['energy'].diff().dropna()
+                    assert (diff >= 0).all()
 
-                target['energy'] = target['energy']*threshold_energy_ryd
+                    df = pd.DataFrame(columns=['energy', 'sigma'])
+                    df['energy'] = target['energy']*threshold_energy_ryd
+                    df['sigma'] = target['sigma']
 
-            elif cross_section_type in [1, 7]:
-                fit_coeff_list = target['fit_coeff'].to_list()
+                elif cross_section_type in [1, 7]:
+                    fit_coeff_list = target['fit_coeff'].to_list()
 
-                if len(fit_coeff_list) not in [1,3,4]:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                    if len(fit_coeff_list) not in [1,3,4]:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    if len(fit_coeff_list) == 1 and fit_coeff_list[0] == 0.0:
+                        continue
+
+                    phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type == 3:
+                    fit_coeff_list = target['fit_coeff'].to_list()
+
+                    if len(fit_coeff_list) != 2:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    scale, n = fit_coeff_list
+                    phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor,
+                                                                        threshold_energy_ryd, n)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type in [2, 8]:
+                    fit_coeff_list = target['fit_coeff'].to_list()
+                    fit_coeff_list[0:3] = [int(x) for x in fit_coeff_list[0:3]]
+
+                    if len(fit_coeff_list) not in [3,4]:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
+                                                                    threshold_energy_ryd, *fit_coeff_list)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type == 5:
+                    fit_coeff_list = target['fit_coeff'].to_list()
+
+                    if len(fit_coeff_list) != 5:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type == 6:
+                    fit_coeff_list = target['fit_coeff'].to_list()
+
+                    if len(fit_coeff_list) != 8:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type == 9:
+                    fit_coeff_table = target
+
+                    if fit_coeff_table.shape[1] != 8:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
+
+                    phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
+                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+                    
+                else:
+                    logger.warning(f'Unsupported cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
                     continue
 
-                if len(fit_coeff_list) == 1 and fit_coeff_list[0] == 0.0:
-                    continue
-
-                phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-
-            elif cross_section_type == 3:
-                fit_coeff_list = target['fit_coeff'].to_list()
-
-                if len(fit_coeff_list) != 2:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
-                    continue
-
-                scale, n = fit_coeff_list
-                phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor,
-                                                                    threshold_energy_ryd, n)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-
-            elif cross_section_type in [2, 8]:
-                fit_coeff_list = target['fit_coeff'].to_list()
-                fit_coeff_list[0:3] = [int(x) for x in fit_coeff_list[0:3]]
-
-                if len(fit_coeff_list) not in [3,4]:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
-                    continue
-                
-                phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
-                                                                threshold_energy_ryd, *fit_coeff_list)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-
-            elif cross_section_type == 5:
-                fit_coeff_list = target['fit_coeff'].to_list()
-
-                if len(fit_coeff_list) != 5:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
-                    continue
-
-                phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-
-            elif cross_section_type == 6:
-                fit_coeff_list = target['fit_coeff'].to_list()
-
-                if len(fit_coeff_list) != 8:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
-                    continue
-
-                phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-
-            elif cross_section_type == 9:
-                fit_coeff_table = target
-
-                if fit_coeff_table.shape[1] != 8:
-                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
-                    continue
-
-                phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
-                target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
-                
-            else:
-                logger.warning(f'Unsupported cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
-                continue
-
-            target['sigma'] = w*target['sigma']*1e-18  # Megabarns to cm²
-            target['level_index'] = level_number
-            phixs_tables.append(target)
+                df['sigma'] = w[j]*df['sigma']*1e-18  # Megabarns to cm²
+                df['level_index'] = level_number[j]
+                phixs_tables.append(df)
 
         ion_phixs_table = pd.concat(phixs_tables)
 
