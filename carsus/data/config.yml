@@ -46,6 +46,12 @@ atom:
         pho:
           - ciiiphot_sm_a_500.dat
           - ciiiphot_sm_b_500.dat
+
+      3: 
+        date: 30oct12
+        osc: civosc_a12_split.dat
+        pho:
+          - civphot_a12.dat
         
   Si:
     dir: SIL

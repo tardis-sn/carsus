@@ -284,7 +284,7 @@ def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
     return phixs_table
 
 
-def get_leibowitz_phixs_table():
+def get_leibowitz_phixs_table(threshold_energy_ryd, a, b, c, d, e, f):
     """
     Radiative Transition Probabilities and Recombination Coefficients 
     of the Ion C IV.
@@ -292,4 +292,4 @@ def get_leibowitz_phixs_table():
     J. Quant. Spectrosc. Radiat. Transfer. Vol 12, pp. 299-306.
     """
 
-    return
+    raise NotImplementedError

@@ -740,9 +740,22 @@ class CMFGENReader:
 
                     phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
                     df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+
+                elif cross_section_type == 4:
+                    fit_coeff_list = target['fit_coeff'].tolist()
+
+                    if len(fit_coeff_list) != 6:
+                        logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                        continue
                     
+                    try:
+                        phixs_table = get_leibowitz_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+
+                    except NotImplementedError:
+                        logger.warning(f'Leibowitz\'s cross-section type 4 not implemented yet.')
+
                 else:
-                    logger.warning(f'Unsupported cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
+                    logger.warning(f'Unknown cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
                     continue
 
                 df['sigma'] = w[j]*df['sigma']*1e-18  # Megabarns to cm²
