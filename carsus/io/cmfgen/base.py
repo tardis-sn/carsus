@@ -648,7 +648,6 @@ class CMFGENReader:
                 match = ion_levels.set_index('Configuration').loc[lower_level_label]
 
             except KeyError:
-                # Question:
                 continue
 
             if len(match.shape) > 1:
@@ -833,7 +832,7 @@ class CMFGENReader:
         if 'phixs' in reader.keys():
             cross_sections = pd.concat(pxs_list)
             cross_sections = cross_sections.set_index(['atomic_number', 'ion_charge', 'level_index'])
-            self.cross_sections = cross_sections
+            self.cross_sections = cross_sections.sort_index()
 
         self.levels = levels
         self.lines = lines
