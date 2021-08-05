@@ -576,7 +576,7 @@ class CMFGENReader:
             ions = parse_selected_species(ions)
 
             if cross_sections and (1,0) not in ions:
-                logger.info('Selecting H 0 required to ingest cross-sections.')
+                logger.warning('Selecting H 0 required to ingest cross-sections.')
                 ions.insert(0, (1,0))
 
             for ion in ions:
@@ -648,6 +648,7 @@ class CMFGENReader:
                 match = ion_levels.set_index('Configuration').loc[lower_level_label]
 
             except KeyError:
+                logger.warning(f'Level not found: \'{lower_level_label}\'.')
                 continue
 
             if len(match.shape) > 1:
@@ -660,15 +661,20 @@ class CMFGENReader:
 
             threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom / RYD_TO_EV
 
-            # ---
-
             if cross_section_type in [20, 21, 22]:
-                target['energy'] = target['energy']*threshold_energy_ryd  # Energy in units of threshold
+                diff = target['energy'].diff().dropna()
+                assert (diff >= 0).all()
+
+                target['energy'] = target['energy']*threshold_energy_ryd
 
             elif cross_section_type in [1, 7]:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
-                if len(fit_coeff_list) not in [3,4]:
+                if len(fit_coeff_list) not in [1,3,4]:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
+                    continue
+
+                if len(fit_coeff_list) == 1 and fit_coeff_list[0] == 0.0:
                     continue
 
                 phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
@@ -678,6 +684,7 @@ class CMFGENReader:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
                 if len(fit_coeff_list) != 2:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                     continue
 
                 scale, n = fit_coeff_list
@@ -690,6 +697,7 @@ class CMFGENReader:
                 fit_coeff_list[0:3] = [int(x) for x in fit_coeff_list[0:3]]
 
                 if len(fit_coeff_list) not in [3,4]:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                     continue
                 
                 phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
@@ -700,6 +708,7 @@ class CMFGENReader:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
                 if len(fit_coeff_list) != 5:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                     continue
 
                 phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
@@ -709,6 +718,7 @@ class CMFGENReader:
                 fit_coeff_list = target['fit_coeff'].to_list()
 
                 if len(fit_coeff_list) != 8:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                     continue
 
                 phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
@@ -718,13 +728,14 @@ class CMFGENReader:
                 fit_coeff_table = target
 
                 if fit_coeff_table.shape[1] != 8:
+                    logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                     continue
 
                 phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
                 target = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 
             else:
-                logger.warning(f'Unsupported cross-section type {cross_section_type}.')
+                logger.warning(f'Unsupported cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
                 continue
 
             target['sigma'] = target['sigma']*1e-18  # Megabarns to cm²
@@ -752,9 +763,11 @@ class CMFGENReader:
         for ion, reader in data.items():
             atomic_number = ion[0]
             ion_charge = ion[1]
-            
-            lvl = reader['levels']
 
+            sym = convert_atomic_number2symbol(ion[0])
+            logger.info(f'Loading atomic data for {sym} {ion[1]}.')
+
+            lvl = reader['levels']
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
