@@ -150,7 +150,7 @@ def test_si2_osc_kurucz(si2_osc_kurucz_fname):
     parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
     n = int(parser.meta['Number of energy levels'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['Configuration', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
+    assert parser.columns == ['label', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
 
 @with_refdata
 def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):

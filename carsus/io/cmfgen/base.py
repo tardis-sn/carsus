@@ -60,17 +60,17 @@ class CMFGENEnergyLevelsParser(BaseParser):
             # Read column names and split them keeping just one space (e.g. '10^15 Hz')
             columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
             columns = [c.rstrip().lstrip() for c in columns if c != '']
-            columns = ['Configuration'] + columns
+            columns = ['label'] + columns
             df.columns = columns
 
         elif df.shape[1] == 7:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
+            df.columns = ['label', 'g', 'E(cm^-1)', 'eV', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 6:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
+            df.columns = ['label', 'g', 'E(cm^-1)', 'Hz 10^15', 'Lam(A)', 'ID']
 
         elif df.shape[1] == 5:
-            df.columns = ['Configuration', 'g', 'E(cm^-1)', 'eV', 'ID']
+            df.columns = ['label', 'g', 'E(cm^-1)', 'eV', 'ID']
 
         else:
             logger.warning(f'Unknown column format: `{fname}`.')
@@ -645,11 +645,11 @@ class CMFGENReader:
             cross_section_type = target.attrs['Type of cross-section']
 
             # Remove the "[J]" term from J-splitted levels labels
-            ion_levels['Configuration'] = ion_levels['Configuration'].str.rstrip(']')
-            ion_levels['Configuration'] = ion_levels['Configuration'].str.split('[', expand=True)
+            ion_levels['label'] = ion_levels['label'].str.rstrip(']')
+            ion_levels['label'] = ion_levels['label'].str.split('[', expand=True)
 
             try:
-                match = ion_levels.set_index('Configuration').loc[[lower_level_label]]
+                match = ion_levels.set_index('label').loc[[lower_level_label]]
 
             except KeyError:
                 logger.warning(f'Level not found: \'{lower_level_label}\'.')
@@ -845,7 +845,7 @@ class CMFGENReader:
         levels = pd.concat(lvl_list)
         levels['priority'] = self.priority
         levels = levels.reset_index(drop=False)
-        levels = levels.rename(columns={'Configuration': 'label', 
+        levels = levels.rename(columns={'label': 'label', 
                                         'E(cm^-1)': 'energy', 
                                         'index': 'level_index'})
         levels['j'] = (levels['g'] -1) / 2
