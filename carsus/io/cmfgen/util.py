@@ -128,7 +128,8 @@ def parse_header(fname, keys, start=0, stop=50):
 
 
 def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):
-    """ Docstring """
+    """
+    """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
@@ -157,7 +158,8 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
 
 
 def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n):
-    """ Docstring """
+    """
+    """
     energy_grid = hyd_gaunt_energy_grid_ryd[n]
     phixs_table = np.empty((len(energy_grid), 2))
     scale_factor = 7.91 / threshold_energy_ryd / n
@@ -177,7 +179,8 @@ def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, th
 
 
 def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0=None):
-    """ Docstring """
+    """
+    """
 
     assert l_start >= 0
     assert l_end <= n - 1
@@ -212,7 +215,15 @@ def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshol
 
 def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000):
     """
-    Peach, Saraph, and Seaton (1988).
+    References:
+
+        Atomic data for opacity calculations. IX. The lithium isoelectronic 
+        sequence.
+
+        Peach, G. ; Saraph, H. E. ; Seaton, M. J.
+
+        Journal of Physics B: Atomic, Molecular, and Optical Physics, 
+        Volume 21, Issue 22, pp. 3669-3683 (1988).
     """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
@@ -233,11 +244,21 @@ def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000
 
 
 def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points=1000):
-    """ 
-    Only applies to `He`. The threshold cross sections seems ok, but energy 
-    dependence could be slightly wrong. What is the `h` parameter that is 
-    not used?.
     """
+    References:
+
+        A Fast and Accurate Method for Evaluating the Nonrelativistic Free-free
+        Gaunt Factor for Hydrogenic Ions.
+        
+        Hummer, D. G.
+
+        Astrophysical Journal v.327, p.477
+    """
+
+    # Only applies to `He`. The threshold cross sections seems ok, but 
+    # energy dependence could be slightly wrong. What is the `h` parameter
+    # that is not used?.
+    
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
@@ -258,10 +279,13 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
 
 def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
     """
-    Analytic FITS for partial photoionization cross sections.
-    Verner, D. A. ; Yakovlev, D. G.
+    References:
 
-    Astronomy and Astrophysics Suppl., Vol. 109, p.125-133 (1995)
+        Analytic FITS for partial photoionization cross sections.
+
+        Verner, D. A. ; Yakovlev, D. G.
+
+        Astronomy and Astrophysics Suppl., Vol. 109, p.125-133 (1995)
     """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
@@ -284,12 +308,25 @@ def get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points=1000):
     return phixs_table
 
 
-def get_leibowitz_phixs_table(threshold_energy_ryd, a, b, c, d, e, f):
+def get_leibowitz_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, n_points=1000):
     """
-    Radiative Transition Probabilities and Recombination Coefficients 
-    of the Ion C IV.
+    References:
 
-    J. Quant. Spectrosc. Radiat. Transfer. Vol 12, pp. 299-306.
+        Radiative Transition Probabilities and Recombination Coefficients 
+        of the Ion C IV.
+
+        Leibowitz, E. M.
+
+        J. Quant. Spectrosc. Radiat. Transfer. Vol 12, pp. 299-306.
     """
-
+    
     raise NotImplementedError
+
+
+def get_null_phixs_table(n_points=1000):
+    """
+    """
+    phixs_table = np.column_stack((np.linspace(0, 1.0, 1000, endpoint=False), 
+                                    np.zeros(1000)))
+
+    return phixs_table

@@ -635,7 +635,7 @@ class CMFGENReader:
                                hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
         """ Docstring """
 
-        phixs_tables = []
+        phixs_table_list = []
         n_targets = len(reader_phixs)
 
         for i in range(n_targets):
@@ -666,13 +666,16 @@ class CMFGENReader:
             for j in range(len(match)):
                 threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
 
-                if cross_section_type in [20, 21, 22]:
+                if cross_section_type == 0:
+                    phixs_table = get_null_phixs_table()
+
+                elif cross_section_type in [20, 21, 22]:
                     diff = target['energy'].diff().dropna()
                     assert (diff >= 0).all()
 
-                    df = pd.DataFrame(columns=['energy', 'sigma'])
-                    df['energy'] = target['energy']*threshold_energy_ryd
-                    df['sigma'] = target['sigma']
+                    energy = (target['energy']*threshold_energy_ryd).values
+                    sigma = target['sigma'].values
+                    phixs_table = np.column_stack((energy, sigma))
 
                 elif cross_section_type in [1, 7]:
                     fit_coeff_list = target['fit_coeff'].to_list()
@@ -682,10 +685,10 @@ class CMFGENReader:
                         continue
 
                     if len(fit_coeff_list) == 1 and fit_coeff_list[0] == 0.0:
-                        continue
+                        phixs_table = get_null_phixs_table()
 
-                    phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
+                    else:
+                        phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
                 elif cross_section_type == 3:
                     fit_coeff_list = target['fit_coeff'].to_list()
@@ -697,7 +700,6 @@ class CMFGENReader:
                     scale, n = fit_coeff_list
                     phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor,
                                                                         threshold_energy_ryd, n)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
                 elif cross_section_type in [2, 8]:
                     fit_coeff_list = target['fit_coeff'].to_list()
@@ -709,7 +711,6 @@ class CMFGENReader:
 
                     phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
                                                                     threshold_energy_ryd, *fit_coeff_list)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
                 elif cross_section_type == 5:
                     fit_coeff_list = target['fit_coeff'].to_list()
@@ -719,7 +720,6 @@ class CMFGENReader:
                         continue
 
                     phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
                 elif cross_section_type == 6:
                     fit_coeff_list = target['fit_coeff'].to_list()
@@ -729,7 +729,6 @@ class CMFGENReader:
                         continue
 
                     phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
                 elif cross_section_type == 9:
                     fit_coeff_table = target
@@ -739,7 +738,6 @@ class CMFGENReader:
                         continue
 
                     phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
-                    df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
 
                 elif cross_section_type == 4:
                     fit_coeff_list = target['fit_coeff'].tolist()
@@ -747,22 +745,25 @@ class CMFGENReader:
                     if len(fit_coeff_list) != 6:
                         logger.warning(f'Inconsistent number of fit coefficients for \'{lower_level_label}\'.')
                         continue
-                    
+
                     try:
                         phixs_table = get_leibowitz_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
                     except NotImplementedError:
                         logger.warning(f'Leibowitz\'s cross-section type 4 not implemented yet.')
+                        phixs_table = get_null_phixs_table()
 
                 else:
                     logger.warning(f'Unknown cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
                     continue
 
-                df['sigma'] = w[j]*df['sigma']*1e-18  # Megabarns to cm²
+                df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 df['level_index'] = level_number[j]
-                phixs_tables.append(df)
+                df['sigma'] = w[j]*df['sigma']
 
-        ion_phixs_table = pd.concat(phixs_tables)
+                phixs_table_list.append(df)
+
+        ion_phixs_table = pd.concat(phixs_table_list)
 
         return ion_phixs_table
 
