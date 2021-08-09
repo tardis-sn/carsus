@@ -580,15 +580,15 @@ class CMFGENReader:
                 ions.insert(0, (1,0))
 
             for ion in ions:
-                sym = convert_atomic_number2symbol(ion[0])
+                symbol = convert_atomic_number2symbol(ion[0])
 
                 try:
-                    ion_keys = conf['atom'][sym]['ion_number'][ion[1]]
-                    BASE_PATH = ATOMIC_PATH.joinpath(cls.CMFGEN_DICT[sym],
+                    ion_keys = conf['atom'][symbol]['ion_charge'][ion[1]]
+                    BASE_PATH = ATOMIC_PATH.joinpath(cls.CMFGEN_DICT[symbol],
                                                      roman.toRoman(ion[1]+1),
                                                      ion_keys['date'])
 
-                    logger.info(f'Configuration schema found for {sym} {ion[1]}.')
+                    logger.info(f'Configuration schema found for {symbol} {ion[1]}.')
 
                 except KeyError:
                     continue
@@ -610,7 +610,7 @@ class CMFGENReader:
                             pho_flist.append(pho_fname)
 
                     except KeyError:
-                        logger.warning(f'No `pho` data for {sym} {ion[1]}.')
+                        logger.warning(f'No `pho` data for {symbol} {ion[1]}.')
 
                     data[ion]['phixs'] = []
                     for l in pho_flist:
@@ -785,8 +785,8 @@ class CMFGENReader:
             atomic_number = ion[0]
             ion_charge = ion[1]
 
-            sym = convert_atomic_number2symbol(ion[0])
-            logger.info(f'Loading atomic data for {sym} {ion[1]}.')
+            symbol = convert_atomic_number2symbol(ion[0])
+            logger.info(f'Loading atomic data for {symbol} {ion[1]}.')
 
             lvl = reader['levels']
             # some ID's have negative values (theoretical?)

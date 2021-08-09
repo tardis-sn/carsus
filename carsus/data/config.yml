@@ -1,7 +1,7 @@
 atom:
   H: 
-    dir: HYD
-    ion_number:
+    name: HYD
+    ion_charge:
       0:
         date: 5dec96
         osc: hi_osc.dat
@@ -11,8 +11,8 @@ atom:
           - hiphot.dat
 
   He:
-    dir: HE
-    ion_number:
+    name: HE
+    ion_charge:
       0: 
         date: 15jul15
         osc: hei_osc
@@ -26,8 +26,8 @@ atom:
           - he2phot.dat
 
   C:
-    dir: CARB
-    ion_number:
+    name: CARB
+    ion_charge:
       0: 
         date: 12dec04
         osc: ci_split_osc
@@ -54,8 +54,8 @@ atom:
           - civphot_a12.dat
         
   Si:
-    dir: SIL
-    ion_number:
+    name: SIL
+    ion_charge:
       0: 
         date: 23nov11
         osc: SiI_OSC
@@ -77,8 +77,8 @@ atom:
 #      CHRO
 
   Co:
-    dir: COB
-    ion_number:
+    name: COB
+    ion_charge:
       2:
         date: 30oct12
         osc: coiii_osc.dat
@@ -94,8 +94,8 @@ atom:
 #      NICK
 
   N:
-    dir: NIT
-    ion_number:
+    name: NIT
+    ion_charge:
       0:
         date: 12sep12
         osc: ni_osc
@@ -112,8 +112,14 @@ atom:
 #      SIL
 
   S:
-    dir: SUL
-    ion_number:
+    name: SUL
+    ion_charge:
+      0:
+        date: 24nov11
+        osc: SI_OSC
+        pho:
+          - SI_PHOT_DATA
+
       1:
         date: 30oct12
         osc: s2_osc
