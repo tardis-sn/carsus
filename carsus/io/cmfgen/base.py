@@ -43,14 +43,15 @@ class CMFGENEnergyLevelsParser(BaseParser):
         meta = parse_header(fname, self.keys)
         skiprows = find_row(fname, "Number of transitions", row_number=True)
         nrows = int(meta['Number of energy levels'])
-        kwargs = {'header': None,
+        config = {'header': None,
                   'index_col': False,
                   'sep': '\s+',
                   'skiprows': skiprows,
-                  'nrows': nrows}
+                  'nrows': nrows,
+                  'engine': 'python'}
 
         try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
+            df = pd.read_csv(fname, **config)
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
@@ -107,19 +108,21 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     def load(self, fname):
         meta = parse_header(fname, self.keys)
         skiprows = find_row(fname, "Transition", "Lam", row_number=True) +1
+
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
         nrows = int(meta['Number of transitions'])
-        kwargs = {'header': None,
+        config = {'header': None,
                   'index_col': False,
                   'sep': '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])',
                   'skiprows': skiprows,
-                  'nrows': nrows}
+                  'nrows': nrows,
+                  'engine': 'python'}
 
         columns = ['label_lower', 'label_upper', 'f', 'A',
                     'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
 
         try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
+            df = pd.read_csv(fname, **config)
 
         except pd.errors.EmptyDataError:
             df = pd.DataFrame(columns=columns)
@@ -182,17 +185,18 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
     def load(self, fname):
         meta = parse_header(fname, self.keys)
         skiprows = find_row(fname, "ransition\T", row_number=True)
-        kwargs = {'header': None,
+        config = {'header': None,
                   'index_col': False,
                   'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
-                  'skiprows': skiprows}
+                  'skiprows': skiprows,
+                  'engine': 'python'}
 
         # FIXME: expensive solution for two files containing more than one 
         # table: `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
         end = find_row(fname, "Johnson values:", 
                         "dln_OMEGA_dlnT", how='OR', row_number=True)
         if end is not None:
-            kwargs['nrows'] = end - kwargs['skiprows'] -2
+            config['nrows'] = end - config['skiprows'] -2
 
         try:
             columns = find_row(fname, 'ransition\T').split()
@@ -200,14 +204,14 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             # NOTE: Comment next line when trying new regexes
             columns = [np.format_float_scientific(
                 to_float(x)*1e+04, precision=4) for x in columns[1:]]
-            kwargs['names'] = ['label_lower', 'label_upper'] + columns
+            config['names'] = ['label_lower', 'label_upper'] + columns
 
         # FIXME: some files have no column names nor header
         except AttributeError:
             logger.warning(f'Unknown column format: `{fname}`.')
 
         try:
-            df = pd.read_csv(fname, **kwargs, engine='python')
+            df = pd.read_csv(fname, **config)
             for c in df.columns[2:]:  # This is done column-wise on purpose
                 try:
                     df[c] = df[c].astype('float64')
