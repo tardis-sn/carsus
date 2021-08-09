@@ -48,7 +48,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
                   'sep': '\s+',
                   'skiprows': skiprows,
                   'nrows': nrows,
-                  'engine': 'python'}
+                  'engine': 'python',
+                  }
 
         try:
             df = pd.read_csv(fname, **config)
@@ -116,7 +117,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
                   'sep': '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])',
                   'skiprows': skiprows,
                   'nrows': nrows,
-                  'engine': 'python'}
+                  'engine': 'python',
+                  }
 
         columns = ['label_lower', 'label_upper', 'f', 'A',
                     'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
@@ -189,7 +191,8 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
                   'index_col': False,
                   'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
                   'skiprows': skiprows,
-                  'engine': 'python'}
+                  'engine': 'python',
+                  }
 
         # FIXME: expensive solution for two files containing more than one 
         # table: `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
