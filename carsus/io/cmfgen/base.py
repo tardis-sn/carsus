@@ -561,7 +561,7 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, atomic_path, cross_sections=False, config_yaml=None):
+    def from_config(cls, ions, atomic_path, priority=10, cross_sections=False, config_yaml=None):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -627,7 +627,7 @@ class CMFGENReader:
                         data[ion]['hyd'] = hyd_parser.base
                         data[ion]['gbf'] = gbf_parser.base
 
-        return cls(data)
+        return cls(data, priority)
 
     @staticmethod
     def cross_sections_squeeze(reader_phixs, ion_levels,
