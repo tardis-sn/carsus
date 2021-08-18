@@ -71,8 +71,11 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        if (chianti_reader is not None) and (not chianti_reader.collisions.empty):
+        if (chianti_reader is not None) and (chianti_reader.collisions.empty):
             self.collisions = self.create_collisions(**collisions_param)
+
+        if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):
+            self.cross_sections = self.create_cross_sections()
 
         logger.info('Finished.')
 
@@ -417,7 +420,7 @@ class TARDISAtomData:
         ions = set(self.gfall_ions).union(set(self.chianti_ions))\
                     .union((set(self.cmfgen_ions)))
 
-        logger.info('Matching lines and levels.')
+        logger.info('Matching levels and lines.')
         lns_list = [ self.get_lvl_index2id(lines.loc[ion], self.levels_all)
                         for ion in ions]
         lines = pd.concat(lns_list, sort=True)
@@ -628,6 +631,19 @@ class TARDISAtomData:
         collisions = collisions.set_index('e_col_id')
 
         return collisions
+
+    def create_cross_sections(self):
+        """
+        """
+        logger.info('Ingesting photoionization cross-sections.')
+
+        cross_sections = self.cmfgen_reader.cross_sections
+        cross_sections['energy'] = u.Quantity(cross_sections['energy'], u.Unit('Ry')).to('eV').to(u.Hz, equivalencies=u.spectral()).value
+        cross_sections['sigma'] = cross_sections['sigma']*1E-18  # Megabarns to cm^2
+        cross_sections.columns = ['nu', 'x_sect']
+
+        return cross_sections
+
 
     def create_macro_atom(self):
         """
