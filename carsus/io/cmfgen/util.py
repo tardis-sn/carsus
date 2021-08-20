@@ -228,9 +228,9 @@ def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
-    for i, c in enumerate(energy_grid):
+    for i, cb in enumerate(energy_grid):
 
-        energy_div_threshold = 1 + 20 * (c ** 2)
+        energy_div_threshold = 1 + 20 * (cb ** 2)
         u = energy_div_threshold
         x = np.log10(min(u, e))
 
@@ -262,8 +262,8 @@ def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_point
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
 
-    for i, c in enumerate(energy_grid):
-        energy_div_threshold = 1 + 20 * (c ** 2)
+    for i, c_en in enumerate(energy_grid):
+        energy_div_threshold = 1 + 20 * (c_en ** 2)
 
         x = np.log10(energy_div_threshold)
         if x < e:
