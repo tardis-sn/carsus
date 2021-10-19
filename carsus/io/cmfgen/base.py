@@ -41,7 +41,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        skiprows = find_row(fname, "Number of transitions", row_number=True)
+        skiprows, _ = find_row(fname, "Number of transitions")
         nrows = int(meta['Number of energy levels'])
         config = {'header': None,
                   'index_col': False,
@@ -60,7 +60,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         if df.shape[1] == 10:
             # Read column names and split them keeping just one space (e.g. '10^15 Hz')
-            columns = find_row(fname, 'E(cm^-1)', "Lam").split('  ')
+            _, columns = find_row(fname, 'E(cm^-1)', "Lam")
+            columns = columns.split('  ')
             columns = [c.rstrip().lstrip() for c in columns if c != '']
             columns = ['label'] + columns
             df.columns = columns
@@ -108,7 +109,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        skiprows = find_row(fname, "Transition", "Lam", row_number=True) +1
+        skiprows, _ = find_row(fname, "Transition", "Lam")
+        skiprows += 1
 
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
         nrows = int(meta['Number of transitions'])
@@ -186,7 +188,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def load(self, fname):
         meta = parse_header(fname, self.keys)
-        skiprows = find_row(fname, "ransition\T", row_number=True)
+        skiprows, _ = find_row(fname, "ransition\T")
         config = {'header': None,
                   'index_col': False,
                   'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
@@ -196,13 +198,14 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
         # FIXME: expensive solution for two files containing more than one 
         # table: `ARG/III/19nov07/col_ariii` & `HE/II/5dec96/he2col.dat`
-        end = find_row(fname, "Johnson values:", 
-                        "dln_OMEGA_dlnT", how='OR', row_number=True)
+        end, _ = find_row(fname, "Johnson values:", "dln_OMEGA_dlnT", how='OR')
+
         if end is not None:
             config['nrows'] = end - config['skiprows'] -2
 
         try:
-            columns = find_row(fname, 'ransition\T').split()
+            _, columns = find_row(fname, 'ransition\T')
+            columns = columns.split()
             
             # NOTE: Comment next line when trying new regexes
             columns = [np.format_float_scientific(
@@ -409,7 +412,8 @@ class CMFGENHydLParser(BaseParser):
             np.arange(self.num_xsect_nus)
         )  # in units of the threshold frequency
 
-        skiprows = find_row(fname, self.nu_ratio_key, row_number=True) + 1
+        skiprows, _ = find_row(fname, self.nu_ratio_key)
+        skiprows += 1
 
         data = []
         indexes = []

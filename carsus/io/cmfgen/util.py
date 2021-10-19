@@ -35,7 +35,7 @@ def to_float(string):
     return float(string.replace('D', 'E'))
 
 
-def find_row(fname, string1, string2=None, how='AND', row_number=False):
+def find_row(fname, string1, string2=None, how='AND'):
     """
     Search for strings in plain text files and returns the matching\
     line (or row number).
@@ -51,13 +51,11 @@ def find_row(fname, string1, string2=None, how='AND', row_number=False):
     how : {'OR', 'AND', 'AND NOT'}
         Search method: `string1` <method> `string2`
             (default is 'AND').
-    row_number : bool
-        If true, returns row number (default is False).
 
     Returns
     -------
-    str or int
-        Returns matching line or match row number.
+    int, str
+        Returns matching row number and line.
     """
 
     if string2 is None:
@@ -83,10 +81,7 @@ def find_row(fname, string1, string2=None, how='AND', row_number=False):
         else:
             n, line = None, None
 
-    if row_number is True:
-        return n
-
-    return line
+    return n, line
 
 
 def parse_header(fname, keys, start=0, stop=50):
