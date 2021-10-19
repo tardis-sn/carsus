@@ -71,7 +71,7 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        if (chianti_reader is not None) and (chianti_reader.collisions.empty):
+        if (chianti_reader is not None) and (not chianti_reader.collisions.empty):
             self.collisions = self.create_collisions(**collisions_param)
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):
