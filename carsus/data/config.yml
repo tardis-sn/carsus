@@ -1,14 +1,14 @@
 atom:
-  H: 
-    name: HYD
+  H:
+    name: HYD                # atom name in CMFGEN database
     ion_charge:
       0:
         date: 5dec96
-        osc: hi_osc.dat
+        osc: hi_osc.dat      # oscillator strengths
         hyd: hyd_l_data.dat  # hydrogen log cross-sections
         gbf: gbf_n_data.dat  # bound-free gaunt factors
-        pho: 
-          - hiphot.dat
+        pho:
+          - hiphot.dat       # photoionization cross-sections
 
   He:
     name: HE
@@ -22,7 +22,7 @@ atom:
       1:
         date: 5dec96
         osc: he2_osc.dat
-        pho: 
+        pho:
           - he2phot.dat
 
   C:
@@ -31,7 +31,7 @@ atom:
       0: 
         date: 12dec04
         osc: ci_split_osc
-        pho: 
+        pho:
           - phot_smooth_50
 
       1: 
