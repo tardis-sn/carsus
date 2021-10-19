@@ -26,20 +26,13 @@ def to_float(string):
     -------
     float
     """
-    try:
-        value = float(string.replace('D', 'E'))
 
-    except ValueError:
+    typos = {'1-.00': '10.00',      # `MG/VIII/23oct02/phot_sm_3000`, line 23340
+             '*********': 'NaN',}   # `SUL/V/08jul99/phot_op.big`, lines 9255-9257
 
-        # Typo in `MG/VIII/23oct02/phot_sm_3000`, line 23340
-        if string == '1-.00':
-            value = 10.00
+    string = typos.get(string) if string in typos.keys() else string
 
-        # Typo in `SUL/V/08jul99/phot_op.big`, lines 9255-9257
-        if string == '*********':
-            value = np.nan
-
-    return value
+    return float(string.replace('D', 'E'))
 
 
 def find_row(fname, string1, string2=None, how='AND', row_number=False):
