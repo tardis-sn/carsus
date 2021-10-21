@@ -769,13 +769,13 @@ class CMFGENReader:
         return ion_phixs_table
 
     def _get_levels_lines(self, data):
-        """ Generates `levels` and `lines` DataFrames.
+        """ Generates `levels`, `lines` and `collisions` DataFrames.
 
         Parameters
         ----------
         data : dict
             Dictionary containing one dictionary per specie with 
-            keys `levels` and `lines`.
+            keys `levels`, `lines` and (optionally) `collisions`.
         """
 
         lvl_list = []
