@@ -669,7 +669,7 @@ class TARDISAtomData:
         logger.info('Ingesting photoionization cross-sections.')
 
         cross_sections = self.cmfgen_reader.cross_sections
-        cross_sections['energy'] = u.Quantity(cross_sections['energy'], u.Unit('Ry')).to('eV').to(u.Hz, equivalencies=u.spectral()).value
+        cross_sections['energy'] = u.Quantity(cross_sections['energy'], u.Unit('Ry')).to(u.Hz, equivalencies=u.spectral()).value
         cross_sections['sigma'] = cross_sections['sigma']*1E-18  # Megabarns to cm^2
         cross_sections.columns = ['nu', 'x_sect']
 
