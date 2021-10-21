@@ -283,11 +283,17 @@ class TARDISAtomData:
 
     def _get_all_levels_data(self):
         """ 
-        Returns the same output than `AtomData._get_all_levels_data()`.
-
         The resulting DataFrame contains stacked energy levels from GFALL,
         Chianti (optional), CMFGEN (optional) and NIST ground levels. Only
         one source of levels is kept based on priorities.
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        Notes
+        -----
+        Produces the same output than `AtomData._get_all_levels_data()`.
 
         """
 
@@ -373,11 +379,17 @@ class TARDISAtomData:
 
 
     def _get_all_lines_data(self):
-        """
-        Returns the same output than `AtomData._get_all_lines_data()`.
-        
+        """        
         The resulting DataFrame contains stacked transition lines for 
         GFALL, Chianti (optional) and CMFGEN (optional).
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        Notes
+        -----
+        Produces the same output than `AtomData._get_all_lines_data()`.
 
         """
 
@@ -455,11 +467,17 @@ class TARDISAtomData:
     def create_levels_lines(self, lines_loggf_threshold=-3,
                             levels_metastable_loggf_threshold=-3):
         """
-        Returns the same output than `AtomData.create_levels_lines` method.
-
         Generates the definitive `lines` and `levels` DataFrames by adding
         new columns and making some calculations.
-        
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        Notes
+        -----
+        Produces the same output than `AtomData.create_levels_lines` method.
+
         """
 
         ionization_energies = self.ionization_energies.base.reset_index()
@@ -555,10 +573,16 @@ class TARDISAtomData:
 
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """
-        Returns the same output than `AtomData.create_collisions` method.
-
         Generates the definitive `collisions` DataFrame by adding new columns
         and making some calculations.
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        Notes
+        -----
+        Produces the same output than `AtomData.create_collisions` method.
 
         """
 
@@ -634,7 +658,14 @@ class TARDISAtomData:
 
     def create_cross_sections(self):
         """
+        Create a DataFrame containing photoionization cross-sections.
+
+        Returns
+        -------
+        pandas.DataFrame
+
         """
+
         logger.info('Ingesting photoionization cross-sections.')
 
         cross_sections = self.cmfgen_reader.cross_sections
@@ -655,7 +686,7 @@ class TARDISAtomData:
 
         Notes
         -----
-        Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+        Refer to the docs: https://tardis-sn.github.io/tardis/physics/setup/plasma/macroatom.html
 
         """
         
@@ -843,7 +874,7 @@ class TARDISAtomData:
         
         Notes
         -----
-        Refer to the docs: https://tardis-sn.github.io/tardis/physics/plasma/macroatom.html
+        Refer to the docs: https://tardis-sn.github.io/tardis/physics/setup/plasma/macroatom.html
 
         """
 
