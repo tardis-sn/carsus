@@ -321,6 +321,7 @@ def get_leibowitz_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, n_points=1
 
 def get_null_phixs_table(n_points=1000):
     """
+    Returns a 1-D array of zeros with `n_points` size.
     """
     phixs_table = np.column_stack((np.linspace(0, 1.0, 1000, endpoint=False), 
                                     np.zeros(1000)))
