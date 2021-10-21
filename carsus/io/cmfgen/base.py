@@ -546,16 +546,6 @@ class CMFGENReader:
 
     """
 
-    CMFGEN_DICT = {
-        'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
-        'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
-        'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
-        'S': 'SUL', 'Cl': 'CHL', 'Ar': 'ARG', 'K': 'POT',
-        'Ca': 'CA', 'Sc': 'SCAN', 'Ti': 'TIT', 'V': 'VAN',
-        'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
-        'Ni': 'NICK'
-    }
-
     def __init__(self, data, priority=10):
         """
         Parameters
@@ -595,7 +585,7 @@ class CMFGENReader:
 
                 try:
                     ion_keys = conf['atom'][symbol]['ion_charge'][ion[1]]
-                    BASE_PATH = ATOMIC_PATH.joinpath(cls.CMFGEN_DICT[symbol],
+                    BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[symbol],
                                                      roman.toRoman(ion[1]+1),
                                                      ion_keys['date'])
 
