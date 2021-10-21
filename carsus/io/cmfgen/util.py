@@ -117,6 +117,14 @@ def parse_header(fname, keys, start=0, stop=50):
 
 def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):
     """
+    References:
+
+        Atomic data for opacity calculations. I. General description
+
+        Seaton, M. J.
+
+        Journal of Physics B: Atomic, Molecular, and Optical Physics,
+        Volume 20, Issue 23, pp. 6363-6378 (1987).
     """
     energy_grid = np.linspace(0.0, 1.0, n_points, endpoint=False)
     phixs_table = np.empty((len(energy_grid), 2))
