@@ -182,11 +182,11 @@ def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshol
     for i, energy_ryd in enumerate(energy_grid):
         energy_div_threshold = energy_ryd / energy_grid[0]
         if nu_0 is None:
-            U = energy_div_threshold
+            u = energy_div_threshold
         else:
-            E_0 = (nu_0 * 1e15 * H_IN_EV_SECONDS)
-            U = threshold_energy_ev * energy_div_threshold / (E_0 + threshold_energy_ev)
-        if U > 0:
+            e_0 = (nu_0 * 1e15 * H_IN_EV_SECONDS)
+            u = threshold_energy_ev * energy_div_threshold / (e_0 + threshold_energy_ev)
+        if u > 0:
             cross_section = 0.0
             for l in range(l_start, l_end + 1):
                 assert np.array_equal(hyd_phixs_energy_grid_ryd[(n, l)], energy_grid)
