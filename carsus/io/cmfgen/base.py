@@ -79,9 +79,23 @@ class CMFGENEnergyLevelsParser(BaseParser):
             logger.warning(f'Unknown column format: `{fname}`.')
 
         self.base = df
+        self.meta = meta
+        self.base['Lam(A)'] = self.calc_Lam_A()
         self.columns = df.columns.tolist()
         self.fname = fname
-        self.meta = meta
+
+    def calc_Lam_A(self):
+        """ 
+        Calculate and replace column `Lam(A)`.
+        """
+
+        level_ionization_threshold = (
+            float(self.meta['Ionization energy']) - self.base['E(cm^-1)']
+        )
+
+        return (level_ionization_threshold.to_numpy() / u.cm).to(
+            'Angstrom', equivalencies=u.spectral()
+        )
 
     def to_hdf(self, key='/energy_levels'):
         if not self.base.empty:
