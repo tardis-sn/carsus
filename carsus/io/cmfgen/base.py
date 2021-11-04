@@ -630,10 +630,10 @@ class CMFGENReader:
                     except KeyError:
                         logger.warning(f'No `pho` data for {symbol} {ion[1]}.')
 
-                    data[ion]['phixs'] = []
+                    data[ion]['cross_sections'] = []
                     for l in pho_flist:
                         pho_parser = CMFGENPhotoionizationCrossSectionParser(l)
-                        data[ion]['phixs'].append(pho_parser.base)
+                        data[ion]['cross_sections'].append(pho_parser.base)
 
                     if ion == (1,0):
                         hyd_fname = BASE_PATH.joinpath('hyd_l_data.dat').as_posix()
@@ -839,7 +839,7 @@ class CMFGENReader:
                                  'ion_number': ion[1]+1, 
                                  'ionization_energy': reader['ionization_energy']})
 
-            if 'phixs' in reader.keys():
+            if 'cross_sections' in reader.keys():
                 if ion == (1,0):
                     
                     n_levels = 30
@@ -864,7 +864,7 @@ class CMFGENReader:
                             hyd_phixs_energy_grid_ryd[(n, l)] = [e_threshold_ev / RYD_TO_EV * 10 ** (l_start_u + l_del_u * i) for i in range(l_points)]
                             hyd_phixs[(n,l)] = hyd.loc[(n,l)].tolist()
 
-                pxs = self.cross_sections_squeeze(reader['phixs'][0], lvl, hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
+                pxs = self.cross_sections_squeeze(reader['cross_sections'][0], lvl, hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
                 pxs['atomic_number'] = ion[0]
                 pxs['ion_charge'] = ion[1]
                 pxs_list.append(pxs)
@@ -896,7 +896,7 @@ class CMFGENReader:
             ionization_energies = ionization_energies.set_index(['atomic_number', 'ion_number']).squeeze()
             self.ionization_energies = ionization_energies
 
-        if 'phixs' in reader.keys():
+        if 'cross_sections' in reader.keys():
             cross_sections = pd.concat(pxs_list)
             cross_sections = cross_sections.set_index(['atomic_number', 'ion_charge', 'level_index'])
             self.cross_sections = cross_sections.sort_index()
