@@ -651,7 +651,10 @@ class CMFGENReader:
     def cross_sections_squeeze(reader_phixs, ion_levels,
                                hyd_phixs_energy_grid_ryd, hyd_phixs,
                                hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor):
-        """ Docstring """
+        """ 
+        Makes a single, uniform table of cross-sections from individual DataFrames
+        based on cross-section types and their respective papers.
+        """
 
         phixs_table_list = []
         n_targets = len(reader_phixs)
