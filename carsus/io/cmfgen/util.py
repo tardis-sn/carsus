@@ -148,12 +148,11 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
 
         else:
             threshold_energy_ev = threshold_energy_ryd * RYD_TO_EV
-            energy_offset_div_threshold = energy_div_threshold + (nu_0 * 1e15 * H_IN_EV_SECONDS) / threshold_energy_ev
-            threshold_div_energy_offset = energy_offset_div_threshold ** -1
+            offset_threshold_div_energy = energy_div_threshold**-1 * (1 + (nu_0 * 1e15 * H_IN_EV_SECONDS) / threshold_energy_ev)
 
-            if threshold_div_energy_offset < 1.0:
-                cross_section = sigma_t * (beta + (1 - beta) * (threshold_div_energy_offset)) * \
-                    (threshold_div_energy_offset ** s)
+            if offset_threshold_div_energy < 1.0:
+                cross_section = sigma_t * (beta + (1 - beta) * (offset_threshold_div_energy)) * \
+                    (offset_threshold_div_energy ** s)
 
             else:
                 cross_section = 0.0
