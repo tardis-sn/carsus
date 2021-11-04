@@ -670,7 +670,7 @@ class TARDISAtomData:
 
         cross_sections = self.cmfgen_reader.cross_sections
         cross_sections['energy'] = u.Quantity(cross_sections['energy'], u.Unit('Ry')).to(u.Hz, equivalencies=u.spectral()).value
-        cross_sections['sigma'] = cross_sections['sigma']*1E-18  # Megabarns to cm^2
+        cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], u.Unit('Mbarn')).to(u.cm2)
         cross_sections.columns = ['nu', 'x_sect']
 
         return cross_sections
