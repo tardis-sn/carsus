@@ -93,7 +93,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             float(self.meta['Ionization energy']) - self.base['E(cm^-1)']
         )
 
-        return (level_ionization_threshold.to_numpy() / u.cm).to(
+        return (level_ionization_threshold.values / u.cm).to(
             'Angstrom', equivalencies=u.spectral()
         )
 
@@ -576,7 +576,7 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, atomic_path, priority=10, cross_sections=False, config_yaml=None):
+    def from_config(cls, ions, atomic_path, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -616,6 +616,9 @@ class CMFGENReader:
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
                 data[ion]['levels'] = lvl_parser.base
                 data[ion]['lines'] = lns_parser.base
+
+                if ionization_energies:
+                    data[ion]['ionization_energy'] = float(lvl_parser.meta['Ionization energy'])
 
                 if cross_sections:
                     pho_flist = []
@@ -794,6 +797,7 @@ class CMFGENReader:
 
         lvl_list = []
         lns_list = []
+        ioz_list = []
         pxs_list = []
 
         for ion, reader in data.items():
@@ -826,6 +830,11 @@ class CMFGENReader:
             lns['ion_charge'] = ion_charge
             lns = lns.reset_index()
             lns_list.append(lns)
+
+            if 'ionization_energy' in reader.keys():
+                ioz_list.append({'atomic_number': ion[0], 
+                                 'ion_number': ion[1]+1, 
+                                 'ionization_energy': reader['ionization_energy']})
 
             if 'phixs' in reader.keys():
                 if ion == (1,0):
@@ -877,6 +886,12 @@ class CMFGENReader:
                                  'level_index_lower', 'level_index_upper'])
         lines = lines[['energy_lower', 'energy_upper', 
                        'gf', 'j_lower', 'j_upper', 'wavelength']]
+
+        if 'ionization_energy' in reader.keys():
+            ionization_energies = pd.DataFrame.from_records(ioz_list)
+            ionization_energies['ionization_energy'] = (ionization_energies['ionization_energy'].values / u.cm).to('eV', equivalencies=u.spectral()).value
+            ionization_energies = ionization_energies.set_index(['atomic_number', 'ion_number']).squeeze()
+            self.ionization_energies = ionization_energies
 
         if 'phixs' in reader.keys():
             cross_sections = pd.concat(pxs_list)
