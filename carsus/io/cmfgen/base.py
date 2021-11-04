@@ -583,7 +583,7 @@ class CMFGENReader:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
 
         else:
-            YAML_PATH = pathlib.Path(CARSUS_PATH[0]).joinpath('data', 'config.yml').as_posix()
+            YAML_PATH = pathlib.Path(CARSUS_PATH[0]).joinpath('data', 'cmfgen_config.yml').as_posix()
             
         data = {}
         with open(YAML_PATH) as f:
