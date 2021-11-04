@@ -881,7 +881,7 @@ class CMFGENReader:
         
         lines = pd.concat(lns_list)
         lines = lines.rename(columns={'Lam(A)': 'wavelength'})
-        lines['wavelength'] = u.Quantity(lines['wavelength'], u.AA).to('nm').value
+        lines['wavelength'] = u.Quantity(lines['wavelength'], 'AA').to('nm').value
         lines['level_index_lower'] = lines['i'] -1
         lines['level_index_upper'] = lines['j'] -1
         lines['gf'] = lines['f'] * lines['g_lower']

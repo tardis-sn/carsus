@@ -321,8 +321,8 @@ class TARDISAtomData:
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
                          'ds_id', 'priority']]
-        levels['energy'] = u.Quantity(levels['energy'], u.Unit('cm-1')).to(
-            u.eV, equivalencies=u.spectral()).value
+        levels['energy'] = u.Quantity(levels['energy'], 'cm-1').to(
+            'eV', equivalencies=u.spectral()).value
  
         # Solve priorities and set attributes for later use.
         self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.solve_priorities(levels)
@@ -443,8 +443,8 @@ class TARDISAtomData:
                             'j_lower', 'level_index_lower',
                             'level_index_upper'])
 
-        lines['wavelength'] = u.Quantity(lines['wavelength'], u.nm).to(
-            'angstrom').value
+        lines['wavelength'] = u.Quantity(lines['wavelength'], 'nm').to(
+            'AA').value
 
         lines.loc[lines['wavelength'] <=
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_VACUUM
@@ -551,7 +551,7 @@ class TARDISAtomData:
 
         # Calculate frequency
         lines['nu'] = u.Quantity(
-            lines['wavelength'], 'angstrom').to('Hz', u.spectral())
+            lines['wavelength'], 'AA').to('Hz', u.spectral())
 
         # Create Einstein coefficients
         self._create_einstein_coeff(lines)
@@ -669,8 +669,8 @@ class TARDISAtomData:
         logger.info('Ingesting photoionization cross-sections.')
 
         cross_sections = self.cmfgen_reader.cross_sections
-        cross_sections['energy'] = u.Quantity(cross_sections['energy'], u.Unit('Ry')).to(u.Hz, equivalencies=u.spectral()).value
-        cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], u.Unit('Mbarn')).to(u.cm2)
+        cross_sections['energy'] = u.Quantity(cross_sections['energy'], 'Ry').to('Hz', equivalencies=u.spectral()).value
+        cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], 'Mbarn').to('cm2')
         cross_sections.columns = ['nu', 'x_sect']
 
         return cross_sections
