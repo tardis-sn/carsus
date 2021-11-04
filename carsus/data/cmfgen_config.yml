@@ -1,3 +1,13 @@
+#  README
+#  ======
+#
+#  Use relative paths to grab a file from a different date.
+#
+#  Although the `pho` input is a list of files, Carsus currently does not handle
+#  more than a single ionization route. Then, only the first file is used and the
+#  rest are ignored.
+#
+
 atom:
   H:
     ion_charge:
@@ -65,13 +75,6 @@ atom:
           - phot_nahar_A
           - phot_nahar_B
 
-#      AL
-#      ARG
-#      BAR
-#      CA
-#      CHL
-#      CHRO
-
   Co:
     ion_charge:
       2:
@@ -79,14 +82,6 @@ atom:
         osc: coiii_osc.dat
         pho:
           - phot_nosm
-
-#      FE
-#      FLU
-#      MAN
-#      MG
-#      NA
-#      NEON
-#      NICK
 
   N:
     ion_charge:
@@ -98,12 +93,6 @@ atom:
           - niphot_b.dat
           - niphot_c.dat
           - niphot_d.dat
-
-#      OXY
-#      PHOS
-#      POT
-#      SCAN
-#      SIL
 
   S:
     ion_charge:
@@ -118,6 +107,3 @@ atom:
         osc: s2_osc
         pho:
           - phot_sm_3000
-
-#      TIT
-#      VAN
