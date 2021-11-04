@@ -164,6 +164,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
 
 def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n):
     """
+    Citation required.
     """
     energy_grid = hyd_gaunt_energy_grid_ryd[n]
     phixs_table = np.empty((len(energy_grid), 2))
@@ -185,6 +186,7 @@ def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, th
 
 def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0=None):
     """
+    Citation required.
     """
 
     assert l_start >= 0
