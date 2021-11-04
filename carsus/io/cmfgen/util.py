@@ -140,7 +140,7 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
     phixs_table = np.empty((len(energy_grid), 2))
 
     for i, c in enumerate(energy_grid):
-        energy_div_threshold = 1 + 20 * (c ** 2)
+        energy_div_threshold = 1 + 20 * (c ** 2)  # Taken from `artisatomic`
 
         if nu_0 is None:
             threshold_div_energy = energy_div_threshold ** -1
