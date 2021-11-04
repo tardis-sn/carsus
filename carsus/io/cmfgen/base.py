@@ -599,7 +599,7 @@ class CMFGENReader:
 
                 try:
                     ion_keys = conf['atom'][symbol]['ion_charge'][ion[1]]
-                    BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_DICT[symbol],
+                    BASE_PATH = ATOMIC_PATH.joinpath(CMFGEN_ATOM_DICT[symbol],
                                                      roman.toRoman(ion[1]+1),
                                                      ion_keys['date'])
 

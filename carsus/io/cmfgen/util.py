@@ -5,7 +5,10 @@ import astropy.constants as const
 import astropy.units as u
 import numpy as np
 
-CMFGEN_DICT = {
+RYD_TO_EV = u.rydberg.to('eV')
+H_IN_EV_SECONDS = const.h.to('eV s').value
+HC_IN_EV_ANGSTROM = (const.h * const.c).to('eV angstrom').value
+CMFGEN_ATOM_DICT = {
     'H': 'HYD', 'He': 'HE', 'C': 'CARB', 'N': 'NIT',
     'O': 'OXY', 'F': 'FLU', 'Ne': 'NEON', 'Na': 'NA',
     'Mg': 'MG', 'Al': 'AL', 'Si': 'SIL', 'P': 'PHOS',
@@ -14,10 +17,6 @@ CMFGEN_DICT = {
     'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
     'Ni': 'NICK'
 }
-
-RYD_TO_EV = u.rydberg.to('eV')
-H_IN_EV_SECONDS = const.h.to('eV s').value
-HC_IN_EV_ANGSTROM = (const.h * const.c).to('eV angstrom').value
 
 
 def open_cmfgen_file(fname, encoding='ISO-8859-1'):
