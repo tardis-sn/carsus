@@ -1,6 +1,5 @@
 atom:
   H:
-    name: HYD                # atom name in CMFGEN database
     ion_charge:
       0:
         date: 5dec96
@@ -11,7 +10,6 @@ atom:
           - hiphot.dat       # photoionization cross-sections
 
   He:
-    name: HE
     ion_charge:
       0: 
         date: 15jul15
@@ -26,7 +24,6 @@ atom:
           - he2phot.dat
 
   C:
-    name: CARB
     ion_charge:
       0: 
         date: 12dec04
@@ -54,7 +51,6 @@ atom:
           - civphot_a12.dat
         
   Si:
-    name: SIL
     ion_charge:
       0: 
         date: 23nov11
@@ -77,7 +73,6 @@ atom:
 #      CHRO
 
   Co:
-    name: COB
     ion_charge:
       2:
         date: 30oct12
@@ -94,7 +89,6 @@ atom:
 #      NICK
 
   N:
-    name: NIT
     ion_charge:
       0:
         date: 12sep12
@@ -112,7 +106,6 @@ atom:
 #      SIL
 
   S:
-    name: SUL
     ion_charge:
       0:
         date: 24nov11
