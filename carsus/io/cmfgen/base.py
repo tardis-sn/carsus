@@ -735,7 +735,7 @@ class CMFGENReader:
 
             if 'ionization_energy' in reader.keys():
                 ioz_list.append({'atomic_number': ion[0], 
-                                 'ion_number': ion[1]+1, 
+                                 'ion_charge': ion[1], 
                                  'ionization_energy': reader['ionization_energy']})
 
             if 'cross_sections' in reader.keys():
@@ -795,7 +795,7 @@ class CMFGENReader:
         if 'ionization_energy' in reader.keys():
             ionization_energies = pd.DataFrame.from_records(ioz_list)
             ionization_energies['ionization_energy'] = (ionization_energies['ionization_energy'].values / u.cm).to('eV', equivalencies=u.spectral()).value
-            ionization_energies = ionization_energies.set_index(['atomic_number', 'ion_number']).squeeze()
+            ionization_energies = ionization_energies.set_index(['atomic_number', 'ion_charge']).squeeze()
             self.ionization_energies = ionization_energies
 
         if 'cross_sections' in reader.keys():

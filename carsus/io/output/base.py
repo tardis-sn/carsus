@@ -481,7 +481,7 @@ class TARDISAtomData:
         """
 
         ionization_energies = self.ionization_energies.base.reset_index()
-        ionization_energies['ion_number'] -= 1
+        ionization_energies = ionization_energies.rename(columns={'ion_charge': 'ion_number'})
 
         # Culling autoionization levels
         levels_w_ionization_energies = pd.merge(self.levels_all,
