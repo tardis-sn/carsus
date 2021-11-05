@@ -112,7 +112,7 @@ def find_row(fname, string1, string2=None, how='AND'):
     return n, line
 
 
-def parse_header(fname, keys, start=0, stop=50):
+def parse_header(fname, start=0, stop=50):
     """
     Parse header information from CMFGEN files.
 
@@ -120,8 +120,6 @@ def parse_header(fname, keys, start=0, stop=50):
     ----------
     fname : str
         Path to plain text file.
-    keys : list of str
-        Entries to search.
     start : int
         First line to search in (default is 0).
     stop : int
@@ -130,17 +128,21 @@ def parse_header(fname, keys, start=0, stop=50):
     Returns
     -------
     dict
-        Dictionary containing metadata.
+        Dictionary containing header information.
     """
-    meta = {k.strip('!'):None for k in keys}
 
+    header = {}
     with open_cmfgen_file(fname) as f:
         for line in itertools.islice(f, start, stop):
-            for k in keys:
-                if k.lower() in line.lower():
-                    meta[k.strip('!')] = line.split()[0]
+            if '!' in line:
+                value, key = line.split('!')
+                
+                if len(key) > 1:
+                    key = key.split('(')[0]
 
-    return meta
+                header[key.strip()] = value.strip()
+
+    return header
 
 
 def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_points=1000):

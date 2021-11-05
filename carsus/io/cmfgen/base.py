@@ -31,16 +31,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
         Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = ['!Date',
-            '!Format date',
-            '!Number of energy levels',
-            '!Ionization energy',
-            '!Screened nuclear charge',
-            '!Number of transitions',
-            ]
-
     def load(self, fname):
-        meta = parse_header(fname, self.keys)
+        meta = parse_header(fname)
         skiprows, _ = find_row(fname, "Number of transitions")
         nrows = int(meta['Number of energy levels'])
         config = {'header': None,
@@ -119,10 +111,8 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = CMFGENEnergyLevelsParser.keys
-
     def load(self, fname):
-        meta = parse_header(fname, self.keys)
+        meta = parse_header(fname)
         skiprows, _ = find_row(fname, "Transition", "Lam")
         skiprows += 1
 
@@ -194,14 +184,8 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = ['!Number of transitions',
-            '!Number of T values OMEGA tabulated at',
-            '!Scaling factor for OMEGA (non-FILE values)',
-            '!Value for OMEGA if f=0',
-            ]
-
     def load(self, fname):
-        meta = parse_header(fname, self.keys)
+        meta = parse_header(fname)
         skiprows, _ = find_row(fname, "ransition\T")
         config = {'header': None,
                   'index_col': False,
@@ -270,18 +254,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
             Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = ['!Date',
-            '!Number of energy levels',
-            '!Number of photoionization routes',
-            '!Screened nuclear charge',
-            '!Final state in ion',
-            '!Excitation energy of final state',
-            '!Statistical weight of ion',
-            '!Cross-section unit',
-            '!Split J levels',
-            '!Total number of data pairs',
-            ]
-
     def _table_gen(self, f):
         """Yields a cross section table for a single energy level target.
 
@@ -337,7 +309,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
         data = []
         column_types = set()
-        meta = parse_header(fname, self.keys)
+        meta = parse_header(fname)
 
         with open_cmfgen_file(fname) as f:
 
@@ -406,16 +378,10 @@ class CMFGENHydLParser(BaseParser):
         Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = [
-        '!Maximum principal quantum number',
-        '!Number of values per cross-section',
-        '!L_ST_U',
-        '!L_DEL_U'
-    ]
     nu_ratio_key = 'L_DEL_U'
 
     def load(self, fname):
-        meta = parse_header(fname, self.keys)
+        meta = parse_header(fname)
         self.meta = meta
         self.max_l = self.get_max_l()
 
@@ -517,12 +483,6 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
         Parses the input file and stores the result in the `base` attribute.
     """
 
-    keys = [
-        "!Maximum principal quantum number",
-        "!Number of values per cross-section",
-        "!N_ST_U",
-        "!N_DEL_U",
-    ]
     nu_ratio_key = "N_DEL_U"
 
     @staticmethod
@@ -796,13 +756,9 @@ class CMFGENReader:
         return ion_phixs_table
 
     def _get_levels_lines(self, data):
-        """ Generates `levels`, `lines` and `collisions` DataFrames.
-
-        Parameters
-        ----------
-        data : dict
-            Dictionary containing one dictionary per specie with 
-            keys `levels`, `lines` and (optionally) `collisions`.
+        """ 
+        Generates `levels`, `lines` and (optionally) `ionization_energies` and 
+        `collisions` DataFrames.
         """
 
         lvl_list = []
