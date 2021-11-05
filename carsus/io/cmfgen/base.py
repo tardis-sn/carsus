@@ -783,6 +783,9 @@ class CMFGENReader:
             if 'cross_sections' in reader.keys():
                 if ion == (1,0):
                     
+                    # Extracted from the header of HYD files since the `data` object 
+                    # passed to this method does not contain header information.
+
                     n_levels = 30
                     l_points, l_start_u, l_del_u = 97, 0.0, 0.041392685
                     n_points, n_start_u, n_del_u = 145, 0.0, 0.041392685
