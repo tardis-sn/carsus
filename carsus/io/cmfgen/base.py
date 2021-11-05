@@ -70,8 +70,8 @@ class CMFGENEnergyLevelsParser(BaseParser):
 
         self.base = df
         self.header = header
+        # Re-calculate Lam(A) values
         self.base['Lam(A)'] = self.calc_Lam_A()
-        self.fname = fname
 
     def calc_Lam_A(self):
         """ 
@@ -85,12 +85,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         return (level_ionization_threshold.values / u.cm).to(
             'Angstrom', equivalencies=u.spectral()
         )
-
-    def to_hdf(self, key='/energy_levels'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENOscillatorStrengthsParser(BaseParser):
@@ -153,14 +147,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['A'] = df['A'].map(to_float)
 
         self.base = df
-        self.fname = fname
         self.header = header
-
-    def to_hdf(self, key='/oscillator_strengths'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENCollisionalStrengthsParser(BaseParser):
@@ -220,14 +207,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             logger.warning(f'Empty table: `{fname}`.')
 
         self.base = df
-        self.fname = fname
         self.header = header
-
-    def to_hdf(self, key='/collisional_strengths'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
@@ -326,19 +306,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 data.append(df)
 
         self.base = data
-        self.fname = fname
         self.header = header
-
-    def to_hdf(self, key='/photoionization_cross_sections'):
-        if len(self.base) > 0:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
-
-                for i in range(0, len(self.base)-1):
-                    subkey = '{0}/{1}'.format(key, i)
-                    f.put(subkey, self.base[i])
-                    f.get_storer(subkey).attrs.metadata = self.base[i].attrs
-
-                f.root._v_attrs['metadata'] = self.header
 
 
 class CMFGENHydLParser(BaseParser):
@@ -394,7 +362,6 @@ class CMFGENHydLParser(BaseParser):
         index = pd.MultiIndex.from_tuples(indexes, names=['n', 'l'])
         self.base = pd.DataFrame(data, index=index, columns=nus)
         self.base.columns.name = 'nu / nu_0'
-        self.fname = fname
 
     def _table_gen(self, f):
         """Yields a logarithmic cross section table for a hydrogen level.
@@ -436,12 +403,6 @@ class CMFGENHydLParser(BaseParser):
     def get_max_l(self):
         return int(self.header['Maximum principal quantum number']) - 1
 
-    def to_hdf(self, key='/hyd_l_data'):
-        if not self.base.empty:
-            with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
-                f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.header
-
 
 class CMFGENHydGauntBfParser(CMFGENHydLParser):
     """
@@ -480,9 +441,6 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
 
     def get_max_l(self):
         return int(self.header["Maximum principal quantum number"])
-
-    def to_hdf(self, key="/gbf_n_data"):
-        super().to_hdf(key)
 
 
 class CMFGENReader:
