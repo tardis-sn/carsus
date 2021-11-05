@@ -1,7 +1,7 @@
 from carsus.io.cmfgen.base import (CMFGENOscillatorStrengthsParser,
                                    CMFGENEnergyLevelsParser,
                                    CMFGENCollisionalStrengthsParser,
-                                   CMFGENPhotoionizationCrossSectionParser,
+                                   CMFGENPhoCrossSectionsParser,
                                    CMFGENHydLParser,
                                    CMFGENHydGauntBfParser,
                                    CMFGENReader)

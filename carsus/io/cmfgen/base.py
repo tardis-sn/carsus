@@ -210,7 +210,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         self.header = header
 
 
-class CMFGENPhotoionizationCrossSectionParser(BaseParser):
+class CMFGENPhoCrossSectionsParser(BaseParser):
     """
         Description
         ----------
@@ -528,7 +528,7 @@ class CMFGENReader:
 
                     data[ion]['cross_sections'] = []
                     for l in pho_flist:
-                        pho_parser = CMFGENPhotoionizationCrossSectionParser(l)
+                        pho_parser = CMFGENPhoCrossSectionsParser(l)
                         data[ion]['cross_sections'].append(pho_parser.base)
 
                     if ion == (1,0):

@@ -9,7 +9,7 @@ from pandas.testing import assert_frame_equal
 from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENOscillatorStrengthsParser,
                               CMFGENCollisionalStrengthsParser,
-                              CMFGENPhotoionizationCrossSectionParser,
+                              CMFGENPhoCrossSectionsParser,
                               CMFGENHydLParser,
                               CMFGENHydGauntBfParser,
                               CMFGENReader
@@ -194,7 +194,7 @@ def test_ariii_col(ariii_col_fname):
 
 @with_refdata
 def test_si2_pho(si2_pho_fname):
-    parser = CMFGENPhotoionizationCrossSectionParser(si2_pho_fname)
+    parser = CMFGENPhoCrossSectionsParser(si2_pho_fname)
     n = int(parser.header['Number of energy levels'])
     m = int(parser.base[0].attrs['Number of cross-section points'])
     assert len(parser.base) == n
@@ -202,7 +202,7 @@ def test_si2_pho(si2_pho_fname):
 
 @with_refdata
 def test_coiv_pho(coiv_pho_fname):
-    parser = CMFGENPhotoionizationCrossSectionParser(coiv_pho_fname)
+    parser = CMFGENPhoCrossSectionsParser(coiv_pho_fname)
     n = int(parser.header['Number of energy levels'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (3, 8)
