@@ -1,0 +1,112 @@
+# For more information about this pipeline, please refer to:
+# https://tardis-sn.github.io/tardis/development/continuous_integration.html
+# https://tardis-sn.github.io/tardis/development/documentation_preview.html
+
+name: docs
+
+on:
+  push:
+    branches:
+    - '*'
+
+  workflow_dispatch:
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XUVTOP: /tmp/chianti
+  CHIANTI_DL_URL: https://download.chiantidatabase.org
+  CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
+  CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.XUVTOP }}
+          key: ${{ env.CHIANTI_DB_VER }}
+        id: chianti-cache
+
+      - name: Download Chianti database
+        run: |
+            mkdir -p ${{ env.XUVTOP }}
+            wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
+            tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }} --warning=none
+        if: steps.chianti-cache.outputs.cache-hit != 'true'
+
+      - uses: actions/cache@v2
+        with:
+          path: /tmp/atomic
+          key: ${{ env.CMFGEN_DB_VER }}
+        id: cmfgen-cache
+
+      - name: Download CMFGEN database
+        run: |
+            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
+            tar -zxf /tmp/atomic.tar.gz -C /tmp
+        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            environment-file: carsus_env3.yml
+            activate-environment: carsus
+            use-mamba: true
+
+      - name: Install package
+        shell: bash -l {0}
+        run: pip install -e .
+
+      - name: Build documentation
+        shell: bash -l {0}
+        run: cd docs/; make html
+
+      - name: Deploy main site
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs/_build/html
+          force_orphan: true
+        if: github.ref == 'refs/heads/master'
+
+      - name: Get branch name
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: get_branch_name
+
+        # Branch deploy is only available on forks, and requires at least one of 
+        # these conditions to be met:
+        #
+        # - branch name contains the word `doc(s)`.
+        # - commit message includes the a valid tag.
+        # - the workflow is triggered manually.
+
+      - name: Deploy branch site
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs/_build/html
+          destination_dir: branch/${{ steps.get_branch_name.outputs.branch }}
+          force_orphan: false
+        if: github.repository_owner != 'tardis-sn' &&
+            github.ref != 'refs/heads/master' && (
+            github.event_name == 'workflow_dispatch' ||
+            contains(github.ref, 'doc') ||
+            contains(github.event.head_commit.message, '[build docs]') ||
+            contains(github.event.head_commit.message, '[build_docs]') ||
+            contains(github.event.head_commit.message, '[build doc]') ||
+            contains(github.event.head_commit.message, '[build_doc]'))
