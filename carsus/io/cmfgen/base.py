@@ -22,8 +22,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
     ----------
     base : pandas.DataFrame
     columns : list of str
-    meta : dict
-        Metadata extracted from file header.
+    header : dict
 
     Methods
     -------
@@ -32,9 +31,9 @@ class CMFGENEnergyLevelsParser(BaseParser):
     """
 
     def load(self, fname):
-        meta = parse_header(fname)
+        header = parse_header(fname)
         skiprows, _ = find_row(fname, "Number of transitions")
-        nrows = int(meta['Number of energy levels'])
+        nrows = int(header['Number of energy levels'])
         config = {'header': None,
                   'index_col': False,
                   'sep': '\s+',
@@ -71,7 +70,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             logger.warning(f'Unknown column format: `{fname}`.')
 
         self.base = df
-        self.meta = meta
+        self.header = header
         self.base['Lam(A)'] = self.calc_Lam_A()
         self.columns = df.columns.tolist()
         self.fname = fname
@@ -82,7 +81,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         """
 
         level_ionization_threshold = (
-            float(self.meta['Ionization energy']) - self.base['E(cm^-1)']
+            float(self.header['Ionization energy']) - self.base['E(cm^-1)']
         )
 
         return (level_ionization_threshold.values / u.cm).to(
@@ -93,7 +92,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
+                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENOscillatorStrengthsParser(BaseParser):
@@ -102,8 +101,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-        meta : dict
-            Metadata extracted from file header.
+        header : dict
 
         Methods
         -------
@@ -112,12 +110,12 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
-        meta = parse_header(fname)
+        header = parse_header(fname)
         skiprows, _ = find_row(fname, "Transition", "Lam")
         skiprows += 1
 
         # Parse only tables listed increasing lower level i, e.g. `FE/II/24may96/osc_nahar.dat`
-        nrows = int(meta['Number of transitions'])
+        nrows = int(header['Number of transitions'])
         config = {'header': None,
                   'index_col': False,
                   'sep': '\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])',
@@ -160,13 +158,13 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         self.base = df
         self.columns = df.columns.tolist()
         self.fname = fname
-        self.meta = meta
+        self.header = header
 
     def to_hdf(self, key='/oscillator_strengths'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
+                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENCollisionalStrengthsParser(BaseParser):
@@ -175,8 +173,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         ----------
         base : pandas.DataFrame
         columns : list of str
-        meta : dict
-            Metadata extracted from file header.
+        header : dict
 
         Methods
         -------
@@ -185,7 +182,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
-        meta = parse_header(fname)
+        header = parse_header(fname)
         skiprows, _ = find_row(fname, "ransition\T")
         config = {'header': None,
                   'index_col': False,
@@ -230,13 +227,13 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         self.base = df
         self.columns = df.columns.tolist()
         self.fname = fname
-        self.meta = meta
+        self.header = header
 
     def to_hdf(self, key='/collisional_strengths'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
+                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENPhotoionizationCrossSectionParser(BaseParser):
@@ -245,8 +242,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         ----------
         base : list of pandas.DataFrame
         columns : list of str
-        meta : dict
-            Metadata extracted from file header.
+        header : dict
 
         Methods
         -------
@@ -309,7 +305,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
 
         data = []
         column_types = set()
-        meta = parse_header(fname)
+        header = parse_header(fname)
 
         with open_cmfgen_file(fname) as f:
 
@@ -341,7 +337,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         self.base = data
         self.columns = sorted(column_types)
         self.fname = fname
-        self.meta = meta
+        self.header = header
 
     def to_hdf(self, key='/photoionization_cross_sections'):
         if len(self.base) > 0:
@@ -352,7 +348,7 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                     f.put(subkey, self.base[i])
                     f.get_storer(subkey).attrs.metadata = self.base[i].attrs
 
-                f.root._v_attrs['metadata'] = self.meta
+                f.root._v_attrs['metadata'] = self.header
 
 
 class CMFGENHydLParser(BaseParser):
@@ -369,8 +365,7 @@ class CMFGENHydLParser(BaseParser):
     columns : list of float
         The frequencies for the cross sections. Given in units of the threshold
         frequency for photoionization.
-    meta : dict
-        Metadata extracted from file header.
+    header : dict
 
     Methods
     -------
@@ -381,12 +376,12 @@ class CMFGENHydLParser(BaseParser):
     nu_ratio_key = 'L_DEL_U'
 
     def load(self, fname):
-        meta = parse_header(fname)
-        self.meta = meta
+        header = parse_header(fname)
+        self.header = header
         self.max_l = self.get_max_l()
 
-        self.num_xsect_nus = int(meta['Number of values per cross-section'])
-        nu_ratio = 10**float(meta[self.nu_ratio_key])
+        self.num_xsect_nus = int(header['Number of values per cross-section'])
+        nu_ratio = 10**float(header[self.nu_ratio_key])
         nus = np.power(
             nu_ratio,
             np.arange(self.num_xsect_nus)
@@ -453,13 +448,13 @@ class CMFGENHydLParser(BaseParser):
         return [int(entry) for entry in line.split()]
 
     def get_max_l(self):
-        return int(self.meta['Maximum principal quantum number']) - 1
+        return int(self.header['Maximum principal quantum number']) - 1
 
     def to_hdf(self, key='/hyd_l_data'):
         if not self.base.empty:
             with pd.HDFStore('{}.h5'.format(self.fname), 'w') as f:
                 f.put(key, self.base)
-                f.get_storer(key).attrs.metadata = self.meta
+                f.get_storer(key).attrs.metadata = self.header
 
 
 class CMFGENHydGauntBfParser(CMFGENHydLParser):
@@ -474,8 +469,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
     columns : list of float
         The frequencies for the gaunt factors. Given in units of the threshold
         frequency for photoionization.
-    meta : dict
-        Metadata extracted from file header.
+    header : dict
 
     Methods
     -------
@@ -501,7 +495,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
         # self.base += 10.0  # undo unit conversion used in CMFGENHydLParser
 
     def get_max_l(self):
-        return int(self.meta["Maximum principal quantum number"])
+        return int(self.header["Maximum principal quantum number"])
 
     def to_hdf(self, key="/gbf_n_data"):
         super().to_hdf(key)
@@ -578,7 +572,7 @@ class CMFGENReader:
                 data[ion]['lines'] = lns_parser.base
 
                 if ionization_energies:
-                    data[ion]['ionization_energy'] = float(lvl_parser.meta['Ionization energy'])
+                    data[ion]['ionization_energy'] = float(lvl_parser.header['Ionization energy'])
 
                 if cross_sections:
                     pho_flist = []
