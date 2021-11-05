@@ -21,7 +21,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
     Description
     ----------
     base : pandas.DataFrame
-    columns : list of str
     header : dict
 
     Methods
@@ -72,7 +71,6 @@ class CMFGENEnergyLevelsParser(BaseParser):
         self.base = df
         self.header = header
         self.base['Lam(A)'] = self.calc_Lam_A()
-        self.columns = df.columns.tolist()
         self.fname = fname
 
     def calc_Lam_A(self):
@@ -100,7 +98,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         Description
         ----------
         base : pandas.DataFrame
-        columns : list of str
         header : dict
 
         Methods
@@ -156,7 +153,6 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
             df['A'] = df['A'].map(to_float)
 
         self.base = df
-        self.columns = df.columns.tolist()
         self.fname = fname
         self.header = header
 
@@ -172,7 +168,6 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         Description
         ----------
         base : pandas.DataFrame
-        columns : list of str
         header : dict
 
         Methods
@@ -225,7 +220,6 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             logger.warning(f'Empty table: `{fname}`.')
 
         self.base = df
-        self.columns = df.columns.tolist()
         self.fname = fname
         self.header = header
 
@@ -241,7 +235,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
         Description
         ----------
         base : list of pandas.DataFrame
-        columns : list of str
         header : dict
 
         Methods
@@ -304,7 +297,6 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
     def load(self, fname):
 
         data = []
-        column_types = set()
         header = parse_header(fname)
 
         with open_cmfgen_file(fname) as f:
@@ -330,12 +322,10 @@ class CMFGENPhotoionizationCrossSectionParser(BaseParser):
                 else:
                     logger.warning(f'Unknown column format: `{fname}`.')
 
-                column_types.add(tuple(columns))
                 df.columns = columns
                 data.append(df)
 
         self.base = data
-        self.columns = sorted(column_types)
         self.fname = fname
         self.header = header
 
@@ -362,9 +352,8 @@ class CMFGENHydLParser(BaseParser):
         common logarithm (i.e. base 10) of the cross section in units cm^2.
         Indexed by the principal quantum number n and orbital quantum
         number l.
-    columns : list of float
-        The frequencies for the cross sections. Given in units of the threshold
-        frequency for photoionization.
+        Columns are the frequencies for the cross sections. Given in units 
+        of the threshold frequency for photoionization.
     header : dict
 
     Methods
@@ -405,9 +394,6 @@ class CMFGENHydLParser(BaseParser):
         index = pd.MultiIndex.from_tuples(indexes, names=['n', 'l'])
         self.base = pd.DataFrame(data, index=index, columns=nus)
         self.base.columns.name = 'nu / nu_0'
-
-        # self.base -= 10.  # Convert from cmfgen units to log10(cm^2)
-        self.columns = self.base.columns.tolist()
         self.fname = fname
 
     def _table_gen(self, f):
@@ -466,9 +452,8 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
     base : pandas.DataFrame, dtype float
         Bound-free gaunt factors for hydrogen.
         Indexed by the principal quantum number n.
-    columns : list of float
-        The frequencies for the gaunt factors. Given in units of the threshold
-        frequency for photoionization.
+        Columns are the frequencies for the gaunt factors. Given in units of 
+        the threshold frequency for photoionization.
     header : dict
 
     Methods
@@ -492,7 +477,6 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
     def load(self, fname):
         super().load(fname)
         self.base.index = self.base.index.droplevel("l")
-        # self.base += 10.0  # undo unit conversion used in CMFGENHydLParser
 
     def get_max_l(self):
         return int(self.header["Maximum principal quantum number"])
