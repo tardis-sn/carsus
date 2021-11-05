@@ -148,14 +148,14 @@ def si2_lines_head_df():
 @with_refdata
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
     parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
-    n = int(parser.meta['Number of energy levels'])
+    n = int(parser.header['Number of energy levels'])
     assert parser.base.shape[0] == n
     assert parser.columns == ['label', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
 
 @with_refdata
 def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
     parser = CMFGENOscillatorStrengthsParser(fevi_osc_kb_rk_fname)
-    n = int(parser.meta['Number of transitions'])
+    n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
     assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isclose(parser.base.iloc[0,2], 1.94e-02)
@@ -163,7 +163,7 @@ def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
 @with_refdata
 def test_p2_osc(p2_osc_fname):
     parser = CMFGENOscillatorStrengthsParser(p2_osc_fname)
-    n = int(parser.meta['Number of transitions'])
+    n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
     assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isnan(parser.base.iloc[0,7])
@@ -189,13 +189,13 @@ def test_he2_col(he2_col_fname):
 @with_refdata
 def test_ariii_col(ariii_col_fname):
     parser = CMFGENCollisionalStrengthsParser(ariii_col_fname)
-    n = int(parser.meta['Number of transitions'])
+    n = int(parser.header['Number of transitions'])
     assert parser.base.shape == (n, 13)
 
 @with_refdata
 def test_si2_pho(si2_pho_fname):
     parser = CMFGENPhotoionizationCrossSectionParser(si2_pho_fname)
-    n = int(parser.meta['Number of energy levels'])
+    n = int(parser.header['Number of energy levels'])
     m = int(parser.base[0].attrs['Number of cross-section points'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (m, 2)
@@ -203,7 +203,7 @@ def test_si2_pho(si2_pho_fname):
 @with_refdata
 def test_coiv_pho(coiv_pho_fname):
     parser = CMFGENPhotoionizationCrossSectionParser(coiv_pho_fname)
-    n = int(parser.meta['Number of energy levels'])
+    n = int(parser.header['Number of energy levels'])
     assert len(parser.base) == n
     assert parser.base[0].shape == (3, 8)
 
@@ -211,7 +211,7 @@ def test_coiv_pho(coiv_pho_fname):
 @with_refdata
 def test_hyd_l(hyd_l_fname):
     parser = CMFGENHydLParser(hyd_l_fname)
-    assert parser.meta["Maximum principal quantum number"] == "30"
+    assert parser.header["Maximum principal quantum number"] == "30"
     assert parser.base.shape == (465, 97)
     assert parser.base.loc[(11, 3)].values[5] == -6.226968
     assert parser.base.loc[(21, 20)].values[2] == -10.3071
@@ -222,7 +222,7 @@ def test_hyd_l(hyd_l_fname):
 @with_refdata
 def test_gbf_n(gbf_n_fname):
     parser = CMFGENHydGauntBfParser(gbf_n_fname)
-    assert parser.meta["Maximum principal quantum number"] == "30"
+    assert parser.header["Maximum principal quantum number"] == "30"
     assert parser.base.shape == (30, 145)
     assert (
         round(parser.base.loc[3].values[3], 7) == 0.9433558
