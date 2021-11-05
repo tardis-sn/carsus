@@ -235,6 +235,11 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
         pd.DataFrame
             DataFrame with attached metadata.
         """
+
+        label_key = 'Configuration name'
+        type_key = 'Type of cross-section'
+        num_key = 'Number of cross-section points'
+
         data = []
         meta = {}
 
@@ -246,19 +251,18 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
             except IndexError:
                 continue
 
-            if '!Configuration name' in line:
-                meta['Configuration name'] = value
+            if f'!{label_key}' in line:
+                meta[f'{label_key}'] = value
 
-            if '!Type of cross-section' in line:
-                meta['Type of cross-section'] = int(value)
+            if f'!{type_key}' in line:
+                meta[f'{type_key}'] = int(value)
 
-            if '!Number of cross-section points' in line:
+            if f'!{num_key}' in line:
                 n_points = int(value)
                 for i in range(n_points):
 
                     values = f.readline().split()
                     if len(values) == 8:  # Verner & Yakolev (1995) ground state fits
-
                         data.append(
                             list(map(int, values[:2])) + list(map(to_float, values[2:])))
 
@@ -268,7 +272,7 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
                     else:
                         data.append(map(to_float, values))
 
-                meta['Number of cross-section points'] = n_points
+                meta[f'{num_key}'] = n_points
                 break
 
         arr = np.array(data)
@@ -278,14 +282,11 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
 
         data = []
         header = parse_header(fname)
-
         with open_cmfgen_file(fname) as f:
-
             while True:
 
                 arr, meta_ = next(self._table_gen(f), None)
                 df = pd.DataFrame.from_records(arr)
-                df.attrs = meta_
 
                 if df.empty:
                     break
@@ -303,6 +304,7 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
                     logger.warning(f'Unknown column format: `{fname}`.')
 
                 df.columns = columns
+                df.attrs = meta_
                 data.append(df)
 
         self.base = data
