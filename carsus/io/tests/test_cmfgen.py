@@ -150,14 +150,14 @@ def test_si2_osc_kurucz(si2_osc_kurucz_fname):
     parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
     n = int(parser.header['Number of energy levels'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['label', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
+    assert list(parser.base.columns) == ['label', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
 
 @with_refdata
 def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
     parser = CMFGENOscillatorStrengthsParser(fevi_osc_kb_rk_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    assert list(parser.base.columns) == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isclose(parser.base.iloc[0,2], 1.94e-02)
 
 @with_refdata
@@ -165,7 +165,7 @@ def test_p2_osc(p2_osc_fname):
     parser = CMFGENOscillatorStrengthsParser(p2_osc_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert parser.columns == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
+    assert list(parser.base.columns) == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
     assert np.isnan(parser.base.iloc[0,7])
     assert np.isclose(parser.base.iloc[0,8], 3.)
     assert np.isnan(parser.base.iloc[1,7])
@@ -216,7 +216,7 @@ def test_hyd_l(hyd_l_fname):
     assert parser.base.loc[(11, 3)].values[5] == -6.226968
     assert parser.base.loc[(21, 20)].values[2] == -10.3071
     assert_allclose(
-        parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
+        parser.base.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
 
 @with_refdata
@@ -229,7 +229,7 @@ def test_gbf_n(gbf_n_fname):
     )  # Rounding is needed as a result of undoing the unit conversion
     assert round(parser.base.loc[18].values[11], 7) == 1.008855
     assert_allclose(
-        parser.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
+        parser.base.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
     )
 
 @with_refdata
