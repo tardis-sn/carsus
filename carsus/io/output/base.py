@@ -669,7 +669,7 @@ class TARDISAtomData:
         logger.info('Ingesting photoionization cross-sections.')
 
         cross_sections = self.cmfgen_reader.cross_sections
-        cross_sections['energy'] = u.Quantity(cross_sections['energy'], 'Ry').to('Hz', equivalencies=u.spectral()).value
+        cross_sections['energy'] = u.Quantity(cross_sections['energy'], 'Ry').to('Hz', equivalencies=u.spectral())
         cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], 'Mbarn').to('cm2')
         cross_sections.columns = ['nu', 'x_sect']
 
@@ -864,6 +864,19 @@ class TARDISAtomData:
         return collisions_prepared
 
     @property
+    def cross_sections_prepared(self):
+        """
+        Prepare the DataFrame with photoionization cross-sections for TARDIS.
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        """
+        
+        return self.cross_sections.copy()
+
+    @property
     def macro_atom_prepared(self):
         """
         Prepare the DataFrame with macro atom data for TARDIS
@@ -931,14 +944,13 @@ class TARDISAtomData:
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
 
-            try:
+            if hasattr(self, 'collisions_prepared'):
                 f.put('/collision_data', self.collisions_prepared)
                 f.put('/collision_data_temperatures', 
                       pd.Series(self.collisions_param['temperatures']))
 
-            # Do not try to store collisions if collisions do not exist.
-            except AttributeError:
-                pass
+            if hasattr(self, 'cross_sections'):
+                f.put('/cross_sections_data', self.cross_sections_prepared)
 
             meta = []
             md5_hash = hashlib.md5()
@@ -992,4 +1004,3 @@ class TARDISAtomData:
             f.root._v_attrs['date'] = timestamp
 
             self.meta = meta_df
-
