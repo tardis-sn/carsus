@@ -322,7 +322,7 @@ class NISTIonizationEnergies(BaseParser):
 
     def _prepare_data(self):
         ionization_data = pd.DataFrame()
-        ionization_data = self.parser.base[['atomic_number', 'ion_charge']]
+        ionization_data = self.parser.base[['atomic_number', 'ion_charge']].copy()
         ionization_data['ionization_energy'] = self.parser.base[
                 'ionization_energy_str'].str.strip('[]()').astype(np.float64)
         ionization_data.set_index(['atomic_number',
