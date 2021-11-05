@@ -687,10 +687,13 @@ class CMFGENReader:
             for j in range(len(match)):
                 threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
 
-                if cross_section_type == 0:
+                if cross_section_type == CrossSectionType.CONSTANT_ZERO:
                     phixs_table = get_null_phixs_table()
 
-                elif cross_section_type in [20, 21, 22]:
+                elif cross_section_type in [CrossSectionType.POINTS_TABLE,
+                                            CrossSectionType.OPACITY_PROJECT_SC,
+                                            CrossSectionType.OPACITY_PROJECT_SC_SM]:
+
                     diff = target['energy'].diff().dropna()
                     assert (diff >= 0).all()
 
@@ -698,7 +701,9 @@ class CMFGENReader:
                     sigma = target['sigma'].values
                     phixs_table = np.column_stack((energy, sigma))
 
-                elif cross_section_type in [1, 7]:
+                elif cross_section_type in [CrossSectionType.SEATON_FITS, 
+                                            CrossSectionType.SEATON_FITS_OFFSET]:
+
                     fit_coeff_list = target['fit_coeff'].to_list()
 
                     if len(fit_coeff_list) not in [1,3,4]:
@@ -711,7 +716,7 @@ class CMFGENReader:
                     else:
                         phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
-                elif cross_section_type == 3:
+                elif cross_section_type == CrossSectionType.HYDROGENIC_PURE_N_LEVEL:
                     fit_coeff_list = target['fit_coeff'].to_list()
 
                     if len(fit_coeff_list) != 2:
@@ -722,7 +727,9 @@ class CMFGENReader:
                     phixs_table = scale * get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor,
                                                                         threshold_energy_ryd, n)
 
-                elif cross_section_type in [2, 8]:
+                elif cross_section_type in [CrossSectionType.HYDROGENIC_SPLIT_L,
+                                            CrossSectionType.HYDROGENIC_SPLIT_L_OFFSET]:
+
                     fit_coeff_list = target['fit_coeff'].to_list()
                     fit_coeff_list[0:3] = [int(x) for x in fit_coeff_list[0:3]]
 
@@ -733,7 +740,7 @@ class CMFGENReader:
                     phixs_table = get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs,
                                                                     threshold_energy_ryd, *fit_coeff_list)
 
-                elif cross_section_type == 5:
+                elif cross_section_type == CrossSectionType.OPACITY_PROJECT_FITS:
                     fit_coeff_list = target['fit_coeff'].to_list()
 
                     if len(fit_coeff_list) != 5:
@@ -742,7 +749,7 @@ class CMFGENReader:
 
                     phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
-                elif cross_section_type == 6:
+                elif cross_section_type == CrossSectionType.HUMMER_HEI_FITS:
                     fit_coeff_list = target['fit_coeff'].to_list()
 
                     if len(fit_coeff_list) != 8:
@@ -751,7 +758,7 @@ class CMFGENReader:
 
                     phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
-                elif cross_section_type == 9:
+                elif cross_section_type == CrossSectionType.VERNER_YAKOLEV_GS_FITS:
                     fit_coeff_table = target
 
                     if fit_coeff_table.shape[1] != 8:
@@ -760,7 +767,7 @@ class CMFGENReader:
 
                     phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table)
 
-                elif cross_section_type == 4:
+                elif cross_section_type == CrossSectionType.LEIBOWITZ_CIV_FITS:
                     fit_coeff_list = target['fit_coeff'].tolist()
 
                     if len(fit_coeff_list) != 6:

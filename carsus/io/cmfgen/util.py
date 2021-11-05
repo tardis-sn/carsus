@@ -5,6 +5,8 @@ import astropy.constants as const
 import astropy.units as u
 import numpy as np
 
+from enum import IntEnum, unique
+
 RYD_TO_EV = u.rydberg.to('eV')
 H_IN_EV_SECONDS = const.h.to('eV s').value
 HC_IN_EV_ANGSTROM = (const.h * const.c).to('eV angstrom').value
@@ -17,6 +19,23 @@ CMFGEN_ATOM_DICT = {
     'Cr': 'CHRO', 'Mn': 'MAN', 'Fe': 'FE', 'Co': 'COB',
     'Ni': 'NICK'
 }
+
+
+@unique
+class CrossSectionType(IntEnum):
+    CONSTANT_ZERO = 0
+    SEATON_FITS = 1
+    HYDROGENIC_SPLIT_L = 2
+    HYDROGENIC_PURE_N_LEVEL = 3
+    LEIBOWITZ_CIV_FITS = 4
+    OPACITY_PROJECT_FITS = 5
+    HUMMER_HEI_FITS = 6
+    SEATON_FITS_OFFSET = 7
+    HYDROGENIC_SPLIT_L_OFFSET = 8
+    VERNER_YAKOLEV_GS_FITS = 9
+    OPACITY_PROJECT_SC = 20
+    OPACITY_PROJECT_SC_SM = 21
+    POINTS_TABLE = 22
 
 
 def open_cmfgen_file(fname, encoding='ISO-8859-1'):
