@@ -398,8 +398,6 @@ class GFALLReader(object):
         ----------
         fname : path
            Path to the HDF5 output file
-        raw : bool
-           If `True` stores `gfall_raw` attribute (default is `True`)
         """
         with pd.HDFStore(fname, 'w') as f:
             f.put('/gfall_raw', self.gfall_raw)
