@@ -69,15 +69,9 @@ class KnoxLongZetaIngester(object):
 
 class KnoxLongZeta(BaseParser):
     """
-        Attributes
-        ----------
-        base : pandas.DataFrame
-        columns : list of str
-
-        Methods
-        -------
-        to_hdf(fname)
-            Dump the `base` attribute into an HDF5 file
+    Attributes
+    ----------
+    base : pandas.DataFrame
     """
 
     def __init__(self, fname=None):
@@ -91,7 +85,6 @@ class KnoxLongZeta(BaseParser):
 
     def _prepare_data(self):
         t_values = np.arange(2000, 42000, 2000)
-
         names = ['atomic_number', 'ion_charge']
         names += [str(i) for i in t_values]
 
@@ -106,18 +99,5 @@ class KnoxLongZeta(BaseParser):
         )
 
         columns = [float(c) for c in self.base.columns]
-
         # To match exactly the `old` format
         self.base.columns = pd.Float64Index(columns, name='temp')
-        self.columns = columns
-
-    def to_hdf(self, fname):
-        """Dump the `base` attribute into an HDF5 file
-
-        Parameters
-        ----------
-        fname : path
-           Path to the HDF5 output file
-        """
-        with pd.HDFStore(fname, 'w') as f:
-            f.put('/zeta_data', self.base)

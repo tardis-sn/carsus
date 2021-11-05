@@ -196,14 +196,7 @@ class NISTWeightsComp(BaseParser):
     Attributes
     ----------
     base : pandas.DataFrame
-
-    columns : list of str
-
-    Methods
-    -------
-    to_hdf(fname)
-        Dump the `base` attribute into an HDF5 file
-
+    version : str
     """
     def __init__(self, atoms='H-Pu'):
         input_data = download_weightscomp()
@@ -232,28 +225,15 @@ class NISTWeightsComp(BaseParser):
 
         atom_data = pd.concat(atom_data_list)
         self.base = atom_data[['symbol', 'name', 'mass']]
-        self.columns = atom_data.columns
 
     def _get_version(self):
-        """Returns NIST Atomic Weights and Isotopic Components
-           Database version.
+        """
+        Returns NIST Atomic Weights and Isotopic Components Database version.
         """
         selector = "td"
         html = requests.get(WEIGHTSCOMP_VERSION_URL).text
         bs = BeautifulSoup(html, 'html5lib')
-        
+
         version = bs.select(selector)
         version = version[0].text.split()[1] 
-
         self.version = version
-
-    def to_hdf(self, fname):
-        """Dump the `base` attribute into an HDF5 file
-
-        Parameters
-        ----------
-        fname : path
-           Path to the HDF5 output file
-        """
-        with pd.HDFStore(fname, 'w') as f:
-            f.put('/atom_data', self.base, min_itemsize={'symbol': 2, 'name': 15})

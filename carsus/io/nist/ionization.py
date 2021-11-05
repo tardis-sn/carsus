@@ -311,12 +311,7 @@ class NISTIonizationEnergies(BaseParser):
     Attributes
     ----------
     base : pandas.Series
-
-    Methods
-    -------
-    to_hdf(fname)
-        Dump the `base` attribute into an HDF5 file
-
+    version : str
     """
     def __init__(self, spectra):
         input_data = download_ionization_energies(spectra)
