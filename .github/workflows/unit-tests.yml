@@ -34,6 +34,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    # This workflow is triggered after pushing commits to any branch, but the `build`
+    # job is skipped on forks (excepting on the `master` branch).
+
     if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
 
     steps:
