@@ -88,6 +88,7 @@ jobs:
           source activate carsus
           pytest carsus --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600 
         displayName: 'Run tests (notebooks)'
+        condition: eq(variables['Agent.OS'], 'Linux')
 
       - bash: bash <(curl -s https://codecov.io/bash)
         displayName: 'Upload to codecov.io'

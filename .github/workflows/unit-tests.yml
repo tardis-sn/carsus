@@ -1,0 +1,45 @@
+# For more information about this pipeline, please refer to:
+# https://tardis-sn.github.io/tardis/development/continuous_integration.html
+
+name: tests
+
+on:
+  push:
+    branches:
+    - '*'
+
+  pull_request:
+    branches:
+    - '*'
+
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build:
+    if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            environment-file: carsus_env3.yml
+            activate-environment: carsus
+            use-mamba: true
+
+      - name: Install package
+        shell: bash -l {0}
+        run: pip install -e .
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: pytest carsus
