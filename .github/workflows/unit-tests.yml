@@ -25,6 +25,7 @@ env:
   PYTEST_FLAGS: --remote-data --runslow --test-db=carsus-db/test_databases/test.db
                 --refdata=carsus-refdata --cov=carsus --cov-report=xml
                 --cov-report=html
+  NBVAL_FLAGS: --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
@@ -94,7 +95,7 @@ jobs:
 
       - name: Run nbval tests
         shell: bash -l {0}
-        run: pytest carsus --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600 
+        run: pytest carsus ${{ env.NBVAL_FLAGS }} 
         if: runner.os == 'Linux'
 
       - name: Upload to codecov.io
