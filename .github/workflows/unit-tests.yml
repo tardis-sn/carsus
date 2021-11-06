@@ -26,8 +26,15 @@ env:
 jobs:
 
   build:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
     if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
-    runs-on: [ubuntu-latest, macos-latest]
+
     steps:
 
       - uses: actions/checkout@v2
