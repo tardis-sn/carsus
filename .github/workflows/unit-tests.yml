@@ -6,7 +6,7 @@ name: tests
 on:
   push:
     branches:
-    - '*'
+    - master
 
   pull_request:
     branches:
@@ -31,11 +31,6 @@ env:
 jobs:
 
   build:
-
-    # This workflow is triggered after pushing commits to any branch, but the `build`
-    # job is skipped on forks (except on the `master` branch).
-
-    if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
 
     strategy:
       matrix:
