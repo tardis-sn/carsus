@@ -39,6 +39,8 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
+        with:
+          fetch_depth: 0
 
       - name: Clone tardis-sn/carsus-db
         uses: actions/checkout@v2
@@ -84,5 +86,6 @@ jobs:
         shell: bash -l {0}
         run: pytest carsus --remote-data --runslow --test-db=carsus-db/test_databases/test.db --refdata=carsus-refdata --cov=carsus --cov-report=xml --cov-report=html
 
-      - name: Upload to codecov.io'
+      - name: Upload to codecov.io
         run: bash <(curl -s https://codecov.io/bash)
+        if: os.runner == 'Linux'
