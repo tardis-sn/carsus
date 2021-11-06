@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: tests-${{ github.ref }}
+  group: ${{ github.action }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -46,7 +46,7 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          fetch_depth: 0
+          fetch-depth: 0
 
       - name: Clone tardis-sn/carsus-db
         uses: actions/checkout@v2
