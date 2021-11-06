@@ -36,6 +36,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
 
+    defaults:
+      run:
+        shell: bash -l {0}
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -81,15 +85,12 @@ jobs:
             use-mamba: true
 
       - name: Install package
-        shell: bash -l {0}
         run: pip install -e .
 
       - name: Run unit tests
-        shell: bash -l {0}
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Run nbval tests
-        shell: bash -l {0}
         run: pytest carsus ${{ env.NBVAL_FLAGS }} 
         if: runner.os == 'Linux'
 
