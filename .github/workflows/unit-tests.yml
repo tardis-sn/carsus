@@ -22,6 +22,9 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  PYTEST_FLAGS: --remote-data --runslow --test-db=carsus-db/test_databases/test.db
+                --refdata=carsus-refdata --cov=carsus --cov-report=xml
+                --cov-report=html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
@@ -87,7 +90,7 @@ jobs:
 
       - name: Run unit tests
         shell: bash -l {0}
-        run: pytest carsus --remote-data --runslow --test-db=carsus-db/test_databases/test.db --refdata=carsus-refdata --cov=carsus --cov-report=xml --cov-report=html
+        run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Upload to codecov.io
         run: bash <(curl -s https://codecov.io/bash)
