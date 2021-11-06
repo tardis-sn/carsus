@@ -91,7 +91,9 @@ jobs:
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Run nbval tests
-        run: pytest carsus ${{ env.NBVAL_FLAGS }} 
+        run: pytest carsus ${{ env.NBVAL_FLAGS }}
+        env:
+          CARSUS_REFDATA: carsus-refdata
         if: runner.os == 'Linux'
 
       - name: Upload to codecov.io
