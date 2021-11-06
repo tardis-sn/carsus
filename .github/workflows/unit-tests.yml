@@ -31,16 +31,16 @@ jobs:
 
   build:
 
+    # This workflow is triggered after pushing commits to any branch, but the `build`
+    # job is skipped on forks (except on the `master` branch).
+
+    if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
-
-    # This workflow is triggered after pushing commits to any branch, but the `build`
-    # job is skipped on forks (excepting on the `master` branch).
-
-    if: github.repository_owner == 'tardis-sn' || github.ref == 'refs/heads/master'
 
     steps:
 
@@ -91,6 +91,11 @@ jobs:
       - name: Run unit tests
         shell: bash -l {0}
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
+
+      - name: Run nbval tests
+        shell: bash -l {0}
+        run: pytest carsus --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600 
+        if: runner.os == 'Linux'
 
       - name: Upload to codecov.io
         run: bash <(curl -s https://codecov.io/bash)
