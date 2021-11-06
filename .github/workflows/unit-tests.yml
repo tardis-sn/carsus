@@ -20,6 +20,8 @@ concurrency:
 
 env:
   XUVTOP: /tmp/chianti
+  CHIANTI_DL_URL: https://download.chiantidatabase.org
+  CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
 
 jobs:
 
@@ -29,6 +31,19 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.XUVTOP }}
+          key: ${{ env.CHIANTI_DB_VER }}
+        id: chianti-cache
+
+      - name: Download Chianti database
+        run: |
+            mkdir -p ${{ env.XUVTOP }}
+            wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
+            tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }} --warning=none
+        if: steps.chianti-cache.outputs.cache-hit != 'true'
 
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v2
@@ -43,6 +58,6 @@ jobs:
         shell: bash -l {0}
         run: pip install -e .
 
-      - name: Run tests
+      - name: Run unit tests
         shell: bash -l {0}
         run: pytest carsus
