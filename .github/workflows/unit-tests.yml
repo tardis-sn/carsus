@@ -18,6 +18,9 @@ concurrency:
   group: tests-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XUVTOP: /tmp/chianti
+
 jobs:
 
   build:
