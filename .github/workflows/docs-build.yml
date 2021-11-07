@@ -104,7 +104,7 @@ jobs:
   preview:
     needs: build
 
-    # Branch deploy is only available on forks, and requires at least one of 
+    # Branch preview is only available on forks, and requires at least one of 
     # these conditions to be met:
     #
     #   a) the branch name contains the word `doc(s)`
@@ -125,7 +125,7 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: my-artifact
+          name: html-dir
           path: docs/_build/html
 
       - name: Get branch name
