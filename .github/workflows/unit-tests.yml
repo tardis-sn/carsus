@@ -99,7 +99,7 @@ jobs:
       - name: Run nbval tests
         run: pytest carsus ${{ env.NBVAL_FLAGS }}
         env:
-          CARSUS_REFDATA: ${{ env.GITHUB_WORKSPACE }}/carsus-refdata
+          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         if: runner.os == 'Linux'
 
       - name: Upload to codecov.io
