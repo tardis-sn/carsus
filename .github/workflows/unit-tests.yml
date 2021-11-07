@@ -53,7 +53,13 @@ jobs:
         with:
           repository: tardis-sn/carsus-db
           path: carsus-db
-          lfs: true
+          lfs: false
+
+      - name: Pull test database
+        run: |
+          cd carsus-db
+          git lfs install --skip-smudge
+          git lfs pull --include="test_databases/test.db"
 
       - name: Clone tardis-sn/carsus-refdata
         uses: actions/checkout@v2
