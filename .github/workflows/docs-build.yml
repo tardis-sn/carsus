@@ -1,6 +1,6 @@
-# For more information about this pipeline, please refer to:
-# https://tardis-sn.github.io/tardis/development/continuous_integration.html
-# https://tardis-sn.github.io/tardis/development/documentation_preview.html
+#  For more information about this pipeline, please refer to:
+#  https://tardis-sn.github.io/tardis/development/continuous_integration.html
+#  https://tardis-sn.github.io/tardis/development/documentation_preview.html
 
 name: docs
 
@@ -25,6 +25,23 @@ env:
 jobs:
 
   build:
+
+    #  The `docs` workflow is triggered when a commit is pushed to any branch
+    #  of the main repo or fork, but the `build` job starts when one of these 
+    #  conditions is met:
+    #
+    #    a) the branch is `master`
+    #    b) the branch name contains the word `doc(s)`
+    #    c) the commit message includes the a valid tag
+    #    d) the workflow has been triggered manually
+
+    if: github.ref == 'refs/heads/master' ||
+        github.event_name == 'workflow_dispatch' ||
+        contains(github.ref, 'doc') ||
+        contains(github.event.head_commit.message, '[build docs]') ||
+        contains(github.event.head_commit.message, '[build_docs]') ||
+        contains(github.event.head_commit.message, '[build doc]') ||
+        contains(github.event.head_commit.message, '[build_doc]')
 
     runs-on: ubuntu-latest
     steps:
@@ -83,6 +100,14 @@ jobs:
   deploy:
   
     needs: build
+
+    #  The website is deployed to the root of the `gh-pages` branch of the main 
+    #  repository or fork, only after a commit is pushed to the `master` branch, 
+    #  and the result will be displayed at:
+    #
+    #    tardis-sn.github.io/carsus         (main repository)
+    #    OR <username>.github.io/carsus     (forks)
+
     if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest
@@ -104,12 +129,16 @@ jobs:
   preview:
     needs: build
 
-    # Branch preview is only available on forks, and requires at least one of 
-    # these conditions to be met:
+    #  Branch preview is only available on forks, and requires at least one of 
+    #  these conditions to be met:
     #
-    #   a) the branch name contains the word `doc(s)`
-    #   b) commit message includes the a valid tag
-    #   c) the workflow is triggered manually
+    #    a) the branch name contains the word `doc(s)`
+    #    b) commit message includes the a valid tag
+    #    c) the workflow is triggered manually
+    #
+    #  Result will be displayed at: 
+    #
+    #    <username>.github.io/carsus/branch/<branch-name>
 
     if: github.repository_owner != 'tardis-sn' &&
         github.ref != 'refs/heads/master' && (
