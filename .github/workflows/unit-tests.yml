@@ -1,5 +1,5 @@
-# For more information about this pipeline, please refer to:
-# https://tardis-sn.github.io/tardis/development/continuous_integration.html
+#  For more information about this pipeline, please refer to:
+#  https://tardis-sn.github.io/tardis/development/continuous_integration.html
 
 name: tests
 
