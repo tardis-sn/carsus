@@ -12,7 +12,6 @@ dependencies:
   - pandas=1.0
   - astropy=3
   - chiantipy=0.8.4
-  - blas=1.1 # numpy/numpy/issues/14165
 
   # I/O
   - pyyaml
