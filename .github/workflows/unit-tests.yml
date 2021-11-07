@@ -25,7 +25,7 @@ env:
   PYTEST_FLAGS: --remote-data --runslow --test-db=carsus-db/test_databases/test.db
                 --refdata=carsus-refdata --cov=carsus --cov-report=xml
                 --cov-report=html
-  NBVAL_FLAGS: --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600
+  PYTEST_NB_FLAGS: --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
@@ -96,8 +96,8 @@ jobs:
       - name: Run unit tests
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
-      - name: Run nbval tests
-        run: pytest carsus ${{ env.NBVAL_FLAGS }}
+      - name: Run notebook tests
+        run: pytest carsus ${{ env.PYTEST_NB_FLAGS }}
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         if: runner.os == 'Linux'
