@@ -25,6 +25,7 @@ env:
 jobs:
 
   build:
+
     runs-on: ubuntu-latest
     steps:
 
@@ -74,6 +75,24 @@ jobs:
         shell: bash -l {0}
         run: cd docs/; make html
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: html-dir
+          path: docs/_build/html
+
+  deploy:
+  
+    needs: build
+    if: github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: html-dir
+          path: docs/_build/html
+
       - name: Deploy main site
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -81,18 +100,37 @@ jobs:
           publish_branch: gh-pages
           publish_dir: docs/_build/html
           force_orphan: true
-        if: github.ref == 'refs/heads/master'
+
+  preview:
+    needs: build
+
+    # Branch deploy is only available on forks, and requires at least one of 
+    # these conditions to be met:
+    #
+    #   a) the branch name contains the word `doc(s)`
+    #   b) commit message includes the a valid tag
+    #   c) the workflow is triggered manually
+
+    if: github.repository_owner != 'tardis-sn' &&
+        github.ref != 'refs/heads/master' && (
+        github.event_name == 'workflow_dispatch' ||
+        contains(github.ref, 'doc') ||
+        contains(github.event.head_commit.message, '[build docs]') ||
+        contains(github.event.head_commit.message, '[build_docs]') ||
+        contains(github.event.head_commit.message, '[build doc]') ||
+        contains(github.event.head_commit.message, '[build_doc]'))
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: my-artifact
+          path: docs/_build/html
 
       - name: Get branch name
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: get_branch_name
-
-        # Branch deploy is only available on forks, and requires at least one of 
-        # these conditions to be met:
-        #
-        # - branch name contains the word `doc(s)`.
-        # - commit message includes the a valid tag.
-        # - the workflow is triggered manually.
 
       - name: Deploy branch site
         uses: peaceiris/actions-gh-pages@v3
@@ -102,11 +140,3 @@ jobs:
           publish_dir: docs/_build/html
           destination_dir: branch/${{ steps.get_branch_name.outputs.branch }}
           force_orphan: false
-        if: github.repository_owner != 'tardis-sn' &&
-            github.ref != 'refs/heads/master' && (
-            github.event_name == 'workflow_dispatch' ||
-            contains(github.ref, 'doc') ||
-            contains(github.event.head_commit.message, '[build docs]') ||
-            contains(github.event.head_commit.message, '[build_docs]') ||
-            contains(github.event.head_commit.message, '[build doc]') ||
-            contains(github.event.head_commit.message, '[build_doc]'))
