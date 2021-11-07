@@ -21,7 +21,6 @@ env:
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
-  SPHINX_CORES: auto
 
 jobs:
 
@@ -74,7 +73,7 @@ jobs:
 
       - name: Build documentation
         shell: bash -l {0}
-        run: cd docs/; CORES=${{ env.SPHINX_CORES }} make html
+        run: cd docs/; make html
 
       - uses: actions/upload-artifact@v2
         with:
