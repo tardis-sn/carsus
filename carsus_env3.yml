@@ -53,6 +53,7 @@ dependencies:
   - pytest-cov
   - pytest-astropy
   - pytest-notebook
+  - pytest-xdist
   - coverage=4  # chrisjsewell/pytest-notebook/issues/6
   - attrs=20  # chrisjsewell/pytest-notebook/issues/16
 
