@@ -950,7 +950,7 @@ class TARDISAtomData:
                       pd.Series(self.collisions_param['temperatures']))
 
             if hasattr(self, 'cross_sections'):
-                f.put('/cross_sections_data', self.cross_sections_prepared)
+                f.put('/photoionization_data', self.cross_sections_prepared)
 
             meta = []
             md5_hash = hashlib.md5()
