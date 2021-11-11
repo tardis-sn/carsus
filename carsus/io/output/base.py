@@ -671,7 +671,7 @@ class TARDISAtomData:
         cross_sections = self.cmfgen_reader.cross_sections
         cross_sections['energy'] = u.Quantity(cross_sections['energy'], 'Ry').to('Hz', equivalencies=u.spectral())
         cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], 'Mbarn').to('cm2')
-        cross_sections.columns = ['nu', 'x_sect']
+        cross_sections = cross_sections.rename(columns={'energy':'nu', 'sigma':'x_sect'})
 
         return cross_sections
 
