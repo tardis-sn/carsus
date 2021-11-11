@@ -873,8 +873,11 @@ class TARDISAtomData:
         pandas.DataFrame
 
         """
-        
-        return self.cross_sections.copy()
+        cross_sections_prepared = self.cross_sections.reset_index()
+        cross_sections_prepared = cross_sections_prepared.rename(columns=({'ion_charge': 'ion_number'}))
+        cross_sections_prepared = cross_sections_prepared.set_index(['atomic_number', 'ion_number', 'level_index'])
+
+        return cross_sections_prepared
 
     @property
     def macro_atom_prepared(self):
