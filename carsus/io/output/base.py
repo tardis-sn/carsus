@@ -498,6 +498,17 @@ class TARDISAtomData:
                     by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
 
+        # Bring ionization energies into TARDIS format
+        destination_ion_charge = self.ionization_energies.base.index.get_level_values(
+            'ion_charge') + 1
+        self.ionization_energies.base.index = pd.MultiIndex.from_arrays(
+            [
+                self.ionization_energies.base.index.get_level_values('atomic_number').values,
+                destination_ion_charge
+            ],
+            names=['atomic_number', 'destination_ion_charge']
+        )
+
         # Clean lines
         lines = self.lines_all.join(pd.DataFrame(index=levels.index),
                                     on="lower_level_id", how="inner").\
@@ -874,8 +885,9 @@ class TARDISAtomData:
 
         """
         cross_sections_prepared = self.cross_sections.reset_index()
-        cross_sections_prepared = cross_sections_prepared.rename(columns=({'ion_charge': 'ion_number'}))
-        cross_sections_prepared = cross_sections_prepared.set_index(['atomic_number', 'ion_number', 'level_index'])
+        cross_sections_prepared = cross_sections_prepared.rename(
+            columns=({'ion_charge': 'ion_number', 'level_index': 'level_number'})
+        )
 
         return cross_sections_prepared
 
