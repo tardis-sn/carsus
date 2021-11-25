@@ -57,7 +57,6 @@ class TARDISAtomData:
 
         self.atomic_weights = atomic_weights
         self.ionization_energies = ionization_energies
-        self.ground_levels = ionization_energies.get_ground_levels()
         self.gfall_reader = gfall_reader
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
@@ -342,7 +341,7 @@ class TARDISAtomData:
             logger.info(f'CMFGEN selected species: {cmfgen_str}.')
 
         # Concatenate ground levels from NIST
-        ground_levels = self.ground_levels
+        ground_levels = self.ionization_energies.get_ground_levels()
         ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
         ground_levels['ds_id'] = 1
 
@@ -497,17 +496,6 @@ class TARDISAtomData:
         levels = levels.set_index('level_id').sort_values(
                     by=['atomic_number', 'ion_number'])
         levels = levels.drop(columns='ionization_energy')
-
-        # Bring ionization energies into TARDIS format
-        destination_ion_charge = self.ionization_energies.base.index.get_level_values(
-            'ion_charge') + 1
-        self.ionization_energies.base.index = pd.MultiIndex.from_arrays(
-            [
-                self.ionization_energies.base.index.get_level_values('atomic_number').values,
-                destination_ion_charge
-            ],
-            names=['atomic_number', 'destination_ion_charge']
-        )
 
         # Clean lines
         lines = self.lines_all.join(pd.DataFrame(index=levels.index),
@@ -678,10 +666,36 @@ class TARDISAtomData:
         """
 
         logger.info('Ingesting photoionization cross-sections.')
+        cross_sections = self.cmfgen_reader.cross_sections.reset_index()
 
-        cross_sections = self.cmfgen_reader.cross_sections
+        logger.info('Matching levels and cross sections.')
+        cross_sections = cross_sections.rename(columns={'ion_charge': 'ion_number'})
+        cross_sections = cross_sections.set_index(['atomic_number', 'ion_number'])
+
+        cross_sections['level_index_lower'] = cross_sections['level_index'].values
+        cross_sections['level_index_upper'] = cross_sections['level_index'].values
+        phixs_list = [ self.get_lvl_index2id(cross_sections.loc[ion], self.levels_all) 
+                        for ion in self.cmfgen_ions ]
+
+        cross_sections = pd.concat(phixs_list, sort=True)
+        cross_sections = cross_sections.sort_values(by=['lower_level_id', 'upper_level_id'])
+        cross_sections['level_id'] = cross_sections['lower_level_id']
+
+        # `x_sect_id` number starts after the last `line_id`, just a convention
+        start = self.lines_all.index[-1] + 1
+        cross_sections['x_sect_id'] = range(start, start + len(cross_sections))
+
+        # Exclude artificially created levels from levels
+        levels = self.levels.loc[self.levels['level_id'] != -1].set_index('level_id')
+        level_number = levels.loc[:, ['level_number']]
+        cross_sections = cross_sections.join(level_number, on='level_id')
+
+        # Levels are already cleaned, just drop the NaN's after join
+        cross_sections = cross_sections.dropna()
+
         cross_sections['energy'] = u.Quantity(cross_sections['energy'], 'Ry').to('Hz', equivalencies=u.spectral())
         cross_sections['sigma'] = u.Quantity(cross_sections['sigma'], 'Mbarn').to('cm2')
+        cross_sections['level_number'] = cross_sections['level_number'].astype('int')
         cross_sections = cross_sections.rename(columns={'energy':'nu', 'sigma':'x_sect'})
 
         return cross_sections
@@ -803,6 +817,25 @@ class TARDISAtomData:
         self.macro_atom_references = macro_atom_references
 
     @property
+    def ionization_energies_prepared(self):
+        """
+        Prepare the DataFrame with ionization energies for TARDIS.
+
+        Returns
+        -------
+        pandas.DataFrame
+
+        """
+        ionization_energies_prepared = self.ionization_energies.base.copy()
+        ionization_energies_prepared = ionization_energies_prepared.reset_index()
+        ionization_energies_prepared['ion_charge'] += 1
+        ionization_energies_prepared = ionization_energies_prepared.rename(columns={'ion_charge': 'ion_number'})
+        ionization_energies_prepared = ionization_energies_prepared.set_index(['atomic_number', 'ion_number'])
+
+        return ionization_energies_prepared.squeeze()
+
+
+    @property
     def levels_prepared(self):
         """
         Prepare the DataFrame with levels for TARDIS.
@@ -884,10 +917,8 @@ class TARDISAtomData:
         pandas.DataFrame
 
         """
-        cross_sections_prepared = self.cross_sections.reset_index()
-        cross_sections_prepared = cross_sections_prepared.rename(
-            columns=({'ion_charge': 'ion_number', 'level_index': 'level_number'})
-        )
+        cross_sections_prepared = self.cross_sections.set_index(['atomic_number', 'ion_number', 'level_number'])
+        cross_sections_prepared = cross_sections_prepared[['nu', 'x_sect']]
 
         return cross_sections_prepared
 
@@ -951,7 +982,7 @@ class TARDISAtomData:
 
         with pd.HDFStore(fname, 'w') as f:
             f.put('/atom_data', self.atomic_weights.base)
-            f.put('/ionization_data', self.ionization_energies.base)
+            f.put('/ionization_data', self.ionization_energies_prepared)
             f.put('/zeta_data', self.zeta_data.base)
             f.put('/levels', self.levels_prepared)
             f.put('/lines', self.lines_prepared)
