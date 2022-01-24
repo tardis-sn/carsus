@@ -17,7 +17,7 @@ sources and output them to file formats readable by radiative transfer codes.
     :target: https://gitter.im/tardis-sn/carsus
     :alt: Join Chat
 
-.. image:: https://github.com/tardis-sn/carsus/actions/workflows/documentation-build.yml/badge.svg
+.. image:: https://github.com/tardis-sn/carsus/actions/workflows/docs-build.yml/badge.svg
     :target: https://tardis-sn.github.io/carsus
     :alt: Carsus Documentation
 
