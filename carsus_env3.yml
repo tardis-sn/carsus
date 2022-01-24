@@ -47,6 +47,7 @@ dependencies:
   - numpydoc
   - docutils
   - recommonmark
+  - pandoc
 
   # Test/Coverage
   - pytest=4
