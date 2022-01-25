@@ -350,11 +350,22 @@ def get_leibowitz_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, n_points=1
     raise NotImplementedError
 
 
-def get_null_phixs_table(n_points=1000):
+def get_null_phixs_table(threshold_energy_ryd):
     """
-    Returns a 1-D array of zeros with `n_points` size.
+    Returns a photoionization table with zero cross sections.
+
+    Parameters
+    ----------
+    threshold_energy_ryd : float
+        Photoionization threshold energy in Rydberg.
+
+    Returns
+    -------
+    numpy.ndarray
+        Photoionization cross sections table with zero cross sections.
     """
-    phixs_table = np.column_stack((np.linspace(0, 1.0, 1000, endpoint=False), 
-                                    np.zeros(1000)))
+    energy = np.array([1., 100.]) * threshold_energy_ryd
+    phixs = np.zeros_like(energy)
+    phixs_table = np.column_stack([energy, phixs])
 
     return phixs_table

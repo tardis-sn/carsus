@@ -586,7 +586,7 @@ class CMFGENReader:
                 threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
 
                 if cross_section_type == CrossSectionType.CONSTANT_ZERO:
-                    phixs_table = get_null_phixs_table()
+                    phixs_table = get_null_phixs_table(threshold_energy_ryd)
 
                 elif cross_section_type in [CrossSectionType.POINTS_TABLE,
                                             CrossSectionType.OPACITY_PROJECT_SC,
@@ -609,7 +609,7 @@ class CMFGENReader:
                         continue
 
                     if len(fit_coeff_list) == 1 and fit_coeff_list[0] == 0.0:
-                        phixs_table = get_null_phixs_table()
+                        phixs_table = get_null_phixs_table(threshold_energy_ryd)
 
                     else:
                         phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
@@ -677,7 +677,7 @@ class CMFGENReader:
 
                     except NotImplementedError:
                         logger.warning(f'Leibowitz\'s cross-section type 4 not implemented yet.')
-                        phixs_table = get_null_phixs_table()
+                        phixs_table = get_null_phixs_table(threshold_energy_ryd)
 
                 else:
                     logger.warning(f'Unknown cross-section type {cross_section_type} for configuration \'{lower_level_label}\'.')
