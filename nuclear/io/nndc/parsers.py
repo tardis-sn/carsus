@@ -7,24 +7,25 @@ import numpy as np
 
 
 def uncertainty_parser(unc_raw_str, split_unc_symbol='%'):
-        unc_raw_str = unc_raw_str.lower()
+    unc_raw_str = unc_raw_str.replace('×10+', 'e+')
+    unc_raw_str = unc_raw_str.lower()
 
-        value_unc_pair = [item.strip()
-                      for item in unc_raw_str.split(split_unc_symbol)]
+    value_unc_pair = [item.strip()
+                  for item in unc_raw_str.split(split_unc_symbol)]
 
-        if len(value_unc_pair) == 1:  # if no uncertainty given
-            return float(value_unc_pair[0]), np.nan
-        else:
-            value, unc = value_unc_pair[:2]  # limit to two
-        if unc == "" or unc == "?":  # if uncertainty_str is empty or unknown
-            unc = np.nan
-        if "e" in value:
-            exp_pos = value.find("e")
-            unc_str = value[:exp_pos] + f"({unc})" + value[exp_pos:]
-        else:
-            unc_str = value + f"({unc})"
-        parsed_uncertainty = ufloat_fromstr(unc_str)
-        return parsed_uncertainty.nominal_value, parsed_uncertainty.std_dev
+    if len(value_unc_pair) == 1:  # if no uncertainty given
+        return float(value_unc_pair[0]), np.nan
+    else:
+        value, unc = value_unc_pair[:2]  # limit to two
+    if unc == "" or unc == "?":  # if uncertainty_str is empty or unknown
+        unc = np.nan
+    if "e" in value:
+        exp_pos = value.find("e")
+        unc_str = value[:exp_pos] + f"({unc})" + value[exp_pos:]
+    else:
+        unc_str = value + f"({unc})"
+    parsed_uncertainty = ufloat_fromstr(unc_str)
+    return parsed_uncertainty.nominal_value, parsed_uncertainty.std_dev
 
 
 class BaseParser(metaclass=ABCMeta):
