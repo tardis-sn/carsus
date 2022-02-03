@@ -87,7 +87,7 @@ class TARDISAtomData:
         Notes
         -----
 
-        The `ds_id` field is the data source identifier.
+        The `data_source_id` field is the data source identifier.
 
         1 : NIST
         2 : GFALL
@@ -106,9 +106,9 @@ class TARDISAtomData:
             lvl_list.append(lvl)
 
         levels_uq = pd.concat(lvl_list, sort=True)
-        gfall_ions = levels_uq[ levels_uq['ds_id'] == 2 ].index.unique()
-        chianti_ions = levels_uq[ levels_uq['ds_id'] == 4 ].index.unique()
-        cmfgen_ions = levels_uq[ levels_uq['ds_id'] == 5 ].index.unique()
+        gfall_ions = levels_uq[ levels_uq['data_source_id'] == 2 ].index.unique()
+        chianti_ions = levels_uq[ levels_uq['data_source_id'] == 4 ].index.unique()
+        cmfgen_ions = levels_uq[ levels_uq['data_source_id'] == 5 ].index.unique()
 
         assert set(gfall_ions).intersection(set(chianti_ions))\
                                 .intersection(set(cmfgen_ions)) == set([])
@@ -298,17 +298,17 @@ class TARDISAtomData:
 
         logger.info('Ingesting energy levels.')
         gf_levels = self.gfall_reader.levels
-        gf_levels['ds_id'] = 2
+        gf_levels['data_source_id'] = 2
 
         if self.chianti_reader is not None:
             ch_levels = self.chianti_reader.levels
-            ch_levels['ds_id'] = 4
+            ch_levels['data_source_id'] = 4
         else:
             ch_levels = pd.DataFrame(columns=gf_levels.columns)
 
         if self.cmfgen_reader is not None:
             cf_levels = self.cmfgen_reader.levels
-            cf_levels['ds_id'] = 5
+            cf_levels['data_source_id'] = 5
         else:
             cf_levels = pd.DataFrame(columns=gf_levels.columns)
 
@@ -319,7 +319,7 @@ class TARDISAtomData:
         levels = levels.reset_index()
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
-                         'ds_id', 'priority']]
+                         'data_source_id', 'priority']]
         levels['energy'] = u.Quantity(levels['energy'], 'cm-1').to(
             'eV', equivalencies=u.spectral()).value
  
@@ -343,7 +343,7 @@ class TARDISAtomData:
         # Concatenate ground levels from NIST
         ground_levels = self.ionization_energies.get_ground_levels()
         ground_levels = ground_levels.rename(columns={'ion_charge': 'ion_number'})
-        ground_levels['ds_id'] = 1
+        ground_levels['data_source_id'] = 1
 
         levels = pd.concat([ground_levels, levels], sort=True)
         levels['level_id'] = range(1, len(levels)+1)
@@ -359,19 +359,19 @@ class TARDISAtomData:
 
         # Filter levels by priority
         for ion in self.chianti_ions:
-            mask = (levels['ds_id'] != 4) & (
+            mask = (levels['data_source_id'] != 4) & (
                         levels['atomic_number'] == ion[0]) & (
                             levels['ion_number'] == ion[1])
             levels = levels.drop(levels[mask].index)
 
         for ion in self.cmfgen_ions:
-            mask = (levels['ds_id'] != 5) & (
+            mask = (levels['data_source_id'] != 5) & (
                         levels['atomic_number'] == ion[0]) & (
                             levels['ion_number'] == ion[1])
             levels = levels.drop(levels[mask].index)
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
-                         'ds_id']]
+                         'data_source_id']]
         levels = levels.reset_index()
 
         return levels
@@ -394,17 +394,17 @@ class TARDISAtomData:
 
         logger.info('Ingesting transition lines.')
         gf_lines = self.gfall_reader.lines
-        gf_lines['ds_id'] = 2
+        gf_lines['data_source_id'] = 2
 
         if self.chianti_reader is not None:
             ch_lines = self.chianti_reader.lines
-            ch_lines['ds_id'] = 4
+            ch_lines['data_source_id'] = 4
         else:
             ch_lines = pd.DataFrame(columns=gf_lines.columns)
 
         if self.cmfgen_reader is not None:
             cf_lines = self.cmfgen_reader.lines
-            cf_lines['ds_id'] = 5
+            cf_lines['data_source_id'] = 5
         else:
             cf_lines = pd.DataFrame(columns=gf_lines.columns)
 
@@ -415,13 +415,13 @@ class TARDISAtomData:
 
         # Filter lines by priority
         for ion in self.chianti_ions:
-            mask = (lines['ds_id'] != 4) & (
+            mask = (lines['data_source_id'] != 4) & (
                         lines['atomic_number'] == ion[0]) & (
                             lines['ion_number'] == ion[1])
             lines = lines.drop(lines[mask].index)
 
         for ion in self.cmfgen_ions:
-            mask = (lines['ds_id'] != 5) & (
+            mask = (lines['data_source_id'] != 5) & (
                         lines['atomic_number'] == ion[0]) & (
                             lines['ion_number'] == ion[1])
             lines = lines.drop(lines[mask].index)
@@ -452,14 +452,14 @@ class TARDISAtomData:
                   GFALL_AIR_THRESHOLD, 'medium'] = MEDIUM_AIR
 
         # Chianti wavelengths are already given in vacuum
-        gfall_mask = lines['ds_id'] == 2
+        gfall_mask = lines['data_source_id'] == 2
         air_mask = lines['medium'] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask,
                   'wavelength'] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, 'wavelength'])
 
         lines = lines[['lower_level_id', 'upper_level_id',
-                       'wavelength', 'gf', 'loggf', 'ds_id']]
+                       'wavelength', 'gf', 'loggf', 'data_source_id']]
 
         return lines
 
@@ -524,7 +524,7 @@ class TARDISAtomData:
         levels["level_number"] = levels["level_number"].astype(np.int)
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy',
-                         'metastable', 'level_number', 'ds_id']]
+                         'metastable', 'level_number', 'data_source_id']]
 
         # Join atomic_number, ion_number, level_number_lower,
         # level_number_upper on lines
@@ -587,7 +587,7 @@ class TARDISAtomData:
 
         logger.info('Ingesting collisional strengths.')
         ch_collisions = self.chianti_reader.collisions
-        ch_collisions['ds_id'] = 4
+        ch_collisions['data_source_id'] = 4
 
         # Not really needed because we have only one source of collisions
         collisions = pd.concat([ch_collisions], sort=True)
@@ -638,7 +638,7 @@ class TARDISAtomData:
                                                 'collision_strengths': 'bscups'})
 
         collisions = collisions[['e_col_id', 'lower_level_id',
-                                 'upper_level_id', 'ds_id',
+                                 'upper_level_id', 'data_source_id',
                                  'btemp', 'bscups', 'ttype', 'cups',
                                  'gf', 'atomic_number', 'ion_number',
                                  'level_number_lower', 'g_l',

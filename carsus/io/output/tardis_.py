@@ -823,7 +823,7 @@ class AtomData(object):
                 e_col.data_source_id, btemp, bscups, e_col.bt92_ttype, e_col.bt92_cups, gf.value))
 
         collisions_dtype = [("e_col_id", np.int), ("lower_level_id", np.int), ("upper_level_id", np.int),
-                            ("ds_id", np.int),  ("btemp", 'O'), ("bscups", 'O'), ("ttype", np.int),
+                            ("data_source_id", np.int),  ("btemp", 'O'), ("bscups", 'O'), ("ttype", np.int),
                             ("cups", np.float), ("gf", np.float)]
 
         collisions = np.array(collisions, dtype=collisions_dtype)
