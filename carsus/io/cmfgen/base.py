@@ -459,7 +459,7 @@ class CMFGENReader:
 
     """
 
-    def __init__(self, data, priority=10):
+    def __init__(self, data, collisions, priority=10):
         """
         Parameters
         ----------
@@ -473,9 +473,13 @@ class CMFGENReader:
         self.priority = priority
         self.ions = list(data.keys())
         self._get_levels_lines(data)
+        if collisions:
+            # TODO: combine all collision data and save it as an attribute
+            self.collisions = self._get_collisions(data)
+
 
     @classmethod
-    def from_config(cls, ions, atomic_path, col_fname=None, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None, collisions=False):
+    def from_config(cls, ions, atomic_path, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None, collisions=False):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -509,18 +513,17 @@ class CMFGENReader:
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
                                                 ).as_posix()
+                col_fname = BASE_PATH.joinpath(ion_keys['col']
+                                                ).as_posix()
 
                 data[ion] = {}
                 lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
+                col_parser = CMFGENCollisionalStrengthsParser(col_fname)
+
                 data[ion]['levels'] = lvl_parser.base
                 data[ion]['lines'] = lns_parser.base
-                
-                if col_fname:
-                    # TODO: get this from yaml
-                    col_fname = BASE_PATH.joinpath(col_fname).as_posix()
-                    col_parser = CMFGENCollisionalStrengthsParser(col_fname)
-                    data[ion]['collisions'] = col_parser.base
+                data[ion]['collisions'] = col_parser.base
                 
                 if ionization_energies:
                     data[ion]['ionization_energy'] = float(lvl_parser.header['Ionization energy'])
@@ -549,13 +552,9 @@ class CMFGENReader:
 
                         data[ion]['hyd'] = hyd_parser.base
                         data[ion]['gbf'] = gbf_parser.base
-                
-                if collisions:
-                    # TODO: combine all collision data and save it as an attribute
-                    collisions_df = self._get_collisions(data)
 
 
-        return cls(data, priority)
+        return cls(data, priority, collisions)
 
     @staticmethod
     def cross_sections_squeeze(reader_phixs, ion_levels,
@@ -822,10 +821,12 @@ class CMFGENReader:
 
         return
 
-    def _get_collisions(data):
+    def _get_collisions(self, data):
         """
         Generate the `collisions` DataFrame.
         """
+        col_list = []
+
         for ion, data_dict in data.items():
             levels = data_dict["levels"]
             collisions = data_dict["collisions"]
@@ -836,12 +837,21 @@ class CMFGENReader:
             gi, lower_level_index, upper_level_index = [], [], []
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
-                lower_level_index.append(mapping[ll][0])
+                # TODO: are the labels mapped properly?
+                try:
+                    lower_level_index.append(mapping[ll][0])
+                except Exception as e:
+                    lower_level_index.append(np.nan)
+                
                 try:
                     upper_level_index.append(mapping[ul][0])
                 except Exception as e:
-                    upper_level_index.append(0)
-                gi.append(mapping[ll][1])
+                    upper_level_index.append(np.nan)
+                
+                try:
+                    gi.append(mapping[ll][1])
+                except Exception as e:
+                    gi.append(np.nan)
 
             (
                 collisions["lower_level_index"],
@@ -871,5 +881,6 @@ class CMFGENReader:
                     "level_number_upper",
                 ]
             )
+            col_list.append(collisions)
 
-        return collisions
+        return col_list
