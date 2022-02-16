@@ -455,6 +455,7 @@ class CMFGENReader:
     ----------
     levels : DataFrame
     lines : DataFrame
+    collisions : DataFrame
 
     """
 
@@ -474,7 +475,7 @@ class CMFGENReader:
         self._get_levels_lines(data)
 
     @classmethod
-    def from_config(cls, ions, atomic_path, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None):
+    def from_config(cls, ions, atomic_path, col_fname=None, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None, collisions=False):
 
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -514,7 +515,13 @@ class CMFGENReader:
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
                 data[ion]['levels'] = lvl_parser.base
                 data[ion]['lines'] = lns_parser.base
-
+                
+                if col_fname:
+                    # TODO: get this from yaml
+                    col_fname = BASE_PATH.joinpath(col_fname).as_posix()
+                    col_parser = CMFGENCollisionalStrengthsParser(col_fname)
+                    data[ion]['collisions'] = col_parser.base
+                
                 if ionization_energies:
                     data[ion]['ionization_energy'] = float(lvl_parser.header['Ionization energy'])
 
@@ -542,6 +549,11 @@ class CMFGENReader:
 
                         data[ion]['hyd'] = hyd_parser.base
                         data[ion]['gbf'] = gbf_parser.base
+                
+                if collisions:
+                    # TODO: combine all collision data and save it as an attribute
+                    collisions_df = self._get_collisions(data)
+
 
         return cls(data, priority)
 
@@ -809,3 +821,55 @@ class CMFGENReader:
         self.lines = lines
 
         return
+
+    def _get_collisions(data):
+        """
+        Generate the `collisions` DataFrame.
+        """
+        for ion, data_dict in data.items():
+            levels = data_dict["levels"]
+            collisions = data_dict["collisions"]
+            mapping = {
+                label: [id_, g] for label, id_, g in zip(levels.label, levels.ID, levels.g)
+            }
+
+            gi, lower_level_index, upper_level_index = [], [], []
+
+            for ll, ul in zip(collisions.label_lower, collisions.label_upper):
+                lower_level_index.append(mapping[ll][0])
+                try:
+                    upper_level_index.append(mapping[ul][0])
+                except Exception as e:
+                    upper_level_index.append(0)
+                gi.append(mapping[ll][1])
+
+            (
+                collisions["lower_level_index"],
+                collisions["upper_level_index"],
+                collisions["gi"],
+            ) = (lower_level_index, upper_level_index, gi)
+
+            collisions["atomic_number"] = ion[0]
+            collisions["ion_number"] = ion[1]
+
+            cols = collisions.columns.tolist()
+            cols = cols[-3:] + cols[:-3]
+            collisions = collisions[cols]
+            collisions = collisions.drop(columns=["label_lower", "label_upper"])
+
+            collisions = collisions.rename(
+                columns={
+                    "lower_level_index": "level_number_lower",
+                    "upper_level_index": "level_number_upper",
+                }
+            )
+            collisions = collisions.set_index(
+                [
+                    "atomic_number",
+                    "ion_number",
+                    "level_number_lower",
+                    "level_number_upper",
+                ]
+            )
+
+        return collisions
