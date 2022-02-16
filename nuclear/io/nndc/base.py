@@ -22,7 +22,7 @@ from pyne import nucname
 from uncertainties import ufloat_fromstr
 
 NNDC_DECAY_RADIATION_BASE_URL = (
-    "http://www.nndc.bnl.gov/nudat2/" "decaysearchdirect.jsp?nuc={nucname}&unc=nds"
+    "http://www.nndc.bnl.gov/nudat3/" "decaysearchdirect.jsp?nuc={nucname}&unc=nds"
 )
 
 NNDC_ARTIFICIAL_DATASET_TAG = "NNDC_DATASET_SPLITTER"
@@ -37,7 +37,7 @@ def _get_nuclear_database_path():
 def _sanitize_isotope_string(isotope_string):
     """
     Checks if the string given is a valid isotope_string
-    
+
     Parameters
     ----------
     isotope_string: str
@@ -121,7 +121,7 @@ def parse_decay_radiation_dataset(decay_rad_dataset_dict):
     -------
 
     """
-    
+
     meta = {
         "energy_column_unit": u.keV,
         "end_point_energy_column_unit": u.keV,
@@ -148,10 +148,12 @@ def parse_decay_radiation_dataset(decay_rad_dataset_dict):
             meta["authors"] = author_bs.find("body").text.split(":")[1].strip()
         elif data_type == "Citation":
             citation_bs = bs4.BeautifulSoup(data_portion, "lxml")
-            citation_data = citation_bs.find("body").text.split(":")[1].split("Parent")[0]
+            citation_data = (
+                citation_bs.find("body").text.split(":")[1].split("Parent")[0]
+            )
             meta["citation"] = citation_data[:-1]
-            decay_table = data_portion.split('</p>', 1)[1]
-            decay_table = decay_table.split('<p></p>')[0]
+            decay_table = data_portion.split("</p>", 1)[1]
+            decay_table = decay_table.split("<p></p>")[0]
             decay_table_df = pd.read_html(decay_table)[0]
             decay_table_df.columns = decay_table_df.iloc[0]
             decay_table_df = decay_table_df.drop(decay_table_df.index[0])
@@ -159,16 +161,16 @@ def parse_decay_radiation_dataset(decay_rad_dataset_dict):
                 if column != "DecayScheme" and column != "ENSDFfile":
                     if column == "Parent T1/2" or column == "GS-GS Q-value (keV)":
                         value = decay_table_df[column].values[0]
-                        unit = ''.join(x for x in value if x.isalpha())
-                        if unit == '':
-                            unit = '\xa0'
-                            value = value.replace('\xa0', ' \xa0 ')
+                        unit = "".join(x for x in value if x.isalpha())
+                        if unit == "":
+                            unit = "\xa0"
+                            value = value.replace("\xa0", " \xa0 ")
                         nominal, unc = uncertainty_parser(value, split_unc_symbol=unit)
-                        if column  == "GS-GS Q-value (keV)":
+                        if column == "GS-GS Q-value (keV)":
                             unit = column[-4:-1]
                             column = column[:-12]
-                        meta[column+' value'] = str(nominal) + ' ' + unit
-                        meta[column+' unc'] = str(unc) + ' ' + unit
+                        meta[column + " value"] = str(nominal) + " " + unit
+                        meta[column + " unc"] = str(unc) + " " + unit
                     else:
                         meta[column] = decay_table_df[column].values[0]
         else:
@@ -248,8 +250,10 @@ def store_decay_radiation(isotope_string, force_update=False):
             data_exists = False
 
     if data_exists and not force_update:
-        logger.warning(f"{isotope_string} is already in the database "
-            "(force_update to overwrite)")
+        logger.warning(
+            f"{isotope_string} is already in the database "
+            "(force_update to overwrite)"
+        )
 
     new_decay_radiation, new_meta = download_decay_radiation(isotope_string)
 
@@ -286,4 +290,3 @@ def get_decay_radiation_database():
     meta = pd.read_hdf(_get_nuclear_database_path(), "metadata")
 
     return decay_radiation_db, meta
-
