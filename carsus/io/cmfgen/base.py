@@ -517,6 +517,11 @@ class CMFGENReader:
                                                 ).as_posix()
 
                 data[ion] = {}
+                
+                # TODO: remove this
+                data[ion]["osc_fname"] = osc_fname
+                data[ion]["col_fname"] = col_fname
+                
                 lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
                 col_parser = CMFGENCollisionalStrengthsParser(col_fname)
@@ -828,13 +833,15 @@ class CMFGENReader:
         col_list = []
 
         for ion, data_dict in data.items():
-            levels = data_dict["levels"]
-            collisions = data_dict["collisions"]
-            mapping = {
-                label: [id_, g] for label, id_, g in zip(levels.label, levels.ID, levels.g)
-            }
-
-            gi, lower_level_index, upper_level_index = [], [], []
+            osc_fname = data_dict["osc_fname"]
+            col_fname = data_dict["col_fname"]
+            
+            levels = CMFGENEnergyLevelsParser(osc_fname).base
+            collisions = CMFGENCollisionalStrengthsParser(col_fname).base
+            
+            mapping = {label: [id_,g] for label, id_, g in zip(levels.label, levels.ID, levels.g)}
+            
+            gi, lower_level_index, upper_level_index = [],[],[]
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
                 # TODO: are the labels mapped properly?
@@ -882,5 +889,5 @@ class CMFGENReader:
                 ]
             )
             col_list.append(collisions)
-
-        return col_list
+        
+        return pd.concat(col_list)
