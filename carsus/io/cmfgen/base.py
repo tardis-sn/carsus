@@ -888,6 +888,8 @@ class CMFGENReader:
                     "level_number_upper",
                 ]
             )
+            collisions = collisions.iloc[:,1:].div(collisions.gi, axis=0)
             col_list.append(collisions)
         
         return pd.concat(col_list)
+
