@@ -826,7 +826,7 @@ class CMFGENReader:
 
         return
 
-    def _get_collisions(self, data):
+    def _get_collisions(self, data, tmp_grid=None):
         """
         Generate the `collisions` DataFrame.
         """
@@ -890,6 +890,30 @@ class CMFGENReader:
             )
             collisions = collisions.iloc[:,1:].div(collisions.gi, axis=0)
             col_list.append(collisions)
-        
-        return pd.concat(col_list)
 
+        collisions = pd.concat(col_list)
+
+        # remove NaN rows
+        collisions = collisions[
+            collisions.index.get_level_values("level_number_lower").notnull()
+            & collisions.index.get_level_values("level_number_upper").notnull()
+        ]
+
+        collisions.columns = collisions.columns.astype(float)
+
+        # assign new columns from the temperature grid
+        if tmp_grid:
+            for item in tmp_grid:
+                if item not in collisions.columns:
+                    collisions.loc[:, item] = np.nan
+        
+        # sort columns and interpolate
+        collisions = collisions[sorted(collisions.columns)]
+        collisions = collisions.interpolate(axis="columns", limit_direction="both")
+
+        # remove columns not in the temperature grid
+        if tmp_grid:
+            old_cols = [item for item in collisions.columns if item not in tmp_grid]
+            collisions = collisions.drop(columns=old_cols)
+
+        return collisions
