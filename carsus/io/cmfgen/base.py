@@ -474,7 +474,6 @@ class CMFGENReader:
         self.ions = list(data.keys())
         self._get_levels_lines(data)
         if collisions:
-            # TODO: combine all collision data and save it as an attribute
             self.collisions = self._get_collisions(data)
 
 
@@ -517,10 +516,6 @@ class CMFGENReader:
                                                 ).as_posix()
 
                 data[ion] = {}
-                
-                # TODO: remove this
-                data[ion]["osc_fname"] = osc_fname
-                data[ion]["col_fname"] = col_fname
                 
                 lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
@@ -833,53 +828,41 @@ class CMFGENReader:
         col_list = []
 
         for ion, data_dict in data.items():
-            osc_fname = data_dict["osc_fname"]
-            col_fname = data_dict["col_fname"]
-            
-            levels = CMFGENEnergyLevelsParser(osc_fname).base
-            collisions = CMFGENCollisionalStrengthsParser(col_fname).base
-            
-            mapping = {label: [id_,g] for label, id_, g in zip(levels.label, levels.ID, levels.g)}
-            
-            gi, lower_level_index, upper_level_index = [],[],[]
+            levels = data_dict["levels"].copy()
+            collisions = data_dict["collisions"].copy()
+
+            mapping = {
+                label: [id_, g] for label, id_, g in zip(levels.label, levels.ID, levels.g)
+            }
+
+            gi, lower_level_index, upper_level_index = [], [], []
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
                 # TODO: are the labels mapped properly?
                 try:
                     lower_level_index.append(mapping[ll][0])
-                except Exception as e:
+                except:
                     lower_level_index.append(np.nan)
-                
+
                 try:
                     upper_level_index.append(mapping[ul][0])
-                except Exception as e:
+                except:
                     upper_level_index.append(np.nan)
-                
+
                 try:
                     gi.append(mapping[ll][1])
-                except Exception as e:
+                except:
                     gi.append(np.nan)
 
             (
-                collisions["lower_level_index"],
-                collisions["upper_level_index"],
-                collisions["gi"],
-            ) = (lower_level_index, upper_level_index, gi)
+                collisions["level_number_lower"],
+                collisions["level_number_upper"],
+            ) = (lower_level_index, upper_level_index)
 
             collisions["atomic_number"] = ion[0]
             collisions["ion_number"] = ion[1]
-
-            cols = collisions.columns.tolist()
-            cols = cols[-3:] + cols[:-3]
-            collisions = collisions[cols]
             collisions = collisions.drop(columns=["label_lower", "label_upper"])
 
-            collisions = collisions.rename(
-                columns={
-                    "lower_level_index": "level_number_lower",
-                    "upper_level_index": "level_number_upper",
-                }
-            )
             collisions = collisions.set_index(
                 [
                     "atomic_number",
@@ -888,7 +871,8 @@ class CMFGENReader:
                     "level_number_upper",
                 ]
             )
-            collisions = collisions.iloc[:,1:].div(collisions.gi, axis=0)
+
+            collisions = collisions.div(gi, axis=0)
             col_list.append(collisions)
 
         collisions = pd.concat(col_list)
@@ -906,7 +890,7 @@ class CMFGENReader:
             for item in tmp_grid:
                 if item not in collisions.columns:
                     collisions.loc[:, item] = np.nan
-        
+
         # sort columns and interpolate
         collisions = collisions[sorted(collisions.columns)]
         collisions = collisions.interpolate(axis="columns", limit_direction="both")
