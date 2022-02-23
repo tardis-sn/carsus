@@ -459,7 +459,7 @@ class CMFGENReader:
 
     """
 
-    def __init__(self, data, collisions, priority=10, temperature_grid=None):
+    def __init__(self, data, collisions=False, priority=10, temperature_grid=None):
         """
         Parameters
         ----------
