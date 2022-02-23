@@ -722,7 +722,7 @@ class CMFGENReader:
             symbol = convert_atomic_number2symbol(ion[0])
             logger.info(f'Loading atomic data for {symbol} {ion[1]}.')
 
-            lvl = reader['levels']
+            lvl = reader['levels'].copy()
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
@@ -733,7 +733,7 @@ class CMFGENReader:
             lvl['ion_charge'] =  ion_charge 
             lvl_list.append(lvl)
 
-            lns = reader['lines']
+            lns = reader['lines'].copy()
             lns = lns.set_index(['i', 'j'])
             lns['energy_lower'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=0).values
             lns['energy_upper'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=1).values
