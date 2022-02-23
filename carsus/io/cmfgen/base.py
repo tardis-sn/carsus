@@ -466,9 +466,12 @@ class CMFGENReader:
         data : dict
             Dictionary containing one dictionary per species with 
             keys `levels` and `lines`.
-
         priority: int, optional
             Priority of the current data source, by default 10.
+        temperature_grid : list of numbers, optional
+            Temperatures to have in the collision dataframe. The collision dataframe
+            will have all the temperatures from the CMFGEN dataset by default.
+
         """
         self.priority = priority
         self.ions = list(data.keys())
