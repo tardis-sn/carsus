@@ -459,7 +459,7 @@ class CMFGENReader:
 
     """
 
-    def __init__(self, data, collisions, priority=10):
+    def __init__(self, data, collisions, priority=10, temperature_grid=None):
         """
         Parameters
         ----------
@@ -474,12 +474,21 @@ class CMFGENReader:
         self.ions = list(data.keys())
         self._get_levels_lines(data)
         if collisions:
-            self.collisions = self._get_collisions(data)
+            self.collisions = self._get_collisions(data, temperature_grid=temperature_grid)
 
 
     @classmethod
-    def from_config(cls, ions, atomic_path, priority=10, ionization_energies=False, cross_sections=False, config_yaml=None, collisions=False):
-
+    def from_config(
+        cls,
+        ions,
+        atomic_path,
+        priority=10,
+        ionization_energies=False,
+        cross_sections=False,
+        config_yaml=None,
+        collisions=False,
+        temperature_grid=None,
+    ):
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
             YAML_PATH = pathlib.Path(config_yaml).as_posix()
@@ -554,7 +563,7 @@ class CMFGENReader:
                         data[ion]['gbf'] = gbf_parser.base
 
 
-        return cls(data, priority, collisions)
+        return cls(data, priority, collisions, temperature_grid)
 
     @staticmethod
     def cross_sections_squeeze(reader_phixs, ion_levels,
@@ -821,7 +830,7 @@ class CMFGENReader:
 
         return
 
-    def _get_collisions(self, data, tmp_grid=None):
+    def _get_collisions(self, data, temperature_grid=None):
         """
         Generate the `collisions` DataFrame.
         """
@@ -831,6 +840,7 @@ class CMFGENReader:
             levels = data_dict["levels"].copy()
             collisions = data_dict["collisions"].copy()
 
+            # mapping of label names and their IDs
             mapping = {
                 label: [id_, g] for label, id_, g in zip(levels.label, levels.ID, levels.g)
             }
@@ -838,7 +848,6 @@ class CMFGENReader:
             gi, lower_level_index, upper_level_index = [], [], []
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
-                # TODO: are the labels mapped properly?
                 try:
                     lower_level_index.append(mapping[ll][0])
                 except:
@@ -877,7 +886,6 @@ class CMFGENReader:
 
         collisions = pd.concat(col_list)
 
-        # remove NaN rows
         collisions = collisions[
             collisions.index.get_level_values("level_number_lower").notnull()
             & collisions.index.get_level_values("level_number_upper").notnull()
@@ -886,18 +894,17 @@ class CMFGENReader:
         collisions.columns = collisions.columns.astype(float)
 
         # assign new columns from the temperature grid
-        if tmp_grid:
-            for item in tmp_grid:
+        if temperature_grid:
+            for item in temperature_grid:
                 if item not in collisions.columns:
                     collisions.loc[:, item] = np.nan
 
-        # sort columns and interpolate
         collisions = collisions[sorted(collisions.columns)]
         collisions = collisions.interpolate(axis="columns", limit_direction="both")
 
         # remove columns not in the temperature grid
-        if tmp_grid:
-            old_cols = [item for item in collisions.columns if item not in tmp_grid]
+        if temperature_grid:
+            old_cols = [item for item in collisions.columns if item not in temperature_grid]
             collisions = collisions.drop(columns=old_cols)
 
         return collisions
