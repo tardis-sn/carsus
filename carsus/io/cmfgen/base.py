@@ -836,6 +836,11 @@ class CMFGENReader:
     def _get_collisions(self, data, temperature_grid=None):
         """
         Generate the `collisions` DataFrame.
+
+        Parameters
+        ----------
+        data : dict
+        temperature_grid : list of numbers, optional
         """
         col_list = []
 
