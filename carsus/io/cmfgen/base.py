@@ -856,29 +856,34 @@ class CMFGENReader:
             gi, lower_level_index, upper_level_index = [], [], []
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
-                try:
+                if ll in mapping:
                     lower_level_index.append(mapping[ll][0])
-                except:
-                    lower_level_index.append(np.nan)
-
-                try:
-                    upper_level_index.append(mapping[ul][0])
-                except:
-                    upper_level_index.append(np.nan)
-
-                try:
                     gi.append(mapping[ll][1])
-                except:
+                else:
+                    lower_level_index.append(np.nan)
                     gi.append(np.nan)
+                
+                if ul in mapping:
+                    upper_level_index.append(mapping[ul][0])
+                else:
+                    upper_level_index.append(np.nan)
 
             (
                 collisions["level_number_lower"],
                 collisions["level_number_upper"],
-            ) = (lower_level_index, upper_level_index)
+                collisions["gi"]
+            ) = (lower_level_index, upper_level_index, gi)
 
+            collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
+            
             collisions["atomic_number"] = ion[0]
             collisions["ion_number"] = ion[1]
             collisions = collisions.drop(columns=["label_lower", "label_upper"])
+
+            collisions = collisions.astype({
+                'level_number_upper': int,
+                'level_number_lower': int,
+            })
 
             collisions = collisions.set_index(
                 [
@@ -888,18 +893,13 @@ class CMFGENReader:
                     "level_number_upper",
                 ]
             )
-
-            collisions = collisions.div(gi, axis=0)
+            # divide the dataframe by gi and remove the column
+            collisions = collisions.iloc[:,:-1].div(collisions.gi, axis=0)
             col_list.append(collisions)
 
         collisions = pd.concat(col_list)
 
-        collisions = collisions[
-            collisions.index.get_level_values("level_number_lower").notnull()
-            & collisions.index.get_level_values("level_number_upper").notnull()
-        ]
-
-        collisions.columns = collisions.columns.astype(float)
+        collisions.columns = collisions.columns.map(float)
 
         # assign new columns from the temperature grid
         if temperature_grid:
