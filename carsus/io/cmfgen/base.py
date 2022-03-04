@@ -477,7 +477,9 @@ class CMFGENReader:
         self.ions = list(data.keys())
         self._get_levels_lines(data)
         if collisions:
-            self.collisions = self._get_collisions(data, temperature_grid=temperature_grid)
+            self.collisions, self.collisional_metadata = self._get_collisions(
+                data, temperature_grid=temperature_grid
+            )
 
 
     @classmethod
@@ -914,5 +916,10 @@ class CMFGENReader:
         if temperature_grid:
             old_cols = [item for item in collisions.columns if item not in temperature_grid]
             collisions = collisions.drop(columns=old_cols)
+        
+        metadata = pd.Series({
+            "temperatures": collisions.columns
+        })
+        collisions.columns = ['' for _ in collisions.columns]
 
-        return collisions
+        return collisions, metadata
