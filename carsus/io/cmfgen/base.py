@@ -918,8 +918,9 @@ class CMFGENReader:
             collisions = collisions.drop(columns=old_cols)
         
         metadata = pd.Series({
-            "temperatures": collisions.columns
+            "temperatures": collisions.columns.astype(int)
         })
-        collisions.columns = ['' for _ in collisions.columns]
+
+        collisions.columns = range(collisions.shape[1])
 
         return collisions, metadata
