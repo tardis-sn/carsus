@@ -98,30 +98,6 @@ def gbf_n_fname(refdata_path):
         "gbf_n_data.dat",
     )
 
-
-@with_refdata
-@pytest.fixture()
-def si1_data_dict(si2_osc_kurucz_fname):
-    si1_levels = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)  #  (carsus) Si 1 == Si II
-    si1_lines = CMFGENOscillatorStrengthsParser(si2_osc_kurucz_fname)
-    return {'Si 1': dict(levels = si1_levels, lines = si1_lines)}
-
-@with_refdata
-@pytest.fixture()
-def si1_reader(si1_data_dict):
-    return CMFGENReader(si1_data_dict)
-
-@with_refdata
-@pytest.fixture()
-def si2_levels_head_df():
-    return pd.read_csv(StringIO(si2_levels_head), delim_whitespace=True, names=['energy', 'j', 'label', 'method', 'priority'])
-
-@with_refdata
-@pytest.fixture()
-def si2_lines_head_df():
-    return pd.read_csv(StringIO(si2_lines_head),delim_whitespace=True, names=['energy_lower', 'energy_upper', 'gf', 'j_lower', 
-                                                                                'j_upper', 'wavelength'])
-
 @with_refdata
 @pytest.fixture()
 def si1_data_dict(si2_osc_kurucz_fname):
@@ -142,7 +118,7 @@ def si2_levels_head_df():
 @with_refdata
 @pytest.fixture()
 def si2_lines_head_df():
-    return pd.read_csv(StringIO(si2_lines_head),delim_whitespace=True, names=['energy_lower', 'energy_upper', 'gf', 'j_lower', 
+    return pd.read_csv(StringIO(si2_lines_head), delim_whitespace=True, names=['energy_lower', 'energy_upper', 'gf', 'j_lower', 
                                                                                 'j_upper', 'wavelength'])
 
 @with_refdata
