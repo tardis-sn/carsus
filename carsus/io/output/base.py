@@ -70,12 +70,23 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        if (chianti_reader is not None) and (not chianti_reader.collisions.empty):
-            self.collisions = self.create_collisions(**collisions_param)
-        
-        if hasattr(cmfgen_reader, 'collisions'):
-            self.cmfgen_collisions = cmfgen_reader.collisions
-            self.cmfgen_collisions_metadata = cmfgen_reader.collisional_metadata
+        if hasattr(cmfgen_reader, "collisions") and (
+            (chianti_reader is not None) and (not chianti_reader.collisions.empty)
+        ):
+            raise ValueError(
+                "Both Chainti and CMFGEN readers contain the collisions dataframe."
+                "Please set collisions=True in one or the other but not both."
+            )
+        else:
+            if hasattr(cmfgen_reader, "collisions"):
+                self.collisions = cmfgen_reader.collisions
+                self.collisions_metadata = cmfgen_reader.collisional_metadata
+            else:
+                self.collisions = self.create_collisions(**collisions_param)
+                self.collisions_metadata = pd.Series({
+                    "temperatures": collisions_param["temperatures"],
+                    "dataset": "chianti"
+                })
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):
             self.cross_sections = self.create_cross_sections()
@@ -993,15 +1004,13 @@ class TARDISAtomData:
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
-
-            if hasattr(self, 'collisions_prepared'):
-                f.put('/collision_data', self.collisions_prepared)
-                f.put('/collision_data_temperatures', 
-                      pd.Series(self.collisions_param['temperatures']))
             
-            if hasattr(self, 'cmfgen_collisions'):
-                f.put('/cmfgen_collisions', self.cmfgen_collisions)
-                f.put('/cmfgen_collisions_metadata', self.cmfgen_collisions_metadata)
+            if hasattr(self, 'collisions'):
+                if self.collisions_metadata.name == "chianti":
+                    f.put('/collisions', self.collisions_prepared)
+                else:
+                    f.put('/collisions', self.collisions)
+                f.put('/collisions_metadata', self.collisions_metadata)
 
             if hasattr(self, 'cross_sections'):
                 f.put('/photoionization_data', self.cross_sections_prepared)
