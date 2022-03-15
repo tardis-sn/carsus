@@ -537,9 +537,9 @@ class CMFGENReader:
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
                 col_parser = CMFGENCollisionalStrengthsParser(col_fname)
 
-                data[ion]['levels'] = lvl_parser.base
-                data[ion]['lines'] = lns_parser.base
-                data[ion]['collisions'] = col_parser.base
+                data[ion]['levels'] = lvl_parser.base.copy()
+                data[ion]['lines'] = lns_parser.base.copy()
+                data[ion]['collisions'] = col_parser.base.copy()
                 
                 if ionization_energies:
                     data[ion]['ionization_energy'] = float(lvl_parser.header['Ionization energy'])
@@ -738,7 +738,7 @@ class CMFGENReader:
             symbol = convert_atomic_number2symbol(ion[0])
             logger.info(f'Loading atomic data for {symbol} {ion[1]}.')
 
-            lvl = reader['levels']
+            lvl = reader['levels'].copy()
             # some ID's have negative values (theoretical?)
             lvl.loc[ lvl['ID'] < 0, 'method'] = 'theor'
             lvl.loc[ lvl['ID'] > 0, 'method'] = 'meas'
@@ -749,7 +749,7 @@ class CMFGENReader:
             lvl['ion_charge'] =  ion_charge 
             lvl_list.append(lvl)
 
-            lns = reader['lines']
+            lns = reader['lines'].copy()
             lns = lns.set_index(['i', 'j'])
             lns['energy_lower'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=0).values
             lns['energy_upper'] = lvl_id['E(cm^-1)'].reindex(lns.index, level=1).values
