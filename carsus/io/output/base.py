@@ -85,7 +85,8 @@ class TARDISAtomData:
                 self.collisions = self.create_collisions(**collisions_param)
                 self.collisions_metadata = pd.Series({
                     "temperatures": collisions_param["temperatures"],
-                    "dataset": "chianti"
+                    "dataset": "chianti",
+                    "info": None
                 })
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):

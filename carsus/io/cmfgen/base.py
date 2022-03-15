@@ -925,7 +925,9 @@ class CMFGENReader:
         
         metadata = pd.Series({
             "temperatures": collisions.columns.astype(int).values,
-            "dataset": "cmfgen"
+            "dataset": "cmfgen",
+            "info": "The dataframe values are thermally-averaged effective collision "
+                    "strengths divided by the statistical weights of the lower levels."
         })
 
         collisions.columns = range(collisions.shape[1])
