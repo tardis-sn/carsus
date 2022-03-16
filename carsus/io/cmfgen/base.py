@@ -504,7 +504,7 @@ class CMFGENReader:
                     logger.info(f'Configuration schema found for {symbol} {ion[1]}.')
 
                 except KeyError:
-                    continue
+                    raise KeyError(f'Configuration schema missing for {symbol} {ion[1]}.')
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
                                                 ).as_posix()
