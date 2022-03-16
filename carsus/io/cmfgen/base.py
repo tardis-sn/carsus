@@ -504,7 +504,9 @@ class CMFGENReader:
                     logger.info(f'Configuration schema found for {symbol} {ion[1]}.')
 
                 except KeyError:
-                    raise KeyError(f'Configuration schema missing for {symbol} {ion[1]}.')
+                    raise KeyError(f'Configuration schema missing for {symbol} {ion[1]}.'
+                                    'Please check the CMFGEN configuration file: carsus/data/cmfgen_config.yml'
+                    )
 
                 osc_fname = BASE_PATH.joinpath(ion_keys['osc']
                                                 ).as_posix()
