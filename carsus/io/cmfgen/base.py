@@ -795,7 +795,7 @@ class CMFGENReader:
                             hyd_phixs_energy_grid_ryd[(n, l)] = [e_threshold_ev / RYD_TO_EV * 10 ** (l_start_u + l_del_u * i) for i in range(l_points)]
                             hyd_phixs[(n,l)] = hyd.loc[(n,l)].tolist()
 
-                pxs = self.cross_sections_squeeze(reader['cross_sections'][0], lvl, hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
+                pxs = self.cross_sections_squeeze(reader['cross_sections'][0], lvl.copy(), hyd_phixs_energy_grid_ryd, hyd_phixs, hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor)
                 pxs['atomic_number'] = ion[0]
                 pxs['ion_charge'] = ion[1]
                 pxs_list.append(pxs)
@@ -855,24 +855,31 @@ class CMFGENReader:
         for ion, data_dict in data.items():
             levels = data_dict["levels"].copy()
             collisions = data_dict["collisions"].copy()
+            levels_combine = self.levels.copy().reset_index()
 
-            # mapping of label names and their IDs
-            mapping = {
-                label: [id_, g] for label, id_, g in zip(levels.label, levels.ID, levels.g)
+            label_ind_mapping = {
+                label: index for label, index in zip(levels_combine.label, levels_combine.level_index )
+            }
+            
+            label_g_mapping = {
+                label: g for label, g in zip(levels.label, levels.g)
             }
 
             gi, lower_level_index, upper_level_index = [], [], []
 
             for ll, ul in zip(collisions.label_lower, collisions.label_upper):
-                if ll in mapping:
-                    lower_level_index.append(mapping[ll][0])
-                    gi.append(mapping[ll][1])
+                if ll in label_ind_mapping:
+                    lower_level_index.append(label_ind_mapping[ll])
                 else:
                     lower_level_index.append(np.nan)
-                    gi.append(np.nan)
                 
-                if ul in mapping:
-                    upper_level_index.append(mapping[ul][0])
+                if ll in label_g_mapping:
+                    gi.append(label_g_mapping[ll])
+                else:
+                    gi.append(np.nan)
+
+                if ul in label_ind_mapping:
+                    upper_level_index.append(label_ind_mapping[ul])
                 else:
                     upper_level_index.append(np.nan)
 
