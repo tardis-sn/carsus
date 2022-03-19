@@ -74,7 +74,7 @@ class TARDISAtomData:
             (chianti_reader is not None) and (not chianti_reader.collisions.empty)
         ):
             raise ValueError(
-                "Both Chainti and CMFGEN readers contain the collisions dataframe."
+                "Both Chianti and CMFGEN readers contain the collisions dataframe."
                 "Please set collisions=True in one or the other but not both."
             )
         else:

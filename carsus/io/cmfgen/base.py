@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import roman
 import yaml
+from scipy import interpolate
 
 from carsus import __path__ as CARSUS_PATH
 from carsus.io.base import BaseParser
@@ -470,7 +471,7 @@ class CMFGENReader:
             Option to calculate collisional data, by default False.
         priority: int, optional
             Priority of the current data source, by default 10.
-        temperature_grid : list of numbers, optional
+        temperature_grid : array/list of numbers, optional
             Temperatures to have in the collision dataframe. The collision dataframe
             will have all the temperatures from the CMFGEN dataset by default.
 
@@ -535,11 +536,12 @@ class CMFGENReader:
                 
                 lvl_parser = CMFGENEnergyLevelsParser(osc_fname)
                 lns_parser = CMFGENOscillatorStrengthsParser(osc_fname)
-                col_parser = CMFGENCollisionalStrengthsParser(col_fname)
-
                 data[ion]['levels'] = lvl_parser.base.copy()
                 data[ion]['lines'] = lns_parser.base.copy()
-                data[ion]['collisions'] = col_parser.base.copy()
+                
+                if collisions:
+                    col_parser = CMFGENCollisionalStrengthsParser(col_fname)
+                    data[ion]['collisions'] = col_parser.base.copy()
                 
                 if ionization_energies:
                     data[ion]['ionization_energy'] = float(lvl_parser.header['Ionization energy'])
@@ -846,11 +848,11 @@ class CMFGENReader:
         data : dict
            Dictionary containing one dictionary per species with 
            keys `levels` and `lines`. 
-        temperature_grid : list of numbers, optional
+        temperature_grid : array/list of numbers, optional
             Temperatures to have in the collision dataframe. The collision dataframe
             will have all the temperatures from the CMFGEN dataset by default.
         """
-        col_list = []
+        col_list, col_interpolator, t_grid = [], [], []
 
         for ion, data_dict in data.items():
             levels = data_dict["levels"].copy()
@@ -858,7 +860,7 @@ class CMFGENReader:
             levels_combine = self.levels.copy().reset_index()
 
             label_ind_mapping = {
-                label: index for label, index in zip(levels_combine.label, levels_combine.level_index )
+                label: index for label, index in zip(levels_combine.label, levels_combine.level_index)
             }
             
             label_g_mapping = {
@@ -910,26 +912,35 @@ class CMFGENReader:
             )
             # divide the dataframe by gi and remove the column
             collisions = collisions.iloc[:,:-1].div(collisions.gi, axis=0)
+            collisions.columns = collisions.columns.map(float)
+            
+            col_interpolator.append(interpolate.interp1d(
+                collisions.columns,
+                collisions.values,
+                bounds_error=False,
+                axis=1,
+            ))
+            
+            t_grid.extend(collisions.columns)
             col_list.append(collisions)
-
-        collisions = pd.concat(col_list)
-
-        collisions.columns = collisions.columns.map(float)
-
-        # assign new columns from the temperature grid
-        if temperature_grid:
-            for item in temperature_grid:
-                if item not in collisions.columns:
-                    collisions.loc[:, item] = np.nan
-
-        collisions = collisions[sorted(collisions.columns)]
-        collisions = collisions.interpolate(axis="columns", limit_direction="both")
-
-        # remove columns not in the temperature grid
-        if temperature_grid:
-            old_cols = [item for item in collisions.columns if item not in temperature_grid]
-            collisions = collisions.drop(columns=old_cols)
         
+        if temperature_grid is None:
+            temperature_grid = sorted(list(set(t_grid)))
+
+        col_interp = []
+        for ion_col_data, interpolator in zip(col_list, col_interpolator):
+            ion_interp = pd.DataFrame(
+                interpolator(temperature_grid),
+                index=ion_col_data.index,
+                columns=temperature_grid
+            )
+            ion_interp = ion_interp.fillna(method="bfill", axis=1)
+            ion_interp = ion_interp.fillna(method="ffill", axis=1)
+            col_interp.append(ion_interp)
+
+        collisions = pd.concat(col_interp)
+        collisions = collisions[sorted(collisions.columns)]
+
         metadata = pd.Series({
             "temperatures": collisions.columns.astype(int).values,
             "dataset": "cmfgen",
