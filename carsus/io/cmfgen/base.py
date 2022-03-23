@@ -169,7 +169,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         skiprows, _ = find_row(fname, "ransition\T")
         config = {'header': None,
                   'index_col': False,
-                  'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDP]e)-',
+                  'sep': '\s*-?\s+-?|(?<=[^edED])-|(?<=[FDPS]e)-',
                   'skiprows': skiprows,
                   'engine': 'python',
                   }
