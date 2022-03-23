@@ -853,15 +853,14 @@ class CMFGENReader:
             will have all the temperatures from the CMFGEN dataset by default.
         """
         col_list, col_interpolator, t_grid = [], [], []
+        levels_combine = self.levels.copy().reset_index()
+        label_ind_mapping = {
+            label: index for label, index in zip(levels_combine.label, levels_combine.level_index)
+        }
 
         for ion, data_dict in data.items():
             levels = data_dict["levels"].copy()
             collisions = data_dict["collisions"].copy()
-            levels_combine = self.levels.copy().reset_index()
-
-            label_ind_mapping = {
-                label: index for label, index in zip(levels_combine.label, levels_combine.level_index)
-            }
             
             label_g_mapping = {
                 label: g for label, g in zip(levels.label, levels.g)
@@ -885,12 +884,10 @@ class CMFGENReader:
                 else:
                     upper_level_index.append(np.nan)
 
-            (
-                collisions["level_number_lower"],
-                collisions["level_number_upper"],
-                collisions["gi"]
-            ) = (lower_level_index, upper_level_index, gi)
-
+            collisions["level_number_lower"] = lower_level_index
+            collisions["level_number_upper"] = upper_level_index
+            collisions["gi"] = gi
+            
             collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
             
             collisions["atomic_number"] = ion[0]
@@ -912,7 +909,7 @@ class CMFGENReader:
             )
             # divide the dataframe by gi and remove the column
             collisions = collisions.iloc[:,:-1].div(collisions.gi, axis=0)
-            collisions.columns = collisions.columns.map(float)
+            collisions.columns = collisions.columns.astype(float)
             
             col_interpolator.append(interpolate.interp1d(
                 collisions.columns,
@@ -928,9 +925,15 @@ class CMFGENReader:
             temperature_grid = sorted(list(set(t_grid)))
 
         col_interp = []
-        for ion_col_data, interpolator in zip(col_list, col_interpolator):
+        for ion_col_data, interpolator, ion in zip(col_list, col_interpolator, data.keys()):
+            interpolated_values = interpolator(temperature_grid)
+            if len(interpolated_values):    
+                logger.info(f"Filling in {sum(np.isnan(interpolated_values[0]))} "
+                            f"values for ion {ion} that are outside the tabulated "
+                            "temperature range using the last valid value."
+                )
             ion_interp = pd.DataFrame(
-                interpolator(temperature_grid),
+                interpolated_values,
                 index=ion_col_data.index,
                 columns=temperature_grid
             )
