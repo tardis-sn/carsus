@@ -579,10 +579,6 @@ class CMFGENReader:
             lambda_angstrom = match['Lam(A)'].tolist()
             level_number = (match['ID'] -1).tolist()
 
-            # Get statistical weights for J-splitted levels
-            match['w'] = match['g']/match.sum()['g']
-            w = match['w'].tolist()
-
             # match is > 1 just for J-splitted levels
             for j in range(len(match)):
                 threshold_energy_ryd = HC_IN_EV_ANGSTROM / lambda_angstrom[j] / RYD_TO_EV
@@ -687,7 +683,6 @@ class CMFGENReader:
 
                 df = pd.DataFrame(phixs_table, columns=['energy', 'sigma'])
                 df['level_index'] = level_number[j]
-                df['sigma'] = w[j]*df['sigma']
 
                 phixs_table_list.append(df)
 
