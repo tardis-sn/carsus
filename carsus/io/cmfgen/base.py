@@ -865,6 +865,7 @@ class CMFGENReader:
             label_g_mapping = {
                 label: g for label, g in zip(levels.label, levels.g)
             }
+            missing_labels = set()
 
             gi, lower_level_index, upper_level_index = [], [], []
 
@@ -872,18 +873,23 @@ class CMFGENReader:
                 if ll in label_ind_mapping:
                     lower_level_index.append(label_ind_mapping[ll])
                 else:
+                    missing_labels.add(ll)
                     lower_level_index.append(np.nan)
                 
                 if ll in label_g_mapping:
                     gi.append(label_g_mapping[ll])
                 else:
+                    missing_labels.add(ll)
                     gi.append(np.nan)
 
                 if ul in label_ind_mapping:
                     upper_level_index.append(label_ind_mapping[ul])
                 else:
+                    missing_labels.add(ul)
                     upper_level_index.append(np.nan)
 
+            if missing_labels:
+                logger.info(f"Entries having label(s): {', '.join(missing_labels)} will be dropped for ion: {ion}.")
             collisions["level_number_lower"] = lower_level_index
             collisions["level_number_upper"] = upper_level_index
             collisions["gi"] = gi
