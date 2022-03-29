@@ -460,7 +460,7 @@ class CMFGENReader:
 
     """
 
-    def __init__(self, data, priority=10, collisions=False, temperature_grid=None):
+    def __init__(self, data, priority=10, collisions=False, temperature_grid=None, drop_mismatched_labels=False):
         """
         Parameters
         ----------
@@ -481,7 +481,7 @@ class CMFGENReader:
         self._get_levels_lines(data)
         if collisions:
             self.collisions, self.collisional_metadata = self._get_collisions(
-                data, temperature_grid=temperature_grid
+                data, temperature_grid=temperature_grid, drop_mismatched_labels=drop_mismatched_labels
             )
 
 
@@ -496,6 +496,7 @@ class CMFGENReader:
         config_yaml=None,
         collisions=False,
         temperature_grid=None,
+        drop_mismatched_labels=False
     ):
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -572,7 +573,7 @@ class CMFGENReader:
                         data[ion]['gbf'] = gbf_parser.base
 
 
-        return cls(data, priority, collisions, temperature_grid)
+        return cls(data, priority, collisions, temperature_grid, drop_mismatched_labels)
 
     @staticmethod
     def cross_sections_squeeze(reader_phixs, ion_levels,
@@ -839,7 +840,7 @@ class CMFGENReader:
 
         return
 
-    def _get_collisions(self, data, temperature_grid=None):
+    def _get_collisions(self, data, temperature_grid=None, drop_mismatched_labels=False):
         """
         Generate the `collisions` DataFrame.
 
@@ -852,7 +853,7 @@ class CMFGENReader:
             Temperatures to have in the collision dataframe. The collision dataframe
             will have all the temperatures from the CMFGEN dataset by default.
         """
-        col_list, col_interpolator, t_grid = [], [], []
+        col_list, t_grid = [], []
         levels_combine = self.levels.copy().reset_index()
         label_ind_mapping = {
             label: index for label, index in zip(levels_combine.label, levels_combine.level_index)
@@ -869,22 +870,37 @@ class CMFGENReader:
 
             gi, lower_level_index, upper_level_index = [], [], []
 
-            for ll, ul in zip(collisions.label_lower, collisions.label_upper):
+            for ll, ul in zip(collisions.label_lower, collisions.label_upper):  
                 if ll in label_ind_mapping:
                     lower_level_index.append(label_ind_mapping[ll])
                 else:
+                    if not drop_mismatched_labels:
+                        raise KeyError(
+                            f"Label {ll} for ion {ion} could not be mapped. "
+                            "Please check the atomic data files."
+                        )
                     missing_labels.add(ll)
                     lower_level_index.append(np.nan)
                 
                 if ll in label_g_mapping:
                     gi.append(label_g_mapping[ll])
                 else:
+                    if not drop_mismatched_labels:
+                        raise KeyError(
+                            f"Label {ll} for ion {ion} could not be mapped. "
+                            "Please check the atomic data files."
+                        )
                     missing_labels.add(ll)
                     gi.append(np.nan)
 
                 if ul in label_ind_mapping:
                     upper_level_index.append(label_ind_mapping[ul])
                 else:
+                    if not drop_mismatched_labels:
+                        raise KeyError(
+                            f"Label {ll} for ion {ion} could not be mapped. "
+                            "Please check the atomic data files."
+                        )
                     missing_labels.add(ul)
                     upper_level_index.append(np.nan)
 
@@ -895,7 +911,8 @@ class CMFGENReader:
             collisions["level_number_upper"] = upper_level_index
             collisions["gi"] = gi
             
-            collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
+            if drop_mismatched_labels:
+                collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
             
             collisions["atomic_number"] = ion[0]
             collisions["ion_number"] = ion[1]
