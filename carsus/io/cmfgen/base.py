@@ -890,6 +890,7 @@ class CMFGENReader:
 
             if missing_labels:
                 logger.info(f"Entries having label(s): {', '.join(missing_labels)} will be dropped for ion: {ion}.")
+            
             collisions["level_number_lower"] = lower_level_index
             collisions["level_number_upper"] = upper_level_index
             collisions["gi"] = gi
@@ -917,13 +918,6 @@ class CMFGENReader:
             collisions = collisions.iloc[:,:-1].div(collisions.gi, axis=0)
             collisions.columns = collisions.columns.astype(float)
             
-            col_interpolator.append(interpolate.interp1d(
-                collisions.columns,
-                collisions.values,
-                bounds_error=False,
-                axis=1,
-            ))
-            
             t_grid.extend(collisions.columns)
             col_list.append(collisions)
         
@@ -931,20 +925,35 @@ class CMFGENReader:
             temperature_grid = sorted(list(set(t_grid)))
 
         col_interp = []
-        for ion_col_data, interpolator, ion in zip(col_list, col_interpolator, data.keys()):
-            interpolated_values = interpolator(temperature_grid)
-            if len(interpolated_values):    
-                logger.info(f"Filling in {sum(np.isnan(interpolated_values[0]))} "
+        for ion_col_data, ion in zip(col_list, data.keys()):
+            ion_col_data_columns = ion_col_data.columns
+            interpolated_values = [
+                np.interp(
+                    x=temperature_grid,
+                    xp=ion_col_data_columns,
+                    fp=ion_col_data_entry 
+                ) for ion_col_data_entry in ion_col_data.values
+            ]
+
+            nans_replaced = len(
+                np.where(
+                    np.logical_or(
+                        temperature_grid < ion_col_data_columns[0],
+                        temperature_grid > ion_col_data_columns[-1],
+                    )
+                )[0]
+            )
+            if nans_replaced:    
+                logger.info(f"Filling in {nans_replaced} "
                             f"values for ion {ion} that are outside the tabulated "
-                            "temperature range using the last valid value."
+                            "temperature range using the last tabulated value."
                 )
+
             ion_interp = pd.DataFrame(
                 interpolated_values,
                 index=ion_col_data.index,
                 columns=temperature_grid
             )
-            ion_interp = ion_interp.fillna(method="bfill", axis=1)
-            ion_interp = ion_interp.fillna(method="ffill", axis=1)
             col_interp.append(ion_interp)
 
         collisions = pd.concat(col_interp)
@@ -956,7 +965,6 @@ class CMFGENReader:
             "info": "The dataframe values are thermally-averaged effective collision "
                     "strengths divided by the statistical weights of the lower levels."
         })
-
         collisions.columns = range(collisions.shape[1])
 
         return collisions, metadata
