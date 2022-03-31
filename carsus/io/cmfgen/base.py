@@ -898,7 +898,7 @@ class CMFGENReader:
                 else:
                     if not drop_mismatched_labels:
                         raise KeyError(
-                            f"Label {ll} for ion {ion} could not be mapped. "
+                            f"Label {ul} for ion {ion} could not be mapped. "
                             "Please check the atomic data files."
                         )
                     missing_labels.add(ul)
