@@ -896,12 +896,16 @@ class CMFGENReader:
                 if ul in label_ind_mapping:
                     upper_level_index.append(label_ind_mapping[ul])
                 else:
-                    if not drop_mismatched_labels:
-                        raise KeyError(
-                            f"Label {ul} for ion {ion} could not be mapped. "
-                            "Please check the atomic data files."
-                        )
-                    missing_labels.add(ul)
+                    if ul!='I':
+                        if not drop_mismatched_labels:
+                            raise KeyError(
+                                f"Label {ll} for ion {ion} could not be mapped. "
+                                "Please check the atomic data files."
+                            )
+                        missing_labels.add(ul)
+                    else:
+                        logger.info("Dropping collisional ionization data.")
+                    
                     upper_level_index.append(np.nan)
 
             if missing_labels:
