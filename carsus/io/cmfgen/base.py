@@ -899,7 +899,7 @@ class CMFGENReader:
                     if ul!='I':
                         if not drop_mismatched_labels:
                             raise KeyError(
-                                f"Label {ll} for ion {ion} could not be mapped. "
+                                f"Label {ul} for ion {ion} could not be mapped. "
                                 "Please check the atomic data files."
                             )
                         missing_labels.add(ul)
@@ -915,9 +915,8 @@ class CMFGENReader:
             collisions["level_number_upper"] = upper_level_index
             collisions["gi"] = gi
             
-            if drop_mismatched_labels:
-                collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
-            
+            collisions = collisions.dropna(subset=['level_number_lower', 'level_number_upper'])
+        
             collisions["atomic_number"] = ion[0]
             collisions["ion_number"] = ion[1]
             collisions = collisions.drop(columns=["label_lower", "label_upper"])
