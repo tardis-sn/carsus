@@ -86,6 +86,12 @@ atom:
 
   Co:
     ion_charge:
+      1:
+        date: 30oct12
+        osc: fin_osc_bound
+        col: Co2_COL_DATA
+        pho:
+          - phot_nosm
       2:
         date: 30oct12
         osc: coiii_osc.dat
@@ -104,6 +110,12 @@ atom:
           - niphot_b.dat
           - niphot_c.dat
           - niphot_d.dat
+      1:
+        date: 12sep12
+        osc: fin_osc
+        col: n2col.dat
+        pho:
+          - phot_sm_3000
 
   S:
     ion_charge:
@@ -120,3 +132,77 @@ atom:
         col: s2_col
         pho:
           - phot_sm_3000
+
+
+  Fe:
+    ion_charge:
+      1: 
+        date: 10sep16
+        osc: fe2_osc
+        col: fe2_col.dat
+        pho:
+          - phot_op.dat
+
+      2: 
+        date: 30oct12
+        osc: FeIII_OSC
+        col: col_data.dat
+        pho:
+          - phot_sm_3000.dat
+
+
+  Ca:
+    ion_charge:
+      1: 
+        date: 30oct12
+        osc: ca2_osc_split.dat
+        col: ca2col.dat
+        pho:
+          - ca2_phot_a.dat
+
+  O:
+    ion_charge:
+      0: 
+        date: 20sep11
+        osc: oi_osc_mchf
+        col: oi_col
+        pho:
+          - phot_nosm_A
+          - phot_nosm_B
+      1: 
+        date: 23mar05
+        osc: o2osc_fin.dat
+        col: o2col.dat
+        pho:
+          - phot_sm_3000.dat
+
+  Ti:
+    ion_charge:
+      1: 
+        date: 18oct00
+        osc: tkii_osc.dat
+        col: col_guess.dat
+        pho:
+          - phot_data.dat
+      2:
+        date: 18oct00
+        osc: tkiii_osc.dat
+        col: col_guess.dat
+        pho:
+          - phot_data.dat  
+
+  Ni:
+    ion_charge:
+      1: 
+        date: 30oct12
+        osc: nkii_osc.dat
+        col: col_data_bautista
+        pho:
+          - phot_data
+      2:
+        date: 27aug12
+        osc: nkiii_osc.dat
+        col: col_data.dat
+        pho:
+          - phot_data.dat
+         

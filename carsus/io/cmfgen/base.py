@@ -554,7 +554,9 @@ class CMFGENReader:
                     logger.info(f"Configuration schema found for {symbol} {ion[1]}.")
 
                 except KeyError:
-                    continue
+                    raise KeyError(f'Configuration schema missing for {symbol} {ion[1]}.'
+                                    'Please check the CMFGEN configuration file: carsus/data/cmfgen_config.yml'
+                    )
 
                 osc_fname = BASE_PATH.joinpath(ion_keys["osc"]).as_posix()
                 col_fname = BASE_PATH.joinpath(ion_keys["col"]).as_posix()
@@ -640,11 +642,7 @@ class CMFGENReader:
 
             lambda_angstrom = match["Lam(A)"].tolist()
             level_number = (match["ID"] - 1).tolist()
-
-            # Get statistical weights for J-splitted levels
-            match["w"] = match["g"] / match.sum()["g"]
-            w = match["w"].tolist()
-
+            
             # match is > 1 just for J-splitted levels
             for j in range(len(match)):
                 threshold_energy_ryd = (
@@ -793,8 +791,7 @@ class CMFGENReader:
 
                 df = pd.DataFrame(phixs_table, columns=["energy", "sigma"])
                 df["level_index"] = level_number[j]
-                df["sigma"] = w[j] * df["sigma"]
-
+                
                 phixs_table_list.append(df)
 
         ion_phixs_table = pd.concat(phixs_table_list)
