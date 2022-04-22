@@ -19,11 +19,11 @@ sources and output them to file formats readable by radiative transfer codes.
 
 .. image:: https://github.com/tardis-sn/carsus/actions/workflows/docs-build.yml/badge.svg
     :target: https://tardis-sn.github.io/carsus
-    :alt: Carsus Documentation
+    :alt: docs
 
-.. image:: https://dev.azure.com/tardis-sn/Carsus/_apis/build/status/Carsus%20tests?branchName=master
-    :target: https://dev.azure.com/tardis-sn/Carsus/_build/latest?definitionId=6&branchName=master
-    :alt: Azure Pipelines
+.. image:: https://github.com/tardis-sn/carsus/actions/workflows/unit-tests.yml/badge.svg
+    :target: https://github.com/tardis-sn/carsus/actions/workflows/unit-tests.yml
+    :alt: tests
 
 *******
 License
