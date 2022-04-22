@@ -41,7 +41,7 @@ Install the Package
 .. code ::
 
     $ conda activate carsus
-    $ python setup.py install
+    $ pip install -e .
 
 
 You are ready! Follow the `Quickstart for Carsus <quickstart.html>`_ guide to continue.
