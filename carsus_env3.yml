@@ -32,7 +32,6 @@ dependencies:
 
   # Analysis
   - notebook
-  - tornado=6.0  # ???
   - matplotlib-base
 
   # Documentation
@@ -54,7 +53,6 @@ dependencies:
   - pytest=4
   - pytest-cov
   - pytest-astropy
-  - pytest-notebook
   - pytest-xdist
 
   # ChiantiPy
@@ -63,3 +61,7 @@ dependencies:
 
   # Other
   - git-lfs
+
+  # Pip
+  - pip:
+    - pytest_notebook>=0.7
