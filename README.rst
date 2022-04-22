@@ -13,10 +13,6 @@ sources and output them to file formats readable by radiative transfer codes.
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-.. image:: https://badges.gitter.im/Join%20Chat.svg
-    :target: https://gitter.im/tardis-sn/carsus
-    :alt: Join Chat
-
 .. image:: https://github.com/tardis-sn/carsus/actions/workflows/docs-build.yml/badge.svg
     :target: https://tardis-sn.github.io/carsus
     :alt: docs
@@ -24,6 +20,10 @@ sources and output them to file formats readable by radiative transfer codes.
 .. image:: https://github.com/tardis-sn/carsus/actions/workflows/unit-tests.yml/badge.svg
     :target: https://github.com/tardis-sn/carsus/actions/workflows/unit-tests.yml
     :alt: tests
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+    :target: https://gitter.im/tardis-sn/carsus
+    :alt: Join Chat
 
 *******
 License
