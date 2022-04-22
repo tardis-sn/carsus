@@ -54,11 +54,6 @@ dependencies:
   - pytest-cov
   - pytest-astropy
   - pytest-xdist
-  - pytest-notebook
-  - jupyter_client=6  # jupyter/jupyter_client/issues/637
-  - nbconvert=5  # chrisjsewell/pytest-notebook/issues/10
-  - coverage=4  # chrisjsewell/pytest-notebook/issues/6
-  - attrs=20  # chrisjsewell/pytest-notebook/issues/16
 
   # ChiantiPy
   - scipy

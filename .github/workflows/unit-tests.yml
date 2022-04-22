@@ -27,7 +27,7 @@ env:
   PYTEST_FLAGS: --remote-data --runslow --test-db=carsus-db/test_databases/test.db
                 --refdata=carsus-refdata --cov=carsus --cov-report=xml
                 --cov-report=html
-  PYTEST_NB_FLAGS: --ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600
+  NBCONVERT_CMD: jupyter nbconvert --execute --nb-exec-timeout 600
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
@@ -99,7 +99,9 @@ jobs:
         run: pytest carsus -n ${{ env.PYTEST_CORES }} ${{ env.PYTEST_FLAGS }}
 
       - name: Run notebook tests
-        run: pytest carsus -n ${{ env.PYTEST_CORES }} ${{ env.PYTEST_NB_FLAGS }}
+        run: |
+          ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_legacy_consistency.ipynb
+          ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_output_base.ipynb
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         if: runner.os == 'Linux'
