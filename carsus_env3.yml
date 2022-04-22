@@ -15,23 +15,24 @@ dependencies:
 
   # I/O
   - pyyaml
-  - requests
   - uncertainties
-  - beautifulsoup4
-  - html5lib
   - pyparsing=2.2
   - sqlalchemy=1.0
+  - beautifulsoup4
+  - html5lib
   - h5py
   - pytables
-  - pyarrow=0.14
+  - pyarrow=0.14.1
+  - glog=0.5  # ???
+  - requests
   - roman
 
 # --- Not required for conda-forge package ---
 
   # Analysis
-  - jupyter
-  - jupyter_client=6  # jupyter/jupyter_client/issues/637
-  - matplotlib
+  - notebook
+  - tornado=6.0  # ???
+  - matplotlib-base
 
   # Documentation
   - sphinx
@@ -41,7 +42,6 @@ dependencies:
   - sphinx_rtd_theme
   - sphinxcontrib-apidoc
   - sphinxcontrib-bibtex
-  - nbconvert=5  # chrisjsewell/pytest-notebook/issues/10
   - nbformat
   - nbsphinx
   - numpydoc
@@ -55,14 +55,10 @@ dependencies:
   - pytest-astropy
   - pytest-notebook
   - pytest-xdist
-  - coverage=4  # chrisjsewell/pytest-notebook/issues/6
-  - attrs=20  # chrisjsewell/pytest-notebook/issues/16
 
   # ChiantiPy
   - scipy
   - ipyparallel
-  - blas=1.1  # numpy/numpy/issues/14165
 
   # Other
   - git-lfs
-  
