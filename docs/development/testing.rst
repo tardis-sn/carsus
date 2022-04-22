@@ -30,9 +30,16 @@ A set of flags can be appended to the above command to run different kinds of te
 - `--refdata=/path/to/carsus-refdata`
     Run tests marked with the ``@with_refdata`` decorator. Requires the
     `tardis-sn/carsus-refdata <https://github.com/tardis-sn/carsus-refdata>`_ repository.
-
-- `--ignore-glob="**/*.py" --nb-test-files --nb-exec-timeout 600`
-    Run notebook tests using the `pytest-notebook <https://pytest-notebook.readthedocs.io/en/latest/>`_ plugin.
   
 - `--cov=carsus --cov-report=xml --cov-report=html`
     Get code coverage results using the `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/>`_ plugin.
+
+
+==============
+Notebook Tests
+==============
+
+These are pseudo-integration tests that require the ``CARSUS_REFDATA`` environment variable exported before run:
+
+- `jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html carsus/io/tests/test_legacy_consistency.ipynb`
+- `jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html carsus/io/tests/test_output_base.ipynb`
