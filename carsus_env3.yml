@@ -12,6 +12,7 @@ dependencies:
   - pandas=1.0
   - astropy=3
   - chiantipy=0.8.4
+  - typing-extensions=4.1  # https://github.com/python/typing/issues/1158
 
   # I/O
   - pyyaml
@@ -23,7 +24,7 @@ dependencies:
   - h5py
   - pytables
   - pyarrow=0.14.1
-  - glog=0.5  # ???
+  - glog=0.5  # https://github.com/google/glog/issues/814
   - requests
   - roman
 
