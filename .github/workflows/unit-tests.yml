@@ -98,7 +98,7 @@ jobs:
       - name: Run unit tests
         run: pytest carsus -n ${{ env.PYTEST_CORES }} ${{ env.PYTEST_FLAGS }}
 
-      - name: Run notebook tests
+      - name: Run notebooks
         run: |
           ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_legacy_consistency.ipynb
           ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_output_base.ipynb
