@@ -67,3 +67,4 @@ pip-wheel-metadata/
 # Carsus
 carsus/tests/data/*.db
 carsus/model/tests/data/*.db
+docs/**/*.h5
