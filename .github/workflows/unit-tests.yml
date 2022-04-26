@@ -13,7 +13,7 @@ on:
     branches:
     - '*'
 
-  workflow_dispatch:
+  workflow_dispatch:  # manual trigger
 
 concurrency:
   group: tests-${{ github.ref }}
@@ -54,7 +54,7 @@ jobs:
         with:
           repository: tardis-sn/carsus-db
           path: carsus-db
-          lfs: false
+          lfs: false  # do not pull LFS objects
 
       - name: Pull test database
         run: |
