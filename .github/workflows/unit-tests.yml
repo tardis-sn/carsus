@@ -23,7 +23,6 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
-  PYTEST_CORES: auto
   PYTEST_FLAGS: --remote-data --runslow --test-db=carsus-db/test_databases/test.db
                 --refdata=carsus-refdata --cov=carsus --cov-report=xml
                 --cov-report=html
@@ -96,7 +95,7 @@ jobs:
         run: pip install -e .
 
       - name: Run unit tests
-        run: pytest carsus -n ${{ env.PYTEST_CORES }} ${{ env.PYTEST_FLAGS }}
+        run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Run notebooks
         run: |
