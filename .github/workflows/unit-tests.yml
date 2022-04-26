@@ -7,13 +7,11 @@ name: tests
 on:
   push:
     branches:
-    - master
+    - '*'
 
   pull_request:
     branches:
     - '*'
-
-  workflow_dispatch:  # manual trigger
 
 concurrency:
   group: tests-${{ github.ref }}
@@ -30,7 +28,6 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 jobs:
-
   build:
 
     strategy:
@@ -44,7 +41,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -94,7 +90,7 @@ jobs:
       - name: Install package
         run: pip install -e .
 
-      - name: Run unit tests
+      - name: Run tests
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Run notebooks
@@ -104,6 +100,5 @@ jobs:
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
 
-      - name: Upload to codecov.io
+      - name: Upload to Codecov
         run: bash <(curl -s https://codecov.io/bash)
-        if: runner.os == 'Linux'
