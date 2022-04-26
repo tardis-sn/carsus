@@ -104,7 +104,6 @@ jobs:
           ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_output_base.ipynb
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
-        if: runner.os == 'Linux'
 
       - name: Upload to codecov.io
         run: bash <(curl -s https://codecov.io/bash)
