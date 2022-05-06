@@ -70,6 +70,7 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
+        # FIXME: re-write this if-else block
         if hasattr(cmfgen_reader, "collisions") and (
             (chianti_reader is not None) and (not chianti_reader.collisions.empty)
         ):
@@ -909,17 +910,26 @@ class TARDISAtomData:
 
         """
 
-        collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
-                              'level_number_lower', 'g_ratio', 'delta_e'] + \
-                              sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
+        if self.collisions_metadata.dataset == 'chianti':
+            collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
+                                'level_number_lower', 'g_ratio', 'delta_e'] + \
+                                sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
+
+            collisions_index = ["atomic_number",
+                                "ion_number",
+                                "level_number_lower",
+                                "level_number_upper"]
+
+        elif self.collisions_metadata.dataset == 'cmfgen':
+            collisions_columns = self.collisions.columns
+            collisions_index = self.collisions.index.names
+
+        else:
+            raise ValueError("Unknown source of collisional data")
 
         collisions_prepared = self.collisions.loc[:, collisions_columns].copy()
-
-        collisions_prepared = collisions_prepared.set_index([
-                    "atomic_number",
-                    "ion_number",
-                    "level_number_lower",
-                    "level_number_upper"])
+        collisions_prepared = collisions_prepared.reset_index()
+        collisions_prepared = collisions_prepared.set_index(collisions_index)
 
         return collisions_prepared
 
@@ -1005,12 +1015,9 @@ class TARDISAtomData:
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
-            
+
             if hasattr(self, 'collisions'):
-                if self.collisions_metadata.name == "chianti":
-                    f.put('/collisions', self.collisions_prepared)
-                else:
-                    f.put('/collisions', self.collisions)
+                f.put('/collisions', self.collisions_prepared)
                 f.put('/collisions_metadata', self.collisions_metadata)
 
             if hasattr(self, 'cross_sections'):
@@ -1021,7 +1028,7 @@ class TARDISAtomData:
             for key in f.keys():
                 # Update the total MD5 sum
                 md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
-                
+
                 # Save the individual Series/DataFrame MD5
                 md5 = hash_pandas_object(f[key])
                 meta.append(('md5sum', key.lstrip('/'), md5[:20]))
