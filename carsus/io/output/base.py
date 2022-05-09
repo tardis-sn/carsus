@@ -927,8 +927,7 @@ class TARDISAtomData:
         else:
             raise ValueError("Unknown source of collisional data")
 
-        collisions_prepared = self.collisions.loc[:, collisions_columns].copy()
-        collisions_prepared = collisions_prepared.reset_index()
+        collisions_prepared = self.collisions.reset_index().loc[:, collisions_columns].copy()
         collisions_prepared = collisions_prepared.set_index(collisions_index)
 
         return collisions_prepared
