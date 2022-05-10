@@ -102,7 +102,7 @@ class GFALLReader(object):
     @property
     def gfall_raw(self):
         if self._gfall_raw is None:
-            self._gfall_raw, self.md5 = self.read_gfall_raw()
+            self._gfall_raw, self.version = self.read_gfall_raw()
         return self._gfall_raw
 
     @property

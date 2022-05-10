@@ -4,6 +4,7 @@ import hashlib
 import uuid
 import pytz
 import platform
+from carsus import FORMAT
 import numpy as np
 import pandas as pd
 import astropy.units as u
@@ -15,6 +16,8 @@ from carsus.util import (convert_atomic_number2symbol,
                          serialize_pandas_object,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
+
+FORMAT_VERSION = "v1.0"
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
@@ -1039,7 +1042,7 @@ class TARDISAtomData:
                          self.ionization_energies.version))
 
             meta.append(('datasets', 'gfall.dat',
-                         self.gfall_reader.md5[:20]))
+                         self.gfall_reader.version[:20]))
 
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti_data', 
@@ -1060,6 +1063,7 @@ class TARDISAtomData:
             uuid1 = uuid.uuid1().hex
 
             logger.info(f"Signing TARDISAtomData.")
+            logger.info(f"Format Version: {FORMAT_VERSION}")
             logger.info(f"MD5: {md5_hash.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
 
@@ -1067,6 +1071,7 @@ class TARDISAtomData:
             # to store these strings encoded (or change TARDIS code).
             f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
             f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
+            f.root._v_attrs['format_version'] = FORMAT_VERSION.encode('ascii')
             f.put('/meta', meta_df)
 
             utc = pytz.timezone('UTC')
