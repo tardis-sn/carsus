@@ -1041,11 +1041,11 @@ class TARDISAtomData:
             meta.append(('datasets', 'nist_spectra', 
                          self.ionization_energies.version))
 
-            meta.append(('datasets', 'gfall.dat',
+            meta.append(('datasets', 'gfall',
                          self.gfall_reader.version[:20]))
 
             if self.chianti_reader is not None:
-                meta.append(('datasets', 'chianti_data', 
+                meta.append(('datasets', 'chianti', 
                              self.chianti_reader.version))
 
             # Save relevant package versions
