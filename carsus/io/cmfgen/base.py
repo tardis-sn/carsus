@@ -481,6 +481,7 @@ class CMFGENReader:
         collisions=False,
         temperature_grid=None,
         drop_mismatched_labels=False,
+        version=None,
     ):
         """
         Parameters
@@ -506,6 +507,7 @@ class CMFGENReader:
                 temperature_grid=temperature_grid,
                 drop_mismatched_labels=drop_mismatched_labels,
             )
+        self.version = version
 
     @classmethod
     def from_config(
@@ -534,6 +536,7 @@ class CMFGENReader:
         data = {}
         with open(YAML_PATH) as f:
             conf = yaml.load(f, Loader=yaml.FullLoader)
+            version = conf["version"]
             ions = parse_selected_species(ions)
 
             if cross_sections and (1, 0) not in ions:
@@ -604,7 +607,7 @@ class CMFGENReader:
                         data[ion]["hyd"] = hyd_parser.base
                         data[ion]["gbf"] = gbf_parser.base
 
-        return cls(data, priority, collisions, temperature_grid, drop_mismatched_labels)
+        return cls(data, priority, collisions, temperature_grid, drop_mismatched_labels, version)
 
     @staticmethod
     def cross_sections_squeeze(

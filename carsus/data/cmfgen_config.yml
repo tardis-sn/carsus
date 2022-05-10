@@ -8,6 +8,8 @@
 #  rest are ignored.
 #
 
+version: "2016-11-15"        # date in ISO format
+
 atom:
   H:
     ion_charge:

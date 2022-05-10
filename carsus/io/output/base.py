@@ -1008,6 +1008,7 @@ class TARDISAtomData:
 
         """
 
+        MD5_DIGITS = 20
         with pd.HDFStore(fname, 'w') as f:
             f.put('/atom_data', self.atomic_weights.base)
             f.put('/ionization_data', self.ionization_energies_prepared)
@@ -1033,7 +1034,7 @@ class TARDISAtomData:
 
                 # Save the individual Series/DataFrame MD5
                 md5 = hash_pandas_object(f[key])
-                meta.append(('md5sum', key.lstrip('/'), md5[:20]))
+                meta.append(('md5sum', key.lstrip('/'), md5[:MD5_DIGITS]))
 
             # Save datasets versions
             meta.append(('datasets', 'nist_weights', 
@@ -1042,11 +1043,15 @@ class TARDISAtomData:
                          self.ionization_energies.version))
 
             meta.append(('datasets', 'gfall',
-                         self.gfall_reader.version[:20]))
+                         self.gfall_reader.version[:MD5_DIGITS]))
 
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti', 
                              self.chianti_reader.version))
+
+            if self.cmfgen_reader is not None:
+                meta.append(('datasets', 'cmfgen',
+                             self.cmfgen_reader.version))
 
             # Save relevant package versions
             meta.append(('software', 'python', platform.python_version()))
