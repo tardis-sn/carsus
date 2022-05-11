@@ -1009,6 +1009,7 @@ class TARDISAtomData:
         """
 
         MD5_DIGITS = 20
+
         with pd.HDFStore(fname, 'w') as f:
             f.put('/atom_data', self.atomic_weights.base)
             f.put('/ionization_data', self.ionization_energies_prepared)
@@ -1077,10 +1078,10 @@ class TARDISAtomData:
             f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
             f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
             f.root._v_attrs['format_version'] = FORMAT_VERSION.encode('ascii')
-            f.put('/meta', meta_df)
+            f.put('/metadata', meta_df)
 
-            utc = pytz.timezone('UTC')
-            timestamp = datetime.now(utc).strftime("%b %d, %Y %H:%M:%S UTC")
-            f.root._v_attrs['date'] = timestamp
+            tz = pytz.timezone('UTC')
+            timestamp = datetime.now(tz).isoformat()
+            f.root._v_attrs['date'] = timestamp.encode('ascii')
 
             self.meta = meta_df
