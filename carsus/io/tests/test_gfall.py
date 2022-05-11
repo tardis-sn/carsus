@@ -210,7 +210,7 @@ def test_gfall_hash(gfall_rdr):
     # Need to generate `gfall_raw` lazy attribute to get `md5`.
     gf_raw = gf.gfall_raw
 
-    assert gf.md5 == 'e2149a67d52b7cb05fa5d35e6912cc98'
+    assert gf.version == 'e2149a67d52b7cb05fa5d35e6912cc98'
 
 
 @pytest.mark.remote_data
