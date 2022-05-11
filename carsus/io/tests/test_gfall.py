@@ -218,4 +218,4 @@ def test_gfall_hash_http(gfall_rdr_http):
     gf = gfall_rdr_http
     gf_raw = gf.gfall_raw
 
-    assert gf.md5 == 'e2149a67d52b7cb05fa5d35e6912cc98'
+    assert gf.version == 'e2149a67d52b7cb05fa5d35e6912cc98'
