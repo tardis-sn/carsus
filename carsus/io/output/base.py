@@ -1081,3 +1081,4 @@ class TARDISAtomData:
             f.root._v_attrs['date'] = timestamp
 
             self.meta = meta_df
+            f.put('/metadata', meta_df)
