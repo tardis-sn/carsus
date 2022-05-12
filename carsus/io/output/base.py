@@ -1072,13 +1072,12 @@ class TARDISAtomData:
 
             # TARDIS tries to decode MD5 and UUID, then it's necessary
             # to store these strings encoded (or change TARDIS code).
-            f.root._v_attrs['md5'] = md5_hash.hexdigest().encode('ascii')
-            f.root._v_attrs['uuid1'] = uuid1.encode('ascii')
-            f.root._v_attrs['format_version'] = FORMAT_VERSION.encode('ascii')
-            f.put('/metadata', meta_df)
+            f.root._v_attrs['md5'] = md5_hash.hexdigest()
+            f.root._v_attrs['uuid1'] = uuid1
+            f.root._v_attrs['format_version'] = FORMAT_VERSION
 
             tz = pytz.timezone('UTC')
             timestamp = datetime.now(tz).isoformat()
-            f.root._v_attrs['date'] = timestamp.encode('ascii')
+            f.root._v_attrs['date'] = timestamp
 
             self.meta = meta_df
