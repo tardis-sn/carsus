@@ -27,3 +27,6 @@ console_formatter = ColoredFormatter(COLOR_FORMAT)
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
 logging.getLogger('py.warnings').addHandler(console_handler)
+
+# Set atomic file format version
+FORMAT_VERSION = "1.0"
