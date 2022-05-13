@@ -645,9 +645,6 @@ class ChiantiReader:
             collisions = collisions[col_columns]
             self.collisions = collisions
 
-        else:
-            self.collisions = pd.DataFrame(columns=[col_columns])
-
         self.levels = levels
         self.lines = lines
         self.version = versionRead()
