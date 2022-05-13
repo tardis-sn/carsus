@@ -1010,14 +1010,14 @@ class TARDISAtomData:
             f.put('/atom_data', self.atomic_weights.base)
             f.put('/ionization_data', self.ionization_energies_prepared)
             f.put('/zeta_data', self.zeta_data.base)
-            f.put('/levels', self.levels_prepared)
-            f.put('/lines', self.lines_prepared)
+            f.put('/levels_data', self.levels_prepared)
+            f.put('/lines_data', self.lines_prepared)
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
 
             if hasattr(self, 'collisions'):
-                f.put('/collisions', self.collisions_prepared)
+                f.put('/collisions_data', self.collisions_prepared)
                 f.put('/collisions_metadata', self.collisions_metadata)
 
             if hasattr(self, 'cross_sections'):
