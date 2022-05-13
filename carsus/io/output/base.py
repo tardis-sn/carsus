@@ -1,22 +1,15 @@
 import re
 import logging
-import hashlib
-import uuid
-import pytz
-import platform
 import numpy as np
 import pandas as pd
 import astropy.units as u
 import astropy.constants as const
 from scipy import interpolate
-from datetime import datetime
 from carsus.util import (convert_atomic_number2symbol,
                          convert_wavelength_air2vacuum,
                          serialize_pandas_object,
                          hash_pandas_object)
 from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
-
-FORMAT_VERSION = "v1.0"
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
@@ -72,25 +65,27 @@ class TARDISAtomData:
         self.create_macro_atom()
         self.create_macro_atom_references()
 
-        # FIXME: re-write this if-else block
-        if hasattr(cmfgen_reader, "collisions") and (
-            (chianti_reader is not None) and (not chianti_reader.collisions.empty)
+        if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
+            (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
         ):
             raise ValueError(
-                "Both Chianti and CMFGEN readers contain the collisions dataframe."
+                "Both Chianti and CMFGEN readers contain the collisions dataframe. "
                 "Please set collisions=True in one or the other but not both."
             )
         else:
             if hasattr(cmfgen_reader, "collisions"):
                 self.collisions = cmfgen_reader.collisions
                 self.collisions_metadata = cmfgen_reader.collisional_metadata
-            else:
+
+            elif hasattr(chianti_reader, "collisions"):
                 self.collisions = self.create_collisions(**collisions_param)
                 self.collisions_metadata = pd.Series({
                     "temperatures": collisions_param["temperatures"],
-                    "dataset": "chianti",
+                    "dataset": ["chianti"],
                     "info": None
                 })
+            else:
+                logger.warning("No source of collisions was selected.")
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):
             self.cross_sections = self.create_cross_sections()
@@ -912,19 +907,17 @@ class TARDISAtomData:
 
         """
 
-        if self.collisions_metadata.dataset == 'chianti':
-            collisions_columns = ['atomic_number', 'ion_number', 'level_number_upper',
-                                'level_number_lower', 'g_ratio', 'delta_e'] + \
+        collisions_index = ["atomic_number",
+                            "ion_number",
+                            "level_number_lower",
+                            "level_number_upper"]
+
+        if "chianti" in self.collisions_metadata.dataset:
+            collisions_columns = collisions_index + ['g_ratio', 'delta_e'] + \
                                 sorted([col for col in self.collisions.columns if re.match('^t\d+$', col)])
 
-            collisions_index = ["atomic_number",
-                                "ion_number",
-                                "level_number_lower",
-                                "level_number_upper"]
-
-        elif self.collisions_metadata.dataset == 'cmfgen':
-            collisions_columns = self.collisions.columns
-            collisions_index = self.collisions.index.names
+        elif "cmfgen" in self.collisions_metadata.dataset:
+            collisions_columns = collisions_index + list(self.collisions.columns)
 
         else:
             raise ValueError("Unknown source of collisional data")
@@ -1006,6 +999,12 @@ class TARDISAtomData:
            Path to the HDF5 output file.
 
         """
+        import hashlib
+        import uuid
+        import platform
+        import pytz
+        from datetime import datetime
+        from carsus import FORMAT_VERSION
 
         with pd.HDFStore(fname, 'w') as f:
             f.put('/atom_data', self.atomic_weights.base)
@@ -1037,6 +1036,7 @@ class TARDISAtomData:
             # Save datasets versions
             meta.append(('datasets', 'nist_weights', 
                          self.atomic_weights.version))
+
             meta.append(('datasets', 'nist_spectra', 
                          self.ionization_energies.version))
 
@@ -1070,15 +1070,13 @@ class TARDISAtomData:
             logger.info(f"MD5: {md5_hash.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
 
-            # TARDIS tries to decode MD5 and UUID, then it's necessary
-            # to store these strings encoded (or change TARDIS code).
-            f.root._v_attrs['md5'] = md5_hash.hexdigest()
-            f.root._v_attrs['uuid1'] = uuid1
-            f.root._v_attrs['format_version'] = FORMAT_VERSION
+            f.root._v_attrs['MD5'] = md5_hash.hexdigest()
+            f.root._v_attrs['UUID1'] = uuid1
+            f.root._v_attrs['FORMAT_VERSION'] = FORMAT_VERSION
 
             tz = pytz.timezone('UTC')
-            timestamp = datetime.now(tz).isoformat()
-            f.root._v_attrs['date'] = timestamp
+            date = datetime.now(tz).isoformat()
+            f.root._v_attrs['DATE'] = date
 
             self.meta = meta_df
             f.put('/metadata', meta_df)
