@@ -1,8 +1,7 @@
-import os
-import carsus
 import numpy as np
 import pandas as pd
 from carsus.io.base import BaseParser
+from carsus.io.util import read_from_buffer
 from carsus.model import (
     Zeta,
     Temperature,
@@ -78,6 +77,7 @@ class KnoxLongZeta(BaseParser):
 
         if fname is None:
             self.fname = ZETA_DATA_URL
+
         else:
             self.fname = fname
 
@@ -85,19 +85,23 @@ class KnoxLongZeta(BaseParser):
 
     def _prepare_data(self):
         t_values = np.arange(2000, 42000, 2000)
-        names = ['atomic_number', 'ion_charge']
+        names = ["atomic_number", "ion_charge"]
         names += [str(i) for i in t_values]
 
-        zeta_raw = np.recfromtxt(
-            self.fname,
+        buffer, checksum = read_from_buffer(self.fname)
+        self.version = checksum
+
+        zeta_df = pd.read_csv(
+            buffer,
             usecols=range(1, 23),
-            names=names)
+            names=names,
+            comment="#",
+            delim_whitespace=True)
 
         self.base = (
-            pd.DataFrame(zeta_raw).set_index(
-                ['atomic_number', 'ion_charge'])
+            pd.DataFrame(zeta_df).set_index(
+                ["atomic_number", "ion_charge"])
         )
 
         columns = [float(c) for c in self.base.columns]
-        # To match exactly the `old` format
-        self.base.columns = pd.Float64Index(columns, name='temp')
+        self.base.columns = pd.Float64Index(columns, name="temp")

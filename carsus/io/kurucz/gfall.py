@@ -1,10 +1,7 @@
 import re
-import hashlib
 import logging
-import requests
 import numpy as np
 import pandas as pd
-from io import BytesIO
 from astropy import units as u
 from sqlalchemy import and_
 from pyparsing import ParseException
@@ -12,6 +9,7 @@ from carsus.model import DataSource, Ion, Level, LevelEnergy,\
     Line, LineWavelength, LineGFValue, MEDIUM_VACUUM, MEDIUM_AIR
 from carsus.io.base import IngesterError
 from carsus.util import convert_atomic_number2symbol, parse_selected_species
+from carsus.io.util import read_from_buffer
 
 
 GFALL_URL = 'https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/gfall/gfall_latest.dat'
@@ -162,22 +160,13 @@ class GFALLReader(object):
         field_type_dict = {col: dtype for col,
                            dtype in zip(self.gfall_columns, field_types)}
 
-        # Pass a buffer to `read_fwf` instead of a path to hash content on-the-fly.
-        if self.fname.startswith("http"):
-            response = requests.get(self.fname)
-            buffer = BytesIO(response.content)
-        else:
-            buffer = BytesIO(open(self.fname, 'rb').read())
-
-        md5 = hashlib.md5(buffer.getbuffer()).hexdigest()
-        
+        buffer, checksum = read_from_buffer(self.fname)        
         gfall = pd.read_fwf(buffer, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
-
+ 
         # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
-
-        return gfall, md5
+        return gfall, checksum
 
     def parse_gfall(self, gfall_raw=None):
         """

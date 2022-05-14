@@ -1,3 +1,6 @@
+import hashlib
+import requests
+from io import BytesIO
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
 
@@ -74,3 +77,32 @@ def convert_species_tuple2chianti_str(species):
     atomic_number, ion_number = species
     chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_number + 1)
     return chianti_ion_name
+
+
+def read_from_buffer(fname):
+    """Read a local or remote file into a buffer and get its MD5 
+    checksum. To be used with `pandas.read_csv` or `pandas.read_fwf`
+    functions.
+
+    Parameters
+    ----------
+    fname : str
+        local path or remote url
+
+    Returns
+    -------
+    bytes, str
+        data from text file, MD5 checksum
+    """    
+    if fname.startswith("http"):
+        response = requests.get(fname)
+        data = response.content
+
+    else:
+        with open(fname, 'rb') as f:
+            data = f.read()
+
+    buffer = BytesIO(data)
+    checksum = hashlib.md5(buffer.getbuffer()).hexdigest()
+
+    return buffer, checksum
