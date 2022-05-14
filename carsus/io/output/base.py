@@ -1024,16 +1024,16 @@ class TARDISAtomData:
                 f.put('/photoionization_data', self.cross_sections_prepared)
 
             meta = []
-            md5_hash = hashlib.md5()
+            total_checksum = hashlib.md5()
             for key in f.keys():
-                # Update the total MD5 sum
-                md5_hash.update(serialize_pandas_object(f[key]).to_buffer())
+                # update the total checksum to sign the file
+                total_checksum.update(serialize_pandas_object(f[key]).to_buffer())
 
-                # Save the individual Series/DataFrame MD5
-                md5 = hash_pandas_object(f[key])
-                meta.append(('md5sum', key.lstrip('/'), md5))
+                # save individual DataFrame/Series checksum
+                checksum = hash_pandas_object(f[key])
+                meta.append(('md5sum', key.lstrip('/'), checksum))
 
-            # Save datasets versions
+            # data sources versions
             meta.append(('datasets', 'nist_weights', 
                          self.atomic_weights.version))
 
@@ -1043,6 +1043,9 @@ class TARDISAtomData:
             meta.append(('datasets', 'gfall',
                          self.gfall_reader.version))
 
+            meta.append(('datasets', 'zeta',
+                         self.zeta_data.version))
+
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti', 
                              self.chianti_reader.version))
@@ -1051,7 +1054,7 @@ class TARDISAtomData:
                 meta.append(('datasets', 'cmfgen',
                              self.cmfgen_reader.version))
 
-            # Save relevant package versions
+            # relevant package versions
             meta.append(('software', 'python', platform.python_version()))
             imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
                        'tables', 'ChiantiPy']
@@ -1067,10 +1070,10 @@ class TARDISAtomData:
 
             logger.info(f"Signing TARDISAtomData.")
             logger.info(f"Format Version: {FORMAT_VERSION}")
-            logger.info(f"MD5: {md5_hash.hexdigest()}")
+            logger.info(f"MD5: {total_checksum.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
 
-            f.root._v_attrs['MD5'] = md5_hash.hexdigest()
+            f.root._v_attrs['MD5'] = total_checksum.hexdigest()
             f.root._v_attrs['UUID1'] = uuid1
             f.root._v_attrs['FORMAT_VERSION'] = FORMAT_VERSION
 
