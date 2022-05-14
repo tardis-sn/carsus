@@ -231,8 +231,8 @@ class NISTWeightsComp(BaseParser):
         Returns NIST Atomic Weights and Isotopic Components Database version.
         """
         selector = "td"
-        html = requests.get(WEIGHTSCOMP_VERSION_URL).text
-        bs = BeautifulSoup(html, 'html5lib')
+        html = requests.get(WEIGHTSCOMP_VERSION_URL)
+        bs = BeautifulSoup(html.text, 'html5lib')
 
         version = bs.select(selector)
         version = version[0].text.split()[1] 

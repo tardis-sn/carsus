@@ -351,8 +351,8 @@ class NISTIonizationEnergies(BaseParser):
         selector = "body > div > table:nth-child(1) > tbody > \
                         tr:nth-child(1) > td:nth-child(1) > b"
          
-        html = requests.get(IONIZATION_ENERGIES_VERSION_URL).text
-        bs = BeautifulSoup(html, 'html5lib')
+        html = requests.get(IONIZATION_ENERGIES_VERSION_URL)
+        bs = BeautifulSoup(html.text, 'html5lib')
         
         version = bs.select(selector)
         version = version[0].text.replace(u'\xa0', ' ')\
