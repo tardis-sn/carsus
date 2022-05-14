@@ -18,12 +18,10 @@ from carsus.io.base import BaseParser, BaseIngester
 from carsus.io.nist.ionization_grammar import level
 from carsus.util import convert_atomic_number2symbol
 
-logger = logging.getLogger(__name__)
-
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
-logger = logging.getLogger(__name__)
 IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
 
+logger = logging.getLogger(__name__)
 
 
 def download_ionization_energies(
