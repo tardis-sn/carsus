@@ -540,7 +540,7 @@ class CMFGENReader:
             ions = parse_selected_species(ions)
 
             if cross_sections and (1, 0) not in ions:
-                logger.warning("Selecting H 0 required to ingest cross-sections.")
+                logger.warning("Selecting H 0 from CMFGEN (required to ingest cross-sections).")
                 ions.insert(0, (1, 0))
 
             for ion in ions:
