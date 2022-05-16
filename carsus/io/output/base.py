@@ -51,7 +51,15 @@ class TARDISAtomData:
                 ):
 
         self.atomic_weights = atomic_weights
-        self.ionization_energies = ionization_energies
+
+        if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'ionization_energies'):
+            import copy
+            combined_ionization_energies = copy.deepcopy(ionization_energies)
+            combined_ionization_energies.base = cmfgen_reader.ionization_energies.combine_first(ionization_energies.base)
+            self.ionization_energies = combined_ionization_energies
+        else:
+            self.ionization_energies = ionization_energies
+
         self.gfall_reader = gfall_reader
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader

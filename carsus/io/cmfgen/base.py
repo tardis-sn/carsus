@@ -932,7 +932,8 @@ class CMFGENReader:
             )
             ionization_energies = ionization_energies.set_index(
                 ["atomic_number", "ion_charge"]
-            ).squeeze()
+            )
+            ionization_energies = ionization_energies["ionization_energy"]
             self.ionization_energies = ionization_energies
 
         if "cross_sections" in reader.keys():
