@@ -1024,6 +1024,8 @@ class TARDISAtomData:
                 f.put('/photoionization_data', self.cross_sections_prepared)
 
             meta = []
+            meta.append(('format', 'version', FORMAT_VERSION))
+
             total_checksum = hashlib.md5()
             for key in f.keys():
                 # update the total checksum to sign the file
