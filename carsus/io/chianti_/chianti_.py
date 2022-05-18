@@ -22,6 +22,7 @@ try:
 
 except ImportError:
     # Shamefully copied from their GitHub source:
+    import chianti.core as ch
     def versionRead():
         """
         Read the version number of the CHIANTI database
@@ -32,7 +33,6 @@ except ImportError:
         versionStr = vFile.readline()
         vFile.close()
         return versionStr.strip()
-    import chianti.core as ch
 
 
 logger = logging.getLogger(__name__)
