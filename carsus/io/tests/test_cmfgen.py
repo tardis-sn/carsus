@@ -15,10 +15,13 @@ from carsus.io.cmfgen import (CMFGENEnergyLevelsParser,
                               CMFGENReader
                              )
 
+from carsus.io.cmfgen.util import *
+
 with_refdata = pytest.mark.skipif(
     not pytest.config.getoption("--refdata"),
     reason="--refdata folder not specified"
 )
+data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
 si2_levels_head = """
 0.00      0.5  3s2_3p_2Po[1/2]   meas        10
@@ -248,3 +251,19 @@ def test_reader_lines_head(si1_reader, si2_lines_head_df):
 def test_reader_col_head(si1_reader, si2_col_head_df):
     assert_frame_equal(si1_reader.collisions.head(5).reset_index(drop=True), 
                         si2_col_head_df)
+
+
+# test with different combinations of input args
+@pytest.mark.array_compare
+@pytest.mark.parametrize("threshold_energy_ryd", [0.053130732819562695])
+@pytest.mark.parametrize("fit_coeff_list", [[34.4452, 1.0, 2.0]])
+def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
+    phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
+    
+    # TODO: generate reference
+
+    # phixs_table_seaton_fname = os.path.join(data_dir, 'phixs_table_seaton.npy')
+    # phixs_table_seaton = np.load(phixs_table_seaton_fname)
+    # assert_allclose(phixs_table_seaton, phixs_table)
+    return phixs_table
+    
