@@ -83,7 +83,7 @@ class TARDISAtomData:
             )
         else:
             if hasattr(cmfgen_reader, "collisions"):
-                collisions = cmfgen_reader.collisions
+                collisions = cmfgen_reader.collisions.copy()
                 collisions.index = collisions.index.rename(
                     ['atomic_number', 'ion_number', 'level_number_lower', 'level_number_upper']
                 )
