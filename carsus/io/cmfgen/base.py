@@ -964,13 +964,14 @@ class CMFGENReader:
             will have all the temperatures from the CMFGEN dataset by default.
         """
         col_list, t_grid = [], []
-        levels_combine = self.levels.copy().reset_index()
-        label_ind_mapping = {
-            label: index
-            for label, index in zip(levels_combine.label, levels_combine.level_index)
-        }
 
         for ion, data_dict in data.items():
+            levels_combine = self.levels.loc[ion].copy().reset_index()
+            label_ind_mapping = {
+                label: index
+                for label, index in zip(levels_combine.label, levels_combine.level_index)
+                }
+
             levels = data_dict["levels"].copy()
             collisions = data_dict["collisions"].copy()
 
