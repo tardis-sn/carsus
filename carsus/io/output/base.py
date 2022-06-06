@@ -7,6 +7,7 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 from scipy import interpolate
+import yaml
 
 from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import (convert_atomic_number2symbol,
@@ -106,6 +107,10 @@ class TARDISAtomData:
 
         logger.info('Finished.')
 
+    @classmethod
+    def from_config(fname):
+        pass
+    
     @staticmethod
     def solve_priorities(levels):
         """ 
