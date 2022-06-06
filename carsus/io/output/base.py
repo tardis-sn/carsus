@@ -1035,7 +1035,7 @@ class TARDISAtomData:
                 f.put('/photoionization_data', self.cross_sections_prepared)
 
             lines_metadata = pd.DataFrame(
-                data=[["format", "version", 1.0]], 
+                data=[["format", "version", "1.0"]], 
                 columns=["field", "key", "value"]
             ).set_index(["field", "key"])
             f.put('/lines_metadata', lines_metadata)
