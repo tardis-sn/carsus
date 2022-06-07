@@ -8,6 +8,11 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 import yaml
+import os
+
+from carsus.io.nist import NISTWeightsComp, NISTIonizationEnergies
+from carsus.io.kurucz import GFALLReader
+from carsus.io.zeta import KnoxLongZeta
 
 from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import (convert_atomic_number2symbol,
@@ -108,8 +113,96 @@ class TARDISAtomData:
         logger.info('Finished.')
 
     @classmethod
-    def from_config(fname):
-        pass
+    def from_config(cls, fname):
+        with open(fname) as stream:
+            loaded_config = yaml.safe_load(stream)
+            loaded_config_keys = loaded_config.keys()
+
+            nist_config = loaded_config["nist"]
+            if nist_config["atomic_weights"] == "default":
+                atomic_weights = NISTWeightsComp()
+            else:
+                atomic_weights = NISTWeightsComp(
+                    nist_config["atomic_weights"]
+                )
+            ionization_energies = NISTIonizationEnergies(
+                nist_config["ionization_energies"]
+            )
+
+            gfall_config = loaded_config["gfall"] 
+            if gfall_config["path"] == "default":
+                # TODO: better alternative?
+                url = 'https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/gfall/gfall_latest.dat'
+                os.system(f"wget -qO /tmp/gfall.dat {url}")
+                gfall_path = "/tmp/gfall.dat"
+            else:
+                gfall_path = gfall_config["path"]
+            gfall_reader = GFALLReader(
+                gfall_config["ions"],
+                gfall_path,
+                # TODO: priority
+            )
+
+            if loaded_config["zeta"]["path"] == "default":
+                zeta_data = KnoxLongZeta()
+            else:
+                zeta_data = loaded_config["zeta"]["path"]
+
+            if "chianti" in loaded_config_keys:
+                from carsus.io.chianti_ import ChiantiReader
+                chianti_config = loaded_config["chianti"]
+                chianti_reader = ChiantiReader(
+                    ions=chianti_config["ions"],
+                    collisions=chianti_config["collisions"],
+                    priority=chianti_config["priority"]
+                )
+            else:
+                chianti_reader = None
+            
+            if "cmfgen" in loaded_config_keys:
+                from carsus.io.cmfgen import CMFGENReader
+                cmfgen_config = loaded_config["cmfgen"]
+                print(cmfgen_config)
+                if cmfgen_config["atomic_path"] == "default":
+                    atomic_path = "/tmp/atomic"
+                else:
+                    atomic_path = cmfgen_config["atomic_path"]
+                
+                if cmfgen_config["config_yaml"] == "default":
+                    config_yaml = None
+                else:
+                    config_yaml = cmfgen_config["config_yaml"]
+
+                if cmfgen_config["temperature_grid"] == "default":
+                    temperature_grid = None
+                else:
+                    temperature_grid = cmfgen_config["temperature_grid"]
+
+                cmfgen_reader = CMFGENReader.from_config(
+                    ions=cmfgen_config["ions"],
+                    atomic_path=atomic_path,
+                    priority=cmfgen_config["priority"],
+                    ionization_energies=cmfgen_config["ionization_energies"],
+                    cross_sections=cmfgen_config["cross_sections"],
+                    config_yaml=config_yaml,
+                    collisions=cmfgen_config["collisions"],
+                    temperature_grid=temperature_grid,
+                    drop_mismatched_labels=cmfgen_config["drop_mismatched_labels"],
+                ) 
+            else:
+                cmfgen_reader = None
+
+        return cls(
+            atomic_weights=atomic_weights,
+            ionization_energies=ionization_energies,
+            gfall_reader=gfall_reader, 
+            zeta_data=zeta_data,
+            chianti_reader=chianti_reader,
+            cmfgen_reader=cmfgen_reader,
+        )
+
+
+        
     
     @staticmethod
     def solve_priorities(levels):
