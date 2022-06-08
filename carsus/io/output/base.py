@@ -134,10 +134,7 @@ class TARDISAtomData:
 
             gfall_config = loaded_config["gfall"] 
             if gfall_config["path"] == "default":
-                # TODO: better alternative?
-                url = 'https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/gfall/gfall_latest.dat'
-                os.system(f"wget -qO /tmp/gfall.dat {url}")
-                gfall_path = "/tmp/gfall.dat"
+                gfall_path = None
             else:
                 gfall_path = gfall_config["path"]
             gfall_reader = GFALLReader(
