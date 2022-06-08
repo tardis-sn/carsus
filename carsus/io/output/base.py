@@ -1,19 +1,22 @@
 import copy
 import logging
+import os
 import re
 
 import astropy.constants as const
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from scipy import interpolate
 import yaml
-import os
+from scipy import interpolate
 
-from carsus.io.nist import NISTWeightsComp, NISTIonizationEnergies
+if "XUVTOP" in os.environ:
+    from carsus.io.chianti_ import ChiantiReader
+
+from carsus.io.cmfgen import CMFGENReader
 from carsus.io.kurucz import GFALLReader
+from carsus.io.nist import NISTIonizationEnergies, NISTWeightsComp
 from carsus.io.zeta import KnoxLongZeta
-
 from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import (convert_atomic_number2symbol,
                          convert_wavelength_air2vacuum, hash_pandas_object,
@@ -149,7 +152,6 @@ class TARDISAtomData:
                 zeta_data = loaded_config["zeta"]["path"]
 
             if "chianti" in loaded_config_keys:
-                from carsus.io.chianti_ import ChiantiReader
                 chianti_config = loaded_config["chianti"]
                 chianti_reader = ChiantiReader(
                     ions=chianti_config["ions"],
@@ -160,9 +162,7 @@ class TARDISAtomData:
                 chianti_reader = None
             
             if "cmfgen" in loaded_config_keys:
-                from carsus.io.cmfgen import CMFGENReader
                 cmfgen_config = loaded_config["cmfgen"]
-                print(cmfgen_config)
                 if cmfgen_config["atomic_path"] == "default":
                     atomic_path = "/tmp/atomic"
                 else:
@@ -200,9 +200,6 @@ class TARDISAtomData:
             chianti_reader=chianti_reader,
             cmfgen_reader=cmfgen_reader,
         )
-
-
-        
     
     @staticmethod
     def solve_priorities(levels):
