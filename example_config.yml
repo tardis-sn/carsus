@@ -28,4 +28,13 @@ cmfgen:
 
 zeta:
     path: default
-    
+
+levels_lines_param: 
+    levels_metastable_loggf_threshold: -3
+    lines_loggf_threshold: -3
+
+collisions_param:
+    temperatures: 
+        start: 2000
+        stop: 50000
+        step: 2000

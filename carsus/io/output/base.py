@@ -188,6 +188,14 @@ class TARDISAtomData:
                 ) 
             else:
                 cmfgen_reader = None
+            
+            levels_lines_param = config["levels_lines_param"]
+            collisions_param = config["collisions_param"]
+            collisions_param["temperatures"] = np.arange(
+                start=collisions_param["temperatures"]["start"],
+                stop=collisions_param["temperatures"]["stop"],
+                step=collisions_param["temperatures"]["step"],
+            )
 
         return cls(
             atomic_weights=atomic_weights,
@@ -196,6 +204,8 @@ class TARDISAtomData:
             zeta_data=zeta_data,
             chianti_reader=chianti_reader,
             cmfgen_reader=cmfgen_reader,
+            levels_lines_param=levels_lines_param,
+            collisions_param=collisions_param
         )
     
     @staticmethod
