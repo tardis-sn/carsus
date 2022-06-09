@@ -12,7 +12,6 @@ dependencies:
   - pandas=1.0
   - astropy=3
   - chiantipy=0.8.4
-  - typing-extensions=4.1  # https://github.com/python/typing/issues/1158
 
   # I/O
   - pyyaml
@@ -53,10 +52,7 @@ dependencies:
   - pytest=4
   - pytest-cov
   - pytest-astropy
-
-  # ChiantiPy
-  - scipy
-  - ipyparallel
+  - pytest-arraydiff
 
   # Other
   - git-lfs
