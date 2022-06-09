@@ -18,7 +18,7 @@ dependencies:
   - pyyaml
   - uncertainties
   - pyparsing=2.2
-  - sqlalchemy=1.0
+  - sqlalchemy=1.2
   - beautifulsoup4
   - html5lib
   - h5py
