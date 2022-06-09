@@ -1,0 +1,30 @@
+carsus_config_format: 1.0
+output_filename: default
+
+nist:
+    atomic_weights: default
+    ionization_energies: "H-Zn"
+
+gfall:
+    path: default
+    ions: "H-Zn"
+    priority: 10
+
+chianti:
+    ions: H-He
+    collisions: false
+    priority: 20
+
+cmfgen:
+    ions: "Si 0-1"
+    atomic_path: /tmp/atomic
+    config_yaml: default
+    ionization_energies: true
+    cross_sections: true
+    collisions: true
+    temperature_grid: default
+    drop_mismatched_labels: true
+    priority: 30
+
+zeta:
+    path: default
