@@ -118,10 +118,10 @@ class TARDISAtomData:
     @classmethod
     def from_config(cls, fname):
         with open(fname) as stream:
-            loaded_config = yaml.safe_load(stream)
-            loaded_config_keys = loaded_config.keys()
+            config = yaml.safe_load(stream)
+            config_keys = config.keys()
 
-            nist_config = loaded_config["nist"]
+            nist_config = config["nist"]
             if nist_config["atomic_weights"] == "default":
                 atomic_weights = NISTWeightsComp()
             else:
@@ -132,7 +132,7 @@ class TARDISAtomData:
                 nist_config["ionization_energies"]
             )
 
-            gfall_config = loaded_config["gfall"] 
+            gfall_config = config["gfall"] 
             if gfall_config["path"] == "default":
                 gfall_path = None
             else:
@@ -143,13 +143,13 @@ class TARDISAtomData:
                 # TODO: priority
             )
 
-            if loaded_config["zeta"]["path"] == "default":
+            if config["zeta"]["path"] == "default":
                 zeta_data = KnoxLongZeta()
             else:
-                zeta_data = loaded_config["zeta"]["path"]
+                zeta_data = config["zeta"]["path"]
 
-            if "chianti" in loaded_config_keys:
-                chianti_config = loaded_config["chianti"]
+            if "chianti" in config_keys:
+                chianti_config = config["chianti"]
                 chianti_reader = ChiantiReader(
                     ions=chianti_config["ions"],
                     collisions=chianti_config["collisions"],
@@ -158,8 +158,8 @@ class TARDISAtomData:
             else:
                 chianti_reader = None
             
-            if "cmfgen" in loaded_config_keys:
-                cmfgen_config = loaded_config["cmfgen"]
+            if "cmfgen" in config_keys:
+                cmfgen_config = config["cmfgen"]
                 if cmfgen_config["atomic_path"] == "default":
                     atomic_path = "/tmp/atomic"
                 else:
