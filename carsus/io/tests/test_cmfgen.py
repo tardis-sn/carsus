@@ -324,13 +324,12 @@ def test_get_opproject_phixs_table(
 @pytest.mark.parametrize("e", [6])
 @pytest.mark.parametrize("f", [7])
 @pytest.mark.parametrize("g", [8])
-@pytest.mark.parametrize("h", [9])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_hummer_phixs_table(
-    threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points
+    threshold_energy_ryd, a, b, c, d, e, f, g, n_points
 ):
     phixs_table = get_hummer_phixs_table(
-        threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points
+        threshold_energy_ryd, a, b, c, d, e, f, g, n_points
     )
     return phixs_table
 
