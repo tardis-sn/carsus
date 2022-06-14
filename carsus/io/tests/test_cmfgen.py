@@ -1,5 +1,6 @@
 import os
 import glob
+import this
 import pytest
 import numpy as np
 import pandas as pd
@@ -253,17 +254,84 @@ def test_reader_col_head(si1_reader, si2_col_head_df):
                         si2_col_head_df)
 
 
-# test with different combinations of input args
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [0.053130732819562695])
 @pytest.mark.parametrize("fit_coeff_list", [[34.4452, 1.0, 2.0]])
 def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
     phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-    
-    # TODO: generate reference
-
-    # phixs_table_seaton_fname = os.path.join(data_dir, 'phixs_table_seaton.npy')
-    # phixs_table_seaton = np.load(phixs_table_seaton_fname)
-    # assert_allclose(phixs_table_seaton, phixs_table)
     return phixs_table
-    
+
+
+@pytest.mark.array_compare
+@pytest.mark.parametrize("hyd_gaunt_energy_grid_ryd", [{1: list(range(1, 3))}])
+@pytest.mark.parametrize("hyd_gaunt_factor", [{1: list(range(3, 6))}])
+@pytest.mark.parametrize("threshold_energy_ryd", [0.5])
+@pytest.mark.parametrize("n", [1])
+def test_get_hydrogenic_n_phixs_table(
+    hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
+):
+    hydrogenic_n_phixs_table = get_hydrogenic_n_phixs_table(
+        hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
+    )
+    return hydrogenic_n_phixs_table
+
+
+@pytest.mark.array_compare
+@pytest.mark.parametrize("hyd_phixs_energy_grid_ryd", [{(4, 1): np.linspace(1, 3, 5)}])
+@pytest.mark.parametrize("hyd_phixs", [{(4, 1): np.linspace(1, 3, 5)}])
+@pytest.mark.parametrize("threshold_energy_ryd", [2])
+@pytest.mark.parametrize("n", [4])
+@pytest.mark.parametrize("l_start", [1])
+@pytest.mark.parametrize("l_end", [1])
+@pytest.mark.parametrize("nu_0", [0.2])
+def test_get_hydrogenic_nl_phixs_table(
+    hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0
+):
+    phixs_table = get_hydrogenic_nl_phixs_table(
+        hyd_phixs_energy_grid_ryd,
+        hyd_phixs,
+        threshold_energy_ryd,
+        n,
+        l_start,
+        l_end,
+        nu_0,
+    )
+    return phixs_table
+
+
+@pytest.mark.array_compare
+@pytest.mark.parametrize("threshold_energy_ryd", [2])
+@pytest.mark.parametrize("a", [2])
+@pytest.mark.parametrize("b", [3])
+@pytest.mark.parametrize("c", [4])
+@pytest.mark.parametrize("d", [5])
+@pytest.mark.parametrize("e", [6])
+@pytest.mark.parametrize("n_points", [50])
+def test_get_opproject_phixs_table(
+    threshold_energy_ryd, a, b, c, d, e, n_points
+):
+    phixs_table = get_opproject_phixs_table(
+        threshold_energy_ryd, a, b, c, d, e, n_points
+    )
+    return phixs_table
+
+@pytest.mark.array_compare
+@pytest.mark.parametrize("threshold_energy_ryd", [2])
+@pytest.mark.parametrize("a", [2])
+@pytest.mark.parametrize("b", [3])
+@pytest.mark.parametrize("c", [4])
+@pytest.mark.parametrize("d", [5])
+@pytest.mark.parametrize("e", [6])
+@pytest.mark.parametrize("f", [7])
+@pytest.mark.parametrize("g", [8])
+@pytest.mark.parametrize("h", [9])
+@pytest.mark.parametrize("n_points", [50])
+def test_get_hummer_phixs_table(
+    threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points
+):
+    phixs_table = get_hummer_phixs_table(
+        threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points
+    )
+    return phixs_table
+
+
