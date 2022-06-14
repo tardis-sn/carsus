@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import sys
 import astropy.units as u
 import numpy as np
 import pandas as pd
@@ -705,18 +704,6 @@ class CMFGENReader:
                         threshold_energy_ryd,
                         n,
                     )
-
-
-                    print(hyd_gaunt_energy_grid_ryd, type(hyd_gaunt_energy_grid_ryd))
-                    print(hyd_gaunt_factor, type(hyd_gaunt_factor))
-                    print(threshold_energy_ryd, type(threshold_energy_ryd)),
-                    print(n, type(n))
-                    
-
-                    with open('hydrogenic_n_phixs_table.npy', 'wb') as f:
-                            np.save(f, phixs_table)
-                    sys.exit()
-
 
                 elif cross_section_type in [
                     CrossSectionType.HYDROGENIC_SPLIT_L,
