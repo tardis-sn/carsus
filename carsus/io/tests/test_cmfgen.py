@@ -333,4 +333,40 @@ def test_get_hummer_phixs_table(
     )
     return phixs_table
 
+@pytest.mark.array_compare
+@pytest.mark.parametrize("threshold_energy_ryd", [10])
+@pytest.mark.parametrize(
+    "fit_coeff_table",
+    [
+        pd.DataFrame.from_dict(
+            {
+                "E": [1, 2],
+                "E_0": [1, 2],
+                "P": [2, 2],
+                "l": [2, 2],
+                "sigma_0": [1, 2],
+                "y(a)": [1, 3],
+                "y(w)": [1, 4],
+            }
+        )
+    ],
+)
+@pytest.mark.parametrize("n_points", [50])
+def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points):
+    phixs_table = get_vy95_phixs_table(
+        threshold_energy_ryd, fit_coeff_table, n_points
+    )
+    return phixs_table
+
+
+# TODO: should this exist? skip?
+# def test_get_leibowitz_phixs_table():
+#     pass
+
+@pytest.mark.array_compare
+@pytest.mark.parametrize("threshold_energy_ryd", [50])
+def test_get_null_phixs_table(threshold_energy_ryd):
+    phixs_table = get_null_phixs_table(threshold_energy_ryd)
+    return phixs_table
+
 
