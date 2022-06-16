@@ -1,6 +1,4 @@
 import os
-import glob
-import this
 import pytest
 import numpy as np
 import pandas as pd
@@ -207,51 +205,33 @@ def test_coiv_pho(coiv_pho_fname):
 
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_hyd_l(hyd_l_fname):
     parser = CMFGENHydLParser(hyd_l_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
-    assert parser.base.shape == (465, 97)
-    assert parser.base.loc[(11, 3)].values[5] == -6.226968
-    assert parser.base.loc[(21, 20)].values[2] == -10.3071
-    assert_allclose(
-        parser.base.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
-    )
+    return parser.base
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_gbf_n(gbf_n_fname):
     parser = CMFGENHydGauntBfParser(gbf_n_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
-    assert parser.base.shape == (30, 145)
-    assert (
-        round(parser.base.loc[3].values[3], 7) == 0.9433558
-    )  # Rounding is needed as a result of undoing the unit conversion
-    assert round(parser.base.loc[18].values[11], 7) == 1.008855
-    assert_allclose(
-        parser.base.columns[:4], [1.1 ** 0, 1.1 ** 1, 1.1 ** 2, 1.1 ** 3]
-    )
+    return parser.base
 
 @with_refdata
-def test_reader_levels_shape(si1_reader):
-    assert si1_reader.levels.shape == (157, 5)
+@pytest.mark.array_compare(file_format='pd_hdf')
+def test_reader_lines(si1_reader):
+    return si1_reader.lines
 
 @with_refdata
-def test_reader_lines_shape(si1_reader):
-    assert si1_reader.lines.shape == (4196, 6)
+@pytest.mark.array_compare(file_format='pd_hdf')
+def test_reader_levels(si1_reader):
+    return si1_reader.levels
 
 @with_refdata
-def test_reader_levels_head(si1_reader, si2_levels_head_df):
-    assert_frame_equal(si1_reader.levels.head(5).reset_index(drop=True), 
-                        si2_levels_head_df)
-
-@with_refdata
-def test_reader_lines_head(si1_reader, si2_lines_head_df):
-    assert_frame_equal(si1_reader.lines.head(5).reset_index(drop=True), 
-                        si2_lines_head_df)
-
-@with_refdata
-def test_reader_col_head(si1_reader, si2_col_head_df):
-    assert_frame_equal(si1_reader.collisions.head(5).reset_index(drop=True), 
-                        si2_col_head_df)
+@pytest.mark.array_compare(file_format='pd_hdf')
+def test_reader_collisions(si1_reader):
+    return si1_reader.collisions
 
 
 @pytest.mark.array_compare
