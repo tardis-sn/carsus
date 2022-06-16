@@ -104,32 +104,29 @@ def si1_reader(si1_data_dict):
 
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
     parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
     n = int(parser.header['Number of energy levels'])
     assert parser.base.shape[0] == n
-    assert list(parser.base.columns) == ['label', 'g', 'E(cm^-1)', '10^15 Hz', 'eV', 'Lam(A)', 'ID', 'ARAD', 'C4', 'C6']
+    return parser.base
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
     parser = CMFGENOscillatorStrengthsParser(fevi_osc_kb_rk_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert list(parser.base.columns) == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
-    assert np.isclose(parser.base.iloc[0,2], 1.94e-02)
+    return parser.base
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_p2_osc(p2_osc_fname):
     parser = CMFGENOscillatorStrengthsParser(p2_osc_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
-    assert list(parser.base.columns) == ['label_lower', 'label_upper', 'f', 'A', 'Lam(A)', 'i', 'j', 'Lam(obs)', '% Acc']
-    assert np.isnan(parser.base.iloc[0,7])
-    assert np.isclose(parser.base.iloc[0,8], 3.)
-    assert np.isnan(parser.base.iloc[1,7])
-    assert np.isclose(parser.base.iloc[1,8], 25.)
-    assert np.isclose(parser.base.iloc[2,7], 1532.51)
-    assert np.isclose(parser.base.iloc[3,7], 1301.87)
+    return parser.base
+
 
 @with_refdata
 def test_vi_osc(vi_osc_fname):
@@ -137,18 +134,18 @@ def test_vi_osc(vi_osc_fname):
     assert parser.base.empty
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_he2_col(he2_col_fname):
     parser = CMFGENCollisionalStrengthsParser(he2_col_fname)
-    assert parser.base.shape[0] == 465
-    assert parser.base.shape[1] == 11
-    assert parser.base.iloc[-1,0] == '30___'
-    assert parser.base.iloc[-1,1] == 'I'
+    return parser.base
 
 @with_refdata
+@pytest.mark.array_compare(file_format='pd_hdf')
 def test_ariii_col(ariii_col_fname):
     parser = CMFGENCollisionalStrengthsParser(ariii_col_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape == (n, 13)
+    return parser.base
 
 @with_refdata
 def test_si2_pho(si2_pho_fname):
