@@ -22,30 +22,6 @@ with_refdata = pytest.mark.skipif(
 )
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
 
-si2_levels_head = """
-0.00      0.5  3s2_3p_2Po[1/2]   meas        10
-287.24    1.5  3s2_3p_2Po[3/2]   meas        10
-42824.29  0.5  3s_3p2_4Pe[1/2]   meas        10
-42932.62  1.5  3s_3p2_4Pe[3/2]   meas        10
-43107.91  2.5  3s_3p2_4Pe[5/2]   meas        10
-"""
-
-si2_lines_head = """
-0.0      42824.29  1.148200e-05      0.5      0.5    233.5123
-0.0      42932.62  7.128000e-08      0.5      1.5    232.9231
-0.0      55309.35  1.527600e-03      0.5      1.5    180.8013
-0.0      65500.47  2.558000e-01      0.5      0.5    152.6707
-0.0      76665.35  2.124000e-01      0.5      0.5    130.4370
-"""
-
-si2_col_head = """
-3.1550 3.1150 3.0750 3.0450 3.0300 3.0100 2.9850 2.9450 2.8850 2.7900 2.5250 2.1800 1.835 1.5450
-0.2330 0.2530 0.2590 0.2575 0.2555 0.2535 0.2510 0.2480 0.2435 0.2380 0.2215 0.1995 0.172 0.1420
-0.4060 0.4090 0.4035 0.3945 0.3910 0.3875 0.3845 0.3805 0.3745 0.3665 0.3425 0.3075 0.264 0.2175
-0.3205 0.3115 0.3035 0.2975 0.2960 0.2955 0.2945 0.2925 0.2885 0.2815 0.2595 0.2290 0.194 0.1565
-1.3450 1.3800 1.3900 1.3700 1.3450 1.3050 1.2500 1.1850 1.1100 1.0300 0.8650 0.7150 0.585 0.4770
-"""
-
 @with_refdata
 @pytest.fixture()
 def si2_osc_kurucz_fname(refdata_path):
@@ -126,20 +102,6 @@ def si1_data_dict(si2_osc_kurucz_fname, si2_col_fname):
 def si1_reader(si1_data_dict):
     return CMFGENReader(si1_data_dict, collisions=True)
 
-@with_refdata
-@pytest.fixture()
-def si2_levels_head_df():
-    return pd.read_csv(StringIO(si2_levels_head), delim_whitespace=True, names=['energy', 'j', 'label', 'method', 'priority'])
-
-@with_refdata
-@pytest.fixture()
-def si2_lines_head_df():
-    return pd.read_csv(StringIO(si2_lines_head), delim_whitespace=True, names=['energy_lower', 'energy_upper', 'gf', 'j_lower', 
-                                                                                'j_upper', 'wavelength'])
-@with_refdata
-@pytest.fixture()
-def si2_col_head_df():
-    return pd.read_csv(StringIO(si2_col_head), delim_whitespace=True, names=range(14))
 
 @with_refdata
 def test_si2_osc_kurucz(si2_osc_kurucz_fname):
