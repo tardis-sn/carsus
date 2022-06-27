@@ -26,65 +26,8 @@ def si2_osc_kurucz_fname(refdata_path):
 
 @with_refdata
 @pytest.fixture()
-def fevi_osc_kb_rk_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'oscillator_strengths', 'fevi_osc_kb_rk.dat')
-
-@with_refdata
-@pytest.fixture()
-def p2_osc_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'oscillator_strengths', 'p2_osc')
-
-@with_refdata
-@pytest.fixture()
-def vi_osc_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'oscillator_strengths', 'vi_osc')
-
-@with_refdata
-@pytest.fixture()
-def he2_col_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'collisional_strengths', 'he2col.dat')
-
-@with_refdata
-@pytest.fixture()
-def ariii_col_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'collisional_strengths', 'col_ariii')
-
-@with_refdata
-@pytest.fixture()
 def si2_col_fname(refdata_path):
     return os.path.join(refdata_path, 'cmfgen', 'collisional_strengths', 'si2_col')
-
-@with_refdata
-@pytest.fixture()
-def si2_pho_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'photoionization_cross_sections', 'phot_nahar_A')
-
-@with_refdata
-@pytest.fixture()
-def coiv_pho_fname(refdata_path):
-    return os.path.join(refdata_path, 'cmfgen', 'photoionization_cross_sections', 'phot_data_gs')
-
-
-@with_refdata
-@pytest.fixture()
-def hyd_l_fname(refdata_path):
-    return os.path.join(
-        refdata_path,
-        "cmfgen",
-        "photoionization_cross_sections",
-        "hyd_l_data.dat",
-    )
-
-
-@with_refdata
-@pytest.fixture()
-def gbf_n_fname(refdata_path):
-    return os.path.join(
-        refdata_path,
-        "cmfgen",
-        "photoionization_cross_sections",
-        "gbf_n_data.dat",
-    )
 
 @with_refdata
 @pytest.fixture()
@@ -99,78 +42,76 @@ def si1_data_dict(si2_osc_kurucz_fname, si2_col_fname):
 def si1_reader(si1_data_dict):
     return CMFGENReader(si1_data_dict, collisions=True)
 
+@pytest.fixture()
+def cmfgen_refdata_fname(refdata_path, path):
+    subdirectory, fname = path
+    return os.path.join(refdata_path, "cmfgen", subdirectory, fname)
 
 @with_refdata
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_si2_osc_kurucz(si2_osc_kurucz_fname):
-    parser = CMFGENEnergyLevelsParser(si2_osc_kurucz_fname)
+@pytest.mark.parametrize('path', [
+    ['energy_levels', 'si2_osc_kurucz'],
+])
+def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
+    parser = CMFGENEnergyLevelsParser(cmfgen_refdata_fname)
     n = int(parser.header['Number of energy levels'])
     assert parser.base.shape[0] == n
     return parser.base
 
 @with_refdata
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_fevi_osc_kb_rk(fevi_osc_kb_rk_fname):
-    parser = CMFGENOscillatorStrengthsParser(fevi_osc_kb_rk_fname)
+@pytest.mark.parametrize('path', [
+    ['oscillator_strengths', 'fevi_osc_kb_rk.dat'],
+    ['oscillator_strengths', 'p2_osc'],
+    ['oscillator_strengths', 'vi_osc']
+])
+def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
+    parser = CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname)
     n = int(parser.header['Number of transitions'])
     assert parser.base.shape[0] == n
     return parser.base
 
 @with_refdata
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_p2_osc(p2_osc_fname):
-    parser = CMFGENOscillatorStrengthsParser(p2_osc_fname)
-    n = int(parser.header['Number of transitions'])
-    assert parser.base.shape[0] == n
+@pytest.mark.parametrize('path', [
+    ['collisional_strengths', 'he2col.dat'],
+    ['collisional_strengths', 'col_ariii'],
+])
+def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
+    parser = CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname)
     return parser.base
 
 
 @with_refdata
-def test_vi_osc(vi_osc_fname):
-    parser = CMFGENOscillatorStrengthsParser(vi_osc_fname)
-    assert parser.base.empty
-
-@with_refdata
+@pytest.mark.parametrize('path', [
+    ['photoionization_cross_sections', 'phot_nahar_A'],
+    ['photoionization_cross_sections', 'phot_data_gs'],
+])
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_he2_col(he2_col_fname):
-    parser = CMFGENCollisionalStrengthsParser(he2_col_fname)
-    return parser.base
-
-@with_refdata
-@pytest.mark.array_compare(file_format='pd_hdf')
-def test_ariii_col(ariii_col_fname):
-    parser = CMFGENCollisionalStrengthsParser(ariii_col_fname)
-    n = int(parser.header['Number of transitions'])
-    assert parser.base.shape == (n, 13)
-    return parser.base
-
-@with_refdata
-def test_si2_pho(si2_pho_fname):
-    parser = CMFGENPhoCrossSectionsParser(si2_pho_fname)
-    n = int(parser.header['Number of energy levels'])
-    m = int(parser.base[0].attrs['Number of cross-section points'])
-    assert len(parser.base) == n
-    assert parser.base[0].shape == (m, 2)
-
-@with_refdata
-def test_coiv_pho(coiv_pho_fname):
-    parser = CMFGENPhoCrossSectionsParser(coiv_pho_fname)
+def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname):
+    parser = CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname)
     n = int(parser.header['Number of energy levels'])
     assert len(parser.base) == n
-    assert parser.base[0].shape == (3, 8)
+    return parser.base[0]
 
 
 @with_refdata
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_hyd_l(hyd_l_fname):
-    parser = CMFGENHydLParser(hyd_l_fname)
+@pytest.mark.parametrize('path', [
+    [ "photoionization_cross_sections", "hyd_l_data.dat"],
+])
+def test_CMFGENHydLParser(cmfgen_refdata_fname):
+    parser = CMFGENHydLParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
     return parser.base
 
 @with_refdata
 @pytest.mark.array_compare(file_format='pd_hdf')
-def test_gbf_n(gbf_n_fname):
-    parser = CMFGENHydGauntBfParser(gbf_n_fname)
+@pytest.mark.parametrize('path', [
+    [ "photoionization_cross_sections", "gbf_n_data.dat"],
+])
+def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname):
+    parser = CMFGENHydGauntBfParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
     return parser.base
 
@@ -237,35 +178,25 @@ def test_get_hydrogenic_nl_phixs_table(
 
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
-@pytest.mark.parametrize("a", [2])
-@pytest.mark.parametrize("b", [3])
-@pytest.mark.parametrize("c", [4])
-@pytest.mark.parametrize("d", [5])
-@pytest.mark.parametrize("e", [6])
+@pytest.mark.parametrize("vars", [[3,4,5,6,7]])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_opproject_phixs_table(
-    threshold_energy_ryd, a, b, c, d, e, n_points
+    threshold_energy_ryd, vars, n_points
 ):
     phixs_table = get_opproject_phixs_table(
-        threshold_energy_ryd, a, b, c, d, e, n_points
+        threshold_energy_ryd, *vars, n_points
     )
     return phixs_table
 
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
-@pytest.mark.parametrize("a", [2])
-@pytest.mark.parametrize("b", [3])
-@pytest.mark.parametrize("c", [4])
-@pytest.mark.parametrize("d", [5])
-@pytest.mark.parametrize("e", [6])
-@pytest.mark.parametrize("f", [7])
-@pytest.mark.parametrize("g", [8])
+@pytest.mark.parametrize("vars", [[2,3,4,5,6,7,8]])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_hummer_phixs_table(
-    threshold_energy_ryd, a, b, c, d, e, f, g, n_points
+    threshold_energy_ryd, vars, n_points
 ):
     phixs_table = get_hummer_phixs_table(
-        threshold_energy_ryd, a, b, c, d, e, f, g, n_points
+        threshold_energy_ryd, *vars, n_points
     )
     return phixs_table
 
@@ -294,10 +225,9 @@ def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points):
     )
     return phixs_table
 
-
-# TODO: should this exist? skip?
-# def test_get_leibowitz_phixs_table():
-#     pass
+@pytest.mark.skip(reason="Not implemented yet")
+def test_get_leibowitz_phixs_table():
+    pass
 
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [50])
