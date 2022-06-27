@@ -72,7 +72,6 @@ def pytest_addoption(parser):
                      help="filename for the testing database")
     parser.addoption("--refdata", dest='refdata', default=None,
                      help="carsus-refdata folder location")
-    
 
 
 @pytest.fixture
