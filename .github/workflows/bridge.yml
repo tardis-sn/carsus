@@ -117,11 +117,11 @@ jobs:
         id: cache-conda
 
       - name: Update environment
-        run: mamba update -n tardis --file conda-${{ matrix.label }}.lock
+        run: mamba update -n tardis --file tardis/conda-${{ matrix.label }}.lock
         if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Install package
-        run: pip install -e .
+        run: pip install -e tardis
 
   generate-spectrum:
     runs-on: ubuntu-latest
