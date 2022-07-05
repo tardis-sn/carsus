@@ -2,6 +2,7 @@ name: carsus
 
 channels:
   - conda-forge
+  # - epassaro
 
 dependencies:
   - python =3.7
@@ -52,7 +53,10 @@ dependencies:
   - pytest =4
   - pytest-cov
   - pytest-astropy
-  - epassaro::pytest-arraydiff >=0.5
+  # - pytest-arraydiff >=0.5
+  - pip
+  - pip:
+    - git+https://github.com/astropy/pytest-arraydiff@main
 
   # Other
   - git-lfs
