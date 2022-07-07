@@ -90,29 +90,13 @@ jobs:
       - name: Install package
         run: pip install -e .
 
-      # - name: Install pytest arraydiff using conda skeleton
-      #   run: |
-      #       conda install conda-build
-      #       conda skeleton pypi pytest-arraydiff --python-version 3.6
-      #       conda build pytest-arraydiff
-      #       conda install --use-local pytest-arraydiff
-      
-      - name: Check version pytest arraydiff
-        run: pytest --version
-        
-      - name: Print plugin
-        run: cat /usr/share/miniconda3/envs/carsus/lib/python3.7/site-packages/pytest_arraydiff/plugin.py
-      
       - name: Generate CMFGEN reference data
         run:  pytest carsus/io/tests/test_cmfgen.py ${{ env.PYTEST_FLAGS }} 
               --arraydiff-generate-path=carsus-refdata/arraydiff  
       
-      - name: Run CMFGEN tests using reference data
-        run:  pytest carsus/io/tests/test_cmfgen.py ${{ env.PYTEST_FLAGS }} 
-              --arraydiff-reference-path=carsus-refdata/arraydiff  
-        
       - name: Run tests
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
+             --arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff  
 
       - name: Run notebooks
         run: |
