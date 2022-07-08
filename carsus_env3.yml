@@ -52,8 +52,7 @@ dependencies:
   - pytest =4
   - pytest-cov
   - pytest-astropy
-  - epassaro::pytest-arraydiff >=0.6
+  - epassaro::pytest-arraydiff >=0.5
 
   # Other
   - git-lfs
-  
