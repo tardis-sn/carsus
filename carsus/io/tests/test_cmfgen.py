@@ -25,6 +25,7 @@ data_dir = os.path.join(os.path.dirname(__file__), "data")
 def si1_reader():
     return CMFGENReader.from_config(
         "Si 0-1",
+        atomic_path="/tmp/atomic",
         collisions=True,
         cross_sections=True,
         ionization_energies=True,
