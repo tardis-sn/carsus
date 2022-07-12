@@ -30,6 +30,7 @@ def si1_reader():
         cross_sections=True,
         ionization_energies=True,
         temperature_grid=np.arange(2000, 50000, 2000),
+        drop_mismatched_labels=True,
     )
 
 
