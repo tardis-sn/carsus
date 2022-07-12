@@ -22,31 +22,14 @@ data_dir = os.path.join(os.path.dirname(__file__), "data")
 
 @with_refdata
 @pytest.fixture()
-def si2_osc_kurucz_fname(refdata_path):
-    return os.path.join(refdata_path, "cmfgen", "energy_levels", "si2_osc_kurucz")
-
-
-@with_refdata
-@pytest.fixture()
-def si2_col_fname(refdata_path):
-    return os.path.join(refdata_path, "cmfgen", "collisional_strengths", "si2_col")
-
-
-@with_refdata
-@pytest.fixture()
-def si1_data_dict(si2_osc_kurucz_fname, si2_col_fname):
-    si1_levels = CMFGENEnergyLevelsParser(
-        si2_osc_kurucz_fname
-    ).base  #  (carsus) Si 1 == Si II
-    si1_lines = CMFGENOscillatorStrengthsParser(si2_osc_kurucz_fname).base
-    si1_col = CMFGENCollisionalStrengthsParser(si2_col_fname).base
-    return {(14, 1): dict(levels=si1_levels, lines=si1_lines, collisions=si1_col)}
-
-
-@with_refdata
-@pytest.fixture()
-def si1_reader(si1_data_dict):
-    return CMFGENReader(si1_data_dict, collisions=True)
+def si1_reader():
+    return CMFGENReader.from_config(
+        "Si 0-1",
+        collisions=True,
+        cross_sections=True,
+        ionization_energies=True,
+        temperature_grid=np.arange(2000, 50000, 2000),
+    )
 
 
 @pytest.fixture()
@@ -161,6 +144,18 @@ def test_reader_levels(si1_reader):
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_collisions(si1_reader):
     return si1_reader.collisions
+
+
+@with_refdata
+@pytest.mark.array_compare(file_format="pd_hdf")
+def test_reader_cross_sections_squeeze(si1_reader):
+    return si1_reader.cross_sections
+
+
+@with_refdata
+@pytest.mark.array_compare(file_format="pd_hdf")
+def test_reader_ionization_energies(si1_reader):
+    return si1_reader.ionization_energies
 
 
 @pytest.mark.array_compare
