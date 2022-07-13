@@ -157,7 +157,7 @@ def test_reader_cross_sections_squeeze(si1_reader):
 @with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_ionization_energies(si1_reader):
-    return si1_reader.ionization_energies
+    return si1_reader.ionization_energies.to_frame()
 
 
 @pytest.mark.array_compare
