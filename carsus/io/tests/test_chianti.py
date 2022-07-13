@@ -10,9 +10,9 @@ slow = pytest.mark.skipif(
 )
 
 
-@pytest.fixture(scope="module")
-def ch_ion_reader():
-    return ChiantiIonReader("ne_2")
+@pytest.fixture()
+def ch_ion_reader(ion_name):
+    return ChiantiIonReader(ion_name)
 
 
 @pytest.fixture
@@ -22,47 +22,22 @@ def ch_ingester(memory_session):
     return ingester
 
 
-# @pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-# def test_chianti_bound_levels(ion_name):
-#     ion_rdr = ChiantiIonReader(ion_name)
-#     bound_levels = ion_rdr.bound_levels.reset_index()
-#     assert bound_levels["level_index"].max() <= ion_rdr.last_bound_level
-
-
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_bound_levels(ion_name):
-    ion_rdr = ChiantiIonReader(ion_name)
-    bound_levels = ion_rdr.bound_levels
+def test_chianti_bound_levels(ch_ion_reader):
+    bound_levels = ch_ion_reader.bound_levels
     return bound_levels
 
 
-# @pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-# def test_chianti_bound_lines(ion_name):
-#     ion_rdr = ChiantiIonReader(ion_name)
-#     bound_lines = ion_rdr.bound_lines.reset_index()
-#     assert bound_lines["upper_level_index"].max() <= ion_rdr.last_bound_level
+@pytest.mark.array_compare(file_format="pd_hdf")
+@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
+def test_chianti_bound_lines(ch_ion_reader):
+    bound_lines = ch_ion_reader.bound_lines
+    return bound_lines
 
 
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_bound_lines(ion_name):
-    ion_rdr = ChiantiIonReader(ion_name)
-    bound_lines = ion_rdr.bound_lines
-    return bound_lines
-
-
-# @pytest.mark.parametrize("level_index, energy, energy_theoretical",[
-#     (1, 0, 0),
-#     (21, 252953.5, 252954),
-# ])
-# def test_chianti_reader_read_levels(ch_ion_reader, level_index, energy, energy_theoretical):
-#     row = ch_ion_reader.levels.loc[level_index]
-#     assert_almost_equal(row['energy'], energy)
-#     assert_almost_equal(row['energy_theoretical'], energy_theoretical)
-
-
-@pytest.mark.array_compare(file_format="pd_hdf")
 def test_chianti_reader_read_levels(ch_ion_reader):
     return ch_ion_reader.levels
 
