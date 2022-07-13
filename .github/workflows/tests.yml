@@ -98,10 +98,6 @@ jobs:
       - name: Install package
         run: pip install -e .
 
-      - name: Generate CMFGEN reference data
-        run:  pytest carsus/io/tests/test_cmfgen.py ${{ env.PYTEST_FLAGS }} 
-              --arraydiff-generate-path=carsus-refdata/arraydiff  
-      
       - name: Run tests
         run: pytest carsus ${{ env.PYTEST_FLAGS }}
              --arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff  
