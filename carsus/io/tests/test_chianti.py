@@ -42,6 +42,12 @@ def test_chianti_reader_read_levels(ch_ion_reader):
     return ch_ion_reader.levels
 
 
+@pytest.mark.array_compare(file_format="pd_hdf")
+@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
+def test_chianti_reader_read_collisions(ch_ion_reader):
+    return ch_ion_reader.collisions
+
+
 @slow
 @pytest.mark.parametrize(
     "atomic_number, ion_charge, levels_count", [(10, 1, 138), (17, 3, 5)]
