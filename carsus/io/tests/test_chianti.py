@@ -10,11 +10,6 @@ slow = pytest.mark.skipif(
 )
 
 
-@pytest.fixture()
-def ch_ion_reader(ion_name):
-    return ChiantiIonReader(ion_name)
-
-
 @pytest.fixture
 def ch_ingester(memory_session):
     ions = "ne 1; cl 3"
@@ -22,30 +17,32 @@ def ch_ingester(memory_session):
     return ingester
 
 
-@pytest.mark.array_compare(file_format="pd_hdf")
-@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_bound_levels(ch_ion_reader):
-    bound_levels = ch_ion_reader.bound_levels
-    return bound_levels
+class TestChiantiIonReader:
+    @pytest.fixture(scope="class", params=["ne_2", "n_5"])
+    def ch_ion_reader(self, request):
+        return ChiantiIonReader(request.param)
 
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_chianti_bound_levels(self, ch_ion_reader):
+        bound_levels = ch_ion_reader.bound_levels
+        return bound_levels
 
-@pytest.mark.array_compare(file_format="pd_hdf")
-@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_bound_lines(ch_ion_reader):
-    bound_lines = ch_ion_reader.bound_lines
-    return bound_lines
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_chianti_bound_lines(self, ch_ion_reader):
+        bound_lines = ch_ion_reader.bound_lines
+        return bound_lines
 
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_chianti_reader_read_levels(self, ch_ion_reader):
+        return ch_ion_reader.levels
 
-@pytest.mark.array_compare(file_format="pd_hdf")
-@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_reader_read_levels(ch_ion_reader):
-    return ch_ion_reader.levels
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_chianti_reader_read_lines(self, ch_ion_reader):
+        return ch_ion_reader.lines
 
-
-@pytest.mark.array_compare(file_format="pd_hdf")
-@pytest.mark.parametrize("ion_name", ["ne_2", "n_5"])
-def test_chianti_reader_read_collisions(ch_ion_reader):
-    return ch_ion_reader.collisions
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_chianti_reader_read_collisions(self, ch_ion_reader):
+        return ch_ion_reader.collisions
 
 
 @slow
