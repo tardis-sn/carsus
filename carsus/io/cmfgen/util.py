@@ -270,7 +270,7 @@ def get_opproject_phixs_table(threshold_energy_ryd, a, b, c, d, e, n_points=1000
     return phixs_table
 
 
-def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, n_points=1000):
+def get_hummer_phixs_table(threshold_energy_ryd, a, b, c, d, e, f, g, h, n_points=1000):
     """
     References:
 

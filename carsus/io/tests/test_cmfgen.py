@@ -216,7 +216,7 @@ def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points):
 
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
-@pytest.mark.parametrize("vars", [[2, 3, 4, 5, 6, 7, 8]])
+@pytest.mark.parametrize("vars", [[2, 3, 4, 5, 6, 7, 8, 9]])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points):
     phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *vars, n_points)
