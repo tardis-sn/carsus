@@ -1,7 +1,7 @@
 import pytest
 
 from numpy.testing import assert_almost_equal
-from carsus.io.chianti_ import ChiantiIonReader, ChiantiIngester
+from carsus.io.chianti_ import ChiantiIonReader, ChiantiIngester, ChiantiReader
 from carsus.model import Level, Ion, Line, ECollision
 
 
@@ -93,3 +93,21 @@ def test_chianti_ingest_e_col_count(
         .count()
     )
     assert cnt == e_col_count
+
+
+class TestChiantiReader:
+    @pytest.fixture(scope="class", params=["H-He", "N"])
+    def ch_reader(self, request):
+        return ChiantiReader(ions=request.param, collisions=True, priority=20)
+
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_levels(self, ch_reader):
+        return ch_reader.levels
+
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_lines(self, ch_reader):
+        return ch_reader.lines
+
+    @pytest.mark.array_compare(file_format="pd_hdf")
+    def test_cols(self, ch_reader):
+        return ch_reader.collisions
