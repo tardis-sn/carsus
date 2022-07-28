@@ -118,12 +118,12 @@ jobs:
 
       - uses: actions/cache@v2
         with:
-          path: ${{ matrix.prefix }}
-          key: conda-${{ matrix.label }}-${{ hashFiles('conda-${{ matrix.label }}.lock') }}-${{ env.CACHE_NUMBER }}
+          path: /usr/share/miniconda3/envs/tardis
+          key: conda-linux-64-${{ hashFiles('conda-linux-64.lock') }}-${{ env.CACHE_NUMBER }}
         id: cache-conda
 
       - name: Update environment
-        run: mamba update -n tardis --file conda-${{ matrix.label }}.lock
+        run: mamba update -n tardis --file conda-linux-64.lock
         if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Install bokeh
@@ -139,9 +139,6 @@ jobs:
           name: atom-data
           path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5      
       
-      - name: Print path
-        run: python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5
-
       - name: Replace atomic data in reference data repository with the generated atomic data
         run: cp carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
       
@@ -153,9 +150,6 @@ jobs:
         with:
           name: reference data
           path: tardis-refdata/unit_test_data_org.h5
-  
-      - name: Print directory tree
-        run: tree
 
       - name: Run tests and generate new reference data
         run:  pytest tardis ${{ env.PYTEST_FLAGS }}
