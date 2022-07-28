@@ -23,20 +23,14 @@ env:
   PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
                 --generate-reference
 
-
 defaults:
       run:
         shell: bash -l {0}
-
 
 jobs:
   carsus-build:
     runs-on: ubuntu-latest
     steps:
-      # - uses: actions/checkout@v2
-      #   with:
-      #     fetch-depth: 0
-
       - name: Clone tardis-sn/carsus
         uses: actions/checkout@v2
         with:
@@ -95,19 +89,6 @@ jobs:
   
   tardis-build:
     needs: carsus-build
-    strategy:
-      matrix:
-        include:
-        - os: ubuntu-latest
-          label: linux-64
-          prefix: /usr/share/miniconda3/envs/tardis
-
-    #     - os: macos-latest
-    #       label: osx-64
-    #       prefix: /Users/runner/miniconda3/envs/tardis
-          
-    # name: ${{ matrix.label }}
-    # runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
 
     steps:
@@ -151,14 +132,12 @@ jobs:
       - name: Install package
         run: pip install -e .
         
-      # only run this steop when carsus build is done
+      # only run this step when carsus build is done
       - name: Download atom data
         uses: actions/download-artifact@v2
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5
-          # path: kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5
-      
+          path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5      
       
       - name: Print path
         run: python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5
@@ -183,12 +162,12 @@ jobs:
 
       - name: Run notebook to test spectrum
         run: |
-            ${{ env.NBCONVERT_CMD }} --allow-errors "tardis-refdata/notebooks/ref_data_compare copy.ipynb"
+            ${{ env.NBCONVERT_CMD }} "tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb"
       
       - name: Upload spectrum notebook
         uses: actions/upload-artifact@v2
         with:
-          path: "tardis-refdata/notebooks/ref_data_compare copy.html"
+          path: "tardis-refdata/notebooks/ref_data_compare_from_paths.html"
         
       
 
