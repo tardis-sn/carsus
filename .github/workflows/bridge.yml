@@ -132,7 +132,6 @@ jobs:
       - name: Install package
         run: pip install -e .
         
-      # only run this step when carsus build is done
       - name: Download atom data
         uses: actions/download-artifact@v2
         with:
@@ -144,12 +143,6 @@ jobs:
       
       - name: Create copy of reference data for comparision
         run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
-      
-      - name: Upload reference data as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: reference data
-          path: tardis-refdata/unit_test_data_org.h5
 
       - name: Run tests and generate new reference data
         run:  pytest tardis ${{ env.PYTEST_FLAGS }}
