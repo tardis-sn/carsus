@@ -77,7 +77,7 @@ jobs:
 
       - name: Run notebooks
         run: |
-          ${{ env.NBCONVERT_CMD }} carsus/docs/quickstart.ipynb
+          ${{ env.NBCONVERT_CMD }} carsus/docs/refdata_gen.ipynb
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
