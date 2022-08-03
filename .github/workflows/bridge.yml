@@ -12,7 +12,8 @@ on:
 env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
-  CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  # CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  CHIANTI_DB_VER: CHIANTI_v8.0.6_database.tar.gz
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
