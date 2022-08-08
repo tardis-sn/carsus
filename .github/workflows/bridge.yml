@@ -149,6 +149,7 @@ jobs:
         run:  pytest tardis ${{ env.PYTEST_FLAGS }}
 
       - name: Run notebook to test spectrum
+        continue-on-error: true
         run: |
             ${{ env.NBCONVERT_CMD }} "tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb"
       
