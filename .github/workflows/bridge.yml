@@ -151,7 +151,6 @@ jobs:
       - name: Run notebook to test spectrum
         run: |
             ${{ env.NBCONVERT_CMD }} "tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb"
-            echo $reference_comparision
       
       - name: Upload spectrum notebook
         uses: actions/upload-artifact@v2
@@ -159,7 +158,4 @@ jobs:
           path: "tardis-refdata/notebooks/ref_data_compare_from_paths.html"
       
       - name: Check if spectra were equal during comparision
-        if: ${{ env.reference_comparision }} == "failed"
-        run: |
-             echo $reference_comparision
-             exit 1      
+        run: if [ "$(cat /tmp/spectrum_compare)" == 1 ]; then exit 1; fi
