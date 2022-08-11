@@ -158,4 +158,4 @@ jobs:
           path: "tardis-refdata/notebooks/ref_data_compare_from_paths.html"
       
       - name: Check if spectra were equal during comparision
-        run: if [ "$(cat /tmp/spectrum_compare)" == 1 ]; then exit 1; fi
+        run: if [ "$(cat /tmp/spectrum_compare)" == 0 ]; then exit 1; fi
