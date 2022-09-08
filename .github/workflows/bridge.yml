@@ -15,9 +15,9 @@ env:
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
   # original reference data
-  REF1_PATH: /home/runner/work/carsus/carsus/tardis-refdata/unit_test_data_org.h5
+  REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
   # generated reference data using the new atomic file 
-  REF2_PATH: /home/runner/work/carsus/carsus/tardis-refdata/unit_test_data.h5
+  REF2_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data.h5
   PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
                 --generate-reference
 
@@ -29,8 +29,7 @@ jobs:
   carsus-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone tardis-sn/carsus
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           repository: atharva-2001/carsus
           path: carsus/
@@ -79,7 +78,7 @@ jobs:
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
-      - name: upload atom data
+      - name: Upload Atom Data
         uses: actions/upload-artifact@v2
         with:
           name: atom-data
@@ -136,16 +135,16 @@ jobs:
           name: atom-data
           path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5      
       
-      - name: Replace atomic data in reference data repository with the generated atomic data
+      - name: Replace Atomic Data
         run: cp carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
       
-      - name: Create copy of reference data for comparision
+      - name: Generate Reference Data Copy
         run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
 
-      - name: Run tests and generate new reference data
+      - name: Generate New Reference Data
         run:  pytest tardis ${{ env.PYTEST_FLAGS }}
 
-      - name: Run notebook to test spectrum
+      - name: Compare Reference Data
         run: |
             ${{ env.NBCONVERT_CMD }} "tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb"
       
