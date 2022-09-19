@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
+import logging
 from carsus.util import parse_selected_species, convert_atomic_number2symbol
 from collections import defaultdict
 
 from collections import defaultdict
 import matplotlib.pyplot as plt
+
+logger = logging.getLogger(__name__)
 
 def highlight_values(val):
     if val == True:
@@ -54,7 +57,7 @@ class AtomDataCompare(object):
         self.d1.close()
         self.d2.close()
 
-    def comparision_table(self):
+    def comparison_table(self):
         d1_keys = self.d1.keys()
         d2_keys = self.d2.keys()
         self.d1_df = pd.DataFrame(index=d1_keys, columns=["exists"])
@@ -96,7 +99,7 @@ class AtomDataCompare(object):
         except AttributeError as exc:
             raise Exception(
                 f"Either key_name: {key_name} is invalid or keys are not set."
-                "Please use the set_keys_as_attributes method to set keys as attributes for comparision."
+                "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
             )
 
         # TODO: should this be moved somewhere else?
@@ -118,7 +121,7 @@ class AtomDataCompare(object):
         if not mismatched_cols.empty:
             logger.warning("Columns do not match.")
             logger.warning(f"Mismatched columns: {mismatched_cols}")
-            logger.info(f"Using common columns for comparision:{common_columns}")
+            logger.info(f"Using common columns for comparison:{common_columns}")
 
         if df1.index.names != df2.index.names:
             raise ValueError("Index names do not match.")
