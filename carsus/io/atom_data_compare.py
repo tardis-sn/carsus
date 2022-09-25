@@ -240,9 +240,9 @@ class AtomDataCompare(object):
         return df_simplified
 
     def plot(self, key_name, ion, column):
-        df_name_format = "merged_{}_".format(key_name)
-        if hasattr(self, df_name_format + ion):
-            merged_df = getattr(self, df_name_format + ion)
+        df_name = f"merged_{key_name}_{ion}"
+        if hasattr(self, df_name):
+            merged_df = getattr(self, df_name)
         else:
             merged_df = self.diff(key_name=key_name, ion=ion)
         return plt.scatter(
