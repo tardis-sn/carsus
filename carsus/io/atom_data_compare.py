@@ -219,6 +219,17 @@ class AtomDataCompare(object):
         merged_df = merged_df.sort_values(by=merged_df.index.names, axis=0)
         setattr(self, f"merged_{key_name}_{ion}", merged_df)
 
+        summary_dict = {}
+        summary_dict["total_rows"] = len(merged_df)
+
+        for column in merged_df.copy().columns:
+            if column.startswith("matches_"):
+                summary_dict[column] = (
+                    merged_df[column].copy().value_counts().get(True, 0)
+                )
+        summary_df = pd.DataFrame(summary_dict, index=["values"])
+        setattr(self, f"merged_{key_name}_{ion}_summary", summary_df)
+
         if simplify_output:
             return self.simplified_df(merged_df.copy())
 
