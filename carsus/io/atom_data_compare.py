@@ -9,39 +9,58 @@ import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
+
 def highlight_values(val):
     if val == True:
-        return 'background-color: #BCF5A9'
+        return "background-color: #BCF5A9"
     else:
-        return 'background-color: #F5A9A9'
-    
+        return "background-color: #F5A9A9"
+
+
 def highlight_diff(val):
     if val == 0:
-        return 'background-color: #BCF5A9'
+        return "background-color: #BCF5A9"
     else:
-        return 'background-color: #F5A9A9'
+        return "background-color: #F5A9A9"
+
+
+def highlight_values(val):
+    if val == True:
+        return "background-color: #BCF5A9"
+    else:
+        return "background-color: #F5A9A9"
+
+
+def highlight_diff(val):
+    if val == 0:
+        return "background-color: #BCF5A9"
+    else:
+        return "background-color: #F5A9A9"
+
 
 class AtomDataCompare(object):
     def __init__(self, d1_path=None, d2_path=None):
         self.d1_path = d1_path
         self.d2_path = d2_path
+        # TODO: for all dataframes
+        self.level_columns = ["energy", "g", "metastable"]
         self.setup()
-        self.level_columns = ["energy", "g", "metastable"]  # TODO: for all dataframes
 
-    def set_keys_as_attributes(self, alt_keys={}):
-        # alt keys should be a subset of this dict
-        # other keys would be ignored
-        alt_keys_default = {
+        self.alt_keys_default = {
             "lines": ["lines_data", "lines"],
             "levels": ["levels_data", "levels"],
             "collisions": ["collisions_data", "collision_data"],
             "photoionization_data": ["photoionization_data"],
         }
-        alt_keys_default = defaultdict(list, alt_keys_default)
+        self.alt_keys_default = defaultdict(list, self.alt_keys_default)
 
-        for key, val in alt_keys_default.items():
+    def set_keys_as_attributes(self, alt_keys={}):
+        # alt keys should be a subset of this self.alt_keys_default
+        # other keys would be ignored
+
+        for key, val in self.alt_keys_default.items():
             if alt_keys.get(key, None):
-                alt_keys_default[key].extend(alt_keys[key])
+                self.alt_keys_default[key].extend(alt_keys[key])
 
             for item in val:
                 if self.d1.get_node(item):
@@ -57,38 +76,58 @@ class AtomDataCompare(object):
         self.d1.close()
         self.d2.close()
 
-    def comparison_table(self):
-        d1_keys = self.d1.keys()
-        d2_keys = self.d2.keys()
-        self.d1_df = pd.DataFrame(index=d1_keys, columns=["exists"])
-        self.d2_df = pd.DataFrame(index=d2_keys, columns=["exists"])
-        self.d1_df["exists"] = True
-        self.d2_df["exists"] = True
+    def generate_comparison_table(
+        self, exclude_correct_matches=False, drop_file_keys=True
+    ):
+        for index, file in enumerate((self.d1, self.d2)):
+            file_keys = {item[1:]: item[1:] for item in file.keys()}
+
+            for original_keyname in self.alt_keys_default.keys():
+                for file_key in file_keys.keys():
+                    alt_key_names = self.alt_keys_default.get(original_keyname, [])
+
+                    if file_key in alt_key_names:
+                        # replace value with key name in self.alt_keys_default
+                        file_keys[file_key] = original_keyname
+
+            # flip the dict to create the dataframe
+            file_keys = {v: k for k, v in file_keys.items()}
+            df = pd.DataFrame(file_keys, index=["file_keys"]).T
+            df["exists"] = True
+            setattr(self, f"d{index+1}_df", df)
+
         joined_df = self.d1_df.join(self.d2_df, how="outer", lsuffix="_1", rsuffix="_2")
-        joined_df = joined_df.fillna(False)
-        self.tt = joined_df
+        joined_df[["exists_1", "exists_2"]] = joined_df[
+            ["exists_1", "exists_2"]
+        ].fillna(False)
+        self.comparison_table = joined_df
+        self.comparison_table["match"] = None
 
-    @property
-    def tt_stylized(self):
-        return self.tt.style.applymap(
-            highlight_values, subset=["exists_1", "exists_2", "match"]
-        )
-
-    def compare(self, exclude_correct_matches=True):
-        self.tt["match"] = None
-        for index, row in self.tt.iterrows():
+        for index, row in self.comparison_table.iterrows():
             if row[["exists_1", "exists_2"]].all():
-                row1_df = self.d1[index]
-                row2_df = self.d2[index]
+                row1_df = self.d1[row["file_keys_1"]]
+                row2_df = self.d2[row["file_keys_2"]]
                 if row1_df.equals(row2_df):
-                    self.tt.at[index, "match"] = True
+                    self.comparison_table.at[index, "match"] = True
                 else:
-                    self.tt.at[index, "match"] = False
+                    self.comparison_table.at[index, "match"] = False
             else:
-                self.tt.at[index, "match"] = False
+                self.comparison_table.at[index, "match"] = False
 
         if exclude_correct_matches:
-            self.tt = self.tt[self.tt.match == False]
+            self.comparison_table = self.comparison_table[
+                self.comparison_table.match == False
+            ]
+        if drop_file_keys:
+            self.comparison_table = self.comparison_table.drop(
+                columns=["file_keys_1", "file_keys_2"]
+            )
+
+    @property
+    def comparison_table_stylized(self):
+        return self.comparison_table.style.applymap(
+            highlight_values, subset=["exists_1", "exists_2", "match"]
+        )
 
     def diff(self, key_name, ion, rtol=1e-07, simplify_output=False):
         # Ion differences
