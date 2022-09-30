@@ -24,20 +24,6 @@ def highlight_diff(val):
         return "background-color: #F5A9A9"
 
 
-def highlight_values(val):
-    if val == True:
-        return "background-color: #BCF5A9"
-    else:
-        return "background-color: #F5A9A9"
-
-
-def highlight_diff(val):
-    if val == 0:
-        return "background-color: #BCF5A9"
-    else:
-        return "background-color: #F5A9A9"
-
-
 class AtomDataCompare(object):
     def __init__(self, d1_path=None, d2_path=None):
         self.d1_path = d1_path
@@ -76,12 +62,11 @@ class AtomDataCompare(object):
         self.d1.close()
         self.d2.close()
 
-    def generate_comparison_table(
-        self, exclude_correct_matches=False, drop_file_keys=True
-    ):
+    def generate_comparison_table(self):
         for index, file in enumerate((self.d1, self.d2)):
+            # create a dict to contain names of keys in the file
+            # and their alternate(more recent) names
             file_keys = {item[1:]: item[1:] for item in file.keys()}
-
             for original_keyname in self.alt_keys_default.keys():
                 for file_key in file_keys.keys():
                     alt_key_names = self.alt_keys_default.get(original_keyname, [])
@@ -102,6 +87,14 @@ class AtomDataCompare(object):
         ].fillna(False)
         self.comparison_table = joined_df
         self.comparison_table["match"] = None
+
+    def compare(
+        self,
+        exclude_correct_matches=False,
+        drop_file_keys=True,
+    ):
+        if not hasattr(self, "comparison_table"):
+            self.generate_comparison_table()
 
         for index, row in self.comparison_table.iterrows():
             if row[["exists_1", "exists_2"]].all():
@@ -129,9 +122,7 @@ class AtomDataCompare(object):
             highlight_values, subset=["exists_1", "exists_2", "match"]
         )
 
-    def diff(self, key_name, ion, rtol=1e-07, simplify_output=False):
-        # Ion differences
-
+    def verify_key_diff(self, key_name):
         try:
             df1 = getattr(self, f"{key_name}1")
             df2 = getattr(self, f"{key_name}2")
@@ -141,7 +132,6 @@ class AtomDataCompare(object):
                 "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
             )
 
-        # TODO: should this be moved somewhere else?
         species1 = df1.index.get_level_values("atomic_number")
         species1 = set([convert_atomic_number2symbol(item) for item in species1])
 
@@ -166,7 +156,65 @@ class AtomDataCompare(object):
             raise ValueError("Index names do not match.")
 
         setattr(self, f"{key_name}_columns", common_columns)
-        parsed_ion = parse_selected_species(ion)[0]
+
+    def key_diff(self, key_name):
+        if not hasattr(self, f"{key_name}_columns"):
+            self.verify_key_diff(key_name)
+
+        df1 = getattr(self, f"{key_name}1")
+        df2 = getattr(self, f"{key_name}2")
+
+        ions1 = set(
+            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df1.index]
+        )
+        ions2 = set(
+            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df2.index]
+        )
+
+        ions = set(ions1).intersection(ions2)
+        ion_diffs = []
+        for ion in ions:
+            ion_diff = self.ion_diff(key_name=key_name, ion=ion, return_summary=True)
+            ion_diff["atomic_number"], ion_diff["ion_number"] = ion
+            ion_diff = ion_diff.set_index(["atomic_number", "ion_number"])
+            ion_diffs.append(ion_diff)
+        key_diff = pd.concat(ion_diffs)
+
+        columns = key_diff.columns
+        for column in columns:
+            if column.startswith("matches"):
+                key_diff[column] = key_diff["total_rows"] - key_diff[column]
+                key_diff = key_diff.rename(columns={column: f"not_{column}"})
+        key_diff = key_diff.sort_values(["atomic_number", "ion_number"])
+
+        return key_diff
+
+    def ion_diff(
+        self,
+        key_name,
+        ion,
+        rtol=1e-07,
+        simplify_output=False,
+        return_summary=False,
+    ):
+        try:
+            df1 = getattr(self, f"{key_name}1")
+            df2 = getattr(self, f"{key_name}2")
+        except AttributeError as exc:
+            raise Exception(
+                f"Either key_name: {key_name} is invalid or keys are not set."
+                "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
+            )
+
+        if not hasattr(self, f"{key_name}_columns"):
+            self.verify_key_diff(key_name)
+
+        common_columns = getattr(self, f"{key_name}_columns")
+
+        if not isinstance(ion, tuple):
+            parsed_ion = parse_selected_species(ion)[0]
+        else:
+            parsed_ion = ion
 
         try:
             df1 = df1.loc[parsed_ion]
@@ -184,7 +232,7 @@ class AtomDataCompare(object):
             suffixes=["_1", "_2"],
         )
 
-        non_numeric_cols = ["line_id", "metastable"]
+        non_numeric_cols = ["line_id", "metastable"]  # TODO
         common_cols_rearranged = []
 
         for item in common_columns:
@@ -217,7 +265,6 @@ class AtomDataCompare(object):
 
         merged_df = merged_df[common_cols_rearranged]
         merged_df = merged_df.sort_values(by=merged_df.index.names, axis=0)
-        setattr(self, f"merged_{key_name}_{ion}", merged_df)
 
         summary_dict = {}
         summary_dict["total_rows"] = len(merged_df)
@@ -228,10 +275,12 @@ class AtomDataCompare(object):
                     merged_df[column].copy().value_counts().get(True, 0)
                 )
         summary_df = pd.DataFrame(summary_dict, index=["values"])
-        setattr(self, f"merged_{key_name}_{ion}_summary", summary_df)
 
         if simplify_output:
             return self.simplified_df(merged_df.copy())
+
+        if return_summary:
+            return summary_df
 
         return merged_df
 
@@ -239,28 +288,12 @@ class AtomDataCompare(object):
         df_simplified = df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
         return df_simplified
 
-    def plot(self, key_name, ion, column):
-        df_name = f"merged_{key_name}_{ion}"
-        if hasattr(self, df_name):
-            merged_df = getattr(self, df_name)
-        else:
-            merged_df = self.diff(key_name=key_name, ion=ion)
+    def plot_ion_diff(self, key_name, ion, column):
+        df = self.ion_diff(key_name=key_name, ion=ion)
         return plt.scatter(
-            merged_df[f"{column}_1"] / merged_df[f"{column}_2"],
-            merged_df[f"{column}_2"],
+            df[f"{column}_1"] / df[f"{column}_2"],
+            df[f"{column}_2"],
         )
 
-    def style_df(self, key_name, ion, simplify_df=True):
-        df_name = f"merged_{key_name}_{ion}"
-
-        if hasattr(self, df_name):
-            merged_df = getattr(self, df_name)
-        else:
-            merged_df = self.diff(key_name=key_name, ion=ion)
-
-        columns = getattr(self, f"{key_name}_columns")
-        subset = [f"matches_{item}" for item in columns]
-        if simplify_df:
-            merged_df = self.simplified_df(merged_df)
-
-        return merged_df.style.applymap(highlight_values, subset=[*subset])
+    def style_df(self, mode, df, simplify_df=True):
+        pass
