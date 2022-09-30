@@ -28,8 +28,6 @@ class AtomDataCompare(object):
     def __init__(self, d1_path=None, d2_path=None):
         self.d1_path = d1_path
         self.d2_path = d2_path
-        # TODO: for all dataframes
-        self.level_columns = ["energy", "g", "metastable"]
         self.setup()
 
         self.alt_keys_default = {
@@ -61,66 +59,6 @@ class AtomDataCompare(object):
     def teardown(self):
         self.d1.close()
         self.d2.close()
-
-    def generate_comparison_table(self):
-        for index, file in enumerate((self.d1, self.d2)):
-            # create a dict to contain names of keys in the file
-            # and their alternate(more recent) names
-            file_keys = {item[1:]: item[1:] for item in file.keys()}
-            for original_keyname in self.alt_keys_default.keys():
-                for file_key in file_keys.keys():
-                    alt_key_names = self.alt_keys_default.get(original_keyname, [])
-
-                    if file_key in alt_key_names:
-                        # replace value with key name in self.alt_keys_default
-                        file_keys[file_key] = original_keyname
-
-            # flip the dict to create the dataframe
-            file_keys = {v: k for k, v in file_keys.items()}
-            df = pd.DataFrame(file_keys, index=["file_keys"]).T
-            df["exists"] = True
-            setattr(self, f"d{index+1}_df", df)
-
-        joined_df = self.d1_df.join(self.d2_df, how="outer", lsuffix="_1", rsuffix="_2")
-        joined_df[["exists_1", "exists_2"]] = joined_df[
-            ["exists_1", "exists_2"]
-        ].fillna(False)
-        self.comparison_table = joined_df
-        self.comparison_table["match"] = None
-
-    def compare(
-        self,
-        exclude_correct_matches=False,
-        drop_file_keys=True,
-    ):
-        if not hasattr(self, "comparison_table"):
-            self.generate_comparison_table()
-
-        for index, row in self.comparison_table.iterrows():
-            if row[["exists_1", "exists_2"]].all():
-                row1_df = self.d1[row["file_keys_1"]]
-                row2_df = self.d2[row["file_keys_2"]]
-                if row1_df.equals(row2_df):
-                    self.comparison_table.at[index, "match"] = True
-                else:
-                    self.comparison_table.at[index, "match"] = False
-            else:
-                self.comparison_table.at[index, "match"] = False
-
-        if exclude_correct_matches:
-            self.comparison_table = self.comparison_table[
-                self.comparison_table.match == False
-            ]
-        if drop_file_keys:
-            self.comparison_table = self.comparison_table.drop(
-                columns=["file_keys_1", "file_keys_2"]
-            )
-
-    @property
-    def comparison_table_stylized(self):
-        return self.comparison_table.style.applymap(
-            highlight_values, subset=["exists_1", "exists_2", "match"]
-        )
 
     def verify_key_diff(self, key_name):
         try:
@@ -156,38 +94,6 @@ class AtomDataCompare(object):
             raise ValueError("Index names do not match.")
 
         setattr(self, f"{key_name}_columns", common_columns)
-
-    def key_diff(self, key_name):
-        if not hasattr(self, f"{key_name}_columns"):
-            self.verify_key_diff(key_name)
-
-        df1 = getattr(self, f"{key_name}1")
-        df2 = getattr(self, f"{key_name}2")
-
-        ions1 = set(
-            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df1.index]
-        )
-        ions2 = set(
-            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df2.index]
-        )
-
-        ions = set(ions1).intersection(ions2)
-        ion_diffs = []
-        for ion in ions:
-            ion_diff = self.ion_diff(key_name=key_name, ion=ion, return_summary=True)
-            ion_diff["atomic_number"], ion_diff["ion_number"] = ion
-            ion_diff = ion_diff.set_index(["atomic_number", "ion_number"])
-            ion_diffs.append(ion_diff)
-        key_diff = pd.concat(ion_diffs)
-
-        columns = key_diff.columns
-        for column in columns:
-            if column.startswith("matches"):
-                key_diff[column] = key_diff["total_rows"] - key_diff[column]
-                key_diff = key_diff.rename(columns={column: f"not_{column}"})
-        key_diff = key_diff.sort_values(["atomic_number", "ion_number"])
-
-        return key_diff
 
     def ion_diff(
         self,
@@ -283,6 +189,98 @@ class AtomDataCompare(object):
             return summary_df
 
         return merged_df
+
+    def key_diff(self, key_name):
+        if not hasattr(self, f"{key_name}_columns"):
+            self.verify_key_diff(key_name)
+
+        df1 = getattr(self, f"{key_name}1")
+        df2 = getattr(self, f"{key_name}2")
+
+        ions1 = set(
+            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df1.index]
+        )
+        ions2 = set(
+            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df2.index]
+        )
+
+        ions = set(ions1).intersection(ions2)
+        ion_diffs = []
+        for ion in ions:
+            ion_diff = self.ion_diff(key_name=key_name, ion=ion, return_summary=True)
+            ion_diff["atomic_number"], ion_diff["ion_number"] = ion
+            ion_diff = ion_diff.set_index(["atomic_number", "ion_number"])
+            ion_diffs.append(ion_diff)
+        key_diff = pd.concat(ion_diffs)
+
+        columns = key_diff.columns
+        for column in columns:
+            if column.startswith("matches"):
+                key_diff[column] = key_diff["total_rows"] - key_diff[column]
+                key_diff = key_diff.rename(columns={column: f"not_{column}"})
+        key_diff = key_diff.sort_values(["atomic_number", "ion_number"])
+
+        return key_diff
+
+    def generate_comparison_table(self):
+        for index, file in enumerate((self.d1, self.d2)):
+            # create a dict to contain names of keys in the file
+            # and their alternate(more recent) names
+            file_keys = {item[1:]: item[1:] for item in file.keys()}
+            for original_keyname in self.alt_keys_default.keys():
+                for file_key in file_keys.keys():
+                    alt_key_names = self.alt_keys_default.get(original_keyname, [])
+
+                    if file_key in alt_key_names:
+                        # replace value with key name in self.alt_keys_default
+                        file_keys[file_key] = original_keyname
+
+            # flip the dict to create the dataframe
+            file_keys = {v: k for k, v in file_keys.items()}
+            df = pd.DataFrame(file_keys, index=["file_keys"]).T
+            df["exists"] = True
+            setattr(self, f"d{index+1}_df", df)
+
+        joined_df = self.d1_df.join(self.d2_df, how="outer", lsuffix="_1", rsuffix="_2")
+        joined_df[["exists_1", "exists_2"]] = joined_df[
+            ["exists_1", "exists_2"]
+        ].fillna(False)
+        self.comparison_table = joined_df
+        self.comparison_table["match"] = None
+
+    def compare(
+        self,
+        exclude_correct_matches=False,
+        drop_file_keys=True,
+    ):
+        if not hasattr(self, "comparison_table"):
+            self.generate_comparison_table()
+
+        for index, row in self.comparison_table.iterrows():
+            if row[["exists_1", "exists_2"]].all():
+                row1_df = self.d1[row["file_keys_1"]]
+                row2_df = self.d2[row["file_keys_2"]]
+                if row1_df.equals(row2_df):
+                    self.comparison_table.at[index, "match"] = True
+                else:
+                    self.comparison_table.at[index, "match"] = False
+            else:
+                self.comparison_table.at[index, "match"] = False
+
+        if exclude_correct_matches:
+            self.comparison_table = self.comparison_table[
+                self.comparison_table.match == False
+            ]
+        if drop_file_keys:
+            self.comparison_table = self.comparison_table.drop(
+                columns=["file_keys_1", "file_keys_2"]
+            )
+
+    @property
+    def comparison_table_stylized(self):
+        return self.comparison_table.style.applymap(
+            highlight_values, subset=["exists_1", "exists_2", "match"]
+        )
 
     def simplified_df(self, df):
         df_simplified = df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
