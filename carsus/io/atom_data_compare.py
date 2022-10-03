@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import functools
 import logging
 from carsus.util import parse_selected_species, convert_atomic_number2symbol
 from collections import defaultdict
@@ -12,13 +13,6 @@ logger = logging.getLogger(__name__)
 
 def highlight_values(val):
     if val == True:
-        return "background-color: #BCF5A9"
-    else:
-        return "background-color: #F5A9A9"
-
-
-def highlight_diff(val):
-    if val == 0:
         return "background-color: #BCF5A9"
     else:
         return "background-color: #F5A9A9"
@@ -100,8 +94,10 @@ class AtomDataCompare(object):
         key_name,
         ion,
         rtol=1e-07,
-        simplify_output=False,
+        simplify_output=True,
         return_summary=False,
+        style=True,
+        style_axis=0,
     ):
         try:
             df1 = getattr(self, f"{key_name}1")
@@ -171,6 +167,7 @@ class AtomDataCompare(object):
 
         merged_df = merged_df[common_cols_rearranged]
         merged_df = merged_df.sort_values(by=merged_df.index.names, axis=0)
+        merged_df = merged_df.abs()  # TODO
 
         summary_dict = {}
         summary_dict["total_rows"] = len(merged_df)
@@ -182,15 +179,33 @@ class AtomDataCompare(object):
                 )
         summary_df = pd.DataFrame(summary_dict, index=["values"])
 
-        if simplify_output:
-            return self.simplified_df(merged_df.copy())
-
         if return_summary:
             return summary_df
 
+        subset = [
+            column for column in merged_df.columns if column.startswith("pct_change")
+        ]
+        conditions = [merged_df[column] != 0.0 for column in subset]
+
+        if simplify_output:
+            merged_df = self.simplified_df(merged_df.copy())  # TODO
+            merged_df = merged_df[functools.reduce(np.logical_or, conditions)]
+            merged_df = merged_df.drop(
+                columns=[
+                    column
+                    for column in merged_df.columns
+                    if column.startswith("matches")
+                ]
+            )
+
+        if style:
+            return merged_df.style.background_gradient(
+                cmap="Reds", subset=subset, axis=style_axis
+            )
+
         return merged_df
 
-    def key_diff(self, key_name):
+    def key_diff(self, key_name, simplify_output=True, style=True, style_axis=0):
         if not hasattr(self, f"{key_name}_columns"):
             self.verify_key_diff(key_name)
 
@@ -220,6 +235,19 @@ class AtomDataCompare(object):
                 key_diff = key_diff.rename(columns={column: f"not_{column}"})
         key_diff = key_diff.sort_values(["atomic_number", "ion_number"])
 
+        subset = [
+            column for column in key_diff.columns if column.startswith("not_matches")
+        ]
+        conditions = [key_diff[column] != 0 for column in subset]
+
+        if simplify_output:
+            key_diff = key_diff[functools.reduce(np.logical_or, conditions)]
+
+        if style:
+            return key_diff.style.background_gradient(
+                cmap="Reds", subset=subset, axis=style_axis
+            )
+
         return key_diff
 
     def generate_comparison_table(self):
@@ -248,11 +276,7 @@ class AtomDataCompare(object):
         self.comparison_table = joined_df
         self.comparison_table["match"] = None
 
-    def compare(
-        self,
-        exclude_correct_matches=False,
-        drop_file_keys=True,
-    ):
+    def compare(self, exclude_correct_matches=False, drop_file_keys=True, style=True):
         if not hasattr(self, "comparison_table"):
             self.generate_comparison_table()
 
@@ -275,23 +299,24 @@ class AtomDataCompare(object):
             self.comparison_table = self.comparison_table.drop(
                 columns=["file_keys_1", "file_keys_2"]
             )
-
-    @property
-    def comparison_table_stylized(self):
-        return self.comparison_table.style.applymap(
-            highlight_values, subset=["exists_1", "exists_2", "match"]
-        )
+        if style:
+            return self.comparison_table.style.applymap(
+                highlight_values, subset=["exists_1", "exists_2", "match"]
+            )
+        return self.comparison_table
 
     def simplified_df(self, df):
         df_simplified = df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
         return df_simplified
 
     def plot_ion_diff(self, key_name, ion, column):
-        df = self.ion_diff(key_name=key_name, ion=ion)
+        df = self.ion_diff(
+            key_name=key_name, ion=ion, style=False, simplify_output=False
+        )
         return plt.scatter(
             df[f"{column}_1"] / df[f"{column}_2"],
             df[f"{column}_2"],
         )
 
-    def style_df(self, mode, df, simplify_df=True):
+    def style_df(self, subset):
         pass
