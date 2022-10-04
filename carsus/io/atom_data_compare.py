@@ -10,12 +10,14 @@ import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 
+LIGHT_GREEN = "#BCF5A9"
+LIGHT_RED = "#F5A9A9"
 
 def highlight_values(val):
     if val == True:
-        return "background-color: #BCF5A9"
+        return f"background-color: {LIGHT_GREEN}"
     else:
-        return "background-color: #F5A9A9"
+        return f"background-color: {LIGHT_RED}"
 
 
 class AtomDataCompare(object):
@@ -321,7 +323,6 @@ class AtomDataCompare(object):
         plt.xlabel(f"{column}$_1$/{column}$_2$")
         plt.ylabel(f"{column}$_2$")
         plt.show()
-        return plt
 
     def style_df(self, subset):
         pass
