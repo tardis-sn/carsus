@@ -19,11 +19,9 @@ def highlight_values(val):
 
 
 class AtomDataCompare(object):
-    def __init__(self, d1_path=None, d2_path=None):
+    def __init__(self, d1_path=None, d2_path=None, alt_keys={}):
         self.d1_path = d1_path
         self.d2_path = d2_path
-        self.setup()
-
         self.alt_keys_default = {
             "lines": ["lines_data", "lines"],
             "levels": ["levels_data", "levels"],
@@ -31,6 +29,7 @@ class AtomDataCompare(object):
             "photoionization_data": ["photoionization_data"],
         }
         self.alt_keys_default = defaultdict(list, self.alt_keys_default)
+        self.setup(alt_keys=alt_keys)
 
     def set_keys_as_attributes(self, alt_keys={}):
         # alt keys should be a subset of this self.alt_keys_default
@@ -46,9 +45,10 @@ class AtomDataCompare(object):
                 if self.d2.get_node(item):
                     setattr(self, f"{key}2", self.d2[item])
 
-    def setup(self):
+    def setup(self, alt_keys={}):
         self.d1 = pd.HDFStore(self.d1_path)
         self.d2 = pd.HDFStore(self.d2_path)
+        self.set_keys_as_attributes(alt_keys=alt_keys)
 
     def teardown(self):
         self.d1.close()
@@ -313,10 +313,15 @@ class AtomDataCompare(object):
         df = self.ion_diff(
             key_name=key_name, ion=ion, style=False, simplify_output=False
         )
-        return plt.scatter(
+        plt.scatter(
             df[f"{column}_1"] / df[f"{column}_2"],
             df[f"{column}_2"],
         )
+
+        plt.xlabel(f"{column}$_1$/{column}$_2$")
+        plt.ylabel(f"{column}$_2$")
+        plt.show()
+        return plt
 
     def style_df(self, subset):
         pass
