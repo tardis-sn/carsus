@@ -14,6 +14,17 @@ LIGHT_GREEN = "#BCF5A9"
 LIGHT_RED = "#F5A9A9"
 
 def highlight_values(val):
+    """
+    Return hex string of background color.
+
+    Parameters
+    ----------
+    val : bool
+
+    Returns
+    -------
+    string
+    """
     if val == True:
         return f"background-color: {LIGHT_GREEN}"
     else:
@@ -21,6 +32,19 @@ def highlight_values(val):
 
 
 class AtomDataCompare(object):
+    """
+    Differentiate between two Carsus atomic files.
+    
+    Parameters
+    ----------
+    d1_path : string
+        Path to the first file.
+    d2_path : string
+        Path to the second file.
+    alt_keys : dict, optional
+        Alternate names to dataframes inside the atomic files. 
+        For example, the `lines` dataframe was used to be called `lines_data` in earlier carsus versions.
+    """
     def __init__(self, d1_path=None, d2_path=None, alt_keys={}):
         self.d1_path = d1_path
         self.d2_path = d2_path
@@ -34,6 +58,14 @@ class AtomDataCompare(object):
         self.setup(alt_keys=alt_keys)
 
     def set_keys_as_attributes(self, alt_keys={}):
+        """
+        Set dataframes as attributes.
+    
+        Parameters
+        ----------
+        alt_keys : dict, optional
+            Alternate names to dataframes inside the atomic files. Defaults to {}.
+        """
         # alt keys should be a subset of this self.alt_keys_default
         # other keys would be ignored
 
@@ -48,21 +80,39 @@ class AtomDataCompare(object):
                     setattr(self, f"{key}2", self.d2[item])
 
     def setup(self, alt_keys={}):
+        """
+        Opeb HDF files using Pandas HDFStore.
+    
+        Parameters
+        ----------
+        alt_keys : dict, optional
+            Alternate names to dataframes inside the atomic files. Defaults to {}.
+        """
         self.d1 = pd.HDFStore(self.d1_path)
         self.d2 = pd.HDFStore(self.d2_path)
         self.set_keys_as_attributes(alt_keys=alt_keys)
 
     def teardown(self):
+        """
+        Close open HDF files.
+        """
         self.d1.close()
         self.d2.close()
 
     def verify_key_diff(self, key_name):
+        """
+        Check if dataframes can be compared.
+    
+        Parameters
+        ----------
+        key_name : string
+        """
         try:
             df1 = getattr(self, f"{key_name}1")
             df2 = getattr(self, f"{key_name}2")
         except AttributeError as exc:
             raise Exception(
-                f"Either key_name: {key_name} is invalid or keys are not set."
+                f"Either key_name: {key_name} is invalid or keys are not set. "
                 "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
             )
 
@@ -101,6 +151,19 @@ class AtomDataCompare(object):
         style=True,
         style_axis=0,
     ):
+        """
+        Compare two dataframes- ion wise.
+    
+        Parameters
+        ----------
+        key_name : string
+        ion: string or tuple
+        rtol: int
+        simplify_output: bool
+        return_summary: bool
+        style: bool
+        style_axis: int or None
+        """
         try:
             df1 = getattr(self, f"{key_name}1")
             df2 = getattr(self, f"{key_name}2")
@@ -208,6 +271,16 @@ class AtomDataCompare(object):
         return merged_df
 
     def key_diff(self, key_name, simplify_output=True, style=True, style_axis=0):
+        """
+        Compare two dataframes.
+    
+        Parameters
+        ----------
+        key_name : string
+        simplify_output: bool
+        style: bool
+        style_axis: int or None
+        """
         if not hasattr(self, f"{key_name}_columns"):
             self.verify_key_diff(key_name)
 
@@ -253,6 +326,9 @@ class AtomDataCompare(object):
         return key_diff
 
     def generate_comparison_table(self):
+        """
+        Generate empty comparison table.
+        """
         for index, file in enumerate((self.d1, self.d2)):
             # create a dict to contain names of keys in the file
             # and their alternate(more recent) names
@@ -279,6 +355,15 @@ class AtomDataCompare(object):
         self.comparison_table["match"] = None
 
     def compare(self, exclude_correct_matches=False, drop_file_keys=True, style=True):
+        """
+        Compare the two HDF files.
+    
+        Parameters
+        ----------
+        exclude_correct_matches : bool
+        drop_file_keys: bool
+        style: bool
+        """
         if not hasattr(self, "comparison_table"):
             self.generate_comparison_table()
 
@@ -308,10 +393,26 @@ class AtomDataCompare(object):
         return self.comparison_table
 
     def simplified_df(self, df):
+        """
+        Drop additional columns belonging to the original dataframes but were used for comparison.
+    
+        Parameters
+        ----------
+        df : pd.DataFrame
+        """
         df_simplified = df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
         return df_simplified
 
     def plot_ion_diff(self, key_name, ion, column):
+        """
+        Plot fractional difference between properties of ions.
+    
+        Parameters
+        ----------
+        key_name : string
+        ion: string or tuple
+        column: string
+        """
         df = self.ion_diff(
             key_name=key_name, ion=ion, style=False, simplify_output=False
         )
@@ -323,6 +424,3 @@ class AtomDataCompare(object):
         plt.xlabel(f"{column}$_1$/{column}$_2$")
         plt.ylabel(f"{column}$_2$")
         plt.show()
-
-    def style_df(self, subset):
-        pass
