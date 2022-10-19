@@ -11,7 +11,7 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
-  NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
+  NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
   # original reference data
@@ -74,7 +74,7 @@ jobs:
 
       - name: Run notebooks
         run: |
-          ${{ env.NBCONVERT_CMD }} carsus/docs/refdata_gen.ipynb
+          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/refdata_gen.ipynb
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5
+          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
   
   tardis-build:
     needs: carsus-build
@@ -146,12 +146,12 @@ jobs:
 
       - name: Compare Reference Data
         run: |
-            ${{ env.NBCONVERT_CMD }} "tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb"
+            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} tardis-refdata/notebooks/ref_data_compare_from_paths.ipynb
       
       - name: Upload spectrum notebook
         uses: actions/upload-artifact@v2
         with:
-          path: "tardis-refdata/notebooks/ref_data_compare_from_paths.html"
+          path: tardis-refdata/notebooks/ref_data_compare_from_paths.html
       
       - name: Check if spectra were equal during comparision
         run: if [ "$(cat /tmp/spectrum_compare)" == 0 ]; then exit 1; fi
