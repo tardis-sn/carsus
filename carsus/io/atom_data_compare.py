@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 LIGHT_GREEN = "#BCF5A9"
 LIGHT_RED = "#F5A9A9"
 
+
 def highlight_values(val):
     """
     Return hex string of background color.
@@ -34,7 +35,7 @@ def highlight_values(val):
 class AtomDataCompare(object):
     """
     Differentiate between two Carsus atomic files.
-    
+
     Parameters
     ----------
     d1_path : string
@@ -42,9 +43,10 @@ class AtomDataCompare(object):
     d2_path : string
         Path to the second file.
     alt_keys : dict, optional
-        Alternate names to dataframes inside the atomic files. 
+        Alternate names to dataframes inside the atomic files.
         For example, the `lines` dataframe was used to be called `lines_data` in earlier carsus versions.
     """
+
     def __init__(self, d1_path=None, d2_path=None, alt_keys={}):
         self.d1_path = d1_path
         self.d2_path = d2_path
@@ -60,7 +62,7 @@ class AtomDataCompare(object):
     def set_keys_as_attributes(self, alt_keys={}):
         """
         Set dataframes as attributes.
-    
+
         Parameters
         ----------
         alt_keys : dict, optional
@@ -82,7 +84,7 @@ class AtomDataCompare(object):
     def setup(self, alt_keys={}):
         """
         Opeb HDF files using Pandas HDFStore.
-    
+
         Parameters
         ----------
         alt_keys : dict, optional
@@ -102,7 +104,7 @@ class AtomDataCompare(object):
     def verify_key_diff(self, key_name):
         """
         Check if dataframes can be compared.
-    
+
         Parameters
         ----------
         key_name : string
@@ -153,7 +155,7 @@ class AtomDataCompare(object):
     ):
         """
         Compare two dataframes- ion wise.
-    
+
         Parameters
         ----------
         key_name : string
@@ -232,29 +234,35 @@ class AtomDataCompare(object):
 
         merged_df = merged_df[common_cols_rearranged]
         merged_df = merged_df.sort_values(by=merged_df.index.names, axis=0)
-        merged_df = merged_df.abs()  # TODO
-
-        summary_dict = {}
-        summary_dict["total_rows"] = len(merged_df)
-
-        for column in merged_df.copy().columns:
-            if column.startswith("matches_"):
-                summary_dict[column] = (
-                    merged_df[column].copy().value_counts().get(True, 0)
-                )
-        summary_df = pd.DataFrame(summary_dict, index=["values"])
+        merged_df.apply(
+            lambda column: column.abs() if column.dtype.kind in "iufc" else column
+        )
 
         if return_summary:
+            summary_dict = {}
+            summary_dict["total_rows"] = len(merged_df)
+
+            for column in merged_df.copy().columns:
+                if column.startswith("matches_"):
+                    summary_dict[column] = (
+                        merged_df[column].copy().value_counts().get(True, 0)
+                    )
+            summary_df = pd.DataFrame(summary_dict, index=["values"])
             return summary_df
 
-        subset = [
-            column for column in merged_df.columns if column.startswith("pct_change")
-        ]
-        conditions = [merged_df[column] != 0.0 for column in subset]
-
         if simplify_output:
+            matches_cols = [
+                column for column in merged_df.columns if column.startswith("matches")
+            ]
+            conditions = [merged_df[column] != True for column in matches_cols]
+
             merged_df = self.simplified_df(merged_df.copy())  # TODO
             merged_df = merged_df[functools.reduce(np.logical_or, conditions)]
+
+            if merged_df.empty:
+                print("All the values in both the dataframes match.")
+                return None
+
             merged_df = merged_df.drop(
                 columns=[
                     column
@@ -264,16 +272,23 @@ class AtomDataCompare(object):
             )
 
         if style:
+            pct_change_subset = [
+                column
+                for column in merged_df.columns
+                if column.startswith("pct_change")
+            ]
             return merged_df.style.background_gradient(
-                cmap="Reds", subset=subset, axis=style_axis
+                cmap="Reds", subset=pct_change_subset, axis=style_axis
             )
 
         return merged_df
 
-    def key_diff(self, key_name, simplify_output=True, style=True, style_axis=0):
+    def key_diff(
+        self, key_name, rtol=1e-07, simplify_output=True, style=True, style_axis=0
+    ):
         """
         Compare two dataframes.
-    
+
         Parameters
         ----------
         key_name : string
@@ -297,7 +312,9 @@ class AtomDataCompare(object):
         ions = set(ions1).intersection(ions2)
         ion_diffs = []
         for ion in ions:
-            ion_diff = self.ion_diff(key_name=key_name, ion=ion, return_summary=True)
+            ion_diff = self.ion_diff(
+                key_name=key_name, ion=ion, rtol=rtol, return_summary=True
+            )
             ion_diff["atomic_number"], ion_diff["ion_number"] = ion
             ion_diff = ion_diff.set_index(["atomic_number", "ion_number"])
             ion_diffs.append(ion_diff)
@@ -357,7 +374,7 @@ class AtomDataCompare(object):
     def compare(self, exclude_correct_matches=False, drop_file_keys=True, style=True):
         """
         Compare the two HDF files.
-    
+
         Parameters
         ----------
         exclude_correct_matches : bool
@@ -395,7 +412,7 @@ class AtomDataCompare(object):
     def simplified_df(self, df):
         """
         Drop additional columns belonging to the original dataframes but were used for comparison.
-    
+
         Parameters
         ----------
         df : pd.DataFrame
@@ -406,7 +423,7 @@ class AtomDataCompare(object):
     def plot_ion_diff(self, key_name, ion, column):
         """
         Plot fractional difference between properties of ions.
-    
+
         Parameters
         ----------
         key_name : string
