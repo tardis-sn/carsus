@@ -26,66 +26,66 @@ defaults:
         shell: bash -l {0}
 
 jobs:
-  carsus-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          repository: atharva-2001/carsus
-          path: carsus/
-          ref: tardis_carsus_bridge
+  # carsus-build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         repository: atharva-2001/carsus
+  #         path: carsus/
+  #         ref: tardis_carsus_bridge
         
-      - uses: actions/cache@v2
-        with:
-          path: ${{ env.XUVTOP }}
-          key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
-        id: chianti-cache
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: ${{ env.XUVTOP }}
+  #         key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
+  #       id: chianti-cache
 
-      - name: Download Chianti database
-        run: |
-            mkdir -p ${{ env.XUVTOP }}
-            wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
-            tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
-        if: steps.chianti-cache.outputs.cache-hit != 'true'
+  #     - name: Download Chianti database
+  #       run: |
+  #           mkdir -p ${{ env.XUVTOP }}
+  #           wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
+  #           tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
+  #       if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v2
-        with:
-          path: /tmp/atomic
-          key: ${{ env.CMFGEN_DB_VER }}
-        id: cmfgen-cache
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: /tmp/atomic
+  #         key: ${{ env.CMFGEN_DB_VER }}
+  #       id: cmfgen-cache
 
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
-        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+  #     - name: Download CMFGEN database
+  #       run: |
+  #           wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
+  #           tar -zxf /tmp/atomic.tar.gz -C /tmp
+  #       if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
-      - name: Setup carsus environment
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            environment-file: carsus/carsus_env3.yml
-            activate-environment: carsus
-            use-mamba: true
+  #     - name: Setup carsus environment
+  #       uses: conda-incubator/setup-miniconda@v2
+  #       with:
+  #           miniforge-variant: Mambaforge
+  #           miniforge-version: latest
+  #           environment-file: carsus/carsus_env3.yml
+  #           activate-environment: carsus
+  #           use-mamba: true
 
-      - name: Install package
-        run: pip install -e carsus/
+  #     - name: Install package
+  #       run: pip install -e carsus/
 
-      - name: Run notebooks
-        run: |
-          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/refdata_gen.ipynb
-        env:
-          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
+  #     - name: Run notebooks
+  #       run: |
+  #         jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/refdata_gen.ipynb
+  #       env:
+  #         CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
-      - name: Upload Atom Data
-        uses: actions/upload-artifact@v2
-        with:
-          name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
+  #     - name: Upload Atom Data
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: atom-data
+  #         path: carsus/docs/kurucz_cd23_chianti_H_He.h5
   
   tardis-build:
-    needs: carsus-build
+    # needs: carsus-build
     runs-on: ubuntu-latest
 
     steps:
@@ -93,17 +93,23 @@ jobs:
         with:
           repository: tardis-sn/tardis
           
-      - uses: actions/checkout@v2
-        with:
-          repository: atharva-2001/tardis-refdata
-          ref: raise_error_refdata_compare
-          path: tardis-refdata
-          lfs: true
+      # - uses: actions/checkout@v2
+      #   with:
+      #     repository: atharva-2001/tardis-refdata
+      #     ref: raise_error_refdata_compare
+      #     path: tardis-refdata
+      #     lfs: true
         
-      - name: Fetch lfs objects
-        run: |
-             cd tardis-refdata
-             git lfs checkout 
+      - name: Download refdata_compare notebook
+        run: wget https://github.com/atharva-2001/tardis-refdata/blob/raise_error_refdata_compare/notebooks/ref_data_compare_from_paths.ipynb
+        
+      - name: Download reference data
+        run: bash .ci-helpers/download_reference_data.sh
+
+      # - name: Fetch lfs objects
+      #   run: |
+      #        cd tardis-refdata
+      #        git lfs checkout 
 
       - name: Setup TARDIS environment
         uses: conda-incubator/setup-miniconda@v2
@@ -113,15 +119,15 @@ jobs:
             activate-environment: tardis
             use-mamba: true
 
-      - uses: actions/cache@v2
-        with:
-          path: /usr/share/miniconda3/envs/tardis
-          key: conda-linux-64-${{ hashFiles('conda-linux-64.lock') }}-${{ env.CACHE_NUMBER }}
-        id: cache-conda
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: /usr/share/miniconda3/envs/tardis
+      #     key: conda-linux-64-${{ hashFiles('conda-linux-64.lock') }}-${{ env.CACHE_NUMBER }}
+      #   id: cache-conda
 
       - name: Update environment
         run: mamba update -n tardis --file conda-linux-64.lock
-        if: steps.cache-conda.outputs.cache-hit != 'true'
+      #   if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Install bokeh
         run: mamba install bokeh=2.2 --channel conda-forge --no-update-deps --yes
@@ -133,10 +139,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5      
+          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
       
       - name: Replace Atomic Data
-        run: cp carsus/docs/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5/kurucz_cd23_chianti_He_cmfgen_H_Si_I-II.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
+        run: cp carsus/docs/kurucz_cd23_chianti_H_He.h5/kurucz_cd23_chianti_H_He.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
       
       - name: Generate Reference Data Copy
         run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
