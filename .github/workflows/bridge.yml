@@ -94,7 +94,7 @@ jobs:
           path: carsus/docs/kurucz_cd23_chianti_H_He.h5
   
   tardis-build:
-    # needs: carsus-build
+    needs: carsus-build
     runs-on: ubuntu-latest
 
     steps:
