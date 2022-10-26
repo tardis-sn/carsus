@@ -73,7 +73,7 @@ jobs:
 
       - name: Run notebooks
         run: |
-          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/refdata_gen.ipynb
+          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/tardis_atomdata_ref.ipynb
         env:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
@@ -134,10 +134,10 @@ jobs:
         run: |
             jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} ref_data_compare_from_paths.ipynb
       
-      - name: Upload spectrum notebook
+      - name: Upload comparison notebook
         uses: actions/upload-artifact@v2
         with:
           path: ref_data_compare_from_paths.html
       
-      - name: Check if spectra were equal during comparision
+      - name: Check if reference data are equal
         run: if [ "$(cat /tmp/spectrum_compare)" == 0 ]; then exit 1; fi
