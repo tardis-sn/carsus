@@ -83,7 +83,7 @@ class TARDISAtomData:
             )
         else:
             if hasattr(cmfgen_reader, "collisions"):
-                self.collisions = cmfgen_reader.collisions
+                self.collisions = self.match_cmfgen_collisions()
                 self.collisions_metadata = cmfgen_reader.collisional_metadata
 
             elif hasattr(chianti_reader, "collisions"):
@@ -608,11 +608,11 @@ class TARDISAtomData:
 
         """
 
-        logger.info('Ingesting collisional strengths.')
+        logger.info('Ingesting collisional strengths from Chianti.')
         ch_collisions = self.chianti_reader.collisions
         ch_collisions['ds_id'] = 4
 
-        # Not really needed because we have only one source of collisions
+        # Not really needed because we have only one source of collisions with this format
         collisions = pd.concat([ch_collisions], sort=True)
         ions = self.chianti_ions
 
@@ -675,6 +675,27 @@ class TARDISAtomData:
 
         collisions = pd.concat([collisions, collisional_ul_factors], axis=1)
         collisions = collisions.set_index('e_col_id')
+
+        return collisions
+
+    def match_cmfgen_collisions(self):
+        logger.info('Ingesting collisional strengths from CMFGEN.')
+        cf_collisions = self.cmfgen_reader.collisions
+        cf_collisions['ds_id'] = 5
+
+        # Not really needed because we have only one source of collisions with this format
+        collisions = pd.concat([cf_collisions], sort=True)
+        ions = self.cmfgen_ions
+
+        collisions = collisions.reset_index()
+        collisions = collisions.rename(columns={'ion_charge': 'ion_number'})
+        collisions = collisions.set_index(['atomic_number', 'ion_number'])
+
+        logger.info('Matching collisions and levels.')
+        col_list = [ self.get_lvl_index2id(collisions.loc[ion], self.levels_all)
+                        for ion in ions]
+        collisions = pd.concat(col_list, sort=True)
+        collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
 
         return collisions
 
