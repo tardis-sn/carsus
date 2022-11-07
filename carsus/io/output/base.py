@@ -696,6 +696,11 @@ class TARDISAtomData:
                         for ion in ions]
         collisions = pd.concat(col_list, sort=True)
         collisions = collisions.sort_values(by=['lower_level_id', 'upper_level_id'])
+        
+        # Everything else has been solved by the CMFGEN reader, we just need to rename the columns 
+        collisions = collisions.rename(columns={'lower_level_id': 'level_number_lower', 'upper_level_id': 'level_number_upper'})
+        collisions = collisions.set_index(['atomic_number', 'ion_number', 'level_number_lower', 'level_number_upper'])
+        collisions = collisions.drop(columns=['level_index_lower', 'level_index_upper'])
 
         return collisions
 
