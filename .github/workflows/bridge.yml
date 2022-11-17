@@ -89,7 +89,7 @@ jobs:
           repository: tardis-sn/tardis
         
       - name: Download refdata_compare notebook
-        run: wget https://raw.githubusercontent.com/atharva-2001/tardis-refdata/raise_error_refdata_compare/notebooks/ref_data_compare_from_paths.ipynb
+        run: wget https://raw.githubusercontent.com/tardis-sn/tardis-refdata/master/notebooks/ref_data_compare_from_paths.ipynb
         
       - name: Download reference data
         run: bash .ci-helpers/download_reference_data.sh
