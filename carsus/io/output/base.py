@@ -680,7 +680,9 @@ class TARDISAtomData:
 
         collisions = pd.concat([collisions, collisional_ul_factors], axis=1)
         collisions = collisions.set_index('e_col_id')
-
+        collisions = collisions.dropna(subset=['level_number_upper', 'level_number_lower'])
+        collisions = collisions.astype({'atomic_number':int, 'ion_number':int, 
+                            'level_number_lower':int, 'level_number_upper':int})
         return collisions
 
     def create_cross_sections(self):
