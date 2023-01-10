@@ -932,7 +932,8 @@ class CMFGENReader:
             )
             ionization_energies = ionization_energies.set_index(
                 ["atomic_number", "ion_charge"]
-            ).squeeze()
+            )
+            ionization_energies = ionization_energies["ionization_energy"]
             self.ionization_energies = ionization_energies
 
         if "cross_sections" in reader.keys():
@@ -1021,31 +1022,31 @@ class CMFGENReader:
                     f"Entries having label(s): {', '.join(missing_labels)} will be dropped for ion: {ion}."
                 )
 
-            collisions["level_number_lower"] = lower_level_index
-            collisions["level_number_upper"] = upper_level_index
+            collisions["level_index_lower"] = lower_level_index
+            collisions["level_index_upper"] = upper_level_index
             collisions["gi"] = gi
 
             collisions = collisions.dropna(
-                subset=["level_number_lower", "level_number_upper"]
+                subset=["level_index_lower", "level_index_upper"]
             )
 
             collisions["atomic_number"] = ion[0]
-            collisions["ion_number"] = ion[1]
+            collisions["ion_charge"] = ion[1]
             collisions = collisions.drop(columns=["label_lower", "label_upper"])
 
             collisions = collisions.astype(
                 {
-                    "level_number_upper": int,
-                    "level_number_lower": int,
+                    "level_index_upper": int,
+                    "level_index_lower": int,
                 }
             )
 
             collisions = collisions.set_index(
                 [
                     "atomic_number",
-                    "ion_number",
-                    "level_number_lower",
-                    "level_number_upper",
+                    "ion_charge",
+                    "level_index_lower",
+                    "level_index_upper",
                 ]
             )
             # divide the dataframe by gi and remove the column

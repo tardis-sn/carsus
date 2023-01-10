@@ -4,31 +4,30 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3.6
+  - python =3.7
   - setuptools
   - setuptools_scm
   - pip
-  - numpy=1.15
-  - pandas=1.0
-  - astropy=3
-  - chiantipy=0.8.4
-  - typing-extensions=4.1  # https://github.com/python/typing/issues/1158
+  - numpy =1.15
+  - pandas =1.0
+  - astropy =3
+  - chiantipy =0.8.4
 
   # I/O
   - pyyaml
   - uncertainties
-  - pyparsing=2.2
-  - sqlalchemy=1.0
+  - pyparsing =2.2
+  - sqlalchemy =1.2
   - beautifulsoup4
   - html5lib
   - h5py
   - pytables
-  - pyarrow=0.14.1
-  - glog=0.5  # https://github.com/google/glog/issues/814
+  - pyarrow =0.14.1
+  - glog =0.5  # https://github.com/google/glog/issues/814
   - requests
   - roman
 
-# --- Not required for conda-forge package ---
+# --- Not required for an hypothetical conda-forge package ---
 
   # Analysis
   - notebook
@@ -50,13 +49,10 @@ dependencies:
   - pandoc
 
   # Test/Coverage
-  - pytest=4
+  - pytest =4
   - pytest-cov
   - pytest-astropy
-
-  # ChiantiPy
-  - scipy
-  - ipyparallel
+  - epassaro::pytest-arraydiff
 
   # Other
   - git-lfs
