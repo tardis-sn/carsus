@@ -107,7 +107,7 @@ jobs:
         run: mamba update -n tardis --file conda-linux-64.lock
 
       - name: Install bokeh
-        run: mamba install bokeh=2.2 --channel conda-forge --no-update-deps --yes
+        run: mamba install bokeh --channel conda-forge --no-update-deps --yes
 
       - name: Install package
         run: pip install -e .
