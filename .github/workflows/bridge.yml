@@ -1,7 +1,8 @@
 name: tardis-carsus-compatibility-check
 
 on: 
-  workflow_dispatch
+  workflow_call: # to be called by save_atomic_files workflow
+  workflow_dispatch:
 
         
 env:
