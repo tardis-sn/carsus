@@ -35,8 +35,24 @@ jobs:
         with:
           name: atom-data
           path: carsus/docs/kurucz_cd23_chianti_H_He.h5
-   # - name: Zip files
-      #   run: zip $(date +'%d_%b_%Y')  notebook atomic_file
+
+      - name: Download comparison notebook
+        uses: actions/download-artifact@v2
+        with:
+          path: ref_data_compare_from_paths.html
+        
+      - name: Extract artifacts
+        run: unzip artifact.zip && unzip atom-data.zip
+
+      - name: Zip files
+        run: zip $(date +'%d_%b_%Y')  ref_data_compare_from_paths.html kurucz_cd23_chianti_H_He.h5
+      
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: \d{2}_[a-zA-Z]*_\d{4}.zip # an example string that matches this pattern: 11_Jan_2023.zip
+      
+
   
 
 
