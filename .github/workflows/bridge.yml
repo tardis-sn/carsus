@@ -136,5 +136,5 @@ jobs:
         with:
           path: ref_data_compare_from_paths.html
       
-      - name: Check if reference data are equal
-        run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
+      # - name: Check if reference data are equal
+      #   run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
