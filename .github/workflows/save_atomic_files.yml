@@ -16,41 +16,31 @@ on:
 
 jobs:
   run_the_bridge:
-    # runs-on: ubuntu-latest
     uses: ./.github/workflows/bridge.yml
-    
-    # with:
-    #       path: bridge/
   
   other_job:
     continue-on-error: true
     needs: run_the_bridge
     runs-on: ubuntu-latest
     steps:
-      - name: Print directory tree
-        run: tree ../
-
       - name: Download atom data
         uses: actions/download-artifact@v2
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
 
       - name: Download comparison notebook
         uses: actions/download-artifact@v2
         with:
-          path: ref_data_compare_from_paths.html
-        
-      - name: Extract artifacts
-        run: unzip artifact.zip && unzip atom-data.zip
+          name: Comparison Notebook
 
       - name: Zip files
-        run: zip $(date +'%d_%b_%Y')  ref_data_compare_from_paths.html kurucz_cd23_chianti_H_He.h5
-      
+        run: zip $(date +'%d_%b_%Y')  kurucz_cd23_chianti_H_He.h5 ref_data_compare_from_paths.html
+        
       - name: Upload combined artifact
         uses: actions/upload-artifact@v2
         with:
-          path: \d{2}_[a-zA-Z]*_\d{4}.zip # an example string that matches this pattern: 11_Jan_2023.zip
+          # path: \d{2}_[a-zA-Z]*_\d{4}.zip # an example string that matches this pattern: 11_Jan_2023.zip
+          path: '*_*_*.zip'
       
 
   

@@ -134,6 +134,7 @@ jobs:
       - name: Upload comparison notebook
         uses: actions/upload-artifact@v2
         with:
+          name: Comparison Notebook
           path: ref_data_compare_from_paths.html
       
       # - name: Check if reference data are equal
