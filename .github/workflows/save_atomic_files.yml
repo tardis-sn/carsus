@@ -15,12 +15,11 @@ on:
 
 
 jobs:
-  run_the_bridge:
+  create_artifacts:
     uses: ./.github/workflows/bridge.yml
   
-  other_job:
-    continue-on-error: true
-    needs: run_the_bridge
+  zip_artifacts:
+    needs: create_artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
@@ -39,7 +38,6 @@ jobs:
       - name: Upload combined artifact
         uses: actions/upload-artifact@v2
         with:
-          # path: \d{2}_[a-zA-Z]*_\d{4}.zip # an example string that matches this pattern: 11_Jan_2023.zip
           path: '*_*_*.zip'
       
 
