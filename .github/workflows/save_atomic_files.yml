@@ -33,7 +33,7 @@ jobs:
           name: Comparison Notebook
 
       - name: Zip files
-        run: zip $(date +'%d_%b_%Y')  kurucz_cd23_chianti_H_He.h5 ref_data_compare_from_paths.html
+        run: zip "$(date +'%d_%b_%Y')_$(curl https://api.github.com/repos/tardis-sn/carsus/commits/master | jq -r .sha | cut -c1-6)"  kurucz_cd23_chianti_H_He.h5 ref_data_compare_from_paths.html
 
       - name: Send file to Moria
         uses: appleboy/scp-action@master
