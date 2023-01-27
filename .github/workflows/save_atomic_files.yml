@@ -20,6 +20,7 @@ jobs:
   
   zip_artifacts:
     needs: create_artifacts
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
