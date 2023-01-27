@@ -34,13 +34,13 @@ jobs:
 
       - name: Zip files
         run: zip $(date +'%d_%b_%Y')  kurucz_cd23_chianti_H_He.h5 ref_data_compare_from_paths.html
-        
-      - name: Upload combined artifact
-        uses: actions/upload-artifact@v2
+
+      - name: Send file to Moria
+        uses: appleboy/scp-action@master
         with:
-          path: '*_*_*.zip'
-      
-
-  
-
+          host: ${{ secrets.GH_DROPOFF_HOST }}
+          username: ${{ secrets.GH_DROPOFF_USERNAME }}
+          password: ${{ secrets.GH_DROPOFF_PASSWORD }}
+          source: '*_*_*.zip'
+          target: "/storage/github_dropoffs/tardis/"
 
