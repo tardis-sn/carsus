@@ -111,6 +111,12 @@ jobs:
       - name: Git LFS Pull
         run: git lfs pull
         working-directory: tardis-refdata
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+
+      - name: Git LFS Checkout
+        run: git lfs checkout
+        working-directory: tardis-refdata
+        if: steps.lfs-cache.outputs.cache-hit == 'true'
 
       - name: Setup TARDIS environment
         uses: conda-incubator/setup-miniconda@v2
