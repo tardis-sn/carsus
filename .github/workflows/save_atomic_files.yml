@@ -1,17 +1,8 @@
 name: Save atomic files every week
 
-# on: 
-#   schedule:
-#     - cron: '0 0 * * 7' # run at midnight every Sunday
-
-on:
-  push:
-    branches:
-    - '*'
-
-  pull_request:
-    branches:
-    - '*'
+on: 
+  schedule:
+    - cron: '0 0 * * 7' # run at midnight every Sunday
 
 
 jobs:
