@@ -89,7 +89,7 @@ atom:
   Co:
     ion_charge:
       1:
-        date: 30oct12
+        date: 15nov11
         osc: fin_osc_bound
         col: Co2_COL_DATA
         pho:
@@ -113,7 +113,7 @@ atom:
           - niphot_c.dat
           - niphot_d.dat
       1:
-        date: 12sep12
+        date: 23jan06
         osc: fin_osc
         col: n2col.dat
         pho:

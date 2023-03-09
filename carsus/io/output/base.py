@@ -1,15 +1,17 @@
-import re
+import copy
 import logging
+import re
+
+import astropy.constants as const
+import astropy.units as u
 import numpy as np
 import pandas as pd
-import astropy.units as u
-import astropy.constants as const
 from scipy import interpolate
+
+from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import (convert_atomic_number2symbol,
-                         convert_wavelength_air2vacuum,
-                         serialize_pandas_object,
-                         hash_pandas_object)
-from carsus.model import MEDIUM_VACUUM, MEDIUM_AIR
+                         convert_wavelength_air2vacuum, hash_pandas_object,
+                         serialize_pandas_object)
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
@@ -51,7 +53,14 @@ class TARDISAtomData:
                 ):
 
         self.atomic_weights = atomic_weights
-        self.ionization_energies = ionization_energies
+
+        if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'ionization_energies'):
+            combined_ionization_energies = copy.deepcopy(ionization_energies)
+            combined_ionization_energies.base = cmfgen_reader.ionization_energies.combine_first(ionization_energies.base)
+            self.ionization_energies = combined_ionization_energies
+        else:
+            self.ionization_energies = ionization_energies
+
         self.gfall_reader = gfall_reader
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
@@ -74,7 +83,12 @@ class TARDISAtomData:
             )
         else:
             if hasattr(cmfgen_reader, "collisions"):
-                self.collisions = cmfgen_reader.collisions
+                collisions = cmfgen_reader.collisions.copy()
+                collisions.index = collisions.index.rename(
+                    ['atomic_number', 'ion_number', 'level_number_lower', 'level_number_upper']
+                )
+
+                self.collisions = collisions
                 self.collisions_metadata = cmfgen_reader.collisional_metadata
 
             elif hasattr(chianti_reader, "collisions"):
@@ -1000,10 +1014,12 @@ class TARDISAtomData:
 
         """
         import hashlib
-        import uuid
         import platform
-        import pytz
+        import uuid
         from datetime import datetime
+
+        import pytz
+
         from carsus import FORMAT_VERSION
 
         with pd.HDFStore(fname, 'w') as f:
@@ -1023,6 +1039,12 @@ class TARDISAtomData:
             if hasattr(self, 'cross_sections'):
                 f.put('/photoionization_data', self.cross_sections_prepared)
 
+            lines_metadata = pd.DataFrame(
+                data=[["format", "version", "1.0"]], 
+                columns=["field", "key", "value"]
+            ).set_index(["field", "key"])
+            f.put('/lines_metadata', lines_metadata)
+             
             meta = []
             meta.append(('format', 'version', FORMAT_VERSION))
 
