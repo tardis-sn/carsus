@@ -21,6 +21,8 @@ from carsus.util import convert_atomic_number2symbol
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +64,7 @@ def download_ionization_energies(
     data = {k:"on" if v is True else v for k, v in data.items()}
 
     logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
-    r = requests.post(IONIZATION_ENERGIES_URL, data=data)
+    r = requests.post(IONIZATION_ENERGIES_URL, data=data, verify=False)
     return r.text
 
 
@@ -352,7 +354,7 @@ class NISTIonizationEnergies(BaseParser):
         selector = "body > div > table:nth-child(1) > tbody > \
                         tr:nth-child(1) > td:nth-child(1) > b"
          
-        html = requests.get(IONIZATION_ENERGIES_VERSION_URL)
+        html = requests.get(IONIZATION_ENERGIES_VERSION_URL, verify=False)
         bs = BeautifulSoup(html.text, 'html5lib')
         
         version = bs.select(selector)

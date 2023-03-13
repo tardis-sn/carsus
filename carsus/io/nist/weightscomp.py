@@ -19,6 +19,8 @@ from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, M
     AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
     AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
@@ -47,7 +49,7 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
 
     """
     logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
-    r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype})
+    r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype}, verify=False)
     soup = BeautifulSoup(r.text, 'html5lib')
     pre_text_data = soup.pre.get_text()
     pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
@@ -231,7 +233,7 @@ class NISTWeightsComp(BaseParser):
         Returns NIST Atomic Weights and Isotopic Components Database version.
         """
         selector = "td"
-        html = requests.get(WEIGHTSCOMP_VERSION_URL)
+        html = requests.get(WEIGHTSCOMP_VERSION_URL, verify=False)
         bs = BeautifulSoup(html.text, 'html5lib')
 
         version = bs.select(selector)
