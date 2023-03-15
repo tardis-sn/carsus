@@ -4,6 +4,8 @@ from io import BytesIO
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 def to_flat_dict(tokens, parent_key='', sep='_'):
     """
     Creates a flattened dictionary from the named values in tokens.
@@ -95,7 +97,7 @@ def read_from_buffer(fname):
         data from text file, MD5 checksum
     """    
     if fname.startswith("http"):
-        response = requests.get(fname)
+        response = requests.get(fname, verify=False)
         data = response.content
 
     else:
