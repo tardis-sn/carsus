@@ -142,4 +142,5 @@ def retry_request(
     sess.mount("https://", HTTPAdapter(max_retries=retries))
     requests_method = getattr(requests, method)
     response = requests_method(url, **kwargs)
+    sess.close()
     return response
