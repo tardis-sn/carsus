@@ -113,7 +113,7 @@ def read_from_buffer(fname):
 def retry_request(
     url,
     method,
-    retries=5,
+    retries=10,
     backoff_factor=1,
     status_forcelist=[502, 503, 504, 400, 495],
     **kwargs
