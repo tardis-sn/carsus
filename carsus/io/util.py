@@ -113,7 +113,7 @@ def read_from_buffer(fname):
 def retry_request(
     url,
     method,
-    retries=10,
+    n_retry=10,
     backoff_factor=1,
     status_forcelist=[502, 503, 504, 400, 495],
     **kwargs
@@ -137,10 +137,10 @@ def retry_request(
     """
     sess = requests.Session()
     retries = Retry(
-        total=retries, backoff_factor=backoff_factor, status_forcelist=status_forcelist
+        total=n_retry, backoff_factor=backoff_factor, status_forcelist=status_forcelist
     )
     sess.mount("https://", HTTPAdapter(max_retries=retries))
-    requests_method = getattr(requests, method)
+    requests_method = getattr(sess, method)
     response = requests_method(url, **kwargs)
     sess.close()
     return response
