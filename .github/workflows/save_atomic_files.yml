@@ -1,9 +1,17 @@
 name: Save atomic files every week
 
-on: 
-  schedule:
-    - cron: '0 0 * * 7' # run at midnight every Sunday
+# on: 
+#   schedule:
+#     - cron: '0 0 * * 7' # run at midnight every Sunday
 
+on:
+  push:
+    branches:
+    - '*'
+
+  pull_request:
+    branches:
+    - '*'
 
 jobs:
   create_artifacts:
@@ -11,7 +19,7 @@ jobs:
   
   zip_artifacts:
     needs: create_artifacts
-    if: always()
+    if: ${{needs.create_artifacts.outputs.ref-check-trig}} == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
