@@ -1,4 +1,4 @@
-name: tardis-carsus-compatibility-check
+name: tardis-carsus-bridge
 
 on: 
   workflow_call: # to be called by save_atomic_files workflow

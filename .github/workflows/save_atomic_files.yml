@@ -1,4 +1,4 @@
-name: Save atomic files every week
+name: save-atomic-files
 
 # on: 
 #   schedule:
@@ -14,12 +14,12 @@ on:
     - '*'
 
 jobs:
-  create_artifacts:
+  create-artifacts:
     uses: ./.github/workflows/bridge.yml
   
   zip_artifacts:
-    needs: create_artifacts
-    if: ${{needs.create_artifacts.outputs.ref-check-trig}} == 'true'
+    needs: create-artifacts
+    if: ${{needs.create-artifacts.outputs.ref-check-trig}} == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
