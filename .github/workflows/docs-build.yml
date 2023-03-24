@@ -10,6 +10,8 @@ on:
     - '*'
 
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 7' # run at midnight every Sunday
 
 concurrency:
   group: docs-${{ github.ref }}
