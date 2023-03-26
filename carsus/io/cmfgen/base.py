@@ -43,6 +43,19 @@ class CMFGENEnergyLevelsParser(BaseParser):
             "engine": "python",
         }
 
+        columns = [
+            'label',
+            'g',
+            'E(cm^-1)',
+            '10^15 Hz',
+            'eV',
+            'Lam(A)',
+            'ID',
+            'ARAD',
+            'C4',
+            'C6'
+        ]
+
         try:
             df = pd.read_csv(fname, **config)
 
