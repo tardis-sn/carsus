@@ -106,7 +106,7 @@ jobs:
         id: lfs-cache
         with:
           path: tardis-refdata/.git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v1
+          key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v${{ env.CACHE_NUMBER }}
 
       - name: Git LFS Pull
         run: git lfs pull
