@@ -126,14 +126,14 @@ def retry_request(
         URL to send request to.
     method : str
         HTTP request method.
-    retries : int, default: 5, optional
+    n_retry : int, default: 15, optional
     backoff_factor : int, default: 1, optional
     status_forcelist : list, default: [502, 503, 504, 400, 495], optional
     **kwargs : dict, optional
 
     Returns
     -------
-    response: requests.Response
+    response : requests.Response
     """
     sess = requests.Session()
     retries = Retry(
