@@ -13,7 +13,7 @@ on:
     branches:
     - '*'
   schedule:
-    - cron: '0 0 * * 7' # run at midnight every Sunday
+    - cron: '0 0 * * 0' # run at midnight every Sunday
 
 concurrency:
   group: tests-${{ github.ref }}
