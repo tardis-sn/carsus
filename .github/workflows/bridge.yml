@@ -17,6 +17,7 @@ env:
   REF2_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data.h5
   PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
                 --generate-reference
+  CACHE_NUMBER: 1
 
 defaults:
       run:
