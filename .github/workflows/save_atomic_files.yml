@@ -11,7 +11,7 @@ jobs:
   
   zip_artifacts:
     needs: create-artifacts
-    if: ${{needs.create-artifacts.outputs.ref-check-trig}} == 'true'
+    if: needs.create-artifacts.outputs.ref-check-trig == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
