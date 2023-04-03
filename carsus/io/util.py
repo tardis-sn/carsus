@@ -3,6 +3,8 @@ import requests
 from io import BytesIO
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
+import requests
+from requests.adapters import HTTPAdapter, Retry
 
 def to_flat_dict(tokens, parent_key='', sep='_'):
     """
@@ -95,7 +97,7 @@ def read_from_buffer(fname):
         data from text file, MD5 checksum
     """    
     if fname.startswith("http"):
-        response = requests.get(fname)
+        response = retry_request(fname, "get")
         data = response.content
 
     else:
@@ -106,3 +108,39 @@ def read_from_buffer(fname):
     checksum = hashlib.md5(buffer.getbuffer()).hexdigest()
 
     return buffer, checksum
+
+
+def retry_request(
+    url,
+    method,
+    n_retry=15,
+    backoff_factor=1,
+    status_forcelist=[502, 503, 504, 400, 495],
+    **kwargs
+):
+    """Retry an HTTP request.
+
+    Parameters
+    ----------
+    url : str
+        URL to send request to.
+    method : str
+        HTTP request method.
+    n_retry : int, default: 15, optional
+    backoff_factor : int, default: 1, optional
+    status_forcelist : list, default: [502, 503, 504, 400, 495], optional
+    **kwargs : dict, optional
+
+    Returns
+    -------
+    response : requests.Response
+    """
+    sess = requests.Session()
+    retries = Retry(
+        total=n_retry, backoff_factor=backoff_factor, status_forcelist=status_forcelist
+    )
+    sess.mount("https://", HTTPAdapter(max_retries=retries))
+    requests_method = getattr(sess, method)
+    response = requests_method(url, **kwargs)
+    sess.close()
+    return response

@@ -13,7 +13,7 @@ from carsus.base import basic_atomic_data_fname
 from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
 from carsus.io.base import BasePyparser, BaseIngester, BaseParser
-from carsus.io.util import to_nom_val_and_std_dev
+from carsus.io.util import to_nom_val_and_std_dev, retry_request
 from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
 from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, MASS_NUM_COL,\
     AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
@@ -47,7 +47,7 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
 
     """
     logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
-    r = requests.get(WEIGHTSCOMP_URL, params={'ascii': ascii, 'isotype': isotype})
+    r = retry_request(url=WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
     soup = BeautifulSoup(r.text, 'html5lib')
     pre_text_data = soup.pre.get_text()
     pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
