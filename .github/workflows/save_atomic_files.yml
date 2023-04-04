@@ -20,7 +20,7 @@ jobs:
     needs: create-artifacts
     if: | 
       success() ||
-      (failure() && ${{needs.create-artifacts.outputs.ref-check-trig}} == 'true')
+      (failure() && ${{ needs.create-artifacts.outputs.ref-check-trig }} == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
