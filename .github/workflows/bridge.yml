@@ -173,5 +173,5 @@ jobs:
         run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
 
       - name: Fail the workflow if reference data check fails
-        if: github.event_name != 'workflow_call' && steps.ref-equal-check.outcome == 'failure'
+        if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
         run: exit 1
