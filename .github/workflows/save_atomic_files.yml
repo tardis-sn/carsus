@@ -18,9 +18,6 @@ jobs:
   
   zip_artifacts:
     needs: create-artifacts
-    if: | 
-      success() ||
-      (failure() && ${{ needs.create-artifacts.outputs.ref-check-trig }} == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
@@ -44,4 +41,10 @@ jobs:
           password: ${{ secrets.GH_DROPOFF_PASSWORD }}
           source: '*_*_*.zip'
           target: "/storage/github_dropoffs/tardis/"
-
+  
+  bridge-ref-check:
+    needs: create-artifacts
+    runs-on: ubuntu-latest
+    if: needs.create-artifacts.outputs.ref-check-trig == 'failure'
+    steps:
+      - run: exit 1
