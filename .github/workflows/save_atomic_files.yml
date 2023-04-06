@@ -1,16 +1,9 @@
 name: save-atomic-files
 
 on: 
-  push:
-    branches:
-    - '*'
-
-  pull_request:
-    branches:
-    - '*'
-  # workflow_dispatch:
-  # schedule:
-  #   - cron: '0 0 * * 0' # run at midnight every Sunday
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # run at midnight every Sunday
 
 jobs:
   create-artifacts:
