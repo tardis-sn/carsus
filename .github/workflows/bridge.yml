@@ -5,7 +5,7 @@ on:
     outputs:
       ref-check-trig:
         value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
-  workflow_dispatch:
+  workflow_dispatch: # for running manually
 
         
 env:
@@ -172,6 +172,11 @@ jobs:
         continue-on-error: true
         run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
 
+      # continue-on-error check would display a green tick even when the step passes
+      # but is necessary for other steps to run
+      # if the workflow was called by save-atomic-files workflow(the only other option)
+      # and refdata comparison failed this workflow would pass but the 
+      # bridge-ref-check job in save-atomic-files about refdata comparison would fail
       - name: Fail the workflow if reference data check fails
         if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
         run: exit 1

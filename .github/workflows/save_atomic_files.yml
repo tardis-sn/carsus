@@ -39,5 +39,8 @@ jobs:
     needs: create-artifacts
     runs-on: ubuntu-latest
     if: needs.create-artifacts.outputs.ref-check-trig == 'failure'
+    # fails if refdata comparison failed in the bridge
+    # continue-on-error wouldn't put a red cross 
+    # even if the bridge passes on refdata compare step
     steps:
       - run: exit 1
