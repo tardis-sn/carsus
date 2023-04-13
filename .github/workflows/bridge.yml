@@ -88,7 +88,7 @@ jobs:
     needs: carsus-build
     runs-on: ubuntu-latest
     outputs:
-      step-ref-check-trig: ${{ steps.ref-equal-check.outcome }}
+      step-ref-check-trig: ${{ steps.ref-equal-check.outcome }} # success or failure of refdata comparison
 
     steps:
       - uses: actions/checkout@v2
