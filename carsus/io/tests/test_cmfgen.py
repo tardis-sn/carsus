@@ -164,8 +164,7 @@ def test_reader_ionization_energies(si1_reader):
 @pytest.mark.parametrize("threshold_energy_ryd", [0.053130732819562695])
 @pytest.mark.parametrize("fit_coeff_list", [[34.4452, 1.0, 2.0]])
 def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
-    phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-    return phixs_table
+    return get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
 
 
 @pytest.mark.array_compare
@@ -176,10 +175,9 @@ def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
 def test_get_hydrogenic_n_phixs_table(
     hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
 ):
-    hydrogenic_n_phixs_table = get_hydrogenic_n_phixs_table(
+    return get_hydrogenic_n_phixs_table(
         hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
     )
-    return hydrogenic_n_phixs_table
 
 
 @pytest.mark.array_compare
@@ -193,7 +191,7 @@ def test_get_hydrogenic_n_phixs_table(
 def test_get_hydrogenic_nl_phixs_table(
     hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0
 ):
-    phixs_table = get_hydrogenic_nl_phixs_table(
+    return get_hydrogenic_nl_phixs_table(
         hyd_phixs_energy_grid_ryd,
         hyd_phixs,
         threshold_energy_ryd,
@@ -202,7 +200,6 @@ def test_get_hydrogenic_nl_phixs_table(
         l_end,
         nu_0,
     )
-    return phixs_table
 
 
 @pytest.mark.array_compare
@@ -210,8 +207,7 @@ def test_get_hydrogenic_nl_phixs_table(
 @pytest.mark.parametrize("vars", [[3, 4, 5, 6, 7]])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points):
-    phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *vars, n_points)
-    return phixs_table
+    return get_opproject_phixs_table(threshold_energy_ryd, *vars, n_points)
 
 
 @pytest.mark.array_compare
@@ -219,8 +215,7 @@ def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points):
 @pytest.mark.parametrize("vars", [[2, 3, 4, 5, 6, 7, 8, 9]])
 @pytest.mark.parametrize("n_points", [50])
 def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points):
-    phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *vars, n_points)
-    return phixs_table
+    return get_hummer_phixs_table(threshold_energy_ryd, *vars, n_points)
 
 
 @pytest.mark.array_compare
@@ -243,8 +238,7 @@ def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points):
 )
 @pytest.mark.parametrize("n_points", [50])
 def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points):
-    phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points)
-    return phixs_table
+    return get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points)
 
 
 @pytest.mark.skip(reason="Not implemented yet")
@@ -255,5 +249,4 @@ def test_get_leibowitz_phixs_table():
 @pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [50])
 def test_get_null_phixs_table(threshold_energy_ryd):
-    phixs_table = get_null_phixs_table(threshold_energy_ryd)
-    return phixs_table
+    return get_null_phixs_table(threshold_energy_ryd)

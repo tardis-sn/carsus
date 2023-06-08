@@ -33,6 +33,7 @@ eq             ::=  "="
 The grammar follows python BNF notation.
 """
 
+
 from pyparsing import Word, Literal, Suppress, Group, Dict, Optional, delimitedList, oneOf, nums, alphas
 from uncertainties import ufloat_fromstr
 
@@ -97,12 +98,12 @@ to_int = lambda t: int(t[0])
 decimal.setParseAction(to_int)
 
 # float  ::=  digit+ "." digit*
-float_ = Word(nums, nums+'.')
+float_ = Word(nums, f'{nums}.')
 to_float = lambda t: float(t[0])
 float_.setParseAction(to_float)
 
 # ufloat ::=  float "("  decimal ")"
-ufloat = Word(nums, nums+'.') + LPAREN + Word(nums) + RPAREN
+ufloat = Word(nums, f'{nums}.') + LPAREN + Word(nums) + RPAREN
 
 
 def to_nom_value_and_std_dev(tokens):
@@ -114,7 +115,13 @@ def to_nom_value_and_std_dev(tokens):
 ufloat.setParseAction(to_nom_value_and_std_dev)
 
 # ufloat_theor ::=  float "("  decimal ["#"] ")"
-ufloat_theor = Word(nums, nums+'.') + LPAREN + Word(nums) + Optional(Literal("#")) + RPAREN
+ufloat_theor = (
+    Word(nums, f'{nums}.')
+    + LPAREN
+    + Word(nums)
+    + Optional(Literal("#"))
+    + RPAREN
+)
 
 
 def to_nom_val_and_std_dev_theor(tokens):

@@ -72,19 +72,10 @@ class GFALLReader(object):
             Priority of the current data source.
         """
 
-        if fname is None:
-            self.fname = GFALL_URL
-        else:
-            self.fname = fname
-
+        self.fname = GFALL_URL if fname is None else fname
         self.priority = priority
 
-        if ions is not None:
-            self.ions = parse_selected_species(ions)
-
-        else:
-            self.ions = None
-
+        self.ions = parse_selected_species(ions) if ions is not None else None
         self._gfall_raw = None
         self._gfall = None
         self._levels = None
@@ -151,19 +142,20 @@ class GFALLReader(object):
         number_match = re.compile(r'\d+(\.\d+)?')
         type_match = re.compile(r'[FIXA]')
         type_dict = {'F': np.float64, 'I': np.int64, 'X': str, 'A': str}
-        field_types = tuple([type_dict[item] for item in number_match.sub(
-            '', self.gfall_fortran_format).split(',')])
+        field_types = tuple(
+            type_dict[item]
+            for item in number_match.sub('', self.gfall_fortran_format).split(',')
+        )
 
         field_widths = type_match.sub('', self.gfall_fortran_format)
         field_widths = map(int, re.sub(r'\.\d+', '', field_widths).split(','))
 
-        field_type_dict = {col: dtype for col,
-                           dtype in zip(self.gfall_columns, field_types)}
+        field_type_dict = dict(zip(self.gfall_columns, field_types))
 
-        buffer, checksum = read_from_buffer(self.fname)        
+        buffer, checksum = read_from_buffer(self.fname)
         gfall = pd.read_fwf(buffer, widths=field_widths, skip_blank_lines=True,
                             names=self.gfall_columns, dtypes=field_type_dict)
- 
+
         # remove empty lines
         gfall = gfall[~gfall.isnull().all(axis=1)].reset_index(drop=True)
         return gfall, checksum
@@ -419,20 +411,15 @@ class GFALLIngester(object):
 
     def __init__(self, session, fname=None, ions=None, unique_level_identifier=None, ds_short_name="ku_latest"):
         self.session = session
-        
-        if fname is None:
-            self.fname = GFALL_URL
-        else:
-            self.fname = fname
-        
+
+        self.fname = GFALL_URL if fname is None else fname
         self.gfall_reader = GFALLReader(ions, self.fname, unique_level_identifier)
 
         if ions is not None:
             try:
                 ions = parse_selected_species(ions)
             except ParseException:
-                raise ValueError(
-                    'Input is not a valid species string {}'.format(ions))
+                raise ValueError(f'Input is not a valid species string {ions}')
             ions = pd.DataFrame.from_records(
                 ions, columns=["atomic_number", "ion_charge"])
             self.ions = ions.set_index(['atomic_number', 'ion_charge'])
@@ -449,10 +436,10 @@ class GFALLIngester(object):
 
         q_ion_lvls = self.session.query(Level.level_id.label("id"),
                                         Level.level_index.label("index")). \
-            filter(and_(Level.ion == ion,
+                filter(and_(Level.ion == ion,
                         Level.data_source == self.data_source))
 
-        lvl_index2id = list()
+        lvl_index2id = []
         for id, index in q_ion_lvls:
             lvl_index2id.append((index, id))
 
@@ -470,11 +457,11 @@ class GFALLIngester(object):
         # Select ions
         if self.ions is not None:
             levels = levels.reset_index().\
-                join(self.ions, how="inner",
+                    join(self.ions, how="inner",
                      on=["atomic_number", "ion_charge"]).\
-                set_index(["atomic_number", "ion_charge", "level_index"])
+                    set_index(["atomic_number", "ion_charge", "level_index"])
 
-        logger.info("Ingesting levels from `{}`.".format(self.data_source.short_name))
+        logger.info(f"Ingesting levels from `{self.data_source.short_name}`.")
 
         for ion_index, ion_levels in levels.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -482,8 +469,9 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            logger.info("Ingesting levels for {} {}.".format(
-                convert_atomic_number2symbol(atomic_number), ion_charge))
+            logger.info(
+                f"Ingesting levels for {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+            )
 
             for index, row in ion_levels.iterrows():
 
@@ -509,12 +497,12 @@ class GFALLIngester(object):
         # Select ions
         if self.ions is not None:
             lines = lines.reset_index(). \
-                join(self.ions, how="inner",
+                    join(self.ions, how="inner",
                      on=["atomic_number", "ion_charge"]). \
-                set_index(["atomic_number", "ion_charge",
+                    set_index(["atomic_number", "ion_charge",
                            "level_index_lower", "level_index_upper"])
 
-        logger.info("Ingesting lines from `{}`.".format(self.data_source.short_name))
+        logger.info(f"Ingesting lines from `{self.data_source.short_name}`.")
 
         for ion_index, ion_lines in lines.groupby(level=["atomic_number", "ion_charge"]):
 
@@ -522,8 +510,9 @@ class GFALLIngester(object):
             ion = Ion.as_unique(
                 self.session, atomic_number=atomic_number, ion_charge=ion_charge)
 
-            logger.info("Ingesting lines for {} {}.".format(
-                convert_atomic_number2symbol(atomic_number), ion_charge))
+            logger.info(
+                f"Ingesting lines for {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+            )
 
             lvl_index2id = self.get_lvl_index2id(ion)
 

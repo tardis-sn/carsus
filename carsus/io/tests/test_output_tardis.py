@@ -16,12 +16,12 @@ with_test_db = pytest.mark.skipif(
 
 @pytest.fixture
 def atom_data(test_session, chianti_short_name):
-    atom_data = AtomData(test_session,
-                         selected_atoms="He, Be, B, N, Si, Zn",
-                         chianti_ions="He 1; N 5",
-                         chianti_short_name=chianti_short_name
-                         )
-    return atom_data
+    return AtomData(
+        test_session,
+        selected_atoms="He, Be, B, N, Si, Zn",
+        chianti_ions="He 1; N 5",
+        chianti_short_name=chianti_short_name,
+    )
 
 
 @pytest.fixture
@@ -35,8 +35,7 @@ def chianti_short_name(test_session):
 
 @pytest.fixture
 def atom_data_be(test_session):
-    atom_data = AtomData(test_session, selected_atoms="Be")
-    return atom_data
+    return AtomData(test_session, selected_atoms="Be")
 
 
 @pytest.fixture
@@ -101,8 +100,8 @@ def test_atom_data_init(memory_session):
     atom_data = AtomData(memory_session,
                          selected_atoms="He, Be, B, N",
                          chianti_ions="He 1; N 5")
-    assert set(atom_data.selected_atomic_numbers) == set([2, 4, 5, 7])
-    assert set(atom_data.chianti_ions) == set([(2,1), (7,5)])
+    assert set(atom_data.selected_atomic_numbers) == {2, 4, 5, 7}
+    assert set(atom_data.chianti_ions) == {(2,1), (7,5)}
 
 
 def test_atom_data_chianti_ions_subset(memory_session):
@@ -117,20 +116,36 @@ def test_atom_data_chianti_ions_subset(memory_session):
 
 @with_test_db
 def test_atom_data_wo_chianti_ions_attributes(atom_data_be, test_session):
-    assert atom_data_be.chianti_ions == list()
+    assert atom_data_be.chianti_ions == []
     assert test_session.query(atom_data_be.chianti_ions_table).count() == 0
 
 
 @with_test_db
 def test_atom_data_only_be(atom_data_be):
-    assert all([atomic_number == 4 for atomic_number in
-                atom_data_be.atom_masses["atomic_number"].values.tolist()])
-    assert all([atomic_number == 4 for atomic_number in
-                atom_data_be.ionization_energies["atomic_number"].values.tolist()])
-    assert all([atomic_number == 4 for atomic_number in
-                atom_data_be.levels["atomic_number"].values.tolist()])
-    assert all([atomic_number == 4 for atomic_number in
-                atom_data_be.lines["atomic_number"].values.tolist()])
+    assert all(
+        atomic_number == 4
+        for atomic_number in atom_data_be.atom_masses[
+            "atomic_number"
+        ].values.tolist()
+    )
+    assert all(
+        atomic_number == 4
+        for atomic_number in atom_data_be.ionization_energies[
+            "atomic_number"
+        ].values.tolist()
+    )
+    assert all(
+        atomic_number == 4
+        for atomic_number in atom_data_be.levels[
+            "atomic_number"
+        ].values.tolist()
+    )
+    assert all(
+        atomic_number == 4
+        for atomic_number in atom_data_be.lines[
+            "atomic_number"
+        ].values.tolist()
+    )
 
 
 @with_test_db
@@ -145,7 +160,7 @@ def test_atom_data_join_on_chianti_ions_table(test_session, atom_data):
                                           Ion.ion_charge == atom_data.chianti_ions_table.c.ion_charge)).\
         order_by(Ion.atomic_number, Ion.ion_charge)
     chianti_ions = [(ion.atomic_number, ion.ion_charge) for ion in chiatni_ions_q]
-    assert set(chianti_ions) == set([(2,1), (7,5)])
+    assert set(chianti_ions) == {(2,1), (7,5)}
 
 
 @with_test_db
@@ -316,17 +331,17 @@ def test_levels_create_artificial_fully_ionized(levels, atomic_number):
 # ToDo: Implement real tests
 @with_test_db
 def test_create_collisions(collisions):
-    assert True
+    pass
 
 
 @with_test_db
 def test_create_macro_atom(macro_atom):
-    assert True
+    pass
 
 
 @with_test_db
 def test_create_macro_atom_ref(macro_atom_references):
-    assert True
+    pass
 
 
 @with_test_db
@@ -344,12 +359,12 @@ def test_create_macro_atom_references_levels_wo_lines(macro_atom_references, ato
     count_up, count_down, count_total = macro_atom_references.loc[
         (atomic_number, ion_number, source_level_number), ("count_up", "count_down", "count_total")
     ]
-    assert all([count == 0 for count in [count_up, count_down, count_total]])
+    assert all(count == 0 for count in [count_up, count_down, count_total])
 
 
 @with_test_db
 def test_create_zeta_data(zeta_data):
-    assert True
+    pass
 
 
 @with_test_db

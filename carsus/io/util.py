@@ -26,11 +26,11 @@ def to_flat_dict(tokens, parent_key='', sep='_'):
     -------
 
     """
-    tokens_dict = dict()
+    tokens_dict = {}
     for key, item in tokens.items():
         new_key = parent_key + sep + key if parent_key else key
         if isinstance(item, ParseResults):
-            tokens_dict.update(to_flat_dict(item, parent_key=new_key, sep=sep))
+            tokens_dict |= to_flat_dict(item, parent_key=new_key, sep=sep)
         else:
             tokens_dict[new_key] = item
     return tokens_dict
@@ -77,8 +77,7 @@ def convert_species_tuple2chianti_str(species):
 
     """
     atomic_number, ion_number = species
-    chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_number + 1)
-    return chianti_ion_name
+    return f'{convert_atomic_number2symbol(atomic_number).lower()}_{str(ion_number + 1)}'
 
 
 def read_from_buffer(fname):

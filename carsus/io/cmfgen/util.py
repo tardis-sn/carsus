@@ -58,7 +58,7 @@ def to_float(string):
     typos = {'1-.00': '10.00',      # `MG/VIII/23oct02/phot_sm_3000`, line 23340
              '*********': 'NaN',}   # `SUL/V/08jul99/phot_op.big`, lines 9255-9257
 
-    string = typos.get(string) if string in typos.keys() else string
+    string = typos.get(string, string)
 
     return float(string.replace('D', 'E'))
 
@@ -94,17 +94,20 @@ def find_row(fname, string1, string2=None, how='AND'):
         for line in f:
 
             n += 1
-            if how == 'OR':
-                if string1 in line or string2 in line:
-                    break
-
-            if how == 'AND':
-                if string1 in line and string2 in line:
-                    break
-
-            if how == 'AND NOT':
-                if string1 in line and string2 not in line:
-                    break
+            if (
+                how == 'AND NOT'
+                and string1 in line
+                and string2 not in line
+                or how != 'AND NOT'
+                and how == 'AND'
+                and string1 in line
+                and string2 in line
+                or how != 'AND NOT'
+                and how != 'AND'
+                and how == 'OR'
+                and (string1 in line or string2 in line)
+            ):
+                break
 
         else:
             n, line = None, None
@@ -225,15 +228,12 @@ def get_hydrogenic_nl_phixs_table(hyd_phixs_energy_grid_ryd, hyd_phixs, threshol
         else:
             e_0 = (nu_0 * 1e15 * H_IN_EV_SECONDS)
             u = threshold_energy_ev * energy_div_threshold / (e_0 + threshold_energy_ev)
+        cross_section = 0.0
         if u > 0:
-            cross_section = 0.0
             for l in range(l_start, l_end + 1):
                 assert np.array_equal(hyd_phixs_energy_grid_ryd[(n, l)], energy_grid)
                 cross_section += (2 * l + 1) * hyd_phixs[(n, l)][i]
             cross_section = cross_section * scale_factor
-        else:
-            cross_section = 0.0
-
         phixs_table[i][0] = energy_div_threshold * threshold_energy_ryd
         phixs_table[i][1] = cross_section
 
@@ -366,6 +366,4 @@ def get_null_phixs_table(threshold_energy_ryd):
     """
     energy = np.array([1., 100.]) * threshold_energy_ryd
     phixs = np.zeros_like(energy)
-    phixs_table = np.column_stack([energy, phixs])
-
-    return phixs_table
+    return np.column_stack([energy, phixs])

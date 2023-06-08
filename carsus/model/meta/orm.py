@@ -37,16 +37,15 @@ class UniqueMixin(object):
         key = (cls, hashfunc(*args, **kwargs))
         if key in cache:
             return cache[key]
-        else:
-            with session.no_autoflush:
-                q = session.query(cls)
-                q = queryfunc(q, *args, **kwargs)
-                obj = q.first()
-                if not obj:
-                    obj = constructor(*args, **kwargs)
-                    session.add(obj)
-            cache[key] = obj
-            return obj
+        with session.no_autoflush:
+            q = session.query(cls)
+            q = queryfunc(q, *args, **kwargs)
+            obj = q.first()
+            if not obj:
+                obj = constructor(*args, **kwargs)
+                session.add(obj)
+        cache[key] = obj
+        return obj
 
 
 def yield_limit(qry, pk_attr, maxrq=100):
@@ -65,8 +64,7 @@ def yield_limit(qry, pk_attr, maxrq=100):
         if firstid is not None:
             q = qry.filter(pk_attr > firstid)
         rec = None
-        for rec in q.order_by(pk_attr).limit(maxrq):
-            yield rec
+        yield from q.order_by(pk_attr).limit(maxrq)
         if rec is None:
             break
         firstid = pk_attr.__get__(rec, pk_attr) if rec else None

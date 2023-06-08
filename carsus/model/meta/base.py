@@ -15,7 +15,6 @@ def setup(url, **kwargs):
 
     engine = create_engine(url, **kwargs)
     Base.metadata.create_all(engine)
-    session = Session(bind=engine)
-    return session
+    return Session(bind=engine)
 
 

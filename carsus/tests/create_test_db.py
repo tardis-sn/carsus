@@ -36,7 +36,7 @@ def create_test_db(
     test_db_f = open(test_db_fname, "w")
     test_db_f.close()
 
-    session = init_db('sqlite:///' + test_db_fname)
+    session = init_db(f'sqlite:///{test_db_fname}')
     session.commit()
 
     # Ingest atomic weights

@@ -29,9 +29,8 @@ except ImportError:
         """
         xuvtop = os.environ['XUVTOP']
         vFileName = os.path.join(xuvtop, 'VERSION')
-        vFile = open(vFileName)
-        versionStr = vFile.readline()
-        vFile.close()
+        with open(vFileName) as vFile:
+            versionStr = vFile.readline()
         return versionStr.strip()
 
 
@@ -166,13 +165,11 @@ class ChiantiIonReader(object):
 
     @property
     def bound_lines(self):
-        bound_lines = self.filter_bound_transitions(self.lines)
-        return bound_lines
+        return self.filter_bound_transitions(self.lines)
 
     @property
     def bound_collisions(self):
-        bound_collisions = self.filter_bound_transitions(self.collisions)
-        return bound_collisions
+        return self.filter_bound_transitions(self.collisions)
 
     def read_levels(self):
 
@@ -180,13 +177,12 @@ class ChiantiIonReader(object):
             elvlc = self.ion.Elvlc
         except AttributeError:
             raise ChiantiIonReaderError(
-                "No levels data is available for ion {}".format(self.ion.Spectroscopic))
+                f"No levels data is available for ion {self.ion.Spectroscopic}"
+            )
 
-        levels_dict = {}
-
-        for key, col_name in self.elvlc_dict.items():
-            levels_dict[col_name] = elvlc.get(key)
-
+        levels_dict = {
+            col_name: elvlc.get(key) for key, col_name in self.elvlc_dict.items()
+        }
         # Check that ground level energy is 0
         try:
             for key in ['energy', 'energy_theoretical']:
@@ -251,13 +247,12 @@ class ChiantiIonReader(object):
             scups = self.ion.Scups
         except AttributeError:
             raise ChiantiIonReaderError(
-                "No collision data is available for ion {}".format(self.ion.Spectroscopic))
+                f"No collision data is available for ion {self.ion.Spectroscopic}"
+            )
 
-        collisions_dict = {}
-
-        for key, col_name in self.scups_dict.items():
-            collisions_dict[col_name] = scups.get(key)
-
+        collisions_dict = {
+            col_name: scups.get(key) for key, col_name in self.scups_dict.items()
+        }
         collisions = pd.DataFrame(collisions_dict)
 
         collisions = collisions.set_index(
@@ -296,20 +291,17 @@ class ChiantiIngester(object):
 
     def __init__(self, session, ions=None, ds_short_name=None):
         if ds_short_name is None:
-            ds_short_name = '{}_v{}'.format(
-                self.ds_prefix,
-                masterlist_version)
+            ds_short_name = f'{self.ds_prefix}_v{masterlist_version}'
 
         self.session = session
-        self.ion_readers = list()
-        self.ions = list()
+        self.ion_readers = []
+        self.ions = []
 
         if ions is not None:
             try:
                 ions = parse_selected_species(ions)
             except ParseException:
-                raise ValueError(
-                    'Input is not a valid species string {}'.format(ions))
+                raise ValueError(f'Input is not a valid species string {ions}')
             self.ions = [convert_species_tuple2chianti_str(_) for _ in ions]
         else:
             self.ions = masterlist_ions
@@ -331,10 +323,10 @@ class ChiantiIngester(object):
 
         q_ion_lvls = self.session.query(Level.level_id.label("id"),
                                         Level.level_index.label("index")). \
-            filter(and_(Level.ion == ion,
+                filter(and_(Level.ion == ion,
                         Level.data_source == self.data_source))
 
-        lvl_index2id = list()
+        lvl_index2id = []
         for id, index in q_ion_lvls:
             lvl_index2id.append((index, id))
 
@@ -346,7 +338,7 @@ class ChiantiIngester(object):
 
     def ingest_levels(self):
 
-        logger.info("Ingesting levels from `{}`.".format(self.data_source.short_name))
+        logger.info(f"Ingesting levels from `{self.data_source.short_name}`.")
 
         for rdr in self.ion_readers:
 
@@ -359,12 +351,14 @@ class ChiantiIngester(object):
             try:
                 bound_levels = rdr.bound_levels
             except ChiantiIonReaderError:
-                logger.info("Levels not found for ion {} {}.".format(
-                    convert_atomic_number2symbol(atomic_number), ion_charge))
+                logger.info(
+                    f"Levels not found for ion {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+                )
                 continue
 
-            logger.info("Ingesting levels for {} {}.".format(
-                convert_atomic_number2symbol(atomic_number), ion_charge))
+            logger.info(
+                f"Ingesting levels for {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+            )
 
             # ToDo: Determine parity from configuration
 
@@ -377,18 +371,23 @@ class ChiantiIngester(object):
                 )
 
                 level.energies = []
-                for column, method in [('energy', 'meas'), ('energy_theoretical', 'theor')]:
-                    if row[column] != -1:  # check if the value exists
-                        level.energies.append(
-                            LevelEnergy(quantity=row[column]*u.Unit("cm-1"),
-                                        data_source=self.data_source,
-                                        method=method),
-                        )
+                level.energies.extend(
+                    LevelEnergy(
+                        quantity=row[column] * u.Unit("cm-1"),
+                        data_source=self.data_source,
+                        method=method,
+                    )
+                    for column, method in [
+                        ('energy', 'meas'),
+                        ('energy_theoretical', 'theor'),
+                    ]
+                    if row[column] != -1
+                )
                 self.session.add(level)
 
     def ingest_lines(self):
 
-        logger.info("Ingesting lines from `{}`.".format(self.data_source.short_name))
+        logger.info(f"Ingesting lines from `{self.data_source.short_name}`.")
 
         for rdr in self.ion_readers:
 
@@ -401,12 +400,14 @@ class ChiantiIngester(object):
             try:
                 bound_lines = rdr.bound_lines
             except ChiantiIonReaderError:
-                logger.info("Lines not found for ion {} {}.".format(
-                    convert_atomic_number2symbol(atomic_number), ion_charge))
+                logger.info(
+                    f"Lines not found for ion {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+                )
                 continue
 
-            logger.info("Ingesting lines for {} {}.".format(
-                convert_atomic_number2symbol(atomic_number), ion_charge))
+            logger.info(
+                f"Ingesting lines for {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+            )
 
             lvl_index2id = self.get_lvl_index2id(ion)
 
@@ -447,8 +448,7 @@ class ChiantiIngester(object):
 
     def ingest_collisions(self):
 
-        logger.info("Ingesting collisions from `{}`.".format(
-            self.data_source.short_name))
+        logger.info(f"Ingesting collisions from `{self.data_source.short_name}`.")
 
         for rdr in self.ion_readers:
 
@@ -461,12 +461,14 @@ class ChiantiIngester(object):
             try:
                 bound_collisions = rdr.bound_collisions
             except ChiantiIonReaderError:
-                logger.info("Collisions not found for ion {} {}.".format(
-                    convert_atomic_number2symbol(atomic_number), ion_charge))
+                logger.info(
+                    f"Collisions not found for ion {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+                )
                 continue
 
-            logger.info("Ingesting collisions for {} {}.".format(
-                convert_atomic_number2symbol(atomic_number), ion_charge))
+            logger.info(
+                f"Ingesting collisions for {convert_atomic_number2symbol(atomic_number)} {ion_charge}."
+            )
 
             lvl_index2id = self.get_lvl_index2id(ion)
 
@@ -631,7 +633,6 @@ class ChiantiReader:
 
         lines['wavelength'] = u.Quantity(lines['wavelength'], u.AA).to('nm').value
 
-        col_columns = ['temperatures', 'collision_strengths', 'gf', 'energy', 'ttype', 'cups']
         if get_collisions:
             collisions = pd.concat(col_list, sort=True)
             collisions = collisions.reset_index()
@@ -642,6 +643,7 @@ class ChiantiReader:
             collisions['level_index_upper'] -= 1
             collisions = collisions.set_index(['atomic_number', 'ion_charge',
                                                'level_index_lower', 'level_index_upper'])
+            col_columns = ['temperatures', 'collision_strengths', 'gf', 'energy', 'ttype', 'cups']
             collisions = collisions[col_columns]
             self.collisions = collisions
 

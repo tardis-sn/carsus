@@ -56,8 +56,7 @@ expected_ioniz_energy_method = ('ionization_energy_method',
 
 @pytest.fixture
 def ioniz_energies_parser():
-    parser = NISTIonizationEnergiesParser(input_data=test_data)
-    return parser
+    return NISTIonizationEnergiesParser(input_data=test_data)
 
 
 @pytest.fixture

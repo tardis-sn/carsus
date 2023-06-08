@@ -20,8 +20,7 @@ foo_db_url = 'sqlite:///' + os.path.join(data_dir, 'foo.db')
 def memory_session():
     engine = create_engine("sqlite://")
     Base.metadata.create_all(engine)
-    session = Session(bind=engine)
-    return session
+    return Session(bind=engine)
 
 
 @pytest.fixture(scope="session")

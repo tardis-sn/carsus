@@ -91,11 +91,7 @@ bibtex_bibfiles = ['references.bib', 'publications.bib']
 numpydoc_show_class_members = False
 
 nbsphinx_allow_errors = False  # use for debugging purposes only
-if os.getenv("DISABLE_NBSPHINX") == "1":
-    nbsphinx_execute = "never"
-else:
-    nbsphinx_execute = "auto"
-
+nbsphinx_execute = "never" if os.getenv("DISABLE_NBSPHINX") == "1" else "auto"
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -166,7 +162,7 @@ html_favicon = 'tardis_logo.ico'
 html_title = '{0} v{1}'.format(project, release)
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = project + 'doc'
+htmlhelp_basename = f'{project}doc'
 
 # Prefixes that are ignored for sorting the Python module index
 modindex_common_prefix = ["carsus."]
@@ -176,16 +172,18 @@ modindex_common_prefix = ["carsus."]
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [('index', project + '.tex', project + u' Documentation',
-                    author, 'manual')]
+latex_documents = [
+    ('index', f'{project}.tex', f'{project} Documentation', author, 'manual')
+]
 
 
 # -- Options for manual page output -------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [('index', project.lower(), project + u' Documentation',
-              [author], 1)]
+man_pages = [
+    ('index', project.lower(), f'{project} Documentation', [author], 1)
+]
 
 
 # -- Options for the edit_on_github extension ---------------------------------

@@ -119,10 +119,10 @@ class AtomDataCompare(object):
             )
 
         species1 = df1.index.get_level_values("atomic_number")
-        species1 = set([convert_atomic_number2symbol(item) for item in species1])
+        species1 = {convert_atomic_number2symbol(item) for item in species1}
 
         species2 = df2.index.get_level_values("atomic_number")
-        species2 = set([convert_atomic_number2symbol(item) for item in species2])
+        species2 = {convert_atomic_number2symbol(item) for item in species2}
 
         species_diff = species1.symmetric_difference(species2)
         if len(species_diff):
@@ -180,11 +180,7 @@ class AtomDataCompare(object):
 
         common_columns = getattr(self, f"{key_name}_columns")
 
-        if not isinstance(ion, tuple):
-            parsed_ion = parse_selected_species(ion)[0]
-        else:
-            parsed_ion = ion
-
+        parsed_ion = ion if isinstance(ion, tuple) else parse_selected_species(ion)[0]
         try:
             df1 = df1.loc[parsed_ion]
             df2 = df2.loc[parsed_ion]
@@ -239,17 +235,13 @@ class AtomDataCompare(object):
         )
 
         if return_summary:
-            summary_dict = {}
-            summary_dict["total_rows"] = len(merged_df)
-
+            summary_dict = {"total_rows": len(merged_df)}
             for column in merged_df.copy().columns:
                 if column.startswith("matches_"):
                     summary_dict[column] = (
                         merged_df[column].copy().value_counts().get(True, 0)
                     )
-            summary_df = pd.DataFrame(summary_dict, index=["values"])
-            return summary_df
-
+            return pd.DataFrame(summary_dict, index=["values"])
         if simplify_output:
             matches_cols = [
                 column for column in merged_df.columns if column.startswith("matches")
@@ -302,12 +294,14 @@ class AtomDataCompare(object):
         df1 = getattr(self, f"{key_name}1")
         df2 = getattr(self, f"{key_name}2")
 
-        ions1 = set(
-            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df1.index]
-        )
-        ions2 = set(
-            [(atomic_number, ion_number) for atomic_number, ion_number, *_ in df2.index]
-        )
+        ions1 = {
+            (atomic_number, ion_number)
+            for atomic_number, ion_number, *_ in df1.index
+        }
+        ions2 = {
+            (atomic_number, ion_number)
+            for atomic_number, ion_number, *_ in df2.index
+        }
 
         ions = set(ions1).intersection(ions2)
         ion_diffs = []
@@ -351,7 +345,7 @@ class AtomDataCompare(object):
             # and their alternate(more recent) names
             file_keys = {item[1:]: item[1:] for item in file.keys()}
             for original_keyname in self.alt_keys_default.keys():
-                for file_key in file_keys.keys():
+                for file_key in file_keys:
                     alt_key_names = self.alt_keys_default.get(original_keyname, [])
 
                     if file_key in alt_key_names:
@@ -388,10 +382,7 @@ class AtomDataCompare(object):
             if row[["exists_1", "exists_2"]].all():
                 row1_df = self.d1[row["file_keys_1"]]
                 row2_df = self.d2[row["file_keys_2"]]
-                if row1_df.equals(row2_df):
-                    self.comparison_table.at[index, "match"] = True
-                else:
-                    self.comparison_table.at[index, "match"] = False
+                self.comparison_table.at[index, "match"] = bool(row1_df.equals(row2_df))
             else:
                 self.comparison_table.at[index, "match"] = False
 
@@ -417,8 +408,7 @@ class AtomDataCompare(object):
         ----------
         df : pd.DataFrame
         """
-        df_simplified = df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
-        return df_simplified
+        return df.drop(df.filter(regex="_1$|_2$").columns, axis=1)
 
     def plot_ion_diff(self, key_name, ion, column):
         """

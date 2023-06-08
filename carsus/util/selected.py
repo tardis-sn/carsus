@@ -29,7 +29,7 @@ def parse_element(tokens):
     try:
         atomic_number = convert_symbol2atomic_number(symbol)
     except KeyError:
-        raise ValueError("Unrecognized atomic symbol {}".format(symbol))
+        raise ValueError(f"Unrecognized atomic symbol {symbol}")
 
     return atomic_number
 
@@ -57,19 +57,22 @@ species_entry = Group(selected_atoms).setResultsName('atomic_numbers') + \
 
 
 def parse_species_entry(tokens):
-    species = list()
+    species = []
 
-    if tokens['ion_numbers']:
-        species = [(atomic_number, ion_number)
-                   for atomic_number in tokens['atomic_numbers']
-                   for ion_number in tokens['ion_numbers']
-                   if atomic_number > ion_number]
-    else:
-        species = [(atomic_number, ion_number)
-                   for atomic_number in tokens['atomic_numbers']
-                   for ion_number in range(atomic_number)]
-
-    return species
+    return (
+        [
+            (atomic_number, ion_number)
+            for atomic_number in tokens['atomic_numbers']
+            for ion_number in tokens['ion_numbers']
+            if atomic_number > ion_number
+        ]
+        if tokens['ion_numbers']
+        else [
+            (atomic_number, ion_number)
+            for atomic_number in tokens['atomic_numbers']
+            for ion_number in range(atomic_number)
+        ]
+    )
 
 species_entry.setParseAction(parse_species_entry)
 

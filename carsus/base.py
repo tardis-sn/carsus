@@ -29,7 +29,7 @@ def init_db(db_url='sqlite://', **kwargs):
     an instance of the sqlalchemy.orm.session.Session class
 
     """
-    logger.info("Initializing the database at {}".format(db_url))
+    logger.info(f"Initializing the database at {db_url}")
 
     session = setup(db_url, **kwargs)
 

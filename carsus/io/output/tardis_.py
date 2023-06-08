@@ -171,7 +171,7 @@ class AtomData(object):
         try:
             self.selected_atomic_numbers = list(map(int, parse_selected_atoms(selected_atoms)))
         except ParseException:
-            raise ValueError('Input is not a valid atoms string {}'.format(selected_atoms))
+            raise ValueError(f'Input is not a valid atoms string {selected_atoms}')
 
         if chianti_ions is not None:
             # Get a list of tuples (atomic_number, ion_charge) for the chianti ions
@@ -179,9 +179,9 @@ class AtomData(object):
             try:
                 self.chianti_ions = parse_selected_species(chianti_ions)
                 self.chianti_ions = [ tuple(map(int,t)) for t in self.chianti_ions ]
-                
+
             except ParseException:
-                raise ValueError('Input is not a valid species string {}'.format(chianti_ions))
+                raise ValueError(f'Input is not a valid species string {chianti_ions}')
 
             try:
                 chianti_atomic_numbers = {atomic_number for atomic_number, ion_charge in self.chianti_ions}
@@ -189,7 +189,7 @@ class AtomData(object):
             except AssertionError:
                 raise ValueError("Chianti ions *must* be species of selected atoms!")
         else:
-            self.chianti_ions = list()
+            self.chianti_ions = []
 
         self._chianti_ions_table = None
 
@@ -228,12 +228,14 @@ class AtomData(object):
 
         if self._chianti_ions_table is None:
 
-            chianti_ions_table_name = "ChiantiIonList" + str(hash(frozenset(self.chianti_ions)))
+            chianti_ions_table_name = f"ChiantiIonList{hash(frozenset(self.chianti_ions))}"
 
             try:
                 chianti_ions_table = Base.metadata.tables[convert_camel2snake(chianti_ions_table_name)]
             except KeyError:
-                chianti_ions_table = type(chianti_ions_table_name, (Base, IonListMixin), dict()).__table__
+                chianti_ions_table = type(
+                    chianti_ions_table_name, (Base, IonListMixin), {}
+                ).__table__
 
             try:
                 # To create the temporary table use the session's current transaction-bound connection
@@ -268,10 +270,10 @@ class AtomData(object):
                 columns: atom_masses, symbol, name, mass[u].
         """
         atom_masses_q = self.session.query(Atom). \
-            filter(Atom.atomic_number.in_(self.selected_atomic_numbers)).\
-            order_by(Atom.atomic_number)
+                filter(Atom.atomic_number.in_(self.selected_atomic_numbers)).\
+                order_by(Atom.atomic_number)
 
-        atom_masses = list()
+        atom_masses = []
         for atom in atom_masses_q.options(joinedload(Atom.weights)):
             try:
                 weight = atom.weights[0].quantity
@@ -321,10 +323,10 @@ class AtomData(object):
                 columns: atomic_number, ion_number, ionization_energy[eV]
         """
         ionization_energies_q = self.session.query(Ion).\
-            filter(Ion.atomic_number.in_(self.selected_atomic_numbers)).\
-            order_by(Ion.atomic_number, Ion.ion_charge)
+                filter(Ion.atomic_number.in_(self.selected_atomic_numbers)).\
+                order_by(Ion.atomic_number, Ion.ion_charge)
 
-        ionization_energies = list()
+        ionization_energies = []
         for ion in ionization_energies_q.options(joinedload(Ion.ionization_energies)):
             try:
                 ionization_energy = ion.ionization_energies[0].quantity
@@ -395,7 +397,7 @@ class AtomData(object):
         '''
         lvl_alias = aliased(Level)
 
-        whens = list()
+        whens = []
 
         if self.chianti_ions:
             # 1. If ion is in `chianti_ions` and there exist levels for this ion from
@@ -606,13 +608,10 @@ class AtomData(object):
     @staticmethod
     def _create_artificial_fully_ionized(levels):
         """ Create artificial levels for fully ionized ions. """
-        fully_ionized_levels = list()
-
-        for atomic_number, _ in levels.groupby("atomic_number"):
-            fully_ionized_levels.append(
-                (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
-            )
-
+        fully_ionized_levels = [
+            (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
+            for atomic_number, _ in levels.groupby("atomic_number")
+        ]
         levels_columns = ["level_id", "atomic_number", "ion_number", "level_number", "energy", "g", "metastable"]
         fully_ionized_levels_dtypes = [(key, levels.dtypes[key]) for key in levels_columns]
 
@@ -773,16 +772,9 @@ class AtomData(object):
     def _build_collisions_q(self, levels_ids):
         levels_subq = self._build_levels_q()
 
-        collisions_q = (
-                self.session.
-                query(ECollision).
-                join(
-                    levels_subq,
-                    ECollision.lower_level_id == levels_subq.c.level_id
-                    )
-                )
-
-        return collisions_q
+        return self.session.query(ECollision).join(
+            levels_subq, ECollision.lower_level_id == levels_subq.c.level_id
+        )
 
     def create_collisions(self, temperatures):
         """
@@ -806,7 +798,7 @@ class AtomData(object):
         levels_idx = levels.index.values
         collisions_q = self._build_collisions_q(levels_idx)
 
-        collisions = list()
+        collisions = []
         for e_col in collisions_q.options(joinedload(ECollision.gf_values),
                                           joinedload(ECollision.temp_strengths)):
 
@@ -831,9 +823,9 @@ class AtomData(object):
 
         # Join atomic_number, ion_number, level_number_lower, level_number_upper
         lower_levels = levels.rename(columns={"level_number": "level_number_lower", "g": "g_l", "energy": "energy_lower"}). \
-                              loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
+                                  loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l", "energy_lower"]]
         upper_levels = levels.rename(columns={"level_number": "level_number_upper", "g": "g_u", "energy": "energy_upper"}). \
-                              loc[:, ["level_number_upper", "g_u", "energy_upper"]]
+                                  loc[:, ["level_number_upper", "g_u", "energy_upper"]]
 
         collisions = collisions.join(lower_levels, on="lower_level_id").join(upper_levels, on="upper_level_id")
 
@@ -959,7 +951,7 @@ class AtomData(object):
         lines = self.lines.set_index("line_id")
         lines = lines.join(lvl_energy_lower, on="lower_level_id").join(lvl_energy_upper, on="upper_level_id")
 
-        macro_atom = list()
+        macro_atom = []
         macro_atom_dtype = [("atomic_number", np.int), ("ion_number", np.int),
                             ("source_level_number", np.int), ("target_level_number", np.int),
                             ("transition_line_id", np.int), ("transition_type", np.int), ("transition_probability", np.float)]
@@ -971,18 +963,50 @@ class AtomData(object):
             f_ul, f_lu = row["f_ul"], row["f_lu"]
             e_lower, e_upper = row["energy_lower"], row["energy_upper"]
 
-            transition_probabilities_dict = dict()  # type : probability
-            transition_probabilities_dict[P_EMISSION_DOWN] = 2 * nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
-            transition_probabilities_dict[P_INTERNAL_DOWN] = 2 * nu**2 * f_ul / const.c.cgs.value**2 * e_lower
-            transition_probabilities_dict[P_INTERNAL_UP] = f_lu * e_lower / (const.h.cgs.value * nu)
-
-            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
-                                    line_id, P_EMISSION_DOWN, transition_probabilities_dict[P_EMISSION_DOWN]))
-            macro_atom.append((atomic_number, ion_number, level_number_upper, level_number_lower,
-                                    line_id, P_INTERNAL_DOWN, transition_probabilities_dict[P_INTERNAL_DOWN]))
-            macro_atom.append((atomic_number, ion_number, level_number_lower, level_number_upper,
-                                    line_id, P_INTERNAL_UP, transition_probabilities_dict[P_INTERNAL_UP]))
-
+            transition_probabilities_dict = {
+                P_EMISSION_DOWN: 2
+                * nu**2
+                * f_ul
+                / const.c.cgs.value**2
+                * (e_upper - e_lower),
+                P_INTERNAL_DOWN: 2
+                * nu**2
+                * f_ul
+                / const.c.cgs.value**2
+                * e_lower,
+                P_INTERNAL_UP: f_lu * e_lower / (const.h.cgs.value * nu),
+            }
+            macro_atom.extend(
+                (
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_upper,
+                        level_number_lower,
+                        line_id,
+                        P_EMISSION_DOWN,
+                        transition_probabilities_dict[P_EMISSION_DOWN],
+                    ),
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_upper,
+                        level_number_lower,
+                        line_id,
+                        P_INTERNAL_DOWN,
+                        transition_probabilities_dict[P_INTERNAL_DOWN],
+                    ),
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_lower,
+                        level_number_upper,
+                        line_id,
+                        P_INTERNAL_UP,
+                        transition_probabilities_dict[P_INTERNAL_UP],
+                    ),
+                )
+            )
         macro_atom = np.array(macro_atom, dtype=macro_atom_dtype)
         macro_atom = pd.DataFrame(macro_atom)
 
@@ -1177,7 +1201,7 @@ class AtomData(object):
 
             uuid1 = uuid.uuid1().hex
 
-            logger.info("Signing AtomData: \nMD5: {}\nUUID1: {}".format(md5_hash.hexdigest(), uuid1))
+            logger.info(f"Signing AtomData: \nMD5: {md5_hash.hexdigest()}\nUUID1: {uuid1}")
 
             store.root._v_attrs['md5'] = md5_hash.hexdigest()
             store.root._v_attrs['uuid1'] = uuid1

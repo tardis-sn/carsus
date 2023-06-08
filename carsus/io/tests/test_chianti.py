@@ -13,8 +13,7 @@ slow = pytest.mark.skipif(
 @pytest.fixture
 def ch_ingester(memory_session):
     ions = "ne 1; cl 3"
-    ingester = ChiantiIngester(memory_session, ions=ions)
-    return ingester
+    return ChiantiIngester(memory_session, ions=ions)
 
 
 class TestChiantiIonReader:

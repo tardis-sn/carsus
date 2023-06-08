@@ -32,10 +32,7 @@ J = decimal ^ decimal + Suppress("/") + decimal
 
 
 def parse_j(tokens):
-    if len(tokens) == 1:
-        return float(tokens[0])
-    else:
-        return float(tokens[0])/tokens[1]
+    return float(tokens[0]) if len(tokens) == 1 else float(tokens[0])/tokens[1]
 
 J.setParseAction(parse_j)
 
@@ -61,9 +58,6 @@ level = Optional(
 
 
 def parse_parity(tokens):
-    if "*" in tokens.asList():
-        tokens["parity"] = 1
-    else:
-        tokens["parity"] = 0
+    tokens["parity"] = 1 if "*" in tokens.asList() else 0
 
 level.setParseAction(parse_parity)

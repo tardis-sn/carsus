@@ -55,5 +55,5 @@ def hdf_dump(cmfgen_dir, patterns, parser, chunk_size=10, ignore_patterns=[]):
         for obj in _:
             obj.to_hdf()
 
-    logger.info(f'Finished.')
+    logger.info('Finished.')
 

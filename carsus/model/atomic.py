@@ -446,7 +446,7 @@ class ECollisionTempStrength(Base):
         return self.temp, self.strength
 
     def __repr__(self):
-        return "<Temp: {}, Strength: {}>".format(self.temp, self.strength)
+        return f"<Temp: {self.temp}, Strength: {self.strength}>"
 
 
 class DataSource(UniqueMixin, Base):
@@ -470,7 +470,7 @@ class DataSource(UniqueMixin, Base):
     # transitions = relationship("Transition", back_populates="data_source")
 
     def __repr__(self):
-        return "<Data Source: {}>".format(self.short_name)
+        return f"<Data Source: {self.short_name}>"
 
 
 class Zeta(Base):

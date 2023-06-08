@@ -367,7 +367,7 @@ class CMFGENHydLParser(BaseParser):
         data = []
         indexes = []
         with open(fname, mode="r") as f:
-            for i in range(skiprows):
+            for _ in range(skiprows):
                 f.readline()
             while True:
                 n, l, log10x_sect = next(self._table_gen(f), None)
@@ -645,7 +645,7 @@ class CMFGENReader:
 
             lambda_angstrom = match["Lam(A)"].tolist()
             level_number = (match["ID"] - 1).tolist()
-            
+
             # match is > 1 just for J-splitted levels
             for j in range(len(match)):
                 threshold_energy_ryd = (
@@ -712,7 +712,7 @@ class CMFGENReader:
                 ]:
 
                     fit_coeff_list = target["fit_coeff"].to_list()
-                    fit_coeff_list[0:3] = [int(x) for x in fit_coeff_list[0:3]]
+                    fit_coeff_list[:3] = [int(x) for x in fit_coeff_list[:3]]
 
                     if len(fit_coeff_list) not in [3, 4]:
                         logger.warning(
@@ -781,9 +781,7 @@ class CMFGENReader:
                         )
 
                     except NotImplementedError:
-                        logger.warning(
-                            f"Leibowitz's cross-section type 4 not implemented yet."
-                        )
+                        logger.warning("Leibowitz's cross-section type 4 not implemented yet.")
                         phixs_table = get_null_phixs_table(threshold_energy_ryd)
 
                 else:
@@ -794,12 +792,10 @@ class CMFGENReader:
 
                 df = pd.DataFrame(phixs_table, columns=["energy", "sigma"])
                 df["level_index"] = level_number[j]
-                
+
                 phixs_table_list.append(df)
 
-        ion_phixs_table = pd.concat(phixs_table_list)
-
-        return ion_phixs_table
+        return pd.concat(phixs_table_list)
 
     def _get_levels_lines(self, data):
         """
@@ -862,7 +858,7 @@ class CMFGENReader:
                     l_points, l_start_u, l_del_u = 97, 0.0, 0.041392685
                     n_points, n_start_u, n_del_u = 145, 0.0, 0.041392685
 
-                    hyd = reader["hyd"].apply(lambda x: 10 ** (8 + x))
+                    hyd = 10**(8 + x)
                     gbf = reader["gbf"]
 
                     hyd_phixs, hyd_phixs_energy_grid_ryd = {}, {}
@@ -965,16 +961,13 @@ class CMFGENReader:
         """
         col_list, t_grid = [], []
         levels_combine = self.levels.copy().reset_index()
-        label_ind_mapping = {
-            label: index
-            for label, index in zip(levels_combine.label, levels_combine.level_index)
-        }
+        label_ind_mapping = dict(zip(levels_combine.label, levels_combine.level_index))
 
         for ion, data_dict in data.items():
             levels = data_dict["levels"].copy()
             collisions = data_dict["collisions"].copy()
 
-            label_g_mapping = {label: g for label, g in zip(levels.label, levels.g)}
+            label_g_mapping = dict(zip(levels.label, levels.g))
             missing_labels = set()
 
             gi, lower_level_index, upper_level_index = [], [], []
@@ -1005,16 +998,16 @@ class CMFGENReader:
                 if ul in label_ind_mapping:
                     upper_level_index.append(label_ind_mapping[ul])
                 else:
-                    if ul != "I":
-                        if not drop_mismatched_labels:
-                            raise KeyError(
-                                f"Label {ul} for ion {ion} could not be mapped. "
-                                "Please check the atomic data files."
-                            )
-                        missing_labels.add(ul)
-                    else:
+                    if ul == "I":
                         logger.info("Dropping collisional ionization data.")
 
+                    elif not drop_mismatched_labels:
+                        raise KeyError(
+                            f"Label {ul} for ion {ion} could not be mapped. "
+                            "Please check the atomic data files."
+                        )
+                    else:
+                        missing_labels.add(ul)
                     upper_level_index.append(np.nan)
 
             if missing_labels:
@@ -1069,15 +1062,14 @@ class CMFGENReader:
                 for ion_col_data_entry in ion_col_data.values
             ]
 
-            nans_replaced = len(
+            if nans_replaced := len(
                 np.where(
                     np.logical_or(
                         temperature_grid < ion_col_data_columns[0],
                         temperature_grid > ion_col_data_columns[-1],
                     )
                 )[0]
-            )
-            if nans_replaced:
+            ):
                 logger.info(
                     f"Filling in {nans_replaced} "
                     f"values for ion {ion} that are outside the tabulated "

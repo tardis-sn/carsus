@@ -98,7 +98,7 @@ class BasePyparser(BaseParser):
 
     def load(self, input_data):
         results = self.grammar.scanString(input_data)
-        base = list()  # list of dicts that will be passed to the base
+        base = []
         for tokens, start, end in results:
             tokens_dict = to_flat_dict(tokens)  # make a flattened dict with the column names as keys
             base.append(tokens_dict)

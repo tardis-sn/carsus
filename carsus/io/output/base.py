@@ -81,25 +81,24 @@ class TARDISAtomData:
                 "Both Chianti and CMFGEN readers contain the collisions dataframe. "
                 "Please set collisions=True in one or the other but not both."
             )
+        if hasattr(cmfgen_reader, "collisions"):
+            collisions = cmfgen_reader.collisions.copy()
+            collisions.index = collisions.index.rename(
+                ['atomic_number', 'ion_number', 'level_number_lower', 'level_number_upper']
+            )
+
+            self.collisions = collisions
+            self.collisions_metadata = cmfgen_reader.collisional_metadata
+
+        elif hasattr(chianti_reader, "collisions"):
+            self.collisions = self.create_collisions(**collisions_param)
+            self.collisions_metadata = pd.Series({
+                "temperatures": collisions_param["temperatures"],
+                "dataset": ["chianti"],
+                "info": None
+            })
         else:
-            if hasattr(cmfgen_reader, "collisions"):
-                collisions = cmfgen_reader.collisions.copy()
-                collisions.index = collisions.index.rename(
-                    ['atomic_number', 'ion_number', 'level_number_lower', 'level_number_upper']
-                )
-
-                self.collisions = collisions
-                self.collisions_metadata = cmfgen_reader.collisional_metadata
-
-            elif hasattr(chianti_reader, "collisions"):
-                self.collisions = self.create_collisions(**collisions_param)
-                self.collisions_metadata = pd.Series({
-                    "temperatures": collisions_param["temperatures"],
-                    "dataset": ["chianti"],
-                    "info": None
-                })
-            else:
-                logger.warning("No source of collisions was selected.")
+            logger.warning("No source of collisions was selected.")
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, 'cross_sections'):
             self.cross_sections = self.create_cross_sections()
@@ -181,13 +180,10 @@ class TARDISAtomData:
         Returns a DataFrame with fully ionized levels.
 
         """
-        fully_ionized_levels = []
-
-        for atomic_number, _ in levels.groupby("atomic_number"):
-            fully_ionized_levels.append(
-                (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
-            )
-
+        fully_ionized_levels = [
+            (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
+            for atomic_number, _ in levels.groupby("atomic_number")
+        ]
         levels_columns = ["level_id", "atomic_number",
                           "ion_number", "level_number",
                           "energy", "g", "metastable"]
@@ -350,20 +346,20 @@ class TARDISAtomData:
                          'ds_id', 'priority']]
         levels['energy'] = u.Quantity(levels['energy'], 'cm-1').to(
             'eV', equivalencies=u.spectral()).value
- 
+
         # Solve priorities and set attributes for later use.
         self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.solve_priorities(levels)
 
         to_string = lambda x: [f"{convert_atomic_number2symbol(ion[0])} {ion[1]}" \
-                                    for ion in sorted(x)]
+                                        for ion in sorted(x)]
 
         gfall_str = ', '.join(to_string(self.gfall_ions))
         logger.info(f'GFALL selected species: {gfall_str}.')
-        
+
         if len(self.chianti_ions) > 0:
             chianti_str = ', '.join(to_string(self.chianti_ions))
             logger.info(f'Chianti selected species: {chianti_str}.')
-        
+
         if len(self.cmfgen_ions) > 0: 
             cmfgen_str = ', '.join(to_string(self.cmfgen_ions))
             logger.info(f'CMFGEN selected species: {cmfgen_str}.')
@@ -400,9 +396,7 @@ class TARDISAtomData:
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
                          'ds_id']]
-        levels = levels.reset_index()
-
-        return levels
+        return levels.reset_index()
 
 
     def _get_all_lines_data(self):
@@ -757,7 +751,7 @@ class TARDISAtomData:
         lines = lines.join(lvl_energy_lower, on="lower_level_id").join(
             lvl_energy_upper, on="upper_level_id")
 
-        macro_atom = list()
+        macro_atom = []
         macro_atom_dtype = [("atomic_number", np.int), ("ion_number", np.int),
                             ("source_level_number",
                              np.int), ("target_level_number", np.int),
@@ -768,34 +762,56 @@ class TARDISAtomData:
         for line_id, row in lines.iterrows():
             atomic_number, ion_number = row["atomic_number"], row["ion_number"]
             level_number_lower, level_number_upper = \
-                row["level_number_lower"], row["level_number_upper"]
+                    row["level_number_lower"], row["level_number_upper"]
             nu = row["nu"]
             f_ul, f_lu = row["f_ul"], row["f_lu"]
             e_lower, e_upper = row["energy_lower"], row["energy_upper"]
 
-            transition_probabilities_dict = dict()
-            
-            transition_probabilities_dict[P_EMISSION_DOWN] = 2 * \
-                nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
+            transition_probabilities_dict = {
+                P_EMISSION_DOWN: 2
+                * nu**2
+                * f_ul
+                / const.c.cgs.value**2
+                * (e_upper - e_lower),
+                P_INTERNAL_DOWN: 2
+                * nu**2
+                * f_ul
+                / const.c.cgs.value**2
+                * e_lower,
+                P_INTERNAL_UP: f_lu * e_lower / (const.h.cgs.value * nu),
+            }
 
-            transition_probabilities_dict[P_INTERNAL_DOWN] = 2 * \
-                nu**2 * f_ul / const.c.cgs.value**2 * e_lower
-
-            transition_probabilities_dict[P_INTERNAL_UP] = f_lu * \
-                e_lower / (const.h.cgs.value * nu)
-
-            macro_atom.append((atomic_number, ion_number, level_number_upper,
-                               level_number_lower, line_id, P_EMISSION_DOWN,
-                               transition_probabilities_dict[P_EMISSION_DOWN]))
-
-            macro_atom.append((atomic_number, ion_number, level_number_upper,
-                               level_number_lower, line_id, P_INTERNAL_DOWN,
-                               transition_probabilities_dict[P_INTERNAL_DOWN]))
-
-            macro_atom.append((atomic_number, ion_number, level_number_lower,
-                               level_number_upper, line_id, P_INTERNAL_UP,
-                               transition_probabilities_dict[P_INTERNAL_UP]))
-
+            macro_atom.extend(
+                (
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_upper,
+                        level_number_lower,
+                        line_id,
+                        P_EMISSION_DOWN,
+                        transition_probabilities_dict[P_EMISSION_DOWN],
+                    ),
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_upper,
+                        level_number_lower,
+                        line_id,
+                        P_INTERNAL_DOWN,
+                        transition_probabilities_dict[P_INTERNAL_DOWN],
+                    ),
+                    (
+                        atomic_number,
+                        ion_number,
+                        level_number_lower,
+                        level_number_upper,
+                        line_id,
+                        P_INTERNAL_UP,
+                        transition_probabilities_dict[P_INTERNAL_UP],
+                    ),
+                )
+            )
         macro_atom = np.array(macro_atom, dtype=macro_atom_dtype)
         macro_atom = pd.DataFrame(macro_atom)
 
@@ -1044,10 +1060,8 @@ class TARDISAtomData:
                 columns=["field", "key", "value"]
             ).set_index(["field", "key"])
             f.put('/lines_metadata', lines_metadata)
-             
-            meta = []
-            meta.append(('format', 'version', FORMAT_VERSION))
 
+            meta = [('format', 'version', FORMAT_VERSION)]
             total_checksum = hashlib.md5()
             for key in f.keys():
                 # update the total checksum to sign the file
@@ -1057,19 +1071,14 @@ class TARDISAtomData:
                 checksum = hash_pandas_object(f[key])
                 meta.append(('md5sum', key.lstrip('/'), checksum))
 
-            # data sources versions
-            meta.append(('datasets', 'nist_weights', 
-                         self.atomic_weights.version))
-
-            meta.append(('datasets', 'nist_spectra', 
-                         self.ionization_energies.version))
-
-            meta.append(('datasets', 'gfall',
-                         self.gfall_reader.version))
-
-            meta.append(('datasets', 'zeta',
-                         self.zeta_data.version))
-
+            meta.extend(
+                (
+                    ('datasets', 'nist_weights', self.atomic_weights.version),
+                    ('datasets', 'nist_spectra', self.ionization_energies.version),
+                    ('datasets', 'gfall', self.gfall_reader.version),
+                    ('datasets', 'zeta', self.zeta_data.version),
+                )
+            )
             if self.chianti_reader is not None:
                 meta.append(('datasets', 'chianti', 
                              self.chianti_reader.version))
@@ -1083,16 +1092,16 @@ class TARDISAtomData:
             imports = ['carsus', 'astropy', 'numpy', 'pandas', 'pyarrow', 
                        'tables', 'ChiantiPy']
 
-            for package in imports:
-                meta.append(('software', package,
-                             __import__(package).__version__))
-
+            meta.extend(
+                ('software', package, __import__(package).__version__)
+                for package in imports
+            )
             meta_df = pd.DataFrame.from_records(meta, columns=['field', 'key',
                         'value'], index=['field', 'key'])
 
             uuid1 = uuid.uuid1().hex
 
-            logger.info(f"Signing TARDISAtomData.")
+            logger.info("Signing TARDISAtomData.")
             logger.info(f"Format Version: {FORMAT_VERSION}")
             logger.info(f"MD5: {total_checksum.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")

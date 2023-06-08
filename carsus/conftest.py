@@ -97,7 +97,7 @@ def test_db_fname(request):
 
 @pytest.fixture(scope="session")
 def test_db_url(test_db_fname):
-    return "sqlite:///" + test_db_fname
+    return f"sqlite:///{test_db_fname}"
 
 
 @pytest.fixture(scope="session")
@@ -107,9 +107,10 @@ def gfall_fname(data_dir):
 
 @pytest.fixture(scope="session")
 def gfall_http(data_dir):
-    url = "https://raw.githubusercontent.com/tardis-sn/carsus/"
-    url += "master/carsus/tests/data/gftest.all"
-    return url
+    return (
+        "https://raw.githubusercontent.com/tardis-sn/carsus/"
+        + "master/carsus/tests/data/gftest.all"
+    )
 
 
 @pytest.fixture(scope="session")

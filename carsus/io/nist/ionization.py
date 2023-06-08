@@ -343,9 +343,7 @@ class NISTIonizationEnergies(BaseParser):
         levels['g'] = levels['g'].astype(np.int)
         levels['energy'] = 0.
         levels = levels[['g', 'energy']]
-        levels = levels.reset_index()
-
-        return levels
+        return levels.reset_index()
 
     def _get_version(self):
         """Returns NIST Atomic Spectra Database version.

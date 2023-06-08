@@ -7,8 +7,8 @@ from carsus.model import DataSource
 
 @pytest.fixture
 def entry():
-    name = Word(alphas, alphas+'_')
-    value = Word(nums, nums+".").setResultsName('nominal_value')
+    name = Word(alphas, f'{alphas}_')
+    value = Word(nums, f"{nums}.").setResultsName('nominal_value')
     uncert = Word(nums).setResultsName('std_dev')
     value_uncert = value + Suppress("(") + uncert + Suppress(")")
     return Dict( Group(name + Suppress("=") + value_uncert ) )

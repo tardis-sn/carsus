@@ -16,9 +16,7 @@ def serialize_pandas_object(pd_object):
     """
 
     context = pa.default_serialization_context()
-    serialized_pd_object = context.serialize(pd_object)
-
-    return serialized_pd_object
+    return context.serialize(pd_object)
 
 
 def hash_pandas_object(pd_object, algorithm="md5"):

@@ -15,16 +15,12 @@ class KnoxLongZetaIngester(object):
     def __init__(self, session, fname=None, ds_name='knox_long'):
         self.session = session
 
-        if fname is None:
-            self.fname = ZETA_DATA_URL
-        else:
-            self.fname = fname
-
+        self.fname = ZETA_DATA_URL if fname is None else fname
         self.data_source = DataSource.as_unique(
             self.session,
             short_name=ds_name
         )
-        
+
         if self.data_source.data_source_id is None:
             self.session.flush()
 
@@ -44,22 +40,22 @@ class KnoxLongZetaIngester(object):
                 ['atomic_number', 'ion_charge']).T
         )
 
-        data = list()
+        data = []
         for i, s in zeta_df.iterrows():
             T = Temperature.as_unique(self.session, value=int(i))
             if T.id is None:
                 self.session.flush()
 
-            for (atomic_number, ion_charge), rate in s.items():
-                data.append(
-                    Zeta(
-                        atomic_number=atomic_number,
-                        ion_charge=ion_charge,
-                        data_source=self.data_source,
-                        temp=T,
-                        zeta=rate
-                    )
+            data.extend(
+                Zeta(
+                    atomic_number=atomic_number,
+                    ion_charge=ion_charge,
+                    data_source=self.data_source,
+                    temp=T,
+                    zeta=rate,
                 )
+                for (atomic_number, ion_charge), rate in s.items()
+            )
 
     def ingest(self):
         self.ingest_zeta_values()
@@ -75,12 +71,7 @@ class KnoxLongZeta(BaseParser):
 
     def __init__(self, fname=None):
 
-        if fname is None:
-            self.fname = ZETA_DATA_URL
-
-        else:
-            self.fname = fname
-
+        self.fname = ZETA_DATA_URL if fname is None else fname
         self._prepare_data()
 
     def _prepare_data(self):
