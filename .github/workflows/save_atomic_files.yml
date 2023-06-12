@@ -1,0 +1,46 @@
+name: save-atomic-files
+
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # run at midnight every Sunday
+
+jobs:
+  create-artifacts:
+    uses: ./.github/workflows/bridge.yml
+  
+  zip_artifacts:
+    needs: create-artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download atom data
+        uses: actions/download-artifact@v2
+        with:
+          name: atom-data
+
+      - name: Download comparison notebook
+        uses: actions/download-artifact@v2
+        with:
+          name: Comparison Notebook
+
+      - name: Zip files
+        run: zip "$(date +'%d_%b_%Y')_$(curl https://api.github.com/repos/tardis-sn/carsus/commits/master | jq -r .sha | cut -c1-6)"  kurucz_cd23_chianti_H_He.h5 ref_data_compare_from_paths.html
+
+      - name: Send file to Moria
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.GH_DROPOFF_HOST }}
+          username: ${{ secrets.GH_DROPOFF_USERNAME }}
+          password: ${{ secrets.GH_DROPOFF_PASSWORD }}
+          source: '*_*_*.zip'
+          target: "/storage/github_dropoffs/tardis/"
+  
+  bridge-ref-check:
+    needs: create-artifacts
+    runs-on: ubuntu-latest
+    if: needs.create-artifacts.outputs.ref-check-trig == 'failure'
+    # fails if refdata comparison failed in the bridge
+    # continue-on-error wouldn't put a red cross 
+    # even if the bridge passes on refdata compare step
+    steps:
+      - run: exit 1

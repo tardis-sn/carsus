@@ -278,7 +278,7 @@ class GFALLReader(object):
 
         levels["method"] = levels["theoretical"].\
             apply(lambda x: "theor" if x else "meas")  # Theoretical or measured
-        levels.drop("theoretical", 1, inplace=True)
+        levels.drop("theoretical", axis="columns", inplace=True)
 
         levels["level_index"] = levels.groupby(['atomic_number', 'ion_charge'])['j'].\
             transform(lambda x: np.arange(len(x), dtype=np.int64)).values
@@ -346,7 +346,7 @@ class GFALLReader(object):
 
         lines = gfall[selected_columns].copy()
         lines["gf"] = np.power(10, lines["loggf"])
-        lines = lines.drop(["loggf"], 1)
+        lines = lines.drop(["loggf"], axis="columns")
 
         # Assigning levels to lines
         levels_unique_idxed = self.levels.reset_index().set_index(

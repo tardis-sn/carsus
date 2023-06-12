@@ -17,6 +17,7 @@ from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
 from carsus.io.base import BaseParser, BaseIngester
 from carsus.io.nist.ionization_grammar import level
 from carsus.util import convert_atomic_number2symbol
+from carsus.io.util import retry_request
 
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
@@ -59,9 +60,10 @@ def download_ionization_energies(
             'unc_out': unc_out, 'biblio': biblio}
 
     data = {k: v for k, v in data.items() if v is not False}
+    data = {k:"on" if v is True else v for k, v in data.items()}
 
     logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
-    r = requests.post(IONIZATION_ENERGIES_URL, data=data)
+    r = retry_request(url=IONIZATION_ENERGIES_URL, method="post", data=data)
     return r.text
 
 
