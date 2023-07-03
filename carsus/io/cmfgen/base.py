@@ -482,6 +482,8 @@ class CMFGENReader:
         temperature_grid=None,
         drop_mismatched_labels=False,
         version=None,
+        hyd_n_phixs_stop2start_energy_ratio=25,
+        hyd_n_phixs_num_points=200,
     ):
         """
         Parameters
@@ -496,11 +498,21 @@ class CMFGENReader:
         temperature_grid : array/list of numbers, optional
             Temperatures to have in the collision dataframe. The collision dataframe
             will have all the temperatures from the CMFGEN dataset by default.
+        hyd_n_phixs_stop2start_energy_ratio : float
+            Maximum energy of the exported photoionization cross section table
+            for type HYDROGENIC_PURE_N_LEVEL in units of the threshold energy.
+        hyd_n_phixs_num_points : int
+            Number of points of the exported photoionization cross section table
+            for type HYDROGENIC_PURE_N_LEVEL.
 
         """
         self.priority = priority
         self.ions = list(data.keys())
-        self._get_levels_lines(data)
+        self._get_levels_lines(
+            data,
+            hyd_n_phixs_stop2start_energy_ratio,
+            hyd_n_phixs_num_points,
+        )
         if collisions:
             self.collisions, self.collisional_metadata = self._get_collisions(
                 data,
@@ -521,6 +533,8 @@ class CMFGENReader:
         collisions=False,
         temperature_grid=None,
         drop_mismatched_labels=False,
+        hyd_n_phixs_stop2start_energy_ratio=25,
+        hyd_n_phixs_num_points=200,
     ):
         ATOMIC_PATH = pathlib.Path(atomic_path)
         if config_yaml is not None:
@@ -607,7 +621,16 @@ class CMFGENReader:
                         data[ion]["hyd"] = hyd_parser.base
                         data[ion]["gbf"] = gbf_parser.base
 
-        return cls(data, priority, collisions, temperature_grid, drop_mismatched_labels, version)
+        return cls(
+            data,
+            priority,
+            collisions,
+            temperature_grid,
+            drop_mismatched_labels,
+            version,
+            hyd_n_phixs_stop2start_energy_ratio,
+            hyd_n_phixs_num_points,
+        )
 
     @staticmethod
     def cross_sections_squeeze(
@@ -617,11 +640,15 @@ class CMFGENReader:
         hyd_phixs,
         hyd_gaunt_energy_grid_ryd,
         hyd_gaunt_factor,
+        hyd_n_phixs_stop2start_energy_ratio,
+        hyd_n_phixs_num_points,
     ):
         """
         Makes a single, uniform table of cross-sections from individual DataFrames
         based on cross-section types and their respective papers.
         """
+        if hyd_n_phixs_stop2start_energy_ratio < 1:
+            raise ValueError("hyd_n_phixs_stop2start_energy_ratio needs to be bigger than 1.")
 
         phixs_table_list = []
         n_targets = len(reader_phixs)
@@ -704,6 +731,8 @@ class CMFGENReader:
                         hyd_gaunt_factor,
                         threshold_energy_ryd,
                         n,
+                        hyd_n_phixs_stop2start_energy_ratio,
+                        hyd_n_phixs_num_points,
                     )
 
                 elif cross_section_type in [
@@ -801,7 +830,12 @@ class CMFGENReader:
 
         return ion_phixs_table
 
-    def _get_levels_lines(self, data):
+    def _get_levels_lines(
+            self,
+            data,
+            hyd_n_phixs_stop2start_energy_ratio,
+            hyd_n_phixs_num_points,
+    ):
         """
         Generates `levels`, `lines` and (optionally) `ionization_energies` and
         `collisions` DataFrames.
@@ -895,6 +929,8 @@ class CMFGENReader:
                     hyd_phixs,
                     hyd_gaunt_energy_grid_ryd,
                     hyd_gaunt_factor,
+                    hyd_n_phixs_stop2start_energy_ratio,
+                    hyd_n_phixs_num_points,
                 )
                 pxs["atomic_number"] = ion[0]
                 pxs["ion_charge"] = ion[1]
