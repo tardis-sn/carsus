@@ -195,6 +195,7 @@ def get_hydrogenic_n_phixs_table(
     Citation required.
     """
     hyd_gaunt_energy_grid_ryd_n = np.array(hyd_gaunt_energy_grid_ryd[n])
+    log_gaunt_factor_n = np.log(hyd_gaunt_factor[n])
     energy_grid = np.geomspace(
         hyd_gaunt_energy_grid_ryd_n.min(),
         hyd_gaunt_energy_grid_ryd_n.min() * hyd_n_phixs_stop2start_energy_ratio,
@@ -204,8 +205,8 @@ def get_hydrogenic_n_phixs_table(
     scale_factor = 7.91 / threshold_energy_ryd / n
     log_hyd_gaunt_factor_interpolator = interp1d(
         np.log(hyd_gaunt_energy_grid_ryd_n),
-        np.log(np.array(hyd_gaunt_factor[n])),
-        fill_value=(hyd_gaunt_factor[n][0], hyd_gaunt_factor[n][-1]),
+        log_gaunt_factor_n,
+        fill_value=(log_gaunt_factor_n[0], log_gaunt_factor_n[-1]),
         bounds_error=False,
     )
 
