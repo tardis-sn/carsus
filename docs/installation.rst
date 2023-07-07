@@ -31,7 +31,7 @@ Setup the Environment
 .. code ::
 
     $ cd carsus
-    $ conda env create -f carsus_env3.yml
+    $ CONDA_SUBDIR=osx-64 conda env create -f carsus_env3.yml
 
 
 ===================
