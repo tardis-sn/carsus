@@ -475,6 +475,7 @@ class AtomData(object):
                     Level.level_id.label('level_id'),
                     Level.atomic_number.label('atomic_number'),
                     Level.ion_charge.label('ion_number'),
+                    Level.label.label('label'),
                     Level.g.label('g'),
                     ).
                 join(
@@ -681,13 +682,15 @@ class AtomData(object):
         lower_levels = levels.rename(
                 columns={
                     "level_number": "level_number_lower",
+                    "label": "label_lower",
                     "g": "g_l"}
-                ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
+                ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "label_lower", "g_l"]]
         upper_levels = levels.rename(
                 columns={
                     "level_number": "level_number_upper",
+                    "label": "label_upper",
                     "g": "g_u"}
-                ).loc[:, ["level_number_upper", "g_u"]]
+                ).loc[:, ["level_number_upper", "label_upper", "g_u"]]
         lines = lines.join(lower_levels, on="lower_level_id").join(upper_levels, on="upper_level_id")
 
         # Calculate absorption oscillator strength f_lu and emission oscillator strength f_ul
@@ -729,7 +732,7 @@ class AtomData(object):
         """
 
         levels_prepared = self.levels.loc[:, [
-            "atomic_number", "ion_number", "level_number",
+            "atomic_number", "ion_number", "level_number", "label",
             "energy", "g", "metastable"]].copy()
 
         # Set index
