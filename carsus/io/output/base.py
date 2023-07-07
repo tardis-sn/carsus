@@ -343,11 +343,11 @@ class TARDISAtomData:
         levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
-        levels = levels.drop(columns=['j', 'label', 'method'])
+        levels = levels.drop(columns=['j', 'method'])
         levels = levels.reset_index()
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
-                         'ds_id', 'priority']]
+                         'ds_id', 'priority', 'label']]
         levels['energy'] = u.Quantity(levels['energy'], 'cm-1').to(
             'eV', equivalencies=u.spectral()).value
  
@@ -399,7 +399,7 @@ class TARDISAtomData:
             levels = levels.drop(levels[mask].index)
 
         levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
-                         'ds_id']]
+                         'ds_id', 'label']]
         levels = levels.reset_index()
 
         return levels
