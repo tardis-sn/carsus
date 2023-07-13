@@ -30,3 +30,21 @@ def test_nndc_reader_decay_data(decay_data, index, element, z, parent_e_level, m
     assert row["Parent E(level)"] == parent_e_level
     assert row["Radiation"] == radiation
     assert row["Rad Energy"] == rad_energy
+
+
+@pytest.mark.parametrize("index, parent_e_level, decay_mode, decay_mode_value, "
+                         "half_life, metastable", [
+                             ("Mn52", 0.0, "EC", 100.00, 483062.4, False),
+                             ("Mn52", 377.749, "IT", 1.75, 1266.0, True),
+                             ("Mn52", 377.749, "EC", 98.22, 1266.0, True)
+                         ])
+def test_nndc_reader_metastable(decay_data, index, parent_e_level, decay_mode,
+                                decay_mode_value, half_life, metastable):
+    df = decay_data[(decay_data.index == index) & (decay_data["Decay Mode"] == decay_mode) &
+                    (decay_data["Parent E(level)"] == parent_e_level)]
+
+    # picking just the first row of the dataframe for a particular nuclei
+    row = df.iloc[0]
+    assert row["Decay Mode Value"] == decay_mode_value
+    assert row["T1/2 (sec)"] == half_life
+    assert row["Metastable"] == metastable
