@@ -4,8 +4,8 @@ from carsus.io.nuclear import NNDCReader
 
 
 @pytest.fixture()
-def nndc_reader(nndc_fname):
-    return NNDCReader(fname=nndc_fname)
+def nndc_reader(nndc_dirname):
+    return NNDCReader(dirname=nndc_dirname)
 
 
 @pytest.fixture()
