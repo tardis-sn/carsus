@@ -113,6 +113,11 @@ def gfall_http(data_dir):
 
 
 @pytest.fixture(scope="session")
+def nndc_dirname(data_dir):
+    return os.path.join(data_dir, "nndc")  # Mn-52, Ni-56
+
+
+@pytest.fixture(scope="session")
 def test_engine(test_db_url):
     return create_engine(test_db_url)
 
