@@ -12,8 +12,27 @@ DECAY_DATA_FINAL_DIR = os.path.join(
 
 
 class NNDCReader:
+    """
+    Class for extracting nuclear decay data from NNDC archives
+
+    Attributes
+    ----------
+    dirname: path to directory containing the decay data in CSV format
+
+    Methods
+    --------
+    decay_data:
+        Return pandas DataFrame representation of the decay data
+    """
 
     def __init__(self, dirname=None):
+        """
+        Parameters
+        ----------
+        dirname : path
+            Path to the directory containing the source CSV data (local file).
+
+        """
         if dirname is None:
             self.dirname = DECAY_DATA_SOURCE_DIR
         else:
@@ -30,6 +49,15 @@ class NNDCReader:
         return self._decay_data
 
     def _get_nuclear_decay_dataframe(self):
+        """
+        Convert the CSV files from the source directory into dataframes
+
+        Returns
+        -------
+            pandas.DataFrame
+                pandas Dataframe representation of the decay data
+        """
+
         all_data = []
         dirpath = pathlib.Path(self.dirname)
         for file in dirpath.iterdir():
@@ -44,12 +72,28 @@ class NNDCReader:
         return decay_data
 
     def _set_group_true(self, group):
-        # set the entire Metastable column to True if any of the values in the group is True
+        """
+        Sets the entire 'Metastable' column to True if any of the values in the group is True.
+
+        Parameters
+        ----------
+        group: pandas.DataFrameGroupBy object
+            A groupby object that contains information about the groups.
+        """
+
         if group['Metastable'].any():
             group['Metastable'] = True
         return group
 
     def _add_metastable_column(self, decay_data=None):
+        """
+        Adds a 'Metastable' column to decay_data indicating the metastable isotopes (e.g: Mn52).
+
+        Returns
+        -------
+            pandas.Dataframe
+                Decay dataframe after the 'Metastable' column has been added.
+        """
         metastable_df = decay_data if decay_data is not None else self.decay_data.copy()
 
         # Create a boolean metastable state column before the 'Decay Mode' column
@@ -70,6 +114,10 @@ class NNDCReader:
         return metastable_df
 
     def _prepare_nuclear_dataframes(self):
+        """
+        Creates the decay dataframe to be stored in HDF Format and formats it by adding
+        the 'Metastable' and 'Isotope' columns, setting the latter as the index.
+        """
         decay_data_raw = self._get_nuclear_decay_dataframe()
         decay_data_raw["Isotope"] = decay_data_raw.Element.map(str) + decay_data_raw.A.map(str)
 
@@ -81,6 +129,12 @@ class NNDCReader:
         return decay_data
 
     def to_hdf(self, fpath=None):
+        """
+        Parameters
+        ----------
+        fpath: path
+            Path to the HDF5 output file
+        """
         if fpath is None:
             fpath = DECAY_DATA_FINAL_DIR
 
