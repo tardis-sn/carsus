@@ -13,6 +13,28 @@ def decay_data(nndc_reader):
     return nndc_reader.decay_data
 
 
+@pytest.mark.parametrize("element, z, parent_e_level, decay_mode, "
+                         "decay_mode_value, radiation, rad_subtype, rad_energy", [
+                             ("Ni", 28, 0.0, "EC", 100.00, "g", "XR ka2", 6.915),
+                             ("Mn", 25, 377.749, "IT", 1.75, "e", "Auger K", 5.190)
+                         ])
+def test_get_nuclear_dataframe(nndc_reader, element, z, parent_e_level, decay_mode, decay_mode_value,
+                               radiation, rad_subtype, rad_energy):
+    decay_data = NNDCReader._get_nuclear_decay_dataframe(nndc_reader)
+    df = decay_data[(decay_data.Element == element) & (decay_data["Decay Mode"] == decay_mode) &
+                    (decay_data["Parent E(level)"] == parent_e_level) &
+                    (decay_data["Rad subtype"] == rad_subtype)]
+
+    row = df.iloc[0]
+    assert row.Z == z
+    assert row["Decay Mode Value"] == decay_mode_value
+    assert row.Radiation == radiation
+
+    # Isotope column is not yet defined in _get_nuclear_decay_dataframe()
+    with pytest.raises(KeyError):
+        assert row.loc["Isotope"]
+
+
 @pytest.mark.parametrize("index, element, z, parent_e_level, metastable, "
                          "decay_mode, decay_mode_value, radiation, rad_subtype, rad_energy", [
                              ("Ni56", "Ni", 28, 0.0, False, "EC", 100.00, "g", "XR ka2", 6.915),
