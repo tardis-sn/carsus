@@ -40,7 +40,6 @@ class NNDCReader:
 
         self._decay_data = None
 
-        # TODO: create an 'nndc_columns' list present in the final dataset.
 
     @property
     def decay_data(self):
