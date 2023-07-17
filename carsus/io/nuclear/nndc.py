@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-import datetime
+import pathlib
 
 DECAY_DATA_SOURCE_DIR = os.path.join(
     os.path.expanduser("~"), "Downloads", "carsus-data-nndc-main", "csv"
@@ -31,11 +31,10 @@ class NNDCReader:
 
     def _get_nuclear_decay_dataframe(self):
         all_data = []
-        for fileName in os.listdir(self.dirname):
-            file = os.path.join(self.dirname, fileName)
-
-            # convert every csv file to Dataframe and appends it to all_data
-            if os.path.splitext(file)[1] == ".csv" and os.path.getsize(file) != 0:
+        dirpath = pathlib.Path(self.dirname)
+        for file in dirpath.iterdir():
+            # convert every csv file to Dataframe and append it to all_data
+            if file.suffix == ".csv" and file.stat().st_size != 0:
                 data = pd.read_csv(
                     file,
                 )
