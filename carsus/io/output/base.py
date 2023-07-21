@@ -47,6 +47,7 @@ class TARDISAtomData:
                  zeta_data,
                  chianti_reader=None,
                  cmfgen_reader=None,
+                 nndc_reader=None,
                  levels_lines_param={"levels_metastable_loggf_threshold": -3,
                                      "lines_loggf_threshold": -3},
                  collisions_param={"temperatures": np.arange(2000, 50000, 2000)}
@@ -65,6 +66,7 @@ class TARDISAtomData:
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
+        self.nndc_reader = nndc_reader
         self.levels_lines_param = levels_lines_param
         self.collisions_param = collisions_param
 
@@ -1031,6 +1033,7 @@ class TARDISAtomData:
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
+            f.put('/nndc_decay_data', self.nndc_reader.decay_data)
 
             if hasattr(self, 'collisions'):
                 f.put('/collisions_data', self.collisions_prepared)
