@@ -1,14 +1,16 @@
 import pandas as pd
 import os
 import pathlib
+import subprocess
 
-DECAY_DATA_SOURCE_DIR = os.path.join(
-    os.path.expanduser("~"), "Downloads", "carsus-data-nndc-main", "csv"
-)
+DECAY_DATA_SOURCE_DIR = os.path.join(os.path.expanduser("~"), "Downloads", "carsus-data-nndc")
 
 DECAY_DATA_FINAL_DIR = os.path.join(
     os.path.expanduser("~"), "Downloads", "tardis-data", "decay-data"
 )
+
+
+NNDC_SOURCE_URL = "https://github.com/tardis-sn/carsus-data-nndc"
 
 
 class NNDCReader:
@@ -25,7 +27,7 @@ class NNDCReader:
         Return pandas DataFrame representation of the decay data
     """
 
-    def __init__(self, dirname=None):
+    def __init__(self, dirname=None, remote=False):
         """
         Parameters
         ----------
@@ -34,7 +36,9 @@ class NNDCReader:
 
         """
         if dirname is None:
-            self.dirname = DECAY_DATA_SOURCE_DIR
+            if remote:
+                subprocess.run(['git', 'clone', NNDC_SOURCE_URL, DECAY_DATA_SOURCE_DIR])
+            self.dirname = os.path.join(DECAY_DATA_SOURCE_DIR, "csv")
         else:
             self.dirname = dirname
 
