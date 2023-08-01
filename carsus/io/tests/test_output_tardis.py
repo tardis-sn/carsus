@@ -8,9 +8,11 @@ from astropy.tests.helper import assert_quantity_allclose
 from sqlalchemy import and_
 from carsus.io.output.tardis_ import AtomData
 from carsus.model import DataSource, Ion
+from carsus.conftest import withtestdb
+
 
 with_test_db = pytest.mark.skipif(
-    not pytest.config.getoption("--test-db"),
+    not withtestdb,
     reason="--testing database was not specified"
 )
 
@@ -95,6 +97,7 @@ def hdf5_path(request, data_dir):
 
 
 def test_atom_data_init(memory_session):
+    print(with_test_db)
     nist = DataSource.as_unique(memory_session, short_name="nist-asd")
     ch = DataSource.as_unique(memory_session, short_name="chianti_v8.0.2")
     ku = DataSource.as_unique(memory_session, short_name="ku_latest")

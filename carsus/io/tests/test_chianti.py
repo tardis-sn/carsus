@@ -3,10 +3,10 @@ import pytest
 from numpy.testing import assert_almost_equal
 from carsus.io.chianti_ import ChiantiIonReader, ChiantiIngester, ChiantiReader
 from carsus.model import Level, Ion, Line, ECollision
-
+from carsus.conftest import runslow
 
 slow = pytest.mark.skipif(
-    not pytest.config.getoption("--runslow"), reason="need --runslow option to run"
+    not runslow, reason="need --runslow option to run"
 )
 
 
