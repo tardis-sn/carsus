@@ -12,10 +12,11 @@ from carsus.io.cmfgen import (
     CMFGENReader,
 )
 
+from carsus.conftest import withrefdata
 from carsus.io.cmfgen.util import *
 
 with_refdata = pytest.mark.skipif(
-    not pytest.config.getoption("--refdata"), reason="--refdata folder not specified"
+    not withrefdata, reason="--refdata folder not specified"
 )
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 
@@ -23,6 +24,7 @@ data_dir = os.path.join(os.path.dirname(__file__), "data")
 @with_refdata
 @pytest.fixture()
 def si1_reader():
+    print(with_refdata)
     return CMFGENReader.from_config(
         "Si 0-1",
         atomic_path="/tmp/atomic",

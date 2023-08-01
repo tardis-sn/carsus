@@ -49,7 +49,7 @@ dependencies:
   - pandoc
 
   # Test/Coverage
-  - pytest =4
+  - pytest
   - pytest-cov
   - pytest-astropy
   - epassaro::pytest-arraydiff
