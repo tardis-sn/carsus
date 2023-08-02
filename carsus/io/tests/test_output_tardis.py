@@ -97,7 +97,6 @@ def hdf5_path(request, data_dir):
 
 
 def test_atom_data_init(memory_session):
-    print(with_test_db)
     nist = DataSource.as_unique(memory_session, short_name="nist-asd")
     ch = DataSource.as_unique(memory_session, short_name="chianti_v8.0.2")
     ku = DataSource.as_unique(memory_session, short_name="ku_latest")

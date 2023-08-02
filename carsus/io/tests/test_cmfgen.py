@@ -24,7 +24,6 @@ data_dir = os.path.join(os.path.dirname(__file__), "data")
 @with_refdata
 @pytest.fixture()
 def si1_reader():
-    print(with_refdata)
     return CMFGENReader.from_config(
         "Si 0-1",
         atomic_path="/tmp/atomic",
