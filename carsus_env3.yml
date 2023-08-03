@@ -52,7 +52,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-astropy
-  - pytest-arraydiff
+  - epassaro::pytest-arraydiff
 
   # Other
   - git-lfs
