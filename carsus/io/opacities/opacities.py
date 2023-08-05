@@ -32,9 +32,6 @@ class HMINUSOPACITIESReader(object):
         ----------
         fname: str
             Path to the h_minus file (http or local file).
-
-        priority: int, optional
-            Priority of the current data source.
         """
 
         if fname is None:
@@ -43,26 +40,12 @@ class HMINUSOPACITIESReader(object):
             self.fname = fname
 
         self._h_minus = None
-        self._wavelengths = None
-        self._cross_sections = None
 
     @property
     def h_minus(self):
         if self._h_minus is None:
             self._h_minus, self.version = self.read_h_minus()
         return self._h_minus
-
-    @property
-    def wavelengths(self):
-        if self._wavelengths is None:
-            self._wavelengths = self.extract_wavelengths()
-        return self._wavelengths
-
-    @property
-    def cross_sections(self):
-        if self._cross_sections is None:
-            self._cross_sections = self.extract_cross_sections()
-        return self._cross_sections
 
     def read_h_minus(self, fname=None):
         """
@@ -100,64 +83,6 @@ class HMINUSOPACITIESReader(object):
         # remove empty lines
         h_minus = h_minus[~h_minus.isnull().all(axis=1)].reset_index(drop=True)
         return h_minus, checksum
-
-    def extract_wavelengths(self, h_minus=None, selected_columns=None):
-        """
-        Extract wavelengths from `h_minus`.
-
-        Parameters
-        ----------
-        h_minus: pandas.DataFrame
-        selected_columns: list
-            list of which columns to select (optional - default=None which selects
-            a default set of columns)
-
-        Returns
-        -------
-            pandas.DataFrame
-                a wavelength DataFrame
-        """
-
-        if h_minus is None:
-            h_minus = self._h_minus
-
-        if selected_columns is None:
-            selected_columns = [
-                "wavelength",
-            ]
-
-        wavelengths = h_minus[selected_columns] * u.Angstrom
-
-        return wavelengths
-
-    def extract_cross_sections(self, h_minus=None, selected_columns=None):
-        """
-        Extract cross sections from `h_minus`.
-
-        Parameters
-        ----------
-        h_minus: pandas.DataFrame
-        selected_columns: list
-            list of which columns to select (optional - default=None which selects
-            a default set of columns)
-
-        Returns
-        -------
-            pandas.DataFrame
-                a cross sections DataFrame
-        """
-
-        if h_minus is None:
-            h_minus = self._h_minus
-
-        if selected_columns is None:
-            selected_columns = [
-                "cross_section",
-            ]
-
-        cross_sections = h_minus[selected_columns]
-
-        return cross_sections
 
     def to_hdf(self, fname):
         """
