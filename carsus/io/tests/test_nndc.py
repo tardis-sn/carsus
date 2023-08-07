@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import shutil
 
 import pytest
@@ -124,4 +124,4 @@ def test_nndc_reader_decay_data_http(decay_data_http, index, element, z, parent_
     assert row["Rad Energy"] == rad_energy
 
     # Deleting the repository cloned during the test
-    shutil.rmtree(os.path.join(os.path.expanduser("~"), "Downloads", "carsus-data-nndc"))
+    shutil.rmtree(Path.home().joinpath("Downloads", "carsus-data-nndc"))
