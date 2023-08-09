@@ -8,11 +8,10 @@ from astropy.tests.helper import assert_quantity_allclose
 from sqlalchemy import and_
 from carsus.io.output.tardis_ import AtomData
 from carsus.model import DataSource, Ion
-from carsus.conftest import withtestdb
 
 
 with_test_db = pytest.mark.skipif(
-    not withtestdb,
+    not pytest.config.getoption("--test-db"),
     reason="--testing database was not specified"
 )
 
