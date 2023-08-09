@@ -4,9 +4,9 @@ from numpy.testing import assert_almost_equal
 from carsus.io.chianti_ import ChiantiIonReader, ChiantiIngester, ChiantiReader
 from carsus.model import Level, Ion, Line, ECollision
 
-slow = pytest.mark.skipif(
-    not pytest.config.getoption("--runslow"), reason="need --runslow option to run"
-)
+# slow = pytest.mark.skipif(
+#     not pytest.config.getoption("--runslow"), reason="need --runslow option to run"
+# )
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ class TestChiantiIonReader:
         return ch_ion_reader.collisions
 
 
-@slow
+@pytest.mark.slow
 @pytest.mark.parametrize(
     "atomic_number, ion_charge, levels_count", [(10, 1, 138), (17, 3, 5)]
 )
@@ -58,7 +58,7 @@ def test_chianti_ingest_levels_count(
     assert len(ion.levels) == levels_count
 
 
-@slow
+@pytest.mark.slow
 @pytest.mark.parametrize("atomic_number, ion_charge, lines_count", [(10, 1, 1999)])
 def test_chianti_ingest_lines_count(
     memory_session, ch_ingester, atomic_number, ion_charge, lines_count
@@ -76,7 +76,7 @@ def test_chianti_ingest_lines_count(
     assert cnt == lines_count
 
 
-@slow
+@pytest.mark.slow
 @pytest.mark.parametrize("atomic_number, ion_charge, e_col_count", [(10, 1, 9453)])
 def test_chianti_ingest_e_col_count(
     memory_session, ch_ingester, atomic_number, ion_charge, e_col_count
