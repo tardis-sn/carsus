@@ -156,3 +156,14 @@ def refdata_path(request):
         pytest.skip('--refdata folder path was not specified')
     else:
         return os.path.expandvars(os.path.expanduser(refdata_path))
+
+@pytest.fixture(scope="session")
+def h_minus_fname(data_dir):
+    return os.path.join(data_dir, "h_minus_cross_section_wbr.dat")
+
+
+@pytest.fixture(scope="session")
+def h_minus_http(data_dir):
+    url = "https://raw.githubusercontent.com/tardis-sn/carsus-data-negative-ions/"
+    url += "main/h_minus_cross_section_wbr.dat"
+    return url
