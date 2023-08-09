@@ -14,13 +14,13 @@ from carsus.io.cmfgen import (
 
 from carsus.io.cmfgen.util import *
 
-with_refdata = pytest.mark.skipif(
-    not pytest.config.getoption("--refdata"), reason="--refdata folder not specified"
-)
+# with_refdata = pytest.mark.skipif(
+#     not pytest.config.getoption("--refdata"), reason="--refdata folder not specified"
+# )
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.fixture()
 def si1_reader():
     return CMFGENReader.from_config(
@@ -40,7 +40,7 @@ def cmfgen_refdata_fname(refdata_path, path):
     return os.path.join(refdata_path, "cmfgen", subdirectory, fname)
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
@@ -55,7 +55,7 @@ def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
     return parser.base
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
@@ -72,7 +72,7 @@ def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
     return parser.base
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
@@ -86,7 +86,7 @@ def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
     return parser.base
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.parametrize(
     "path",
     [
@@ -102,7 +102,7 @@ def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname):
     return parser.base[0]
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
@@ -116,7 +116,7 @@ def test_CMFGENHydLParser(cmfgen_refdata_fname):
     return parser.base
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
@@ -130,31 +130,31 @@ def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname):
     return parser.base
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_lines(si1_reader):
     return si1_reader.lines
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_levels(si1_reader):
     return si1_reader.levels
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_collisions(si1_reader):
     return si1_reader.collisions
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_cross_sections_squeeze(si1_reader):
     return si1_reader.cross_sections
 
 
-@with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_ionization_energies(si1_reader):
     return si1_reader.ionization_energies.to_frame()

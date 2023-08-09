@@ -66,24 +66,52 @@ from carsus import init_db
 
 
 def pytest_addoption(parser):
-    parser.addoption("--runslow", action="store_true",
-                     help="include running slow tests during run")
-    parser.addoption("--test-db", dest='test-db', default=None,
-                     help="filename for the testing database")
-    parser.addoption("--refdata", dest='refdata', default=None,
-                     help="carsus-refdata folder location")
-    
-@pytest.fixture
-def withtestdb(request):
-    return request.config.getoption("--test-db")
+    parser.addoption(
+        "--runslow", action="store_true", default=False, help="include running slow tests during run"
+    )
+    parser.addoption(
+        "--test-db",
+        dest="test-db",
+        default=None,
+        help="filename for the testing database",
+    )
+    parser.addoption(
+        "--refdata", dest="refdata", default=None, help="carsus-refdata folder location"
+    )
 
-@pytest.fixture
-def withrefdata(request):
-    return request.config.getoption("--refdata")
 
-@pytest.fixture
-def runslow(request):
-    return request.config.getoption("--runslow")
+# @pytest.fixture
+# def withtestdb(request):
+#     return request.config.getoption("--test-db")
+
+# @pytest.fixture
+# def withrefdata(request):
+#     return request.config.getoption("--refdata")
+
+# @pytest.fixture
+# def runslow(request):
+#     return request.config.getoption("--runslow")
+
+
+# def pytest_configure(config):
+#     config.addinivalue_line("markers", "slow: mark test as slow to run")
+
+
+def pytest_collection_modifyitems(config, items):
+    skip_slow = pytest.mark.skip(reason="need --runslow option to run")
+    skip_not_with_refdata = pytest.mark.skip(
+        reason="carsus-refdata folder location not specified"
+    )
+    skip_not_with_testdb = pytest.mark.skip(
+        reason="filename for the testing database not specified"
+    )
+    for item in items:
+        if "slow" in item.keywords and not config.getoption("--runslow"):
+            item.add_marker(skip_slow)
+        if "with_refdata" in item.keywords and not config.getoption("--refdata"):
+            item.add_marker(skip_not_with_refdata)
+        if "with_test_db" in item.keywords and not config.getoption("--test-db"):
+            item.add_marker(skip_not_with_testdb)
 
 
 @pytest.fixture
