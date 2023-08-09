@@ -12,11 +12,10 @@ from carsus.io.cmfgen import (
     CMFGENReader,
 )
 
-from carsus.conftest import withrefdata
 from carsus.io.cmfgen.util import *
 
 with_refdata = pytest.mark.skipif(
-    not withrefdata, reason="--refdata folder not specified"
+    not pytest.config.getoption("--refdata"), reason="--refdata folder not specified"
 )
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 
