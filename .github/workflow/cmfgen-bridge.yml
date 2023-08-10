@@ -1,0 +1,164 @@
+name: tardis-carsus-bridge
+
+on: 
+  workflow_call: 
+    outputs:
+      ref-check-trig:
+        value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
+  workflow_dispatch: 
+
+        
+env:
+  NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
+  #CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
+  CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+  # original reference data
+  REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
+  # generated reference data using the new atomic file 
+  REF2_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data.h5
+  PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
+                --generate-reference
+  CACHE_NUMBER: 1
+
+defaults:
+      run:
+        shell: bash -l {0}
+
+jobs:
+  carsus-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: carsus/
+        
+      - name: Clone tardis-sn/carsus-data-cmfgen
+        uses: actions/checkout@v3
+        with:
+          repository: tardis-sn/carsus-data-cmfgen
+          path: carsus-data-cmfgen
+
+      - name: Download CMFGEN database
+        run: |
+            cp -r carsus-data-cmfgen/atomic /tmp/
+
+      - name: Setup carsus environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            environment-file: carsus/carsus_env3.yml
+            activate-environment: carsus
+            use-mamba: true
+
+      - name: Install package
+        run: pip install -e carsus/
+
+      - name: Run notebooks
+        run: |
+          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/tardis_atomdata_ref.ipynb
+        env:
+          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
+        
+      - name: Upload Atom Data
+        uses: actions/upload-artifact@v2
+        with:
+          name: atom-data
+          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
+  
+  tardis-build:
+    needs: carsus-build
+    runs-on: ubuntu-latest
+    outputs:
+      step-ref-check-trig: ${{ steps.ref-equal-check.outcome }} # success or failure of refdata comparison
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: tardis-sn/tardis
+        
+      - name: Download refdata_compare notebook
+        run: wget https://raw.githubusercontent.com/tardis-sn/tardis-refdata/master/notebooks/ref_data_compare_from_paths.ipynb
+        
+      - name: Clone tardis-sn/tardis-refdata
+        uses: actions/checkout@v2
+        with:
+          repository: tardis-sn/tardis-refdata
+          path: tardis-refdata
+
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+        working-directory: tardis-refdata
+
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: tardis-refdata/.git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v${{ env.CACHE_NUMBER }}
+
+      - name: Git LFS Pull
+        run: git lfs pull
+        working-directory: tardis-refdata
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+
+      - name: Git LFS Checkout
+        run: git lfs checkout
+        working-directory: tardis-refdata
+        if: steps.lfs-cache.outputs.cache-hit == 'true'
+
+      - name: Setup TARDIS environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            activate-environment: tardis
+            use-mamba: true
+
+      - name: Update environment
+        run: mamba update -n tardis --file conda-linux-64.lock
+
+      - name: Install bokeh
+        run: mamba install bokeh --channel conda-forge --no-update-deps --yes
+
+      - name: Install package
+        run: pip install -e .
+        
+      - name: Download atom data
+        uses: actions/download-artifact@v2
+        with:
+          name: atom-data
+          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
+      
+      - name: Replace Atomic Data
+        run: cp carsus/docs/kurucz_cd23_chianti_H_He.h5/kurucz_cd23_chianti_H_He.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
+      
+      - name: Generate Reference Data Copy
+        run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
+
+      - name: Generate New Reference Data
+        run:  pytest tardis ${{ env.PYTEST_FLAGS }}
+
+      - name: Compare Reference Data
+        run: |
+            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} ref_data_compare_from_paths.ipynb
+      
+      - name: Upload comparison notebook
+        uses: actions/upload-artifact@v2
+        with:
+          name: Comparison Notebook
+          path: ref_data_compare_from_paths.html
+      
+      - name: Check if reference data are equal
+        id: ref-equal-check
+        continue-on-error: true
+        run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
+
+      # continue-on-error check would display a green tick even when the step passes
+      # but is necessary for other steps to run
+      # if the workflow was called by save-atomic-files workflow(the only other option)
+      # and refdata comparison failed this workflow would pass but the 
+      # bridge-ref-check job in save-atomic-files about refdata comparison would fail
+      - name: Fail the workflow if reference data check fails
+        if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
+        run: exit 1
