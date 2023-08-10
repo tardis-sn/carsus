@@ -69,7 +69,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--runslow", 
         action="store_true", 
-        default=False,
+        default=True,
         help="include running slow tests during run"
     )
     parser.addoption(
