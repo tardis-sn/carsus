@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 from pathlib import Path
 import subprocess
@@ -7,6 +9,8 @@ DECAY_DATA_SOURCE_DIR = Path.home() / "Downloads" / "carsus-data-nndc"
 DECAY_DATA_FINAL_DIR = Path.home() / "Downloads" / "tardis-data" / "decay-data"
 
 NNDC_SOURCE_URL = "https://github.com/tardis-sn/carsus-data-nndc"
+
+logger = logging.getLogger(__name__)
 
 
 class NNDCReader:
@@ -34,9 +38,12 @@ class NNDCReader:
         if dirname is None:
             if remote:
                 subprocess.run(['git', 'clone', NNDC_SOURCE_URL, DECAY_DATA_SOURCE_DIR])
+                logger.info(f"Downloading NNDC decay data from {NNDC_SOURCE_URL}")
             self.dirname = Path().joinpath(DECAY_DATA_SOURCE_DIR, "csv")
         else:
             self.dirname = dirname
+
+        logger.info(f"Parsing decay data from: {DECAY_DATA_SOURCE_DIR}/csv")
 
         self._decay_data = None
 

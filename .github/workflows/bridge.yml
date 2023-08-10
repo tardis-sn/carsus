@@ -1,11 +1,11 @@
 name: tardis-carsus-bridge
 
 on: 
-  workflow_call: # to be called by save_atomic_files workflow
+  workflow_call: 
     outputs:
       ref-check-trig:
         value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
-  workflow_dispatch: # for running manually
+  workflow_dispatch: 
 
         
 env:
@@ -13,8 +13,8 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
-  CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
-  CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+  #CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
+  #CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
   # original reference data
   REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
   # generated reference data using the new atomic file 
@@ -34,31 +34,43 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: carsus/
-        
+          
       - uses: actions/cache@v2
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
         id: chianti-cache
-
+          
       - name: Download Chianti database
         run: |
             mkdir -p ${{ env.XUVTOP }}
             wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
-      
-      - uses: actions/cache@v2
+            
+      - name: Cache carsus-data-cmfgen
+        uses: actions/cache@v2
         with:
-          path: /tmp/atomic
-          key: ${{ env.CMFGEN_DB_VER }}
+          path: cloned-repo-carsus-data-cmfgen
+          key: ${{ runner.os }}-cache-${{ hashFiles('cloned-repo-carsus-data-cmfgen/**/*') }}
         id: cmfgen-cache
-
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
+            
+      - name: Clone carsus-data-cmfgen
+        run: | 
+          git clone https://github.com/tardis-sn/carsus-data-cmfgen cloned-repo-carsus-data-cmfgen
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+
+      - name: Cache Cloned carsus-data-kurucz
+        uses: actions/cache@v2
+        with:
+          path: cloned-repo-carsus-data-kurucz
+          key: ${{ runner.os }}-cache-${{ hashFiles('cloned-repo-carsus-data-kurucz/**/*') }}
+        id: kurucz-cache
+
+      - name: Clone Repo carsus-data-kurucz
+        run: |
+          git clone https://github.com/tardis-sn/carsus-data-kurucz cloned-repo-carsus-data-kurucz
+        if: steps.kurucz-cache.outputs.cache-hit != 'true'
 
       - name: Setup carsus environment
         uses: conda-incubator/setup-miniconda@v2
