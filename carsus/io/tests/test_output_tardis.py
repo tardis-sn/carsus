@@ -10,10 +10,6 @@ from carsus.io.output.tardis_ import AtomData
 from carsus.model import DataSource, Ion
 
 
-# with_test_db = pytest.mark.skipif(
-#     not pytest.config.getoption("--test-db"),
-#     reason="--testing database was not specified"
-# )
 
 @pytest.fixture
 def atom_data(test_session, chianti_short_name):

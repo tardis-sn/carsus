@@ -107,7 +107,7 @@ jobs:
         run: pip install -e .
 
       - name: Run tests
-        run: pytest carsus ${{ env.PYTEST_FLAGS }} -vvv
+        run: pytest carsus ${{ env.PYTEST_FLAGS }}
 
       - name: Run notebooks
         run: |

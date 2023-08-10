@@ -14,9 +14,6 @@ from carsus.io.cmfgen import (
 
 from carsus.io.cmfgen.util import *
 
-# with_refdata = pytest.mark.skipif(
-#     not pytest.config.getoption("--refdata"), reason="--refdata folder not specified"
-# )
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 
 

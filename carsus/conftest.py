@@ -67,7 +67,10 @@ from carsus import init_db
 
 def pytest_addoption(parser):
     parser.addoption(
-        "--runslow", action="store_true", help="include running slow tests during run"
+        "--runslow", 
+        action="store_true", 
+        default=False,
+        help="include running slow tests during run"
     )
     parser.addoption(
         "--test-db",
@@ -78,23 +81,6 @@ def pytest_addoption(parser):
     parser.addoption(
         "--refdata", dest="refdata", default=None, help="carsus-refdata folder location"
     )
-
-
-# @pytest.fixture
-# def withtestdb(request):
-#     return request.config.getoption("--test-db")
-
-# @pytest.fixture
-# def withrefdata(request):
-#     return request.config.getoption("--refdata")
-
-# @pytest.fixture
-# def runslow(request):
-#     return request.config.getoption("--runslow")
-
-
-# def pytest_configure(config):
-#     config.addinivalue_line("markers", "slow: mark test as slow to run")
 
 
 def pytest_collection_modifyitems(config, items):
