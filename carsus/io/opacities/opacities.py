@@ -15,7 +15,7 @@ class HMINUSOPACITIESReader(object):
 
     Attributes
     ----------
-    fname: path to h_minus_cross_section_wbr.dat
+    fname : path to h_minus_cross_section_wbr.dat
 
     Methods
     --------
@@ -30,7 +30,7 @@ class HMINUSOPACITIESReader(object):
         """
         Parameters
         ----------
-        fname: str
+        fname : str
             Path to the h_minus file (http or local file).
         """
 
@@ -53,13 +53,13 @@ class HMINUSOPACITIESReader(object):
 
         Parameters
         ----------
-        fname: ~str
+        fname : ~str
             path to h_minus_cross_section_wbr.dat
 
         Returns
         -------
             pandas.DataFrame
-                pandas Dataframe represenation of h_minus
+                pandas Dataframe representation of h_minus
 
             str
                 MD5 checksum
