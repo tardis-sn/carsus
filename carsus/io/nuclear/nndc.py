@@ -37,8 +37,12 @@ class NNDCReader:
         """
         if dirname is None:
             if remote:
-                subprocess.run(['git', 'clone', NNDC_SOURCE_URL, DECAY_DATA_SOURCE_DIR])
-                logger.info(f"Downloading NNDC decay data from {NNDC_SOURCE_URL}")
+                try:
+                    subprocess.run(['git', 'clone', NNDC_SOURCE_URL, DECAY_DATA_SOURCE_DIR], check=True)
+                    logger.info(f"Downloading NNDC decay data from {NNDC_SOURCE_URL}")
+                except subprocess.CalledProcessError:
+                    logger.warning(f"Failed to clone the repository.\n"
+                                   "Check if the repository already exists at {DECAY_DATA_SOURCE_DIR}")
             self.dirname = DECAY_DATA_SOURCE_DIR / "csv"
         else:
             self.dirname = dirname
