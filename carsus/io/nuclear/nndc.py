@@ -39,7 +39,7 @@ class NNDCReader:
             if remote:
                 subprocess.run(['git', 'clone', NNDC_SOURCE_URL, DECAY_DATA_SOURCE_DIR])
                 logger.info(f"Downloading NNDC decay data from {NNDC_SOURCE_URL}")
-            self.dirname = Path().joinpath(DECAY_DATA_SOURCE_DIR, "csv")
+            self.dirname = DECAY_DATA_SOURCE_DIR / "csv"
         else:
             self.dirname = dirname
 
