@@ -11,16 +11,16 @@ logger = logging.getLogger(__name__)
 
 class HMINUSOPACITIESReader(object):
     """
-    Class for extracting wavelengths and cross-section from h-minus opacities data files
+    Class for extracting wavelengths and cross-section from h minus opacities data files
 
     Attributes
     ----------
-    fname : path to h_minus_cross_section_wbr.dat
+    fname : path to h minus opacity file
 
     Methods
     --------
-    h_minus_raw:
-        Return pandas DataFrame representation of h_minus_cross_section_wbr
+    h_minus:
+        Return pandas DataFrame representation of h minus opacity data
 
     """
 
@@ -31,7 +31,7 @@ class HMINUSOPACITIESReader(object):
         Parameters
         ----------
         fname : str
-            Path to the h_minus file (http or local file).
+            Path to h minus opacity file (http or local file).
         """
 
         if fname is None:
@@ -49,12 +49,12 @@ class HMINUSOPACITIESReader(object):
 
     def read_h_minus(self, fname=None):
         """
-        Reading in a normal h_minus_cross_section_wbr.dat
+        Reading in a normal h minus opacity file
 
         Parameters
         ----------
         fname : ~str
-            path to h_minus_cross_section_wbr.dat
+            path to h minus opacity file
 
         Returns
         -------
