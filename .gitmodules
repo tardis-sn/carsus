@@ -1,0 +1,3 @@
+[submodule "carsus/io/tests/carsus-data-cmfgen"]
+	path = carsus/io/tests/carsus-data-cmfgen
+	url = https://github.com/tardis-sn/carsus-data-cmfgen
