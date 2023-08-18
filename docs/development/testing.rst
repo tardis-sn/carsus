@@ -20,8 +20,6 @@ A set of flags can be appended to the above command to run different kinds of te
 - `--remote-data`
     Run tests marked with the ``@pytest.mark.remote_data`` decorator. Requires an internet connection.
 
-- `--runslow`
-    Run tests marked with the ``@slow`` decorator.
 
 - `--test-db=/path/to/carsus-db/test_databases/test.db`
     Run test for the Carsus SQL output module. Requires data from the
