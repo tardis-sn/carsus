@@ -68,7 +68,8 @@ from carsus import init_db
 def pytest_addoption(parser):
     parser.addoption(
         "--runslow", 
-        default=True,
+        action="store_true",
+        default=False,
         help="include running slow tests during run"
     )
     parser.addoption(
