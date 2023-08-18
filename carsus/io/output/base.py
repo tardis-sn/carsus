@@ -1033,7 +1033,9 @@ class TARDISAtomData:
             f.put('/macro_atom_data', self.macro_atom_prepared)
             f.put('/macro_atom_references',
                   self.macro_atom_references_prepared)
-            f.put('/nuclear_decay_rad', self.nndc_reader.decay_data)
+
+            if hasattr(self.nndc_reader, 'decay_data'):
+                f.put('/nuclear_decay_rad', self.nndc_reader.decay_data)
 
             if hasattr(self, 'collisions'):
                 f.put('/collisions_data', self.collisions_prepared)
