@@ -78,4 +78,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_cmfgen_Si.h5
+          path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
