@@ -50,7 +50,7 @@ def download_ionization_energies(
         unc_out=True,
         biblio=False):
     """
-        Downloader function for the Ionization Energies Data from the NIST Atomic Spectra Database
+        Downloader function for the Ionization Energies Data
         Parameters
         ----------
         spectra: str
@@ -96,7 +96,7 @@ def download_ionization_energies(
 
 class NISTIonizationEnergiesParser(BaseParser):
     """
-        Class for parsers for the Ionization Energies Data from the NIST Atomic Spectra Database
+        Class for parsers for the Ionization Energies Data from the NIST Atomic Spectra
         Attributes
         ----------
         base : pandas.DataFrame
@@ -221,7 +221,7 @@ class NISTIonizationEnergiesParser(BaseParser):
 
 class NISTIonizationEnergiesIngester(BaseIngester):
     """
-        Class for ingesters for the Ionization Energies Data from the NIST Atomic Spectra Database
+        Class for ingesters for the Ionization Energies Data
         Attributes
         ----------
         session: SQLAlchemy session
@@ -340,7 +340,7 @@ class NISTIonizationEnergies(BaseParser):
     base : pandas.Series
     version : str
     """
-    def __init__(self, spectra, nist_url=True):
+    def __init__(self, spectra, nist_url=False):
         input_data = download_ionization_energies(nist_url=nist_url,spectra=spectra)
         self.parser = NISTIonizationEnergiesParser(input_data=input_data)
         self._prepare_data()
