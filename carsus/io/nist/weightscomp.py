@@ -4,20 +4,26 @@ http://www.nist.gov/pml/data/comp.cfm
 """
 
 import logging
-import requests
-import pandas as pd
 
-from bs4 import BeautifulSoup
+import pandas as pd
+import requests
 from astropy import units as u
+from bs4 import BeautifulSoup
+
 from carsus.base import basic_atomic_data_fname
+from carsus.io.base import BaseIngester, BaseParser, BasePyparser
+from carsus.io.nist.weightscomp_grammar import (AM_SD_COL, AM_VAL_COL,
+                                                ATOM_NUM_COL, ATOM_WEIGHT_COLS,
+                                                AW_LWR_BND_COL, AW_SD_COL,
+                                                AW_STABLE_MASS_NUM_COL,
+                                                AW_TYPE_COL, AW_UPR_BND_COL,
+                                                AW_VAL_COL, COLUMNS, INTERVAL,
+                                                MASS_NUM_COL, STABLE_MASS_NUM,
+                                                isotope)
+from carsus.io.util import retry_request, to_nom_val_and_std_dev
 from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
-from carsus.io.base import BasePyparser, BaseIngester, BaseParser
-from carsus.io.util import to_nom_val_and_std_dev, retry_request
 from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
-from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, MASS_NUM_COL,\
-    AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
-    AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
 
 logger = logging.getLogger(__name__)
 
