@@ -4,28 +4,36 @@ http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 """
 
 import logging
-import requests
+import os
+from io import StringIO
+
 import numpy as np
 import pandas as pd
-
-from bs4 import BeautifulSoup
-from io import StringIO
+import requests
 from astropy import units as u
-from uncertainties import ufloat_fromstr
+from bs4 import BeautifulSoup
 from pyparsing import ParseException
-from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
-from carsus.io.base import BaseParser, BaseIngester
+
+import carsus
+from carsus.io.base import BaseIngester, BaseParser
 from carsus.io.nist.ionization_grammar import level
-from carsus.util import convert_atomic_number2symbol
 from carsus.io.util import retry_request
+from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
+from carsus.util import convert_atomic_number2symbol
+from uncertainties import ufloat_fromstr
 
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
 
+carsus_data_nist_ionization_url = 'https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/ionization_energies.html'
+
 logger = logging.getLogger(__name__)
 
+basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
+basic_atomic_data =pd.read_csv(basic_atomic_data_fname)
 
 def download_ionization_energies(
+        nist_url,
         spectra='h-uuh',
         e_out=0,
         e_unit=1,
@@ -62,9 +70,28 @@ def download_ionization_energies(
     data = {k: v for k, v in data.items() if v is not False}
     data = {k:"on" if v is True else v for k, v in data.items()}
 
-    logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
-    r = retry_request(url=IONIZATION_ENERGIES_URL, method="post", data=data)
-    return r.text
+    if nist_url is False:
+        logger.info("Downloading ionization energies from the carsus-data-nist repo.")     
+        atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
+
+        atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
+        if atomic_numbers is None:
+            return "Invalid atomic name"
+
+        max_atomic_number = max(atomic_numbers)
+        response = requests.get(carsus_data_nist_ionization_url, verify=False)
+        carsus_data = response.text
+        extracted_content = []
+        for line in carsus_data.split('\n'):
+            if f' {max_atomic_number + 1} ' in line:
+                break
+            extracted_content.append(line)      
+        return '\n'.join(extracted_content)
+    
+    elif nist_url is True:
+        logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
+        r = retry_request(url=IONIZATION_ENERGIES_URL, method="post", data=data)
+        return r.text
 
 
 class NISTIonizationEnergiesParser(BaseParser):
@@ -313,9 +340,9 @@ class NISTIonizationEnergies(BaseParser):
     base : pandas.Series
     version : str
     """
-    def __init__(self, spectra):
-        input_data = download_ionization_energies(spectra)
-        self.parser = NISTIonizationEnergiesParser(input_data)
+    def __init__(self, spectra, nist_url=True):
+        input_data = download_ionization_energies(nist_url=nist_url,spectra=spectra)
+        self.parser = NISTIonizationEnergiesParser(input_data=input_data)
         self._prepare_data()
         self._get_version()
 

@@ -66,7 +66,7 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
             
 class NISTWeightsCompPyparser(BasePyparser):
     """
-    Class for parsers for the NIST Atomic Weights and Isotopic Compositions database
+    Class for parsers for the NIST Atomic Weights and Isotopic Compositions
 
     Attributes
     ----------
@@ -139,7 +139,7 @@ class NISTWeightsCompPyparser(BasePyparser):
 
 class NISTWeightsCompIngester(BaseIngester):
     """
-    Class for ingesters for the NIST Atomic Weights and Isotopic Compositions database
+    Class for ingesters for the NIST Atomic Weights and Isotopic Compositions
 
     Attributes
     ----------
