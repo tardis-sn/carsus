@@ -50,9 +50,12 @@ def download_ionization_energies(
         unc_out=True,
         biblio=False):
     """
-        Downloader function for the Ionization Energies Data
+        Downloads ionization energies data from the NIST Atomic Spectra Database
         Parameters
         ----------
+        nist_url: Bool
+            If False or None, downloads data from the carsus-dat-nist repository,
+            else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
         spectra: str
             (default value = 'h-uuh')
         Returns
@@ -70,7 +73,7 @@ def download_ionization_energies(
     data = {k: v for k, v in data.items() if v is not False}
     data = {k:"on" if v is True else v for k, v in data.items()}
 
-    if nist_url is False:
+    if not nist_url:
         logger.info("Downloading ionization energies from the carsus-data-nist repo.")     
         atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
 
@@ -88,7 +91,7 @@ def download_ionization_energies(
             extracted_content.append(line)      
         return '\n'.join(extracted_content)
     
-    elif nist_url is True:
+    else:
         logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
         r = retry_request(url=IONIZATION_ENERGIES_URL, method="post", data=data)
         return r.text

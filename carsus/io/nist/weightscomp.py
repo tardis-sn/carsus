@@ -39,7 +39,7 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
 
     Parameters
     ----------
-    url: Bool
+    nist_url: Bool
         If False or None, downloads data from the carsus-dat-nist repository,
         else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
     ascii: str
@@ -56,12 +56,12 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
 
     """
 
-    if nist_url is False:
+    if not nist_url:
             logger.info("Downloading data from the carsus-dat-nist repository")
             response = requests.get(carsus_data_nist_weights, verify=False)
             data = response.text
             return data
-    elif nist_url is True: 
+    else: 
             logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
             r = retry_request(WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
             soup = BeautifulSoup(r.text, 'html5lib')
