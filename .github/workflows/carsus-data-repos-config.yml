@@ -28,16 +28,19 @@ jobs:
         uses: actions/cache@v3
         with:
           path: carsus-data-kurucz
-          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-kurucz/**/*.lock') }}
+          key: ${{ runner.os }}-cache-${{ hashFiles('ccarsus-data-kurucz/**/*.lock') }}
 
       - name: Restore cache
         uses: actions/cache@v3
         with:
           path: carsus-data-nist
           key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-nist/**/*.lock') }}
+
+
+      - run: |
+          ls
         
       - run: |
-          - run: |
           for repo in carsus-data-cmfgen carsus-data-kurucz carsus-data-nist; do
             repo_path="$repo"
             echo "Checking for repository $repo_path..."        
@@ -51,7 +54,8 @@ jobs:
               cd ..
             fi
           done
-
+      - run: |
+            ls
       - name: Setup carsus environment
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -63,6 +67,17 @@ jobs:
 
       - name: Install package
         run: pip install -e carsus/
+
+      - run: |
+          current_dir="${PWD}"
+          echo "curent: $current_dir"
+          #cd carsus-data-cmfgen/atomic/HYD/I
+          ls
+          cd carsus/
+          ls
+          #cd ../../carsus-data-nist
+          #echo "carsus-data-nist"
+          #ls
           
       - name: Run notebooks
         run: |
