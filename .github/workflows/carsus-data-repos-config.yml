@@ -21,40 +21,36 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v3
         with:
-          path: cloned-repo-carsus-data-cmfgen
-          key: ${{ runner.os }}-cache-${{ hashFiles('cloned-repo-carsus-data-cmfgen/**/*.lock') }}
+          path: carsus-data-cmfgen
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-cmfgen/**/*.lock') }}
 
       - name: Restore cache
         uses: actions/cache@v3
         with:
-          path: cloned-repo-carsus-data-kurucz
-          key: ${{ runner.os }}-cache-${{ hashFiles('cloned-repo-carsus-data-kurucz/**/*.lock') }}
+          path: carsus-data-kurucz
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-kurucz/**/*.lock') }}
 
       - name: Restore cache
         uses: actions/cache@v3
         with:
-          path: cloned-repo-carsus-data-nist
-          key: ${{ runner.os }}-cache-${{ hashFiles('cloned-repo-carsus-data-nist/**/*.lock') }}
+          path: carsus-data-nist
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-nist/**/*.lock') }}
         
       - run: |
+          - run: |
           for repo in carsus-data-cmfgen carsus-data-kurucz carsus-data-nist; do
-            repo_path="cloned-repo-$repo"
-
-            if [ ! -d $repo_path ]] ; then
+            repo_path="$repo"
+            echo "Checking for repository $repo_path..."        
+            if [ ! -d $repo_path ] ; then
               echo "Cloning repository $repo..."
-              git clone https://github.com/tardis-sn/$repo $repo_path
-            fi
-
-            # check for changes and update
-            cd $repo_path
-            git fetch
-            if git diff origin/main --exit-code; then
-              echo "No changes found for $repo. Using existing clone."
-            else
+              git clone https://github.com/s-rathi/$repo $repo_path     
+            else                               
+              cd $repo_path
+              git fetch
               git checkout origin/main
-              echo "Repository $repo updated. Checked out latest changes."
+              cd ..
             fi
-          done
+          done- run: |
 
       - name: Setup carsus environment
         uses: conda-incubator/setup-miniconda@v2
