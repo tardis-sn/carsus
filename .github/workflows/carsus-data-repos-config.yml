@@ -50,7 +50,7 @@ jobs:
               git checkout origin/main
               cd ..
             fi
-          done- run: |
+          done
 
       - name: Setup carsus environment
         uses: conda-incubator/setup-miniconda@v2
