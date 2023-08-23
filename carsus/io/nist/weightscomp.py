@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
 WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
-carsus_data_nist_weights = "https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/weights.html"
+CARSUS_DATA_NIST_WEIGHTS_URL = "https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/weights.html"
 
 def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
     """
@@ -39,7 +39,7 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
 
     Parameters
     ----------
-    nist_url: Bool
+    nist_url: bool
         If False or None, downloads data from the carsus-dat-nist repository,
         else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
     ascii: str
@@ -57,17 +57,17 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
     """
 
     if not nist_url:
-            logger.info("Downloading data from the carsus-dat-nist repository")
-            response = requests.get(carsus_data_nist_weights, verify=False)
-            data = response.text
-            return data
+        logger.info("Downloading data from the carsus-dat-nist repository")
+        response = requests.get(CARSUS_DATA_NIST_WEIGHTS_URL, verify=False)
+        data = response.text
+        return data
     else: 
-            logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
-            r = retry_request(WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
-            soup = BeautifulSoup(r.text, 'html5lib')
-            pre_text_data = soup.pre.get_text()
-            pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
-            return pre_text_data
+        logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
+        r = retry_request(WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
+        soup = BeautifulSoup(r.text, 'html5lib')
+        pre_text_data = soup.pre.get_text()
+        pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
+        return pre_text_data
 
             
 class NISTWeightsCompPyparser(BasePyparser):

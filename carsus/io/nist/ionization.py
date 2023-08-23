@@ -25,7 +25,7 @@ from uncertainties import ufloat_fromstr
 IONIZATION_ENERGIES_URL = 'https://physics.nist.gov/cgi-bin/ASD/ie.pl'
 IONIZATION_ENERGIES_VERSION_URL = 'https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml'
 
-carsus_data_nist_ionization_url = 'https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/ionization_energies.html'
+CARSUS_DATA_NIST_IONIZATION_URL = 'https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/ionization_energies.html'
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ def download_ionization_energies(
         Downloads ionization energies data from the NIST Atomic Spectra Database
         Parameters
         ----------
-        nist_url: Bool
+        nist_url: bool
             If False or None, downloads data from the carsus-dat-nist repository,
             else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
         spectra: str
@@ -74,7 +74,10 @@ def download_ionization_energies(
     data = {k:"on" if v is True else v for k, v in data.items()}
 
     if not nist_url:
-        logger.info("Downloading ionization energies from the carsus-data-nist repo.")     
+        logger.info("Downloading ionization energies from the carsus-data-nist repo.")
+        basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
+        basic_atomic_data =pd.read_csv(basic_atomic_data_fname)     
+        
         atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
 
         atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
@@ -82,7 +85,7 @@ def download_ionization_energies(
             return "Invalid atomic name"
 
         max_atomic_number = max(atomic_numbers)
-        response = requests.get(carsus_data_nist_ionization_url, verify=False)
+        response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
         carsus_data = response.text
         extracted_content = []
         for line in carsus_data.split('\n'):
