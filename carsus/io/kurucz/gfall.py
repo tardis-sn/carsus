@@ -13,6 +13,7 @@ from carsus.io.util import read_from_buffer
 
 
 GFALL_URL = 'https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/gfall/gfall_latest.dat'
+CARSUS_DATA_GFALL_URL = 'https://github.com/s-rathi/carsus-data-kurucz/raw/main/linelists/gfall/gfall.dat'
 GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ class GFALLReader(object):
         """
 
         if fname is None:
-            self.fname = GFALL_URL
+            self.fname = CARSUS_DATA_GFALL_URL
         else:
             self.fname = fname
 
@@ -395,7 +396,7 @@ class GFALLReader(object):
 
 class GFALLIngester(object):
     """
-        Class for ingesting data from kurucz dfall files
+        Class for ingesting data from kurucz gfall files 
 
         Attributes
         ----------
@@ -421,7 +422,7 @@ class GFALLIngester(object):
         self.session = session
         
         if fname is None:
-            self.fname = GFALL_URL
+            self.fname = CARSUS_DATA_GFALL_URL
         else:
             self.fname = fname
         
