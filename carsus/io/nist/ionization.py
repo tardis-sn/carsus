@@ -348,7 +348,7 @@ class NISTIonizationEnergies(BaseParser):
     base : pandas.Series
     version : str
     """
-    def __init__(self, spectra, nist_url):
+    def __init__(self, spectra='h-uuh', nist_url=False):
         input_data = download_ionization_energies(spectra=spectra, nist_url=nist_url)
         self.parser = NISTIonizationEnergiesParser(input_data=input_data)
         self._prepare_data()
