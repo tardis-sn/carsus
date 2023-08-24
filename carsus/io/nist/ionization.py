@@ -78,10 +78,10 @@ def download_ionization_energies(
             return response.text
         else:
             basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
-            basic_atomic_data =pd.read_csv(basic_atomic_data_fname)                 
+            basic_atomic_data =pd.read_csv(basic_atomic_data_fname)                             
             atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
-
             atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
+            
             if atomic_numbers is None:
                 return "Invalid atomic name"
 
