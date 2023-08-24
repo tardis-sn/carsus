@@ -216,7 +216,7 @@ class NISTWeightsComp(BaseParser):
     version : str
     """
 
-    def __init__(self, atoms='H-Pu', nist_url=False,):
+    def __init__(self, atoms='H-Pu', nist_url=False):
         input_data =  download_weightscomp(nist_url)
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
