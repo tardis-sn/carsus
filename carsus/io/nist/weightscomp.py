@@ -31,7 +31,7 @@ WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
 WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
 CARSUS_DATA_NIST_WEIGHTS_URL = "https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/weights.html"
 
-def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
+def download_weightscomp(nist_url=False, ascii='ascii2', isotype='some'):
     """
     Downloader function for the NIST Atomic Weights and Isotopic Compositions database
 
@@ -40,7 +40,7 @@ def download_weightscomp(nist_url, ascii='ascii2', isotype='some'):
     Parameters
     ----------
     nist_url: bool
-        If False or None, downloads data from the carsus-dat-nist repository,
+        If False, downloads data from the carsus-dat-nist repository,
         else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
     ascii: str
         GET request parameter, refer to the NIST docs
@@ -170,16 +170,17 @@ class NISTWeightsCompIngester(BaseIngester):
 
     """
 
-    def __init__(self, session, ds_short_name="nist", parser=None, downloader=None):
+    def __init__(self, session, ds_short_name="nist", parser=None, downloader=None, nist_url=False):
         if parser is None:
             parser = NISTWeightsCompPyparser()
         if downloader is None:
             downloader = download_weightscomp
+        self.nist_url = nist_url
         super(NISTWeightsCompIngester, self).\
             __init__(session, ds_short_name, parser=parser, downloader=downloader)
 
     def download(self):
-        data = self.downloader()
+        data = self.downloader(nist_url=self.nist_url)
         self.parser(data)
 
     def ingest_atomic_weights(self, atomic_weights=None):
@@ -215,7 +216,7 @@ class NISTWeightsComp(BaseParser):
     version : str
     """
 
-    def __init__(self,atoms='H-Pu', nist_url=False ):
+    def __init__(self, nist_url, atoms='H-Pu'):
         input_data =  download_weightscomp(nist_url)
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)

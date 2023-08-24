@@ -29,11 +29,8 @@ CARSUS_DATA_NIST_IONIZATION_URL = 'https://raw.githubusercontent.com/s-rathi/car
 
 logger = logging.getLogger(__name__)
 
-basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
-basic_atomic_data =pd.read_csv(basic_atomic_data_fname)
 
 def download_ionization_energies(
-        nist_url,
         spectra='h-uuh',
         e_out=0,
         e_unit=1,
@@ -48,13 +45,14 @@ def download_ionization_energies(
         level_out=True,
         ion_conf_out=False,
         unc_out=True,
-        biblio=False):
+        biblio=False,
+        nist_url=False):
     """
         Downloads ionization energies data from the NIST Atomic Spectra Database
         Parameters
         ----------
         nist_url: bool
-            If False or None, downloads data from the carsus-dat-nist repository,
+            If False, downloads data from the carsus-dat-nist repository,
             else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
         spectra: str
             (default value = 'h-uuh')
@@ -75,24 +73,27 @@ def download_ionization_energies(
 
     if not nist_url:
         logger.info("Downloading ionization energies from the carsus-data-nist repo.")
-        basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
-        basic_atomic_data =pd.read_csv(basic_atomic_data_fname)     
-        
-        atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
+        if spectra == 'h-uuh':
+            response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
+            return response.text
+        else:
+            basic_atomic_data_fname = os.path.join(carsus.__path__[0], 'data', 'basic_atomic_data.csv')
+            basic_atomic_data =pd.read_csv(basic_atomic_data_fname)                 
+            atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
 
-        atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
-        if atomic_numbers is None:
-            return "Invalid atomic name"
+            atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
+            if atomic_numbers is None:
+                return "Invalid atomic name"
 
-        max_atomic_number = max(atomic_numbers)
-        response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
-        carsus_data = response.text
-        extracted_content = []
-        for line in carsus_data.split('\n'):
-            if f' {max_atomic_number + 1} ' in line:
-                break
-            extracted_content.append(line)      
-        return '\n'.join(extracted_content)
+            max_atomic_number = max(atomic_numbers)
+            response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
+            carsus_data = response.text
+            extracted_content = []
+            for line in carsus_data.split('\n'):
+                if f' {max_atomic_number + 1} ' in line:
+                    break
+                extracted_content.append(line)      
+            return '\n'.join(extracted_content)
     
     else:
         logger.info("Downloading ionization energies from the NIST Atomic Spectra Database.")
@@ -251,17 +252,18 @@ class NISTIonizationEnergiesIngester(BaseIngester):
             Persists the downloaded data into the database
         """
 
-    def __init__(self, session, ds_short_name="nist-asd", downloader=None, parser=None, spectra="h-uuh"):
+    def __init__(self, session, ds_short_name="nist-asd", downloader=None, parser=None, spectra="h-uuh", nist_url=False):
         if parser is None:
             parser = NISTIonizationEnergiesParser()
         if downloader is None:
             downloader = download_ionization_energies
         self.spectra = spectra
+        self.nist_url = nist_url
         super(NISTIonizationEnergiesIngester, self). \
             __init__(session, ds_short_name=ds_short_name, parser=parser, downloader=downloader)
 
     def download(self):
-        data = self.downloader(spectra=self.spectra)
+        data = self.downloader(spectra=self.spectra, nist_url=self.nist_url)
         self.parser(data)
 
     def ingest_ionization_energies(self, ioniz_energies=None):
@@ -346,8 +348,8 @@ class NISTIonizationEnergies(BaseParser):
     base : pandas.Series
     version : str
     """
-    def __init__(self, spectra, nist_url=False):
-        input_data = download_ionization_energies(nist_url=nist_url,spectra=spectra)
+    def __init__(self, spectra, nist_url):
+        input_data = download_ionization_energies(spectra=spectra, nist_url=nist_url)
         self.parser = NISTIonizationEnergiesParser(input_data=input_data)
         self._prepare_data()
         self._get_version()
