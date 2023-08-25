@@ -130,6 +130,7 @@ class NNDCReader:
 
         decay_data.set_index(['Isotope'], inplace=True)
         decay_data.drop(['index'], axis=1, inplace=True)
+        decay_data=decay_data.sort(['A', 'Z'])
 
         return decay_data
 
