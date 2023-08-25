@@ -166,15 +166,27 @@ def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
 
 
 @pytest.mark.array_compare
-@pytest.mark.parametrize("hyd_gaunt_energy_grid_ryd", [{1: list(range(1, 3))}])
+@pytest.mark.parametrize("hyd_gaunt_energy_grid_ryd", [{1: list(range(1, 4))}])
 @pytest.mark.parametrize("hyd_gaunt_factor", [{1: list(range(3, 6))}])
 @pytest.mark.parametrize("threshold_energy_ryd", [0.5])
 @pytest.mark.parametrize("n", [1])
+@pytest.mark.parametrize("hyd_n_phixs_stop2start_energy_ratio", [20])
+@pytest.mark.parametrize("hyd_n_phixs_num_points", [20])
 def test_get_hydrogenic_n_phixs_table(
-    hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
+    hyd_gaunt_energy_grid_ryd,
+    hyd_gaunt_factor,
+    threshold_energy_ryd,
+    n,
+    hyd_n_phixs_stop2start_energy_ratio,
+    hyd_n_phixs_num_points,
 ):
     hydrogenic_n_phixs_table = get_hydrogenic_n_phixs_table(
-        hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n
+        hyd_gaunt_energy_grid_ryd,
+        hyd_gaunt_factor,
+        threshold_energy_ryd,
+        n,
+        hyd_n_phixs_stop2start_energy_ratio,
+        hyd_n_phixs_num_points,
     )
     return hydrogenic_n_phixs_table
 
