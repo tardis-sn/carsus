@@ -82,8 +82,8 @@ def download_ionization_energies(
             atomic_number_mapping = dict(zip(basic_atomic_data['symbol'], basic_atomic_data['atomic_number']))
             atomic_numbers = [atomic_number_mapping.get(name) for name in spectra.split('-')]
             
-            if atomic_numbers is None:
-                return "Invalid atomic name"
+            if None in atomic_numbers:
+                raise ValueError("Invalid atomic name")
 
             max_atomic_number = max(atomic_numbers)
             response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
