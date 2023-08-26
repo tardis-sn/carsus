@@ -12,7 +12,7 @@ from carsus.util import convert_atomic_number2symbol, parse_selected_species
 from carsus.io.util import read_from_buffer
 
 
-CARSUS_DATA_GFALL_URL = 'https://github.com/s-rathi/carsus-data-kurucz/raw/main/linelists/gfall/gfall.dat'
+CARSUS_DATA_GFALL_URL = 'https://github.com/s-rathi/carsus-data-kurucz/raw/main/linelists/gfall/gfall.dat?raw=true'
 GFALL_AIR_THRESHOLD = 200  # [nm], wavelengths above this value are given in air
 
 logger = logging.getLogger(__name__)
