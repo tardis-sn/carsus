@@ -8,6 +8,10 @@ on:
   push:
     branches:
     - '*'
+    
+  pull_request_target:
+    branches:
+      - master
 
   workflow_dispatch:
   schedule:
@@ -40,10 +44,10 @@ jobs:
     if: github.ref == 'refs/heads/master' ||
         github.event_name == 'workflow_dispatch' ||
         contains(github.ref, 'doc') ||
-        contains(github.event.head_commit.message, '[build docs]') ||
-        contains(github.event.head_commit.message, '[build_docs]') ||
-        contains(github.event.head_commit.message, '[build doc]') ||
-        contains(github.event.head_commit.message, '[build_doc]')
+        contains(github.event.pull_request.labels.*.name, '[build docs]') ||
+        contains(github.event.pull_request.labels.*.name, '[build_docs]') ||
+        contains(github.event.pull_request.labels.*.name, '[build doc]') ||
+        contains(github.event.pull_request.labels.*.name, '[build_doc]')
 
     runs-on: ubuntu-latest
     steps:
@@ -146,10 +150,10 @@ jobs:
         github.ref != 'refs/heads/master' && (
         github.event_name == 'workflow_dispatch' ||
         contains(github.ref, 'doc') ||
-        contains(github.event.head_commit.message, '[build docs]') ||
-        contains(github.event.head_commit.message, '[build_docs]') ||
-        contains(github.event.head_commit.message, '[build doc]') ||
-        contains(github.event.head_commit.message, '[build_doc]'))
+        contains(github.event.pull_request.labels.*.name, '[build-docs]') ||
+        contains(github.event.pull_request.labels.*.name, '[build_docs]') ||
+        contains(github.event.pull_request.labels.*.name, '[build doc]') ||
+        contains(github.event.pull_request.labels.*.name, '[build_doc]'))
 
     runs-on: ubuntu-latest
     steps:
