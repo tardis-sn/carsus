@@ -128,8 +128,8 @@ class NNDCReader:
 
         decay_data = self._add_metastable_column(decay_data_raw)
 
-        decay_data.set_index(['Isotope'], inplace=True)
-        decay_data.drop(['index'], axis=1, inplace=True)
+        decay_data = decay_data.set_index(['Isotope']).drop(['index'], axis=1)
+        decay_data = decay_data.sort_values(by=decay_data.columns.tolist())
 
         return decay_data
 
