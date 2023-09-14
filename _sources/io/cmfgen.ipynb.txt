@@ -1,0 +1,323 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# CMFGEN\n",
+    "\n",
+    "Database from John Hillier’s CMFGEN, a radiative transfer code designed to solve the radiative transfer and statistical equilibrium equations in spherical geometry.\n",
+    "\n",
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Note:**\n",
+    "    \n",
+    "In this example, the data was downloaded from the [CMFGEN website](http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm) and extracted to the `/tmp/atomic` folder.\n",
+    "    \n",
+    "</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Parsers\n",
+    "\n",
+    "The CMFGEN parsers retrieves data from text files preserving its original form (no unit conversions) and stores it in DataFrames. Currently, just `osc`, `col` and `pho` files are supported.\n",
+    "\n",
+    "\n",
+    "### Levels, Lines and Collisions\n",
+    "\n",
+    "Energy levels and spectral lines are stored in the `osc` files, while collisions strengths are provided by the `col` files."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.cmfgen import CMFGENEnergyLevelsParser, CMFGENOscillatorStrengthsParser, CMFGENCollisionalStrengthsParser"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_lvl = CMFGENEnergyLevelsParser('/tmp/atomic/SIL/II/16sep15/si2_osc_kurucz')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_osc = CMFGENOscillatorStrengthsParser('/tmp/atomic/SIL/II/16sep15/si2_osc_kurucz')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_col = CMFGENCollisionalStrengthsParser('/tmp/atomic/SIL/II/16sep15/si2_col')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Header information is stored in the `header` attribute and the DataFrame in the `base` attribute:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_col.header"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_lvl.base"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Photoionization Cross-sections\n",
+    "\n",
+    "Photoionization cross-sections are provided by the `pho` files."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.cmfgen import CMFGENPhoCrossSectionsParser"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_cross_sections = CMFGENPhoCrossSectionsParser('/tmp/atomic/SIL/II/16sep15/phot_nahar_A')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_cross_sections.header"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In this case, `base` is a list containing many DataFrames. Also, each individual DataFrame contains information relative to that specific target under the attribute `attr`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(si2_cross_sections.base)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "len(si2_cross_sections.base)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_cross_sections.base[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "si2_cross_sections.base[0].attrs"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Batch Convert Files to HDF5\n",
+    "\n",
+    "To convert multiple CMFGEN files to the HDF5 format import the `hdf_dump` function.\n",
+    "\n",
+    "<div class=\"alert alert-info\">\n",
+    "\n",
+    "**Note:**\n",
+    "    \n",
+    "This feature has been temporary disabled.\n",
+    "    \n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {},
+   "source": [
+    "from carsus.io.cmfgen import hdf_dump"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {},
+   "source": [
+    "hdf_dump('/tmp/atomic/', ['osc', 'OSC', 'Osc'], CMFGENEnergyLevelsParser(), chunk_size=10, ignore_patterns=['ERROR_CHK'])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Required parameters are `cmfgen_dir`, `patterns` and `parser`, while `chunk_size` and `ignore_patterns` are optional."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## CMFGENReader\n",
+    "\n",
+    "The `CMFGENReader` provides processed `levels`, `lines`, `ionization_energies`, `cross_sections` and `collisions` tables to work with. You can provide temperatures for the `collisions` dataframe using the `temperature_grid` option. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.cmfgen import CMFGENReader"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader = CMFGENReader.from_config('Si 0-1', '/tmp/atomic', ionization_energies=True, cross_sections=True, collisions=True, drop_mismatched_labels=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.levels"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.lines"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.cross_sections"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.ionization_energies"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The values in the collisions dataframe are thermally-averaged effective collision strengths divided by the statistical weights of the lower levels. Please see Eq. A1 and A2 of <cite data-cite=\"2004ApJ...609.1181P\">Przybilla & Butler, 2004 </cite> for definitions. More information about the `collisions` table is stored inside the `collisional_metadata` attribute. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.collisions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cmfgen_reader.collisional_metadata"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.15"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
