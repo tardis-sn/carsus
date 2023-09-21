@@ -138,7 +138,8 @@ class VALDReader(object):
         vald = vald_raw if vald_raw is not None else self.vald_raw.copy()
 
         vald["elm_ion"] = vald["elm_ion"].str.replace("'", "")
-        vald[["molecule", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
+        vald[["chemical", "charge"]] = vald["elm_ion"].str.split(" ", expand=True)
+        vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
 
         del vald["elm_ion"]
 
