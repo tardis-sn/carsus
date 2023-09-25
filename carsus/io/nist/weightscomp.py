@@ -4,28 +4,34 @@ http://www.nist.gov/pml/data/comp.cfm
 """
 
 import logging
-import requests
-import pandas as pd
 
-from bs4 import BeautifulSoup
+import pandas as pd
+import requests
 from astropy import units as u
+from bs4 import BeautifulSoup
+
 from carsus.base import basic_atomic_data_fname
+from carsus.io.base import BaseIngester, BaseParser, BasePyparser
+from carsus.io.nist.weightscomp_grammar import (AM_SD_COL, AM_VAL_COL,
+                                                ATOM_NUM_COL, ATOM_WEIGHT_COLS,
+                                                AW_LWR_BND_COL, AW_SD_COL,
+                                                AW_STABLE_MASS_NUM_COL,
+                                                AW_TYPE_COL, AW_UPR_BND_COL,
+                                                AW_VAL_COL, COLUMNS, INTERVAL,
+                                                MASS_NUM_COL, STABLE_MASS_NUM,
+                                                isotope)
+from carsus.io.util import retry_request, to_nom_val_and_std_dev
 from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
-from carsus.io.base import BasePyparser, BaseIngester, BaseParser
-from carsus.io.util import to_nom_val_and_std_dev, retry_request
 from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
-from carsus.io.nist.weightscomp_grammar import isotope, COLUMNS, ATOM_NUM_COL, MASS_NUM_COL,\
-    AM_VAL_COL, AM_SD_COL, INTERVAL, STABLE_MASS_NUM, ATOM_WEIGHT_COLS, AW_STABLE_MASS_NUM_COL,\
-    AW_TYPE_COL, AW_VAL_COL, AW_SD_COL, AW_LWR_BND_COL, AW_UPR_BND_COL
 
 logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
 WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
+CARSUS_DATA_NIST_WEIGHTS_URL = "https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/weights.html"
 
-
-def download_weightscomp(ascii='ascii2', isotype='some'):
+def download_weightscomp(nist_url=False, ascii='ascii2', isotype='some'):
     """
     Downloader function for the NIST Atomic Weights and Isotopic Compositions database
 
@@ -33,6 +39,9 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
 
     Parameters
     ----------
+    nist_url: bool
+        If False, downloads data from the carsus-dat-nist repository,
+        else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.
     ascii: str
         GET request parameter, refer to the NIST docs
         (default: 'ascii')
@@ -46,17 +55,24 @@ def download_weightscomp(ascii='ascii2', isotype='some'):
         Preformatted text data
 
     """
-    logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
-    r = retry_request(url=WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
-    soup = BeautifulSoup(r.text, 'html5lib')
-    pre_text_data = soup.pre.get_text()
-    pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
-    return pre_text_data
 
+    if not nist_url:
+        logger.info("Downloading data from the carsus-dat-nist repository")
+        response = requests.get(CARSUS_DATA_NIST_WEIGHTS_URL, verify=False)
+        data = response.text
+        return data
+    else: 
+        logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
+        r = retry_request(WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
+        soup = BeautifulSoup(r.text, 'html5lib')
+        pre_text_data = soup.pre.get_text()
+        pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
+        return pre_text_data
 
+            
 class NISTWeightsCompPyparser(BasePyparser):
     """
-    Class for parsers for the NIST Atomic Weights and Isotopic Compositions database
+    Class for parsers for the NIST Atomic Weights and Isotopic Compositions
 
     Attributes
     ----------
@@ -129,7 +145,7 @@ class NISTWeightsCompPyparser(BasePyparser):
 
 class NISTWeightsCompIngester(BaseIngester):
     """
-    Class for ingesters for the NIST Atomic Weights and Isotopic Compositions database
+    Class for ingesters for the NIST Atomic Weights and Isotopic Compositions
 
     Attributes
     ----------
@@ -154,16 +170,17 @@ class NISTWeightsCompIngester(BaseIngester):
 
     """
 
-    def __init__(self, session, ds_short_name="nist", parser=None, downloader=None):
+    def __init__(self, session, ds_short_name="nist", parser=None, downloader=None, nist_url=False):
         if parser is None:
             parser = NISTWeightsCompPyparser()
         if downloader is None:
             downloader = download_weightscomp
+        self.nist_url = nist_url
         super(NISTWeightsCompIngester, self).\
             __init__(session, ds_short_name, parser=parser, downloader=downloader)
 
     def download(self):
-        data = self.downloader()
+        data = self.downloader(nist_url=self.nist_url)
         self.parser(data)
 
     def ingest_atomic_weights(self, atomic_weights=None):
@@ -198,8 +215,9 @@ class NISTWeightsComp(BaseParser):
     base : pandas.DataFrame
     version : str
     """
-    def __init__(self, atoms='H-Pu'):
-        input_data = download_weightscomp()
+
+    def __init__(self, atoms='H-Pu', nist_url=False):
+        input_data =  download_weightscomp(nist_url)
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
         self._get_version()

@@ -1,3 +1,6 @@
+from pathlib import Path
+import shutil
+
 import pytest
 
 from carsus.io.nuclear import NNDCReader
@@ -9,8 +12,18 @@ def nndc_reader(nndc_dirname):
 
 
 @pytest.fixture()
+def nndc_reader_http():
+    return NNDCReader(remote=True)
+
+
+@pytest.fixture()
 def decay_data(nndc_reader):
     return nndc_reader.decay_data
+
+
+@pytest.fixture()
+def decay_data_http(nndc_reader_http):
+    return nndc_reader_http.decay_data
 
 
 @pytest.mark.parametrize("element, z, parent_e_level, decay_mode, "
@@ -90,3 +103,25 @@ def test_nndc_reader_metastable(decay_data, index, parent_e_level, decay_mode,
     assert row["Decay Mode Value"] == decay_mode_value
     assert row["T1/2 (sec)"] == half_life
     assert row["Metastable"] == metastable
+
+
+@pytest.mark.parametrize("index, element, z, parent_e_level, metastable, "
+                         "decay_mode, decay_mode_value, radiation, rad_subtype, rad_energy", [
+                             ("Ni56", "Ni", 28, 0.0, False, "EC", 100.00, "g", "XR ka2", 6.915),
+                             ("Mn52", "Mn", 25, 377.749, True, "IT", 1.75, "g", "XR ka1", 5.899)
+                         ])
+def test_nndc_reader_decay_data_http(decay_data_http, index, element, z, parent_e_level, metastable,
+                                     decay_mode, decay_mode_value, radiation, rad_subtype, rad_energy):
+    df = decay_data_http[(decay_data_http.index == index) & (decay_data_http["Decay Mode"] == decay_mode) &
+                         (decay_data_http["Decay Mode Value"] == decay_mode_value) &
+                         (decay_data_http["Rad subtype"] == rad_subtype)]
+
+    row = df.loc[index]
+    assert row["Element"] == element
+    assert row["Z"] == z
+    assert row["Parent E(level)"] == parent_e_level
+    assert row["Radiation"] == radiation
+    assert row["Rad Energy"] == rad_energy
+
+    # Deleting the repository cloned during the test
+    shutil.rmtree(Path.home().joinpath("Downloads", "carsus-data-nndc"))

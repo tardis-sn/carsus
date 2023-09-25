@@ -4,6 +4,7 @@ import itertools
 import astropy.constants as const
 import astropy.units as u
 import numpy as np
+from scipy.interpolate import interp1d
 
 from enum import IntEnum, unique
 
@@ -182,19 +183,43 @@ def get_seaton_phixs_table(threshold_energy_ryd, sigma_t, beta, s, nu_0=None, n_
     return phixs_table
 
 
-def get_hydrogenic_n_phixs_table(hyd_gaunt_energy_grid_ryd, hyd_gaunt_factor, threshold_energy_ryd, n):
+def get_hydrogenic_n_phixs_table(
+    hyd_gaunt_energy_grid_ryd,
+    hyd_gaunt_factor,
+    threshold_energy_ryd,
+    n,
+    hyd_n_phixs_stop2start_energy_ratio,
+    hyd_n_phixs_num_points,
+):
     """
     Citation required.
     """
-    energy_grid = hyd_gaunt_energy_grid_ryd[n]
+    hyd_gaunt_energy_grid_ryd_n = np.array(hyd_gaunt_energy_grid_ryd[n])
+    log_gaunt_factor_n = np.log(hyd_gaunt_factor[n])
+    energy_grid = np.geomspace(
+        hyd_gaunt_energy_grid_ryd_n.min(),
+        hyd_gaunt_energy_grid_ryd_n.min() * hyd_n_phixs_stop2start_energy_ratio,
+        hyd_n_phixs_num_points,
+    )
     phixs_table = np.empty((len(energy_grid), 2))
     scale_factor = 7.91 / threshold_energy_ryd / n
+    log_hyd_gaunt_factor_interpolator = interp1d(
+        np.log(hyd_gaunt_energy_grid_ryd_n),
+        log_gaunt_factor_n,
+        fill_value=(log_gaunt_factor_n[0], log_gaunt_factor_n[-1]),
+        bounds_error=False,
+    )
 
     for i, energy_ryd in enumerate(energy_grid):
         energy_div_threshold = energy_ryd / energy_grid[0]
 
         if energy_div_threshold > 0:
-            cross_section = scale_factor * hyd_gaunt_factor[n][i] / (energy_div_threshold) ** 3
+            hyd_gaunt_factor_n = np.exp(
+                log_hyd_gaunt_factor_interpolator(np.log(energy_ryd))
+            )
+            cross_section = (
+                scale_factor * hyd_gaunt_factor_n / (energy_div_threshold) ** 3
+            )
         else:
             cross_section = 0.0
 

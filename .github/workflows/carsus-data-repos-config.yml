@@ -1,0 +1,75 @@
+name: carsus-data-repos-config
+
+on: 
+  workflow_dispatch: 
+        
+env:
+  NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
+
+defaults:
+      run:
+        shell: bash -l {0}
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: carsus/
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: carsus-data-cmfgen
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-cmfgen/**/*.lock') }}
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: carsus-data-kurucz
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-kurucz/**/*.lock') }}
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: carsus-data-nist
+          key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-nist/**/*.lock') }}
+        
+      - run: |
+          for repo in carsus-data-cmfgen carsus-data-kurucz carsus-data-nist; do
+            repo_path="$repo"
+       
+            if [ ! -d $repo_path ] ; then
+              git clone https://github.com/s-rathi/$repo $repo_path     
+            else                               
+              cd $repo_path
+              git fetch
+              git checkout origin/main
+              cd ..
+            fi
+          done
+
+      - name: Setup carsus environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            environment-file: carsus/carsus_env3.yml
+            activate-environment: carsus
+            use-mamba: true
+
+      - name: Install package
+        run: pip install -e carsus/
+          
+      - name: Run notebooks
+        run: |
+          jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/tardis_atomdata_ref.ipynb
+        env:
+          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
+        
+      - name: Upload Atom Data
+        uses: actions/upload-artifact@v3
+        with:
+          name: atom-data
+          path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5

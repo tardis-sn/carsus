@@ -9,10 +9,7 @@ from sqlalchemy import and_
 from carsus.io.output.tardis_ import AtomData
 from carsus.model import DataSource, Ion
 
-with_test_db = pytest.mark.skipif(
-    not pytest.config.getoption("--test-db"),
-    reason="--testing database was not specified"
-)
+
 
 @pytest.fixture
 def atom_data(test_session, chianti_short_name):
@@ -115,13 +112,13 @@ def test_atom_data_chianti_ions_subset(memory_session):
                              chianti_ions="He 1; N 5; Si 1")
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_atom_data_wo_chianti_ions_attributes(atom_data_be, test_session):
     assert atom_data_be.chianti_ions == list()
     assert test_session.query(atom_data_be.chianti_ions_table).count() == 0
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_atom_data_only_be(atom_data_be):
     assert all([atomic_number == 4 for atomic_number in
                 atom_data_be.atom_masses["atomic_number"].values.tolist()])
@@ -133,7 +130,7 @@ def test_atom_data_only_be(atom_data_be):
                 atom_data_be.lines["atomic_number"].values.tolist()])
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_atom_data_join_on_chianti_ions_table(test_session, atom_data):
 
     # This join operation leads to an empty chianti_ions list
@@ -148,7 +145,7 @@ def test_atom_data_join_on_chianti_ions_table(test_session, atom_data):
     assert set(chianti_ions) == set([(2,1), (7,5)])
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_atom_data_two_instances_same_session(
         test_session,
         chianti_short_name):
@@ -167,7 +164,7 @@ def test_atom_data_two_instances_same_session(
     atom_data2.chianti_ions_table
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, exp_mass", [
     (2, 4.002602 * u.u),
     (4, 9.0121831 * u.u),
@@ -184,7 +181,7 @@ def test_create_atom_masses(atom_masses, atomic_number, exp_mass):
     )
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, exp_ioniz_energy", [
     (2, 1,  54.41776311 * u.eV),
     (4, 2, 153.896198 * u.eV),
@@ -201,7 +198,7 @@ def test_create_ionizatinon_energies(ionization_energies, atomic_number, ion_num
     )
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, ionization_energy",[
     (2, 1, 54.41776311 * u.eV),
     (4, 2, 153.896198 * u.eV),
@@ -216,7 +213,7 @@ def test_create_levels_filter_auto_ionizing_levels(levels, atomic_number, ion_nu
     assert all(levels_energies < ionization_energy)
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, level_number, exp_energy, exp_g, exp_metastable_flag",[
     # Kurucz levels
     (4, 2, 0, 0.0 * u.Unit("cm-1"), 1, True),
@@ -248,7 +245,7 @@ def test_create_levels(levels, atomic_number, ion_number, level_number,
     assert metastable_flag == exp_metastable_flag
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, level_number_lower, level_number_upper, exp_wavelength, exp_loggf",[
     # Kurucz lines
     (14, 1, 0, 57, 81.8575 * u.Unit("nm"), -1.92),
@@ -270,7 +267,7 @@ def test_create_lines(lines, atomic_number, ion_number, level_number_lower, leve
     assert_almost_equal(loggf, exp_loggf)
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, level_number_lower, level_number_upper, exp_wavelength, exp_loggf",[
     # Kurucz lines with wavelength above 2000 Angstrom
     (14, 1, 8, 83, 2015.574293 * u.Unit("angstrom"), -0.120),
@@ -287,7 +284,7 @@ def test_create_lines_convert_air2vacuum(lines, atomic_number, ion_number, level
     assert_quantity_allclose(wavelength, exp_wavelength)
     assert_almost_equal(loggf, exp_loggf)
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, level_number_lower, level_number_upper", [
     # Default loggf_threshold = -3
     # Kurucz lines
@@ -304,7 +301,7 @@ def test_create_lines_loggf_treshold(lines, atomic_number, ion_number, level_num
         assert lines.loc[(atomic_number, ion_number, level_number_lower, level_number_upper)]
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number", [2, 14, 30])
 def test_levels_create_artificial_fully_ionized(levels, atomic_number):
     levels = levels.set_index(["atomic_number", "ion_number", "level_number"])
@@ -314,22 +311,22 @@ def test_levels_create_artificial_fully_ionized(levels, atomic_number):
     assert metastable
 
 # ToDo: Implement real tests
-@with_test_db
+@pytest.mark.with_test_db
 def test_create_collisions(collisions):
     assert True
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_create_macro_atom(macro_atom):
     assert True
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_create_macro_atom_ref(macro_atom_references):
     assert True
 
 
-@with_test_db
+@pytest.mark.with_test_db
 @pytest.mark.parametrize("atomic_number, ion_number, source_level_number", [
     (2, 2, 0),
     (5, 5, 0),
@@ -347,12 +344,12 @@ def test_create_macro_atom_references_levels_wo_lines(macro_atom_references, ato
     assert all([count == 0 for count in [count_up, count_down, count_total]])
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_create_zeta_data(zeta_data):
     assert True
 
 
-@with_test_db
+@pytest.mark.with_test_db
 def test_atom_data_to_hdf(atom_data, hdf5_path):
     atom_data.to_hdf(hdf5_path, store_atom_masses=True, store_ionization_energies=True,
                      store_levels=True, store_lines=True, store_macro_atom=True,

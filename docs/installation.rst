@@ -31,7 +31,20 @@ Setup the Environment
 .. code ::
 
     $ cd carsus
+
+
+If you're using GNU/Linux or Intel-based Mac installation then directly create the environment using the below command:
+
+.. code ::
+
     $ conda env create -f carsus_env3.yml
+
+
+However, if you're using M1-based Mac (Apple Silicon), then force conda to install Intel-based packages:
+
+.. code ::
+
+    $ CONDA_SUBDIR=osx-64 conda env create -f carsus_env3.yml
 
 
 ===================
