@@ -41,26 +41,13 @@ class VALDReader(object):
         "waals",
     ]
 
-    default_unique_level_identifier = ["energy", "j"]
-
-    def __init__(
-        self, ions=None, fname=None, unique_level_identifier=None, priority=10
-    ):
+    def __init__(self, fname=None):
         """
         Parameters
         ----------
         fname: str
             Path to the vald file (http or local file).
 
-        ions: str, optional
-            Ions to extract, by default None.
-
-        unique_level_identifier: list
-            List of attributes to identify unique levels from. Will always use
-            atomic_number and ion charge in addition.
-
-        priority: int, optional
-            Priority of the current data source.
         """
 
         if fname is None:
