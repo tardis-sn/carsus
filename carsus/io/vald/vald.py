@@ -4,8 +4,7 @@ import pandas as pd
 from io import StringIO
 from carsus.io.util import read_from_buffer
 
-
-VALD_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/vald/vald_latest.dat"
+VALD_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/vald/vald_sample.dat"
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +124,7 @@ class VALDReader(object):
         vald = vald_raw if vald_raw is not None else self.vald_raw.copy()
 
         vald["elm_ion"] = vald["elm_ion"].str.replace("'", "")
-        vald[["chemical", "charge"]] = vald["elm_ion"].str.split(" ", expand=True)
+        vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
         vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
 
         del vald["elm_ion"]
