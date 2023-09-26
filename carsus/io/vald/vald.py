@@ -61,10 +61,7 @@ class VALDReader(object):
 
         """
 
-        if fname is None:
-            self.fname = VALD_URL
-        else:
-            self.fname = fname
+        self.fname = VALD_URL if fname is None else fname
 
         self._vald_raw = None
         self._vald = None
