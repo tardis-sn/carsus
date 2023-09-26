@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class VALDReader(object):
     """
-    Class for extracting lines and levels data from vald files
+    Class for extracting lines data from vald files
 
     Attributes
     ----------
@@ -101,7 +101,7 @@ class VALDReader(object):
 
     def read_vald_raw(self, fname=None):
         """
-        Read in a vald data file
+        Reads in a vald data file
 
         Parameters
         ----------
@@ -139,7 +139,7 @@ class VALDReader(object):
 
     def parse_vald(self, vald_raw=None, strip_molecules=True):
         """
-        Parse raw vald DataFrame
+        Parses raw vald DataFrame
 
         Parameters
         ----------
