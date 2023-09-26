@@ -1,8 +1,15 @@
 import re
 import logging
 import pandas as pd
+import numpy as np
 from io import StringIO
 from carsus.io.util import read_from_buffer
+from carsus.util.helpers import (
+    convert_wavelength_air2vacuum,
+    ATOMIC_SYMBOLS_DATA,
+    convert_symbol2atomic_number,
+)
+
 
 VALD_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/vald/vald_sample.dat"
 
@@ -40,7 +47,7 @@ class VALDReader(object):
         "waals",
     ]
 
-    def __init__(self, fname=None):
+    def __init__(self, fname=None, strip_molecules=True):
         """
         Parameters
         ----------
@@ -56,6 +63,9 @@ class VALDReader(object):
 
         self._vald_raw = None
         self._vald = None
+        self._linelist = None
+
+        self.strip_molecules = strip_molecules
 
     @property
     def vald_raw(self):
@@ -66,8 +76,14 @@ class VALDReader(object):
     @property
     def vald(self):
         if self._vald is None:
-            self._vald = self.parse_vald()
+            self._vald = self.parse_vald(strip_molecules=self.strip_molecules)
         return self._vald
+
+    @property
+    def linelist(self):
+        if self._linelist is None:
+            self._linelist = self.extract_linelist(self.vald)
+        return self._linelist
 
     def read_vald_raw(self, fname=None):
         """
@@ -107,13 +123,15 @@ class VALDReader(object):
 
         return vald, checksum
 
-    def parse_vald(self, vald_raw=None):
+    def parse_vald(self, vald_raw=None, strip_molecules=True):
         """
         Parse raw vald DataFrame
 
         Parameters
         ----------
         vald_raw: pandas.DataFrame
+        strip_molecules: bool
+            If True, remove molecules from vald
 
         Returns
         -------
@@ -126,10 +144,36 @@ class VALDReader(object):
         vald["elm_ion"] = vald["elm_ion"].str.replace("'", "")
         vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
         vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
+        vald["wavelength"] = convert_wavelength_air2vacuum(vald["wl_air"])
 
         del vald["elm_ion"]
 
+        if strip_molecules:
+            vald = self._strip_molecules(vald)
+            vald.reset_index(drop=True, inplace=True)
+
+            atom_nums = np.zeros(len(vald), dtype=int)
+            for i in range(len(atom_nums)):
+                atom_nums[i] = convert_symbol2atomic_number(vald.chemical[i])
+            vald["atomic_number"] = atom_nums
+
         return vald
+
+    def _strip_molecules(self, vald):
+        return vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])]
+
+    def extract_linelist(self, vald):
+        return vald[
+            [
+                "atomic_number",
+                "ion_charge",
+                "wavelength",
+                "log_gf",
+                "rad",
+                "stark",
+                "waals",
+            ]
+        ].copy()
 
     def to_hdf(self, fname):
         """
