@@ -6,7 +6,7 @@ from carsus.io.vald import VALDReader
 
 @pytest.fixture()
 def vald_rdr(vald_fname):
-    return VALDReader(fname=vald_fname)
+    return VALDReader(fname=vald_fname, strip_molecules=False)
 
 
 @pytest.fixture()
