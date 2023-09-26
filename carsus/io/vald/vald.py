@@ -22,7 +22,10 @@ class VALDReader(object):
 
     Attributes
     ----------
-    fname: path to vald.dat
+    fname: str
+        path to vald data file
+    strip_molecules: bool
+        Whether to remove molecules from the data.
 
     Methods
     --------
@@ -53,6 +56,8 @@ class VALDReader(object):
         ----------
         fname: str
             Path to the vald file (http or local file).
+        strip_molecules: bool
+            Whether to remove molecules from the data.
 
         """
 
@@ -87,17 +92,17 @@ class VALDReader(object):
 
     def read_vald_raw(self, fname=None):
         """
-        Reading in a normal vald.dat
+        Read in a vald data file
 
         Parameters
         ----------
         fname: ~str
-            path to vald.dat
+            path to vald data file
 
         Returns
         -------
             pandas.DataFrame
-                pandas Dataframe represenation of vald
+                pandas Dataframe representation of vald
 
             str
                 MD5 checksum
@@ -136,7 +141,6 @@ class VALDReader(object):
         Returns
         -------
             pandas.DataFrame
-                a level DataFrame
         """
 
         vald = vald_raw if vald_raw is not None else self.vald_raw.copy()
@@ -165,6 +169,17 @@ class VALDReader(object):
         return vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])]
 
     def extract_linelist(self, vald):
+        """
+        Parameters
+        ----------
+        vald: pandas.DataFrame
+
+        Returns
+        -------
+            pandas.DataFrame
+               vald linelist containing only the following columns:
+                atomic_number, ion_charge, wavelength, log_gf, rad, stark, waals
+        """
         return vald[
             [
                 "atomic_number",
