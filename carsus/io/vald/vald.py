@@ -74,18 +74,27 @@ class VALDReader(object):
 
     @property
     def vald_raw(self):
+        """
+        Reads the raw data and returns raw vald data as a pandas DataFrame
+        """
         if self._vald_raw is None:
             self._vald_raw, self.version = self.read_vald_raw()
         return self._vald_raw
 
     @property
     def vald(self):
+        """
+        Processes the raw vald DataFrame
+        """
         if self._vald is None:
             self._vald = self.parse_vald(strip_molecules=self.strip_molecules)
         return self._vald
 
     @property
     def linelist(self):
+        """
+        Prepares the linelist from the processed vald DataFrame
+        """
         if self._linelist is None:
             self._linelist = self.extract_linelist(self.vald)
         return self._linelist
@@ -166,6 +175,9 @@ class VALDReader(object):
         return vald
 
     def _strip_molecules(self, vald):
+        """
+        Removes molecules from a vald dataframe
+        """
         return vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])]
 
     def extract_linelist(self, vald):
