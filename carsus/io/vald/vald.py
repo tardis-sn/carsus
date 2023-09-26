@@ -153,8 +153,10 @@ class VALDReader(object):
             vald.reset_index(drop=True, inplace=True)
 
             atom_nums = np.zeros(len(vald), dtype=int)
-            for i in range(len(atom_nums)):
-                atom_nums[i] = convert_symbol2atomic_number(vald.chemical[i])
+            atom_nums = [
+                convert_symbol2atomic_number(symbol)
+                for symbol in vald.chemical.to_list()
+            ]
             vald["atomic_number"] = atom_nums
 
         return vald
