@@ -1241,7 +1241,7 @@ class TARDISAtomData:
                 f.put("/nuclear_decay_rad", self.nndc_reader.decay_data)
 
             if hasattr(self.vald_reader, "linelist"):
-                f.put("/vald_linelist", self.vald_reader.linelist)
+                f.put("/linelist", self.vald_reader.linelist)
 
             if hasattr(self, "collisions"):
                 f.put("/collisions_data", self.collisions_prepared)
