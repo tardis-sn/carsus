@@ -345,10 +345,10 @@ class TARDISAtomData:
         levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
         levels['g'] = 2*levels['j'] + 1
         levels['g'] = levels['g'].astype(np.int)
-        levels = levels.drop(columns=['j', 'label', 'method'])
+        levels = levels.drop(columns=['j', 'method'])
         levels = levels.reset_index()
         levels = levels.rename(columns={'ion_charge': 'ion_number'})
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
+        levels = levels[['atomic_number', 'ion_number', 'label', 'g', 'energy',
                          'ds_id', 'priority']]
         levels['energy'] = u.Quantity(levels['energy'], 'cm-1').to(
             'eV', equivalencies=u.spectral()).value
@@ -400,7 +400,7 @@ class TARDISAtomData:
                             levels['ion_number'] == ion[1])
             levels = levels.drop(levels[mask].index)
 
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy', 
+        levels = levels[['atomic_number', 'ion_number', 'label', 'g', 'energy',
                          'ds_id']]
         levels = levels.reset_index()
 
@@ -553,7 +553,7 @@ class TARDISAtomData:
 
         levels["level_number"] = levels["level_number"].astype(np.int)
 
-        levels = levels[['atomic_number', 'ion_number', 'g', 'energy',
+        levels = levels[['atomic_number', 'ion_number', 'label', 'g', 'energy',
                          'metastable', 'level_number', 'ds_id']]
 
         # Join atomic_number, ion_number, level_number_lower,
@@ -561,14 +561,16 @@ class TARDISAtomData:
         lower_levels = levels.rename(
             columns={
                 "level_number": "level_number_lower",
+                "label": "label_lower",
                 "g": "g_l"}
-        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
+        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "label_lower", "g_l"]]
 
         upper_levels = levels.rename(
             columns={
                 "level_number": "level_number_upper",
+                "label": "label_upper",
                 "g": "g_u"}
-        ).loc[:, ["level_number_upper", "g_u"]]
+        ).loc[:, ["level_number_upper", "label_upper", "g_u"]]
 
         lines = lines.join(lower_levels, on="lower_level_id").join(
             upper_levels, on="upper_level_id")
@@ -877,7 +879,7 @@ class TARDISAtomData:
         """
 
         levels_prepared = self.levels.loc[:, [
-            "atomic_number", "ion_number", "level_number",
+            "atomic_number", "ion_number", "level_number", "label",
             "energy", "g", "metastable"]].copy()
 
         levels_prepared = levels_prepared.set_index(
