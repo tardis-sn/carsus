@@ -9,6 +9,7 @@ def vald_rdr(vald_fname):
     return VALDReader(fname=vald_fname, strip_molecules=False)
 
 
+
 @pytest.fixture()
 def vald_raw(vald_rdr):
     return vald_rdr.vald_raw

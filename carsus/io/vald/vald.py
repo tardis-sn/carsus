@@ -27,6 +27,7 @@ class VALDReader(object):
     strip_molecules: bool
         Whether to remove molecules from the data.
 
+
     Methods
     --------
     vald_raw:
@@ -51,6 +52,7 @@ class VALDReader(object):
     ]
 
     def __init__(self, fname=None, strip_molecules=True):
+
         """
         Parameters
         ----------
@@ -105,10 +107,12 @@ class VALDReader(object):
         fname: ~str
             path to vald data file
 
+
         Returns
         -------
             pandas.DataFrame
                 pandas Dataframe representation of vald
+
 
             str
                 MD5 checksum
@@ -137,6 +141,7 @@ class VALDReader(object):
     def parse_vald(self, vald_raw=None, strip_molecules=True):
         """
         Parses raw vald DataFrame
+
 
         Parameters
         ----------
