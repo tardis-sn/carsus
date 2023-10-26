@@ -9,6 +9,7 @@ def vald_rdr(vald_fname):
     return VALDReader(fname=vald_fname, strip_molecules=False)
 
 
+
 @pytest.fixture()
 def vald_rdr_stripped_molecules(vald_fname):
     return VALDReader(fname=vald_fname, strip_molecules=True)
