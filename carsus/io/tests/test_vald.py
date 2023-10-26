@@ -30,8 +30,13 @@ def vald_stripped_molecules(vald_rdr_stripped_molecules):
 
 
 @pytest.fixture()
-def vald_linelist(vald_rdr_stripped_molecules):
+def vald_linelist_stripped_molecules(vald_rdr_stripped_molecules):
     return vald_rdr_stripped_molecules.linelist
+
+
+@pytest.fixture()
+def vald_linelist(vald_rdr):
+    return vald_rdr.linelist
 
 
 @pytest.mark.parametrize(
@@ -70,11 +75,32 @@ def test_vald_reader_strip_molecules(vald, vald_stripped_molecules):
     assert len(vald_stripped_molecules) == 1
 
 
+def test_vald_strip_molecules_linelist(vald_linelist_stripped_molecules):
+    assert all(
+        vald_linelist_stripped_molecules.columns
+        == [
+            "atomic_number",
+            "ion_charge",
+            "wavelength",
+            "log_gf",
+            "e_low",
+            "e_up",
+            "j_lo",
+            "j_up",
+            "rad",
+            "stark",
+            "waals",
+        ]
+    )
+    # Test to see if any values have become nan in new columns
+    assert ~vald_linelist_stripped_molecules.isna().values.any()
+
+
 def test_vald_linelist(vald_linelist):
     assert all(
         vald_linelist.columns
         == [
-            "atomic_number",
+            "chemical",
             "ion_charge",
             "wavelength",
             "log_gf",
