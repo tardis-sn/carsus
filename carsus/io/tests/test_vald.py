@@ -10,6 +10,11 @@ def vald_rdr(vald_fname):
 
 
 @pytest.fixture()
+def vald_rdr_stripped_molecules(vald_fname):
+    return VALDReader(fname=vald_fname, strip_molecules=True)
+
+
+@pytest.fixture()
 def vald_raw(vald_rdr):
     return vald_rdr.vald_raw
 
@@ -17,6 +22,11 @@ def vald_raw(vald_rdr):
 @pytest.fixture()
 def vald(vald_rdr):
     return vald_rdr.vald
+
+
+@pytest.fixture()
+def vald_stripped_molecules(vald_rdr_stripped_molecules):
+    return vald_rdr_stripped_molecules.vald
 
 
 @pytest.mark.parametrize(
@@ -46,3 +56,8 @@ def test_vald_reader_vald(vald, index, wl_air, log_gf, e_low, e_up, ion_charge):
         [row["log_gf"], row["e_low"], row["e_up"], row["ion_charge"]],
         [log_gf, e_low, e_up, ion_charge],
     )
+
+
+def test_vald_reader_strip_molecules(vald, vald_stripped_molecules):
+    assert len(vald) >= len(vald_stripped_molecules)
+    assert len(vald_stripped_molecules) == 1
