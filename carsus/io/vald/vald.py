@@ -191,23 +191,40 @@ class VALDReader(object):
         -------
             pandas.DataFrame
                 vald linelist containing only the following columns:
-                atomic_number, ion_charge, wavelength, log_gf, rad, stark, waals
+                atomic_number or chemical, ion_charge, wavelength, log_gf, rad, stark, waals
         """
-        return vald[
-            [
-                "atomic_number",
-                "ion_charge",
-                "wavelength",
-                "log_gf",
-                "e_low",
-                "e_up",
-                "j_lo",
-                "j_up",
-                "rad",
-                "stark",
-                "waals",
-            ]
-        ].copy()
+        if self.strip_molecules:
+            return vald[
+                [
+                    "atomic_number",
+                    "ion_charge",
+                    "wavelength",
+                    "log_gf",
+                    "e_low",
+                    "e_up",
+                    "j_lo",
+                    "j_up",
+                    "rad",
+                    "stark",
+                    "waals",
+                ]
+            ].copy()
+        else:
+            return vald[
+                [
+                    "chemical",
+                    "ion_charge",
+                    "wavelength",
+                    "log_gf",
+                    "e_low",
+                    "e_up",
+                    "j_lo",
+                    "j_up",
+                    "rad",
+                    "stark",
+                    "waals",
+                ]
+            ].copy()
 
     def to_hdf(self, fname):
         """
