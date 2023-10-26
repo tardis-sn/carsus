@@ -52,7 +52,6 @@ class VALDReader(object):
     ]
 
     def __init__(self, fname=None, strip_molecules=True):
-
         """
         Parameters
         ----------
@@ -191,7 +190,7 @@ class VALDReader(object):
         Returns
         -------
             pandas.DataFrame
-               vald linelist containing only the following columns:
+                vald linelist containing only the following columns:
                 atomic_number, ion_charge, wavelength, log_gf, rad, stark, waals
         """
         return vald[
@@ -215,7 +214,7 @@ class VALDReader(object):
         Parameters
         ----------
         fname : path
-           Path to the HDF5 output file
+            Path to the HDF5 output file
         """
         with pd.HDFStore(fname, "w") as f:
             f.put("/vald_raw", self.vald_raw)
