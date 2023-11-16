@@ -48,7 +48,7 @@ def vald_linelist(vald_rdr):
 )
 def test_vald_reader_vald_raw(vald_raw, index, wl_air, log_gf, e_low, e_up):
     row = vald_raw.loc[index]
-    assert_almost_equal(row["wl_air"], wl_air)
+    assert_almost_equal(row["WL_air(A)"], wl_air)
     assert_allclose([row["log_gf"], row["e_low"], row["e_up"]], [log_gf, e_low, e_up])
 
 
@@ -61,7 +61,7 @@ def test_vald_reader_vald_raw(vald_raw, index, wl_air, log_gf, e_low, e_up):
 )
 def test_vald_reader_vald(vald, index, wl_air, log_gf, e_low, e_up, ion_charge):
     row = vald.loc[index]
-    assert_almost_equal(row["wl_air"], wl_air)
+    assert_almost_equal(row["WL_air(A)"], wl_air)
     assert_allclose(
         [row["log_gf"], row["e_low"], row["e_up"], row["ion_charge"]],
         [log_gf, e_low, e_up, ion_charge],
