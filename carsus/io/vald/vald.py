@@ -9,6 +9,7 @@ from carsus.util.helpers import (
     ATOMIC_SYMBOLS_DATA,
     convert_symbol2atomic_number,
 )
+from astropy import units as u
 
 
 VALD_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/vald/vald_sample.dat"
@@ -26,6 +27,8 @@ class VALDReader(object):
         path to vald data file
     strip_molecules: bool
         Whether to remove molecules from the data.
+    shortlist: bool
+        Whether the parsed file is a shortlist or not.
 
 
     Methods
@@ -37,7 +40,7 @@ class VALDReader(object):
 
     vald_columns = [
         "elm_ion",
-        "wl_air",
+        "wave_unprepared",
         "log_gf",
         "e_low",
         "j_lo",
@@ -51,7 +54,21 @@ class VALDReader(object):
         "waals",
     ]
 
-    def __init__(self, fname=None, strip_molecules=True):
+    vald_shortlist_columns = [
+        "elm_ion",
+        "wave_unprepared",
+        "e_low",
+        "v_mic",
+        "log_gf",
+        "rad",
+        "stark",
+        "waals",
+        "lande_factor",
+        "central_depth",
+        "reference",
+    ]
+
+    def __init__(self, fname=None, strip_molecules=True, shortlist=False):
         """
         Parameters
         ----------
@@ -59,7 +76,8 @@ class VALDReader(object):
             Path to the vald file (http or local file).
         strip_molecules: bool
             Whether to remove molecules from the data.
-
+        shortlist: bool
+            Whether the parsed file is a shortlist or not.
         """
 
         self.fname = VALD_URL if fname is None else fname
@@ -68,7 +86,12 @@ class VALDReader(object):
         self._vald = None
         self._linelist = None
 
+        self._vald_columns = (
+            self.vald_shortlist_columns if shortlist else self.vald_columns
+        )
+
         self.strip_molecules = strip_molecules
+        self.shortlist = shortlist
 
     @property
     def vald_raw(self):
@@ -129,11 +152,24 @@ class VALDReader(object):
         data_match = re.compile("'[a-zA-Z]+ \d+',[\s*-?\d+[\.\d+]+,]*")
 
         buffer, checksum = read_from_buffer(self.fname)
+        content = buffer.read().decode()
+
+        # Need to identify the wavelength column header and overwrite the wavelength to obtain units and air or vacuum
+        for line in content.split("\n")[:10]:
+            if "WL" in line:
+                for column_header in line.split():
+                    if "WL" in column_header:
+                        self._vald_columns[1] = column_header
+                        logger.info(f"Found wavelength column header: {column_header}")
+
         vald = pd.read_csv(
-            StringIO("\n".join(data_match.findall(buffer.read().decode()))),
-            names=self.vald_columns,
+            StringIO("\n".join(data_match.findall(content))),
+            names=self._vald_columns,
             index_col=False,
         )
+
+        if self.shortlist:
+            del vald["reference"]
 
         return vald, checksum
 
@@ -158,7 +194,19 @@ class VALDReader(object):
         vald["elm_ion"] = vald["elm_ion"].str.replace("'", "")
         vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
         vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
-        vald["wavelength"] = convert_wavelength_air2vacuum(vald["wl_air"])
+
+        wave = vald.columns[1]
+        if "nm" in wave:
+            if "air" in wave:
+                vald["wavelength"] = convert_wavelength_air2vacuum(
+                    (vald[wave].values * u.nm).to(u.AA)
+                )
+            else:
+                vald["wavelength"] = (vald[wave].values * u.nm).to(u.AA)
+        elif "air" in wave:
+            vald["wavelength"] = convert_wavelength_air2vacuum(vald[wave])
+        else:
+            vald["wavelength"] = vald[wave]
 
         del vald["elm_ion"]
 
@@ -193,38 +241,37 @@ class VALDReader(object):
                 vald linelist containing only the following columns:
                 atomic_number or chemical, ion_charge, wavelength, log_gf, rad, stark, waals
         """
-        if self.strip_molecules:
-            return vald[
-                [
-                    "atomic_number",
-                    "ion_charge",
-                    "wavelength",
-                    "log_gf",
-                    "e_low",
-                    "e_up",
-                    "j_lo",
-                    "j_up",
-                    "rad",
-                    "stark",
-                    "waals",
-                ]
-            ].copy()
+        if self.shortlist:
+            linelist_mask = [
+                "chemical",
+                "ion_charge",
+                "wavelength",
+                "log_gf",
+                "e_low",
+                "v_mic",
+                "rad",
+                "stark",
+                "waals",
+            ]
         else:
-            return vald[
-                [
-                    "chemical",
-                    "ion_charge",
-                    "wavelength",
-                    "log_gf",
-                    "e_low",
-                    "e_up",
-                    "j_lo",
-                    "j_up",
-                    "rad",
-                    "stark",
-                    "waals",
-                ]
-            ].copy()
+            linelist_mask = [
+                "chemical",
+                "ion_charge",
+                "wavelength",
+                "log_gf",
+                "e_low",
+                "e_up",
+                "j_lo",
+                "j_up",
+                "rad",
+                "stark",
+                "waals",
+            ]
+
+        if self.strip_molecules:
+            linelist_mask[0] = "atomic_number"
+
+        return vald[linelist_mask].copy()
 
     def to_hdf(self, fname):
         """
