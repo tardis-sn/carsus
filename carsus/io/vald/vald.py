@@ -58,7 +58,6 @@ class VALDReader(object):
         "elm_ion",
         "wave_unprepared",
         "e_low",
-        "v_mic",
         "log_gf",
         "rad",
         "stark",
@@ -85,9 +84,12 @@ class VALDReader(object):
         self._vald_raw = None
         self._vald = None
         self._linelist = None
+        self._stellar_linelist = False
 
         self._vald_columns = (
-            self.vald_shortlist_columns if shortlist else self.vald_columns
+            self.vald_shortlist_columns.copy()
+            if shortlist
+            else self.vald_columns.copy()
         )
 
         self.strip_molecules = strip_molecules
@@ -155,12 +157,20 @@ class VALDReader(object):
         content = buffer.read().decode()
 
         # Need to identify the wavelength column header and overwrite the wavelength to obtain units and air or vacuum
+        # Also need to identify if Vmic is in the columns for correct column construction
         for line in content.split("\n")[:10]:
             if "WL" in line:
                 for column_header in line.split():
                     if "WL" in column_header:
                         self._vald_columns[1] = column_header
                         logger.info(f"Found wavelength column header: {column_header}")
+            if "Vmicro" in line and self._stellar_linelist == False:
+                logger.info("Found Vmic column - This is a stellar vald linelist")
+                self._vald_columns.insert(3, "v_mic")
+                print(self._vald_columns)
+
+                # self._vald_columns.insert(3, "v_mic")
+                self._stellar_linelist = True
 
         vald = pd.read_csv(
             StringIO("\n".join(data_match.findall(content))),
@@ -248,11 +258,13 @@ class VALDReader(object):
                 "wavelength",
                 "log_gf",
                 "e_low",
-                "v_mic",
                 "rad",
                 "stark",
                 "waals",
             ]
+            if self._stellar_linelist:
+                linelist_mask.insert(5, "v_mic")
+
         else:
             linelist_mask = [
                 "chemical",
