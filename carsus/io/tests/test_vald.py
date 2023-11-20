@@ -39,6 +39,18 @@ def vald_linelist(vald_rdr):
     return vald_rdr.linelist
 
 
+@pytest.fixture()
+def vald_rdr_shortlist_stellar(vald_short_stellar_fname):
+    return VALDReader(
+        fname=vald_short_stellar_fname, strip_molecules=False, shortlist=True
+    )
+
+
+@pytest.fixture()
+def vald_linelist_short_stellar(vald_rdr_shortlist_stellar):
+    return vald_rdr_shortlist_stellar.linelist
+
+
 @pytest.mark.parametrize(
     "index, wl_air, log_gf, e_low, e_up",
     [
@@ -115,3 +127,28 @@ def test_vald_linelist(vald_linelist):
     )
     # Test to see if any values have become nan in new columns
     assert ~vald_linelist.isna().values.any()
+
+
+@pytest.mark.parametrize(
+    "index, wavelength, log_gf, e_low, v_mic, ion_charge",
+    [
+        (73, 5001.40537184386, -1.563, 0.5786, 1, 0),
+        (17, 5001.397869850396, -6.421, 7.1801, 1, 0),
+    ],
+)
+def test_vald_short_stellar_linelist(
+    vald_linelist_short_stellar, index, wavelength, log_gf, e_low, v_mic, ion_charge
+):
+    assert len(vald_linelist_short_stellar) == 95
+    row = vald_linelist_short_stellar.iloc[index]
+    assert_almost_equal(row["wavelength"], wavelength)
+    print(row)
+    assert_allclose(
+        [
+            row["log_gf"],
+            row["e_low"],
+            row["v_mic"],
+            row["ion_charge"],
+        ],
+        [log_gf, e_low, v_mic, ion_charge],
+    )

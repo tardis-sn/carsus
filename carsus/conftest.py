@@ -138,6 +138,11 @@ def vald_fname(data_dir):
 
 
 @pytest.fixture(scope="session")
+def vald_short_stellar_fname(data_dir):
+    return os.path.join(data_dir, "vald_shortlist_test.dat")
+
+
+@pytest.fixture(scope="session")
 def nndc_dirname(data_dir):
     return os.path.join(data_dir, "nndc")  # Mn-52, Ni-56
 
