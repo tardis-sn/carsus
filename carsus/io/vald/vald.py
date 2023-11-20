@@ -167,9 +167,7 @@ class VALDReader(object):
             if "Vmicro" in line and self._stellar_linelist == False:
                 logger.info("Found Vmic column - This is a stellar vald linelist")
                 self._vald_columns.insert(3, "v_mic")
-                print(self._vald_columns)
 
-                # self._vald_columns.insert(3, "v_mic")
                 self._stellar_linelist = True
 
         vald = pd.read_csv(
