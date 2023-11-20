@@ -26,7 +26,7 @@ class VALDReader(object):
     fname: str
         path to vald data file
     strip_molecules: bool
-        Whether to remove molecules from the data.
+        Whether to remove molecules from the data. Defaults to True.
     shortlist: bool
         Whether the parsed file is a shortlist or not.
 
@@ -35,6 +35,8 @@ class VALDReader(object):
     --------
     vald_raw:
         Return pandas DataFrame representation of vald
+    linelist:
+        Return pandas DataFrame representation of linelist properties necessary to compute line opacities
 
     """
 
@@ -247,7 +249,8 @@ class VALDReader(object):
         -------
             pandas.DataFrame
                 vald linelist containing only the following columns:
-                atomic_number or chemical, ion_charge, wavelength, log_gf, rad, stark, waals
+                atomic_number or chemical, ion_charge, wavelength, e_low, log_gf, rad, stark, waals
+                optionally: v_mic (if stellar linelist) and e_up, j_lo, j_up (if not shortlist)
         """
         if self.shortlist:
             linelist_mask = [
@@ -293,3 +296,4 @@ class VALDReader(object):
         with pd.HDFStore(fname, "w") as f:
             f.put("/vald_raw", self.vald_raw)
             f.put("/vald", self.vald)
+            f.put("/linelist", self.linelist)
