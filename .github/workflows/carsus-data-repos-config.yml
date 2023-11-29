@@ -41,7 +41,7 @@ jobs:
             repo_path="$repo"
        
             if [ ! -d $repo_path ] ; then
-              git clone https://github.com/s-rathi/$repo $repo_path     
+              git clone https://github.com/tardis-sn/$repo $repo_path     
             else                               
               cd $repo_path
               git fetch
