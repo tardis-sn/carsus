@@ -12,14 +12,23 @@ from bs4 import BeautifulSoup
 
 from carsus.base import basic_atomic_data_fname
 from carsus.io.base import BaseIngester, BaseParser, BasePyparser
-from carsus.io.nist.weightscomp_grammar import (AM_SD_COL, AM_VAL_COL,
-                                                ATOM_NUM_COL, ATOM_WEIGHT_COLS,
-                                                AW_LWR_BND_COL, AW_SD_COL,
-                                                AW_STABLE_MASS_NUM_COL,
-                                                AW_TYPE_COL, AW_UPR_BND_COL,
-                                                AW_VAL_COL, COLUMNS, INTERVAL,
-                                                MASS_NUM_COL, STABLE_MASS_NUM,
-                                                isotope)
+from carsus.io.nist.weightscomp_grammar import (
+    AM_SD_COL,
+    AM_VAL_COL,
+    ATOM_NUM_COL,
+    ATOM_WEIGHT_COLS,
+    AW_LWR_BND_COL,
+    AW_SD_COL,
+    AW_STABLE_MASS_NUM_COL,
+    AW_TYPE_COL,
+    AW_UPR_BND_COL,
+    AW_VAL_COL,
+    COLUMNS,
+    INTERVAL,
+    MASS_NUM_COL,
+    STABLE_MASS_NUM,
+    isotope,
+)
 from carsus.io.util import retry_request, to_nom_val_and_std_dev
 from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
@@ -28,10 +37,13 @@ from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
 logger = logging.getLogger(__name__)
 
 WEIGHTSCOMP_URL = "http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl"
-WEIGHTSCOMP_VERSION_URL = "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
-CARSUS_DATA_NIST_WEIGHTS_URL = "https://raw.githubusercontent.com/s-rathi/carsus-data-nist/main/html_files/weights.html"
+WEIGHTSCOMP_VERSION_URL = (
+    "https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-version-history"
+)
+CARSUS_DATA_NIST_WEIGHTS_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-nist/main/html_files/weights.html"
 
-def download_weightscomp(nist_url=False, ascii='ascii2', isotype='some'):
+
+def download_weightscomp(nist_url=False, ascii="ascii2", isotype="some"):
     """
     Downloader function for the NIST Atomic Weights and Isotopic Compositions database
 
@@ -61,15 +73,21 @@ def download_weightscomp(nist_url=False, ascii='ascii2', isotype='some'):
         response = requests.get(CARSUS_DATA_NIST_WEIGHTS_URL, verify=False)
         data = response.text
         return data
-    else: 
-        logger.info("Downloading data from the NIST Atomic Weights and Isotopic Compositions Database.")
-        r = retry_request(WEIGHTSCOMP_URL, method="get", params={'ascii': ascii, 'isotype': isotype})
-        soup = BeautifulSoup(r.text, 'html5lib')
+    else:
+        logger.info(
+            "Downloading data from the NIST Atomic Weights and Isotopic Compositions Database."
+        )
+        r = retry_request(
+            WEIGHTSCOMP_URL, method="get", params={"ascii": ascii, "isotype": isotype}
+        )
+        soup = BeautifulSoup(r.text, "html5lib")
         pre_text_data = soup.pre.get_text()
-        pre_text_data = pre_text_data.replace(u'\xa0', u' ')  # replace non-breaking spaces with spaces
+        pre_text_data = pre_text_data.replace(
+            "\xa0", " "
+        )  # replace non-breaking spaces with spaces
         return pre_text_data
 
-            
+
 class NISTWeightsCompPyparser(BasePyparser):
     """
     Class for parsers for the NIST Atomic Weights and Isotopic Compositions
@@ -98,14 +116,15 @@ class NISTWeightsCompPyparser(BasePyparser):
     """
 
     def __init__(self, grammar=isotope, columns=COLUMNS, input_data=None):
-        super(NISTWeightsCompPyparser, self).\
-            __init__(grammar=grammar,
-                     columns=columns,
-                     input_data=input_data)
+        super(NISTWeightsCompPyparser, self).__init__(
+            grammar=grammar, columns=columns, input_data=input_data
+        )
 
     def load(self, input_data):
         super(NISTWeightsCompPyparser, self).load(input_data)
-        self.base.set_index([ATOM_NUM_COL, MASS_NUM_COL], inplace=True)  # set multiindex "atomic_number","mass_number"
+        self.base.set_index(
+            [ATOM_NUM_COL, MASS_NUM_COL], inplace=True
+        )  # set multiindex "atomic_number","mass_number"
 
     def _prepare_atomic_weights(self, atomic):
         grouped = atomic.groupby([AW_TYPE_COL])
@@ -113,25 +132,32 @@ class NISTWeightsCompPyparser(BasePyparser):
         stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
 
         def atomic_weight_interval_to_nom_val_and_std(row):
-            nom_val, std_dev = to_nom_val_and_std_dev([row[AW_LWR_BND_COL], row[AW_UPR_BND_COL]])
+            nom_val, std_dev = to_nom_val_and_std_dev(
+                [row[AW_LWR_BND_COL], row[AW_UPR_BND_COL]]
+            )
             return pd.Series([nom_val, std_dev])
 
-        interval_gr[[AW_VAL_COL, AW_SD_COL]] = interval_gr.\
-            apply(atomic_weight_interval_to_nom_val_and_std, axis=1)
+        interval_gr[[AW_VAL_COL, AW_SD_COL]] = interval_gr.apply(
+            atomic_weight_interval_to_nom_val_and_std, axis=1
+        )
 
         def atomic_weight_find_stable_atom_mass(row):
             stable_isotope = self.base.loc[row.name, int(row[AW_STABLE_MASS_NUM_COL])]
             return stable_isotope[[AM_VAL_COL, AM_SD_COL]]
 
-        stable_mass_num_gr[[AW_VAL_COL, AW_SD_COL]] = stable_mass_num_gr.\
-            apply(atomic_weight_find_stable_atom_mass, axis=1)
+        stable_mass_num_gr[[AW_VAL_COL, AW_SD_COL]] = stable_mass_num_gr.apply(
+            atomic_weight_find_stable_atom_mass, axis=1
+        )
 
         atomic.update(interval_gr)
         atomic.update(stable_mass_num_gr)
-        return atomic.drop([AW_TYPE_COL, AW_LWR_BND_COL, AW_UPR_BND_COL, AW_STABLE_MASS_NUM_COL], axis=1)
+        return atomic.drop(
+            [AW_TYPE_COL, AW_LWR_BND_COL, AW_UPR_BND_COL, AW_STABLE_MASS_NUM_COL],
+            axis=1,
+        )
 
     def prepare_atomic_dataframe(self):
-        """ Returns a new dataframe created from `base` and containing data *only* related to atoms """
+        """Returns a new dataframe created from `base` and containing data *only* related to atoms"""
         atomic = self.base[ATOM_WEIGHT_COLS].reset_index(level=MASS_NUM_COL, drop=True)
         atomic = atomic[~atomic.index.duplicated()]
         atomic = self._prepare_atomic_weights(atomic)
@@ -139,7 +165,7 @@ class NISTWeightsCompPyparser(BasePyparser):
         return atomic
 
     def prepare_isotope_dataframe(self):
-        """ Returns a new dataframe created from `base` and containing data *only* related to isotopes """
+        """Returns a new dataframe created from `base` and containing data *only* related to isotopes"""
         pass
 
 
@@ -170,35 +196,46 @@ class NISTWeightsCompIngester(BaseIngester):
 
     """
 
-    def __init__(self, session, ds_short_name="nist", parser=None, downloader=None, nist_url=False):
+    def __init__(
+        self,
+        session,
+        ds_short_name="nist",
+        parser=None,
+        downloader=None,
+        nist_url=False,
+    ):
         if parser is None:
             parser = NISTWeightsCompPyparser()
         if downloader is None:
             downloader = download_weightscomp
         self.nist_url = nist_url
-        super(NISTWeightsCompIngester, self).\
-            __init__(session, ds_short_name, parser=parser, downloader=downloader)
+        super(NISTWeightsCompIngester, self).__init__(
+            session, ds_short_name, parser=parser, downloader=downloader
+        )
 
     def download(self):
         data = self.downloader(nist_url=self.nist_url)
         self.parser(data)
 
     def ingest_atomic_weights(self, atomic_weights=None):
-
         if atomic_weights is None:
             atomic_weights = self.parser.prepare_atomic_dataframe()
 
-        logger.info("Ingesting atomic weights from `{}`.".format(self.data_source.short_name))
+        logger.info(
+            "Ingesting atomic weights from `{}`.".format(self.data_source.short_name)
+        )
 
         for atomic_number, row in atomic_weights.iterrows():
-            weight = AtomWeight(atomic_number=atomic_number,
-                                     data_source=self.data_source,
-                                     quantity=row[AW_VAL_COL] * u.u,
-                                     uncert=row[AW_SD_COL])
+            weight = AtomWeight(
+                atomic_number=atomic_number,
+                data_source=self.data_source,
+                quantity=row[AW_VAL_COL] * u.u,
+                uncert=row[AW_SD_COL],
+            )
             self.session.add(weight)
 
     def ingest(self, atomic_weights=True):
-        """ *Only* ingests atomic weights *for now* """
+        """*Only* ingests atomic weights *for now*"""
 
         if self.parser.base is None:
             self.download()
@@ -216,8 +253,8 @@ class NISTWeightsComp(BaseParser):
     version : str
     """
 
-    def __init__(self, atoms='H-Pu', nist_url=False):
-        input_data =  download_weightscomp(nist_url)
+    def __init__(self, atoms="H-Pu", nist_url=False):
+        input_data = download_weightscomp(nist_url)
         self.parser = NISTWeightsCompPyparser(input_data=input_data)
         self._prepare_data(atoms)
         self._get_version()
@@ -228,21 +265,22 @@ class NISTWeightsComp(BaseParser):
 
         for atomic_number in atomic_numbers:
             basic_atomic_data = pd.read_csv(basic_atomic_data_fname)
-            basic_atomic_data = basic_atomic_data.loc[atomic_number-1]
+            basic_atomic_data = basic_atomic_data.loc[atomic_number - 1]
 
             atom_masses = self.parser.prepare_atomic_dataframe()
-            atom_masses = atom_masses.drop(columns='atomic_weight_std_dev')
+            atom_masses = atom_masses.drop(columns="atomic_weight_std_dev")
             atom_masses = atom_masses.rename(
-                            columns={'atomic_weight_nominal_value': 'mass'})
+                columns={"atomic_weight_nominal_value": "mass"}
+            )
 
             data = atom_masses.loc[[(atomic_number)]]
-            data['symbol'] = basic_atomic_data['symbol']
-            data['name'] = basic_atomic_data['name']
+            data["symbol"] = basic_atomic_data["symbol"]
+            data["name"] = basic_atomic_data["name"]
 
             atom_data_list.append(data)
 
         atom_data = pd.concat(atom_data_list)
-        self.base = atom_data[['symbol', 'name', 'mass']]
+        self.base = atom_data[["symbol", "name", "mass"]]
 
     def _get_version(self):
         """
@@ -250,8 +288,8 @@ class NISTWeightsComp(BaseParser):
         """
         selector = "td"
         html = requests.get(WEIGHTSCOMP_VERSION_URL)
-        bs = BeautifulSoup(html.text, 'html5lib')
+        bs = BeautifulSoup(html.text, "html5lib")
 
         version = bs.select(selector)
-        version = version[0].text.split()[1] 
+        version = version[0].text.split()[1]
         self.version = version
