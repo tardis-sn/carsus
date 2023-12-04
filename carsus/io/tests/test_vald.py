@@ -142,7 +142,6 @@ def test_vald_short_stellar_linelist(
     assert len(vald_linelist_short_stellar) == 95
     row = vald_linelist_short_stellar.iloc[index]
     assert_almost_equal(row["wavelength"], wavelength)
-    print(row)
     assert_allclose(
         [
             row["log_gf"],
