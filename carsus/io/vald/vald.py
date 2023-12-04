@@ -12,8 +12,6 @@ from carsus.util.helpers import (
 from astropy import units as u
 
 
-VALD_URL = "https://media.githubusercontent.com/media/tardis-sn/carsus-db/master/vald/vald_sample.dat"
-
 logger = logging.getLogger(__name__)
 
 
@@ -81,7 +79,8 @@ class VALDReader(object):
             Whether the parsed file is a shortlist or not.
         """
 
-        self.fname = VALD_URL if fname is None else fname
+        assert fname is not None, "fname must be specified"
+        self.fname = fname
 
         self._vald_raw = None
         self._vald = None
