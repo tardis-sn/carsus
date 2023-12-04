@@ -139,7 +139,7 @@ def vald_fname(data_dir):
 
 
 @pytest.fixture(scope="session")
-def vald_short_stellar_fname(data_dir):
+def vald_short_form_stellar_fname(data_dir):
     return str(data_dir / "vald_shortlist_test.dat")
 
 

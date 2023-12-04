@@ -40,15 +40,15 @@ def vald_linelist(vald_rdr):
 
 
 @pytest.fixture()
-def vald_rdr_shortlist_stellar(vald_short_stellar_fname):
+def vald_rdr_short_form_stellar(vald_short_form_stellar_fname):
     return VALDReader(
-        fname=vald_short_stellar_fname, strip_molecules=False, shortlist=True
+        fname=vald_short_form_stellar_fname, strip_molecules=False, shortlist=True
     )
 
 
 @pytest.fixture()
-def vald_linelist_short_stellar(vald_rdr_shortlist_stellar):
-    return vald_rdr_shortlist_stellar.linelist
+def vald_linelist_short_form_stellar(vald_rdr_short_form_stellar):
+    return vald_rdr_short_form_stellar.linelist
 
 
 @pytest.mark.parametrize(
@@ -137,10 +137,16 @@ def test_vald_linelist(vald_linelist):
     ],
 )
 def test_vald_short_stellar_linelist(
-    vald_linelist_short_stellar, index, wavelength, log_gf, e_low, v_mic, ion_charge
+    vald_linelist_short_form_stellar,
+    index,
+    wavelength,
+    log_gf,
+    e_low,
+    v_mic,
+    ion_charge,
 ):
-    assert len(vald_linelist_short_stellar) == 95
-    row = vald_linelist_short_stellar.iloc[index]
+    assert len(vald_linelist_short_form_stellar) == 95
+    row = vald_linelist_short_form_stellar.iloc[index]
     assert_almost_equal(row["wavelength"], wavelength)
     assert_allclose(
         [
