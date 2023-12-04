@@ -42,7 +42,7 @@ class VALDReader(object):
 
     vald_columns = [
         "elm_ion",
-        "wave_unprepared",
+        "wave_unprepared",  # This is the wavelength column header before it is ingested overwritten with appropriate units
         "log_gf",
         "e_low",
         "j_lo",
@@ -58,7 +58,7 @@ class VALDReader(object):
 
     vald_shortlist_columns = [
         "elm_ion",
-        "wave_unprepared",
+        "wave_unprepared",  # This is the wavelength column header before it is ingested overwritten with appropriate units
         "e_low",
         "log_gf",
         "rad",

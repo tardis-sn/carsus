@@ -8,6 +8,7 @@ packagename.test
 """
 
 import os
+from pathlib import Path
 
 from astropy.version import version as astropy_version
 
@@ -44,7 +45,8 @@ def pytest_configure(config):
 
         from . import __version__
 
-        packagename = os.path.basename(os.path.dirname(__file__))
+        # packagename = os.path.basename(os.path.dirname(__file__))
+        packagename = Path(__file__).parent.name
         TESTED_VERSIONS[packagename] = __version__
 
 
@@ -103,7 +105,8 @@ def memory_session():
 
 @pytest.fixture(scope="session")
 def data_dir():
-    return os.path.join(os.path.dirname(__file__), "tests", "data")
+    return Path(__file__).parent / "tests" / "data"
+    # return os.path.join(os.path.dirname(__file__), "tests", "data")
 
 
 @pytest.fixture(scope="session")
