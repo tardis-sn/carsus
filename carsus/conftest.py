@@ -7,7 +7,6 @@ packagename.test
 
 """
 
-import os
 from pathlib import Path
 
 from astropy.version import version as astropy_version
