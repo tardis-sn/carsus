@@ -153,7 +153,7 @@ class VALDReader(object):
         # Elm Ion       WL_air(A)  log gf* E_low(eV) J lo  E_up(eV) J up   lower   upper    mean   Rad.  Stark    Waals
         # 'TiO 1',     4100.00020, -11.472,  0.2011, 31.0,  3.2242, 32.0, 99.000, 99.000, 99.000, 6.962, 0.000, 0.000,
 
-        data_match = re.compile("'[a-zA-Z]+ \d+',[\s*-?\d+[\.\d+]+,]*")
+        DATA_RE_PATTERN = re.compile("'[a-zA-Z]+ \d+',[\s*-?\d+[\.\d+]+,]*")
 
         buffer, checksum = read_from_buffer(self.fname)
         content = buffer.read().decode()
@@ -173,7 +173,7 @@ class VALDReader(object):
                 self._stellar_linelist = True
 
         vald = pd.read_csv(
-            StringIO("\n".join(data_match.findall(content))),
+            StringIO("\n".join(DATA_RE_PATTERN.findall(content))),
             names=self._vald_columns,
             index_col=False,
         )

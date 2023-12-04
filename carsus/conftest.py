@@ -123,11 +123,11 @@ def test_db_url(test_db_fname):
 
 @pytest.fixture(scope="session")
 def gfall_fname(data_dir):
-    return str(Path(data_dir) / "gftest.all")  # Be III, B IV, N VI
+    return str(data_dir / "gftest.all")  # Be III, B IV, N VI
 
 
 @pytest.fixture(scope="session")
-def gfall_http(data_dir):
+def gfall_http():
     url = "https://raw.githubusercontent.com/tardis-sn/carsus/"
     url += "master/carsus/tests/data/gftest.all"
     return url
@@ -135,17 +135,17 @@ def gfall_http(data_dir):
 
 @pytest.fixture(scope="session")
 def vald_fname(data_dir):
-    return str(Path(data_dir) / "valdtest.dat")
+    return str(data_dir / "valdtest.dat")
 
 
 @pytest.fixture(scope="session")
 def vald_short_stellar_fname(data_dir):
-    return (Path(data_dir) / "vald_shortlist_test.dat").name
+    return str(data_dir / "vald_shortlist_test.dat")
 
 
 @pytest.fixture(scope="session")
 def nndc_dirname(data_dir):
-    return str(Path(data_dir) / "nndc")  # Mn-52, Ni-56
+    return str(data_dir / "nndc")  # Mn-52, Ni-56
 
 
 @pytest.fixture(scope="session")
