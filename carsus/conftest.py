@@ -113,7 +113,7 @@ def test_db_fname(request):
     if test_db_fname is None:
         pytest.skip("--testing database was not specified")
     else:
-        return Path(test_db_fname).expanduser().resolve()
+        return str(Path(test_db_fname).expanduser().resolve())
 
 
 @pytest.fixture(scope="session")
@@ -123,7 +123,7 @@ def test_db_url(test_db_fname):
 
 @pytest.fixture(scope="session")
 def gfall_fname(data_dir):
-    return Path(data_dir) / "gftest.all"  # Be III, B IV, N VI
+    return str(Path(data_dir) / "gftest.all")  # Be III, B IV, N VI
 
 
 @pytest.fixture(scope="session")
@@ -135,17 +135,17 @@ def gfall_http(data_dir):
 
 @pytest.fixture(scope="session")
 def vald_fname(data_dir):
-    return Path(data_dir) / "valdtest.dat"
+    return str(Path(data_dir) / "valdtest.dat")
 
 
 @pytest.fixture(scope="session")
 def vald_short_stellar_fname(data_dir):
-    return Path(data_dir) / "vald_shortlist_test.dat"
+    return (Path(data_dir) / "vald_shortlist_test.dat").name
 
 
 @pytest.fixture(scope="session")
 def nndc_dirname(data_dir):
-    return Path(data_dir) / "nndc"  # Mn-52, Ni-56
+    return str(Path(data_dir) / "nndc")  # Mn-52, Ni-56
 
 
 @pytest.fixture(scope="session")
@@ -185,4 +185,4 @@ def refdata_path(request):
     if refdata_path is None:
         pytest.skip("--refdata folder path was not specified")
     else:
-        return Path(refdata_path).expanduser().resolve()
+        return str(Path(refdata_path).expanduser().resolve())
