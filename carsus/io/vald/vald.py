@@ -182,6 +182,28 @@ class VALDReader(object):
 
         return vald, checksum
 
+    def check_wavelength_column_medium_and_units(self):
+        wave_col_name = self.vald_raw.columns[1]
+        if "air" in wave_col_name:
+            wave_air = True
+        elif "vac" in wave_col_name:
+            wave_air = False
+        else:
+            raise ValueError(
+                "Wavelength column header does not contain air or vac - Not sure what medium the wavelengths are in"
+            )
+        if "(A)" in wave_col_name:
+            wave_units = u.AA
+        elif "(nm)" in wave_col_name:
+            wave_units = u.nm
+        elif "(cm-1)" in wave_col_name:
+            wave_units = u.cm**-1
+        else:
+            raise ValueError(
+                "Wavelength column header does not contain units - Not sure what units the wavelengths are in"
+            )
+        return wave_col_name, wave_air, wave_units
+
     def parse_vald(self, vald_raw=None, strip_molecules=True):
         """
         Parses raw vald DataFrame
@@ -204,18 +226,17 @@ class VALDReader(object):
         vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
         vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
 
-        wave = vald.columns[1]
-        if "nm" in wave:
-            if "air" in wave:
-                vald["wavelength"] = convert_wavelength_air2vacuum(
-                    (vald[wave].values * u.nm).to(u.AA)
-                )
-            else:
-                vald["wavelength"] = (vald[wave].values * u.nm).to(u.AA)
-        elif "air" in wave:
-            vald["wavelength"] = convert_wavelength_air2vacuum(vald[wave])
-        else:
-            vald["wavelength"] = vald[wave]
+        # Check units and medium of wavelength column and create wavelength column in angstroms in vacuum
+        (
+            wave_col_name,
+            wave_air,
+            wave_units,
+        ) = self.check_wavelength_column_medium_and_units()
+        vald["wavelength"] = (vald[wave_col_name].values * wave_units).to(u.AA).value
+        if wave_air:
+            vald["wavelength"] = convert_wavelength_air2vacuum(
+                (vald["wavelength"].values * wave_units).to(u.AA).value
+            )
 
         del vald["elm_ion"]
 
