@@ -67,6 +67,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
 
+DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
+
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -102,11 +104,6 @@ def memory_session():
 
 
 @pytest.fixture(scope="session")
-def data_dir():
-    return Path(__file__).parent / "tests" / "data"
-
-
-@pytest.fixture(scope="session")
 def test_db_fname(request):
     test_db_fname = request.config.getoption("--test-db")
     if test_db_fname is None:
@@ -121,8 +118,8 @@ def test_db_url(test_db_fname):
 
 
 @pytest.fixture(scope="session")
-def gfall_fname(data_dir):
-    return str(data_dir / "gftest.all")  # Be III, B IV, N VI
+def gfall_fname():
+    return str(DATA_DIR_PATH / "gftest.all")  # Be III, B IV, N VI
 
 
 @pytest.fixture(scope="session")
@@ -133,18 +130,18 @@ def gfall_http():
 
 
 @pytest.fixture(scope="session")
-def vald_fname(data_dir):
-    return str(data_dir / "valdtest.dat")
+def vald_fname():
+    return str(DATA_DIR_PATH / "valdtest.dat")
 
 
 @pytest.fixture(scope="session")
-def vald_short_form_stellar_fname(data_dir):
-    return str(data_dir / "vald_shortlist_test.dat")
+def vald_short_form_stellar_fname():
+    return str(DATA_DIR_PATH / "vald_shortlist_test.dat")
 
 
 @pytest.fixture(scope="session")
-def nndc_dirname(data_dir):
-    return str(data_dir / "nndc")  # Mn-52, Ni-56
+def nndc_dirname():
+    return str(DATA_DIR_PATH / "nndc")  # Mn-52, Ni-56
 
 
 @pytest.fixture(scope="session")
