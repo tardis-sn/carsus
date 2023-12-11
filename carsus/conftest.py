@@ -7,7 +7,7 @@ packagename.test
 
 """
 
-import os
+from pathlib import Path
 
 from astropy.version import version as astropy_version
 
@@ -44,7 +44,7 @@ def pytest_configure(config):
 
         from . import __version__
 
-        packagename = os.path.basename(os.path.dirname(__file__))
+        packagename = Path(__file__).parent.name
         TESTED_VERSIONS[packagename] = __version__
 
 
@@ -66,6 +66,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
+
+DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
 
 
 def pytest_addoption(parser):
@@ -102,17 +104,12 @@ def memory_session():
 
 
 @pytest.fixture(scope="session")
-def data_dir():
-    return os.path.join(os.path.dirname(__file__), "tests", "data")
-
-
-@pytest.fixture(scope="session")
 def test_db_fname(request):
     test_db_fname = request.config.getoption("--test-db")
     if test_db_fname is None:
         pytest.skip("--testing database was not specified")
     else:
-        return os.path.expandvars(os.path.expanduser(test_db_fname))
+        return str(Path(test_db_fname).expanduser().resolve())
 
 
 @pytest.fixture(scope="session")
@@ -121,25 +118,30 @@ def test_db_url(test_db_fname):
 
 
 @pytest.fixture(scope="session")
-def gfall_fname(data_dir):
-    return os.path.join(data_dir, "gftest.all")  # Be III, B IV, N VI
+def gfall_fname():
+    return str(DATA_DIR_PATH / "gftest.all")  # Be III, B IV, N VI
 
 
 @pytest.fixture(scope="session")
-def gfall_http(data_dir):
+def gfall_http():
     url = "https://raw.githubusercontent.com/tardis-sn/carsus/"
     url += "master/carsus/tests/data/gftest.all"
     return url
 
 
 @pytest.fixture(scope="session")
-def vald_fname(data_dir):
-    return os.path.join(data_dir, "valdtest.dat")
+def vald_fname():
+    return str(DATA_DIR_PATH / "valdtest.dat")
 
 
 @pytest.fixture(scope="session")
-def nndc_dirname(data_dir):
-    return os.path.join(data_dir, "nndc")  # Mn-52, Ni-56
+def vald_short_form_stellar_fname():
+    return str(DATA_DIR_PATH / "vald_shortlist_test.dat")
+
+
+@pytest.fixture(scope="session")
+def nndc_dirname():
+    return str(DATA_DIR_PATH / "nndc")  # Mn-52, Ni-56
 
 
 @pytest.fixture(scope="session")
@@ -179,4 +181,4 @@ def refdata_path(request):
     if refdata_path is None:
         pytest.skip("--refdata folder path was not specified")
     else:
-        return os.path.expandvars(os.path.expanduser(refdata_path))
+        return str(Path(refdata_path).expanduser().resolve())
