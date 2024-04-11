@@ -60,14 +60,13 @@ jobs:
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
-      - name: Setup carsus environment
-        uses: conda-incubator/setup-miniconda@v2
+      - uses: mamba-org/setup-micromamba@v1
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            environment-file: carsus/carsus_env3.yml
-            activate-environment: carsus
-            use-mamba: true
+          environment-file: conda-lock.yml
+          init-shell: bash
+          cache-environment: true
+          cache-downloads: true 
+          environment-name: carsus
 
       - name: Install package
         run: pip install -e carsus/

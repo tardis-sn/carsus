@@ -63,7 +63,7 @@ jobs:
           git lfs pull --include="test_databases/test.db"
 
       - name: Clone tardis-sn/carsus-refdata
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: tardis-sn/carsus-refdata
           path: carsus-refdata
@@ -93,15 +93,14 @@ jobs:
             wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
-
-      - name: Setup environment
-        uses: conda-incubator/setup-miniconda@v2
+      
+      - uses: mamba-org/setup-micromamba@v1
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            environment-file: carsus_env3.yml
-            activate-environment: carsus
-            use-mamba: true
+          environment-file: conda-lock.yml
+          init-shell: bash
+          cache-environment: true
+          cache-downloads: true 
+          environment-name: carsus
 
       - name: Install package
         run: pip install -e .
