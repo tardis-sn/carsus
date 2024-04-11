@@ -100,6 +100,7 @@ jobs:
           init-shell: bash
           cache-environment: true
           cache-downloads: true 
+          environment-name: carsus
 
       - name: Install package
         run: pip install -e .
