@@ -65,8 +65,7 @@ jobs:
       - name: Clone tardis-sn/carsus-refdata
         uses: actions/checkout@v4
         with:
-          repository: atharva-2001/carsus-refdata
-          ref: update_ionisation_data
+          repository: tardis-sn/carsus-refdata
           path: carsus-refdata
           lfs: true
 
