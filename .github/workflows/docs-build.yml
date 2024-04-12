@@ -7,12 +7,20 @@ name: docs
 on:
   push:
     branches:
-    - '*'
-  pull_request:
-    branches:
-    - '*'
+      - master
 
-  workflow_dispatch:
+  pull_request_target:
+    branches:
+      - master
+
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled                         # requires the `build-docs` label
+
+  workflow_dispatch:                    # manual trigger
+
   schedule:
     - cron: '0 0 * * 0' # run at midnight every Sunday
 
@@ -26,32 +34,19 @@ env:
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+  DEPLOY_BRANCH: gh-pages               # deployed docs branch
 
 jobs:
 
   build:
-
-    #  The `docs` workflow is triggered when a commit is pushed to any branch
-    #  of the main repo or fork, but the `build` job starts when one of these 
-    #  conditions is met:
-    #
-    #    a) the branch is `master`
-    #    b) the branch name contains the word `doc(s)`
-    #    c) the commit message includes the a valid tag
-    #    d) the workflow has been triggered manually
-
-    if: github.ref == 'refs/heads/master' ||
+    if: github.event_name == 'push' ||
         github.event_name == 'workflow_dispatch' ||
-        contains(github.ref, 'doc') ||
-        contains(github.event.head_commit.message, '[build docs]') ||
-        contains(github.event.head_commit.message, '[build_docs]') ||
-        contains(github.event.head_commit.message, '[build doc]') ||
-        contains(github.event.head_commit.message, '[build_doc]')
-
+        (github.event_name == 'pull_request_target' &&
+        contains(github.event.pull_request.labels.*.name, 'build-docs'))
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -96,80 +91,100 @@ jobs:
         shell: bash -l {0}
         run: cd docs/; make html
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: html-dir
-          path: docs/_build/html
+      - name: Set destination directory
+        run: |
+          BRANCH=$(echo ${GITHUB_REF#refs/heads/})
+          if [[ $EVENT == push ]] || [[ $EVENT == workflow_dispatch ]]; then
 
-  deploy:
-  
-    needs: build
+            if [[ $BRANCH == $DEFAULT ]]; then
+              echo "DEST_DIR=" >> $GITHUB_ENV
+            else
+              echo "DEST_DIR=branch/$BRANCH" >> $GITHUB_ENV
+            fi
 
-    #  The website is deployed to the root of the `gh-pages` branch of the main 
-    #  repository or fork, only after a commit is pushed to the `master` branch, 
-    #  and the result will be displayed at:
-    #
-    #    tardis-sn.github.io/carsus         (main repository)
-    #    OR <username>.github.io/carsus     (forks)
+          elif [[ $EVENT == pull_request_target ]]; then
+            echo "DEST_DIR=pull/$PR" >> $GITHUB_ENV
 
-    if: github.ref == 'refs/heads/master'
+          else
+            echo "Unexpected event trigger $EVENT"
+            exit 1
 
-    runs-on: ubuntu-latest
-    steps:
+          fi
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: html-dir
-          path: docs/_build/html
+          cat $GITHUB_ENV
+        env:
+          DEFAULT: ${{ github.event.repository.default_branch }}
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.number }}
 
-      - name: Deploy main site
+      - name: Set clean branch option
+        run: |
+          if [[ $EVENT == workflow_dispatch ]]; then
+            echo "CLEAN_BRANCH=true" >> $GITHUB_ENV
+
+          else
+            echo "CLEAN_BRANCH=false" >> $GITHUB_ENV
+
+          fi
+
+          cat $GITHUB_ENV
+        env:
+          EVENT: ${{ github.event_name }}
+
+      - name: Deploy ${{ env.DEST_DIR }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: docs/_build/html
-          force_orphan: true
+          publish_branch: ${{ env.DEPLOY_BRANCH }}
+          publish_dir: ./docs/_build/html
+          destination_dir: ${{ env.DEST_DIR }}
+          keep_files: true
+          force_orphan: ${{ env.CLEAN_BRANCH }}
+          user_name: 'Github Actions'
+          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
 
-  preview:
-    needs: build
-
-    #  Branch preview is only available on forks, and requires at least one of 
-    #  these conditions to be met:
-    #
-    #    a) the branch name contains the word `doc(s)`
-    #    b) commit message includes the a valid tag
-    #    c) the workflow is triggered manually
-    #
-    #  Result will be displayed at: 
-    #
-    #    <username>.github.io/carsus/branch/<branch-name>
-
-    if: github.repository_owner != 'tardis-sn' &&
-        github.ref != 'refs/heads/master' && (
-        github.event_name == 'workflow_dispatch' ||
-        contains(github.ref, 'doc') ||
-        contains(github.event.head_commit.message, '[build docs]') ||
-        contains(github.event.head_commit.message, '[build_docs]') ||
-        contains(github.event.head_commit.message, '[build doc]') ||
-        contains(github.event.head_commit.message, '[build_doc]'))
-
-    runs-on: ubuntu-latest
-    steps:
-
-      - uses: actions/download-artifact@v2
+      - name: Find comment
+        uses: peter-evans/find-comment@v1
+        id: fc
         with:
-          name: html-dir
-          path: docs/_build/html
+          issue-number: ${{ github.event.number }}
+          body-includes: Hi, human.
+        if: always() && github.event_name == 'pull_request_target'
 
-      - name: Get branch name
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: get_branch_name
-
-      - name: Deploy branch site
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Post comment (success)
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: docs/_build/html
-          destination_dir: branch/${{ steps.get_branch_name.outputs.branch }}
-          force_orphan: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            *\*beep\* \*bop\**
+
+            Hi, human.
+
+            The **`${{ github.workflow }}`** workflow has **succeeded** :heavy_check_mark:
+            
+            [**Click here**](${{ env.URL }}) to see your results.
+        env:
+          URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pull/${{ github.event.number }}/index.html
+        if: success() && github.event_name == 'pull_request_target'
+
+      - name: Post comment (failure)
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token:  ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            *\*beep\* \*bop\**
+
+            Hi, human.
+
+            The **`${{ github.workflow }}`** workflow has **failed** :x:
+            
+            [**Click here**](${{ env.URL }}) to see the build log.
+        env:
+          URL: https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}?check_suite_focus=true
+        if: failure() && github.event_name == 'pull_request_target'
