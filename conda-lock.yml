@@ -4082,33 +4082,31 @@ package:
   category: main
   optional: false
 - name: numpydoc
-  version: 1.7.0
+  version: 1.5.0
   manager: conda
   platform: linux-64
   dependencies:
     jinja2: '>=2.10'
     python: '>=3.7'
-    sphinx: '>=5'
-    tabulate: '>=0.8.10'
-  url: https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.7.0-pyhd8ed1ab_0.conda
+    sphinx: '>=1.8'
+  url: https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.5.0-pyhd8ed1ab_0.tar.bz2
   hash:
-    md5: 1ad3afced398492586ca1bef70328be4
-    sha256: fe33123d34c06c6bc05095f17f92d43f012f990813ad4cf0cc93f7b215c2ad04
+    md5: 3c275d7168a6a135329f4acb364c229a
+    sha256: a45bc74d4ccb5e850f21e3aaf1f0718065569944f99505e49da5409528193348
   category: main
   optional: false
 - name: numpydoc
-  version: 1.7.0
+  version: 1.5.0
   manager: conda
   platform: osx-64
   dependencies:
     python: '>=3.7'
     jinja2: '>=2.10'
-    sphinx: '>=5'
-    tabulate: '>=0.8.10'
-  url: https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.7.0-pyhd8ed1ab_0.conda
+    sphinx: '>=1.8'
+  url: https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.5.0-pyhd8ed1ab_0.tar.bz2
   hash:
-    md5: 1ad3afced398492586ca1bef70328be4
-    sha256: fe33123d34c06c6bc05095f17f92d43f012f990813ad4cf0cc93f7b215c2ad04
+    md5: 3c275d7168a6a135329f4acb364c229a
+    sha256: a45bc74d4ccb5e850f21e3aaf1f0718065569944f99505e49da5409528193348
   category: main
   optional: false
 - name: olefile
@@ -6625,30 +6623,6 @@ package:
   hash:
     md5: fc4dae09f6b38084f3bfc87c77032584
     sha256: c9c1b7d6025d5efa74f4ddbda1ae72a721f041ad3d4a6ec3dda600befe9dffaa
-  category: main
-  optional: false
-- name: tabulate
-  version: 0.9.0
-  manager: conda
-  platform: linux-64
-  dependencies:
-    python: '>=3.7'
-  url: https://conda.anaconda.org/conda-forge/noarch/tabulate-0.9.0-pyhd8ed1ab_1.tar.bz2
-  hash:
-    md5: 4759805cce2d914c38472f70bf4d8bcb
-    sha256: f6e4a0dd24ba060a4af69ca79d32361a6678e61d78c73eb5e357909b025b4620
-  category: main
-  optional: false
-- name: tabulate
-  version: 0.9.0
-  manager: conda
-  platform: osx-64
-  dependencies:
-    python: '>=3.7'
-  url: https://conda.anaconda.org/conda-forge/noarch/tabulate-0.9.0-pyhd8ed1ab_1.tar.bz2
-  hash:
-    md5: 4759805cce2d914c38472f70bf4d8bcb
-    sha256: f6e4a0dd24ba060a4af69ca79d32361a6678e61d78c73eb5e357909b025b4620
   category: main
   optional: false
 - name: terminado

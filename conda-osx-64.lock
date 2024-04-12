@@ -136,7 +136,6 @@ https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-jsmath-1.0.1-pyhd8ed
 https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-qthelp-1.0.3-py_0.tar.bz2#d01180388e6d1838c3e1ad029590aa7a
 https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-serializinghtml-1.1.5-pyhd8ed1ab_2.tar.bz2#9ff55a0901cf952f05c654394de76bf7
 https://conda.anaconda.org/conda-forge/osx-64/sqlalchemy-1.2.18-py37h1de35cc_0.tar.bz2#963e47a6588edbea2f76796f2255fcfd
-https://conda.anaconda.org/conda-forge/noarch/tabulate-0.9.0-pyhd8ed1ab_1.tar.bz2#4759805cce2d914c38472f70bf4d8bcb
 https://conda.anaconda.org/conda-forge/osx-64/thrift-cpp-0.12.0-h874095a_1004.tar.bz2#e1c65e82c8ea5349169e6ce7e5a24c18
 https://conda.anaconda.org/conda-forge/noarch/toml-0.10.2-pyhd8ed1ab_0.tar.bz2#f832c45a477c78bebd107098db465095
 https://conda.anaconda.org/conda-forge/noarch/tomli-2.0.1-pyhd8ed1ab_0.tar.bz2#5844808ffab9ebdb694585b50ba02a96
@@ -215,7 +214,7 @@ https://conda.anaconda.org/conda-forge/noarch/uncertainties-3.1.7-pyhd8ed1ab_0.t
 https://conda.anaconda.org/conda-forge/osx-64/ipython-7.33.0-py37hf985489_0.tar.bz2#5290a8018447303c34674bfa57696559
 https://conda.anaconda.org/conda-forge/osx-64/matplotlib-3.3.2-py37hf985489_1.tar.bz2#152f8673265782532f880bdfb0e851ce
 https://conda.anaconda.org/conda-forge/noarch/nbclient-0.7.0-pyhd8ed1ab_0.tar.bz2#87eed34d791330d8acdab6a8ab63113f
-https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.7.0-pyhd8ed1ab_0.conda#1ad3afced398492586ca1bef70328be4
+https://conda.anaconda.org/conda-forge/noarch/numpydoc-1.5.0-pyhd8ed1ab_0.tar.bz2#3c275d7168a6a135329f4acb364c229a
 https://conda.anaconda.org/conda-forge/noarch/parquet-cpp-1.5.1-2.tar.bz2#79a5f78c42817594ae016a7896521a97
 https://conda.anaconda.org/conda-forge/osx-64/pytables-3.6.1-py37he7827f7_2.tar.bz2#1ec7244ad2b48010bc8c98c05cf889ae
 https://conda.anaconda.org/conda-forge/noarch/pytest-7.4.4-pyhd8ed1ab_0.conda#a9d145de8c5f064b5fa68fb34725d9f4
