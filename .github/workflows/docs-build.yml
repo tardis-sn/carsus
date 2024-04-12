@@ -25,7 +25,7 @@ on:
     - cron: '0 0 * * 0' # run at midnight every Sunday
 
 concurrency:
-  group: docs-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -167,7 +167,7 @@ jobs:
             
             [**Click here**](${{ env.URL }}) to see your results.
         env:
-          URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pull/${{ github.event.number }}/index.html
+          URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pull/${{ github.event.number }}/
         if: success() && github.event_name == 'pull_request_target'
 
       - name: Post comment (failure)
