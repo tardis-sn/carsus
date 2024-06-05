@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GFALL &mdash; carsus v0.1.dev723+g1fb3256</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CHIANTI" href="chianti.html" />
+    <link rel="prev" title="NIST" href="nist.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                0.1.dev723+g1fb3256
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nist.html">NIST</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nndc.html">NNDC DATA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Legacy Code</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../legacy/index.html">SQL Interface</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GFALL</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/gfall.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="GFALL">
+<h1>GFALL<a class="headerlink" href="#GFALL" title="Permalink to this heading"></a></h1>
+<p>Atomic spectral line database from CD-ROM 23 of R. L. Kurucz.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.kurucz</span> <span class="kn">import</span> <span class="n">GFALLReader</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.8.4
+ found PyQt5 widgets
+ using PyQt5 widgets
+</pre></div></div>
+</div>
+<p>By default, a patched version of <code class="docutils literal notranslate"><span class="pre">gfall.dat</span></code> is downloaded from the <a class="reference external" href="https://github.com/tardis-sn/carsus-db/tree/master/gfall">tardis-sn/carsus-db</a> repository. If you want to use a local copy use the <code class="docutils literal notranslate"><span class="pre">fname</span></code> parameter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gfall_reader</span> <span class="o">=</span> <span class="n">GFALLReader</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">    carsus.io.kurucz.gfall</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - A specific combination to identify unique levels from GFALL data has not been given. Defaulting to [&#34;energy&#34;, &#34;j&#34;]. (<span class="ansi-bold">gfall.py</span>:90)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gfall_reader</span><span class="o">.</span><span class="n">levels</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy</th>
+      <th>j</th>
+      <th>label</th>
+      <th>method</th>
+      <th>priority</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">2</th>
+      <th rowspan="5" valign="top">0</th>
+      <th>0</th>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>s2 1S</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>159856.069</td>
+      <td>1.0</td>
+      <td>2s 3S</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>166277.546</td>
+      <td>0.0</td>
+      <td>2s 1S</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>169086.864</td>
+      <td>2.0</td>
+      <td>2p 3P</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>169086.940</td>
+      <td>1.0</td>
+      <td>2p 3P</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">92</th>
+      <th rowspan="5" valign="top">1</th>
+      <th>261</th>
+      <td>39508.266</td>
+      <td>7.5</td>
+      <td>NaN</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>262</th>
+      <td>41317.031</td>
+      <td>5.5</td>
+      <td>NaN</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>263</th>
+      <td>43635.738</td>
+      <td>6.5</td>
+      <td>NaN</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>264</th>
+      <td>44173.973</td>
+      <td>6.5</td>
+      <td>NaN</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>265</th>
+      <td>45533.457</td>
+      <td>6.5</td>
+      <td>NaN</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+<p>38334 rows × 5 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gfall_reader</span><span class="o">.</span><span class="n">lines</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">    carsus.io.kurucz.gfall</span>][<span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Extracting line data: atomic_number, ion_charge, energy_lower, j_lower, energy_upper, j_upper, wavelength, loggf. (<span class="ansi-bold">gfall.py</span>:347)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy_upper</th>
+      <th>j_upper</th>
+      <th>energy_lower</th>
+      <th>j_lower</th>
+      <th>wavelength</th>
+      <th>gf</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index_lower</th>
+      <th>level_index_upper</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">7</th>
+      <th rowspan="2" valign="top">5</th>
+      <th rowspan="2" valign="top">0</th>
+      <th>14</th>
+      <td>4016390.000</td>
+      <td>1.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>2.4898</td>
+      <td>0.143880</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3473790.000</td>
+      <td>1.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>2.8787</td>
+      <td>0.674528</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">5</th>
+      <th rowspan="3" valign="top">3</th>
+      <th rowspan="3" valign="top">0</th>
+      <th>9</th>
+      <td>1898180.000</td>
+      <td>1.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>5.2682</td>
+      <td>0.134896</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1658020.000</td>
+      <td>1.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>6.0313</td>
+      <td>0.609537</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1636882.000</td>
+      <td>1.0</td>
+      <td>0.000</td>
+      <td>0.0</td>
+      <td>6.1092</td>
+      <td>0.000007</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">26</th>
+      <th>0</th>
+      <th>323</th>
+      <th>330</th>
+      <td>51461.667</td>
+      <td>4.0</td>
+      <td>51361.388</td>
+      <td>3.0</td>
+      <td>99694.5982</td>
+      <td>0.013002</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>722</th>
+      <th>725</th>
+      <td>109912.180</td>
+      <td>4.5</td>
+      <td>109811.920</td>
+      <td>4.5</td>
+      <td>99713.4910</td>
+      <td>0.000094</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <th>0</th>
+      <th>138</th>
+      <th>144</th>
+      <td>48340.750</td>
+      <td>0.0</td>
+      <td>48240.530</td>
+      <td>1.0</td>
+      <td>99753.2890</td>
+      <td>3.380648</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <th>0</th>
+      <th>326</th>
+      <th>333</th>
+      <td>43975.718</td>
+      <td>1.0</td>
+      <td>43875.513</td>
+      <td>1.0</td>
+      <td>99768.2213</td>
+      <td>0.000769</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <th>0</th>
+      <th>177</th>
+      <th>190</th>
+      <td>48760.140</td>
+      <td>2.0</td>
+      <td>48660.130</td>
+      <td>1.0</td>
+      <td>99962.7500</td>
+      <td>0.001324</td>
+    </tr>
+  </tbody>
+</table>
+<p>563283 rows × 6 columns</p>
+</div></div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {}, "version_major": 2, "version_minor": 0}
+</script></section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nist.html" class="btn btn-neutral float-left" title="NIST" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chianti.html" class="btn btn-neutral float-right" title="CHIANTI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 05 Jun 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

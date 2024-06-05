@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart for Carsus SQL &mdash; carsus v0.1.dev723+g1fb3256</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Database Models in Carsus" href="model/model.html" />
+    <link rel="prev" title="SQL Interface" href="index.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                0.1.dev723+g1fb3256
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../io/nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/nndc.html">NNDC DATA</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Legacy Code</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">SQL Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Quickstart for Carsus SQL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Creating-a-Database">Creating a Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Atomic-Weights-and-Ionization-Energies">Atomic Weights and Ionization Energies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Levels,-Lines-and-Collisions">Levels, Lines and Collisions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#GFALL">GFALL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CHIANTI">CHIANTI</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Zeta-Data">Zeta Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Dump-to-HDF5">Dump to HDF5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model/model.html">Database Models in Carsus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api.html">API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">SQL Interface</a></li>
+      <li class="breadcrumb-item active">Quickstart for Carsus SQL</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/legacy/quickstart_legacy.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Quickstart-for-Carsus-SQL">
+<h1>Quickstart for Carsus SQL<a class="headerlink" href="#Quickstart-for-Carsus-SQL" title="Permalink to this heading"></a></h1>
+<p>This notebook provides a quick introduction in using Carsus with the SQL interface.</p>
+<section id="Creating-a-Database">
+<h2>Creating a Database<a class="headerlink" href="#Creating-a-Database" title="Permalink to this heading"></a></h2>
+<p>To start working with a database you need to initialize it. This requires an <code class="docutils literal notranslate"><span class="pre">url</span></code>, for example <code class="docutils literal notranslate"><span class="pre">sqlite:///path/to/example.db</span></code>.</p>
+<p>In this guide we’ll use a in-memory <code class="docutils literal notranslate"><span class="pre">sqlite</span></code> database, so we leave the <code class="docutils literal notranslate"><span class="pre">url</span></code> empty:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus</span> <span class="kn">import</span> <span class="n">init_db</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">init_db</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                carsus.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Initializing the database at sqlite:// (<span class="ansi-bold">base.py</span>:32)
+[<span class="ansi-bold">                carsus.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting basic atomic data. (<span class="ansi-bold">base.py</span>:45)
+</pre></div></div>
+</div>
+<p>Now, we have an SQLAlchemy <code class="docutils literal notranslate"><span class="pre">Session</span></code> object named <code class="docutils literal notranslate"><span class="pre">session</span></code>. We can use <code class="docutils literal notranslate"><span class="pre">session</span></code> to make simple queries. As you can see from the output, some basic atomic data has been ingested into our database.</p>
+<p>Let’s examine it:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.model</span> <span class="kn">import</span> <span class="n">Atom</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of Atoms in the database: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Atom</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()))</span>
+<span class="n">si</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Atom</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Symbol: </span><span class="si">{}</span><span class="s1">, atomic_number: </span><span class="si">{}</span><span class="s1">, name: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of Atoms in the database: 118
+Symbol: Si, atomic_number: 14, name: Silicon
+</pre></div></div>
+</div>
+<p>So, our database already contains basic information about atoms. But this information has not been commited to the database yet. It is always <strong>your responsibility</strong> to commit the data!.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Atomic-Weights-and-Ionization-Energies">
+<h2>Atomic Weights and Ionization Energies<a class="headerlink" href="#Atomic-Weights-and-Ionization-Energies" title="Permalink to this heading"></a></h2>
+<p>To store more interesting data we are going to use <strong>ingesters</strong>. For each data source supported by Carsus there is a corresponding <strong>ingester class</strong>.</p>
+<p>For example, to ingest atomic weights from the NIST Atomic Weights and Isotopic Compositions database:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.nist</span> <span class="kn">import</span> <span class="n">NISTWeightsCompIngester</span>
+
+<span class="n">weightscomp_ingester</span> <span class="o">=</span> <span class="n">NISTWeightsCompIngester</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+<span class="n">weightscomp_ingester</span><span class="o">.</span><span class="n">ingest</span><span class="p">()</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.8.4
+ found PyQt5 widgets
+ using PyQt5 widgets
+[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:72)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  InsecureRequestWarning,
+ (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting atomic weights from `nist`. (<span class="ansi-bold">weightscomp.py</span>:225)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;Quantity: 28.085 u&gt;]
+</pre></div></div>
+</div>
+<p>And the ionization energies from the NIST Atomic Spectra Database:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.nist</span> <span class="kn">import</span> <span class="n">NISTIonizationEnergiesIngester</span>
+
+<span class="n">ioniz_energies_ingester</span> <span class="o">=</span> <span class="n">NISTIonizationEnergiesIngester</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">spectra</span><span class="o">=</span><span class="s1">&#39;H-Mg&#39;</span><span class="p">)</span>
+<span class="n">ioniz_energies_ingester</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">ionization_energies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ground_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:89)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  InsecureRequestWarning,
+ (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting ionization energies from `nist-asd`. (<span class="ansi-bold">ionization.py</span>:331)
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting ground levels from `nist-asd`. (<span class="ansi-bold">ionization.py</span>:356)
+</pre></div></div>
+</div>
+</section>
+<section id="Levels,-Lines-and-Collisions">
+<h2>Levels, Lines and Collisions<a class="headerlink" href="#Levels,-Lines-and-Collisions" title="Permalink to this heading"></a></h2>
+<p>The Carsus SQL interface supports only two sources of energy levels and spectral lines: GFALL and CHIANTI.</p>
+<section id="GFALL">
+<h3>GFALL<a class="headerlink" href="#GFALL" title="Permalink to this heading"></a></h3>
+<p>The Robert Kurucz’s Atomic Linelist (GFALL) is the main source of levels and lines in Carsus.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.kurucz</span> <span class="kn">import</span> <span class="n">GFALLIngester</span>
+
+<span class="n">gfall_url</span> <span class="o">=</span> <span class="s1">&#39;http://kurucz.harvard.edu/linelists/gfall/gfall.dat&#39;</span>
+<span class="n">gfall_ingester</span> <span class="o">=</span> <span class="n">GFALLIngester</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">gfall_url</span><span class="p">,</span> <span class="n">ions</span><span class="o">=</span><span class="s1">&#39;H-Mg&#39;</span><span class="p">)</span>
+<span class="n">gfall_ingester</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - A specific combination to identify unique levels from GFALL data has not been given. Defaulting to [&#34;energy&#34;, &#34;j&#34;]. (<span class="ansi-bold">gfall.py</span>:129)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Parsing GFALL from: http://kurucz.harvard.edu/linelists/gfall/gfall.dat (<span class="ansi-bold">gfall.py</span>:182)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels from `ku_latest`. (<span class="ansi-bold">gfall.py</span>:574)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for He 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for He 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Li 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Li 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Be 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Be 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Be 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for B 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for B 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for B 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for B 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for C 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for C 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for C 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for C 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for N 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for F 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Ne 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Na 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 0. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 1. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 2. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 3. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 4. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for Mg 5. (<span class="ansi-bold">gfall.py</span>:586)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Extracting line data: atomic_number, ion_charge, energy_lower, j_lower, energy_upper, j_upper, wavelength, loggf. (<span class="ansi-bold">gfall.py</span>:425)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines from `ku_latest`. (<span class="ansi-bold">gfall.py</span>:628)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for He 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for He 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Li 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Li 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Be 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Be 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Be 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for B 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for B 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for B 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for B 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for C 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for C 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for C 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for C 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for N 5. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 5. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for F 5. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Ne 5. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Na 5. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 0. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 1. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 2. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 3. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 4. (<span class="ansi-bold">gfall.py</span>:640)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for Mg 5. (<span class="ansi-bold">gfall.py</span>:640)
+</pre></div></div>
+</div>
+</section>
+<section id="CHIANTI">
+<h3>CHIANTI<a class="headerlink" href="#CHIANTI" title="Permalink to this heading"></a></h3>
+<p>The Chianti Atomic Database is also a source of collision strengths.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.chianti_</span> <span class="kn">import</span> <span class="n">ChiantiIngester</span>
+
+<span class="n">chianti_ingester</span> <span class="o">=</span> <span class="n">ChiantiIngester</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ions</span><span class="o">=</span><span class="s1">&#39;O 0-2&#39;</span><span class="p">)</span>
+<span class="n">chianti_ingester</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels from `chianti_v9.0.1`. (<span class="ansi-bold">chianti_.py</span>:349)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 0. (<span class="ansi-bold">chianti_.py</span>:367)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 1. (<span class="ansi-bold">chianti_.py</span>:367)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting levels for O 2. (<span class="ansi-bold">chianti_.py</span>:367)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines from `chianti_v9.0.1`. (<span class="ansi-bold">chianti_.py</span>:391)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 0. (<span class="ansi-bold">chianti_.py</span>:409)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 1. (<span class="ansi-bold">chianti_.py</span>:409)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting lines for O 2. (<span class="ansi-bold">chianti_.py</span>:409)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting collisions from `chianti_v9.0.1`. (<span class="ansi-bold">chianti_.py</span>:451)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting collisions for O 0. (<span class="ansi-bold">chianti_.py</span>:469)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting collisions for O 1. (<span class="ansi-bold">chianti_.py</span>:469)
+[<span class="ansi-bold">carsus.io.chianti_.chianti_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting collisions for O 2. (<span class="ansi-bold">chianti_.py</span>:469)
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Zeta-Data">
+<h2>Zeta Data<a class="headerlink" href="#Zeta-Data" title="Permalink to this heading"></a></h2>
+<p>The Knox S. Long’s ground state recombinations fractions (<span class="math notranslate nohighlight">\(\zeta\)</span>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.zeta</span> <span class="kn">import</span> <span class="n">KnoxLongZetaIngester</span>
+
+<span class="n">zeta_url</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/tardis-sn/carsus/master/carsus/data/knox_long_recombination_zeta.dat&#39;</span>
+<span class="n">zeta_ingester</span> <span class="o">=</span> <span class="n">KnoxLongZetaIngester</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">zeta_url</span><span class="p">)</span>
+<span class="n">zeta_ingester</span><span class="o">.</span><span class="n">ingest</span><span class="p">()</span>
+
+<span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Dump-to-HDF5">
+<h2>Dump to HDF5<a class="headerlink" href="#Dump-to-HDF5" title="Permalink to this heading"></a></h2>
+<p>Once you have a database, it’s very easy to create atomic data files for TARDIS using a special class called <code class="docutils literal notranslate"><span class="pre">AtomData</span></code>. This class takes <code class="docutils literal notranslate"><span class="pre">session</span></code> as its first argument; other important parameters are <code class="docutils literal notranslate"><span class="pre">selected_atoms</span></code> and <code class="docutils literal notranslate"><span class="pre">chianti_ions</span></code> (if any).</p>
+<p>Only data for <code class="docutils literal notranslate"><span class="pre">selected_atoms</span></code> will be stored in the output DataFrames and levels and lines for <code class="docutils literal notranslate"><span class="pre">chianti_ions</span></code> will be taken from the data source with the same name.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.output</span> <span class="kn">import</span> <span class="n">AtomData</span>
+<span class="n">atom_data</span> <span class="o">=</span> <span class="n">AtomData</span><span class="p">(</span><span class="n">session</span><span class="p">,</span>
+                     <span class="n">selected_atoms</span><span class="o">=</span><span class="s1">&#39;H-Mg&#39;</span><span class="p">,</span>
+                     <span class="n">chianti_short_name</span><span class="o">=</span><span class="s1">&#39;chianti_v9.0.1&#39;</span><span class="p">,</span>
+                     <span class="n">chianti_ions</span><span class="o">=</span><span class="s1">&#39;O 0-2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Warning:</strong></p>
+<p>If <code class="docutils literal notranslate"><span class="pre">chianti_short_name</span></code> does NOT match with your current version of Chianti DB the above command will fail.</p>
+</div>
+<p>The stored DataFrames can be easily accessed as attributes of <code class="docutils literal notranslate"><span class="pre">atom_data</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atom_data</span><span class="o">.</span><span class="n">atom_masses_prepared</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>symbol</th>
+      <th>name</th>
+      <th>mass</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>b'H'</td>
+      <td>b'Hydrogen'</td>
+      <td>1.007975</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>b'He'</td>
+      <td>b'Helium'</td>
+      <td>4.002602</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>b'Li'</td>
+      <td>b'Lithium'</td>
+      <td>6.967500</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>b'Be'</td>
+      <td>b'Beryllium'</td>
+      <td>9.012183</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>b'B'</td>
+      <td>b'Boron'</td>
+      <td>10.813500</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>b'C'</td>
+      <td>b'Carbon'</td>
+      <td>12.010600</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>b'N'</td>
+      <td>b'Nitrogen'</td>
+      <td>14.006855</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>b'O'</td>
+      <td>b'Oxygen'</td>
+      <td>15.999400</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>b'F'</td>
+      <td>b'Fluorine'</td>
+      <td>18.998403</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>b'Ne'</td>
+      <td>b'Neon'</td>
+      <td>20.179700</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>b'Na'</td>
+      <td>b'Sodium'</td>
+      <td>22.989769</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>b'Mg'</td>
+      <td>b'Magnesium'</td>
+      <td>24.305500</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atom_data</span><span class="o">.</span><span class="n">levels_prepared</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/pandas/core/series.py:679: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+ (<span class="ansi-bold">warnings.py</span>:110)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy</th>
+      <th>g</th>
+      <th>metastable</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_number</th>
+      <th>level_number</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">1</th>
+      <th>0</th>
+      <th>0</th>
+      <td>0.000000</td>
+      <td>2</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <th>0</th>
+      <td>0.000000</td>
+      <td>1</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th rowspan="18" valign="top">2</th>
+      <th rowspan="18" valign="top">0</th>
+      <th>0</th>
+      <td>0.000000</td>
+      <td>1</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19.819626</td>
+      <td>3</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20.615788</td>
+      <td>1</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>20.964099</td>
+      <td>5</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>20.964109</td>
+      <td>3</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>20.964117</td>
+      <td>5</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>20.964117</td>
+      <td>9</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>20.964231</td>
+      <td>1</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>21.218036</td>
+      <td>3</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>22.718479</td>
+      <td>3</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>22.920331</td>
+      <td>1</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>23.007085</td>
+      <td>5</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>23.007087</td>
+      <td>3</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>23.007090</td>
+      <td>5</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>23.007121</td>
+      <td>1</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>23.073663</td>
+      <td>7</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>23.073663</td>
+      <td>5</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>23.073664</td>
+      <td>7</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atom_data</span><span class="o">.</span><span class="n">macro_atom_prepared</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>atomic_number</th>
+      <th>ion_number</th>
+      <th>source_level_number</th>
+      <th>destination_level_number</th>
+      <th>transition_type</th>
+      <th>transition_probability</th>
+      <th>transition_line_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>142</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>69</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>132</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>70</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>122</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>71</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>110</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>72</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>96</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>73</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>81</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>74</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>64</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>75</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>50</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>76</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>35</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>20</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>78</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>8</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>79</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>164</td>
+      <td>1</td>
+      <td>1.012837e+09</td>
+      <td>145</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>155</td>
+      <td>1</td>
+      <td>1.248469e+09</td>
+      <td>146</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>146</td>
+      <td>1</td>
+      <td>1.561061e+09</td>
+      <td>147</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>136</td>
+      <td>1</td>
+      <td>1.994064e+09</td>
+      <td>148</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>126</td>
+      <td>1</td>
+      <td>2.596821e+09</td>
+      <td>149</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>114</td>
+      <td>1</td>
+      <td>1.149997e+09</td>
+      <td>151</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>115</td>
+      <td>1</td>
+      <td>1.908520e+09</td>
+      <td>152</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>100</td>
+      <td>1</td>
+      <td>1.602380e+09</td>
+      <td>154</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>99</td>
+      <td>1</td>
+      <td>2.659288e+09</td>
+      <td>155</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Finally, use the <code class="docutils literal notranslate"><span class="pre">to_hdf()</span></code> method to create an HDF5 file.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">atom_data</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span><span class="s1">&#39;kurucz_H-Mg_chianti_O_I-III.h5&#39;</span><span class="p">,</span>
+                 <span class="n">store_atom_masses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_ionization_energies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_macro_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">store_zeta_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/IPython/core/interactiveshell.py:3552: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;bytes,key-&gt;block0_values] [items-&gt;Index([&#39;symbol&#39;, &#39;name&#39;], dtype=&#39;object&#39;)]
+
+  exec(code_obj, self.user_global_ns, self.user_ns)
+ (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/pyarrow/serialization.py:165: FutureWarning: The SparseDataFrame class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  if isinstance(obj, pd.SparseDataFrame):
+ (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/pyarrow/serialization.py:176: FutureWarning: The SparseSeries class is removed from pandas. Accessing it from the top-level namespace will also be removed in the next version
+  if isinstance(obj, pd.SparseSeries):
+ (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">   carsus.io.output.tardis_</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Signing AtomData:
+MD5: 4204f1d3261dd980fe309e34b5d74592
+UUID1: de78aac6234611efa0806045bdbd36d1 (<span class="ansi-bold">tardis_.py</span>:1180)
+</pre></div></div>
+</div>
+<p>You are done! Now you can use your file to run TARDIS simulations.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="SQL Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model/model.html" class="btn btn-neutral float-right" title="Database Models in Carsus" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 05 Jun 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
