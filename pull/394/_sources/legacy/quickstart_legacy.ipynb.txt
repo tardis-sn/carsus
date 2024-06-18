@@ -1,0 +1,321 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Quickstart for Carsus SQL\n",
+    "\n",
+    "This notebook provides a quick introduction in using Carsus with the SQL interface."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Creating a Database\n",
+    "\n",
+    "To start working with a database you need to initialize it. This requires an `url`, for example `sqlite:///path/to/example.db`. \n",
+    "\n",
+    "In this guide we'll use a in-memory `sqlite` database, so we leave the `url` empty:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus import init_db\n",
+    "session = init_db()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, we have an SQLAlchemy `Session` object named `session`. We can use `session` to make simple queries. As you can see from the output, some basic atomic data has been ingested into our database. \n",
+    "\n",
+    "Let's examine it:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.model import Atom\n",
+    "\n",
+    "print('Number of Atoms in the database: {}'.format(session.query(Atom).count()))\n",
+    "si = session.query(Atom).get(14) \n",
+    "\n",
+    "print('Symbol: {}, atomic_number: {}, name: {}'.format(si.symbol, si.atomic_number, si.name))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "So, our database already contains basic information about atoms. But this information has not been commited to the database yet. It is always **your responsibility** to commit the data!."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Atomic Weights and Ionization Energies\n",
+    "\n",
+    "To store more interesting data we are going to use **ingesters**. For each data source supported by Carsus there is a corresponding **ingester class**. \n",
+    "\n",
+    "For example, to ingest atomic weights from the NIST Atomic Weights and Isotopic Compositions database:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.nist import NISTWeightsCompIngester\n",
+    "\n",
+    "weightscomp_ingester = NISTWeightsCompIngester(session)\n",
+    "weightscomp_ingester.ingest()\n",
+    "\n",
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(si.weights)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "And the ionization energies from the NIST Atomic Spectra Database:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.nist import NISTIonizationEnergiesIngester\n",
+    "\n",
+    "ioniz_energies_ingester = NISTIonizationEnergiesIngester(session, spectra='H-Mg')\n",
+    "ioniz_energies_ingester.ingest(ionization_energies=True, ground_levels=True)\n",
+    "\n",
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Levels, Lines and Collisions\n",
+    "\n",
+    "The Carsus SQL interface supports only two sources of energy levels and spectral lines: GFALL and CHIANTI. \n",
+    "\n",
+    "### GFALL\n",
+    "\n",
+    "The Robert Kurucz’s Atomic Linelist (GFALL) is the main source of levels and lines in Carsus."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.kurucz import GFALLIngester\n",
+    "\n",
+    "gfall_url = 'http://kurucz.harvard.edu/linelists/gfall/gfall.dat'\n",
+    "gfall_ingester = GFALLIngester(session, fname=gfall_url, ions='H-Mg')\n",
+    "gfall_ingester.ingest(levels=True, lines=True)\n",
+    "\n",
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### CHIANTI\n",
+    "\n",
+    "The Chianti Atomic Database is also a source of collision strengths."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.chianti_ import ChiantiIngester\n",
+    "\n",
+    "chianti_ingester = ChiantiIngester(session, ions='O 0-2')\n",
+    "chianti_ingester.ingest(levels=True, lines=True, collisions=True)\n",
+    "\n",
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Zeta Data\n",
+    "\n",
+    "The Knox S. Long’s ground state recombinations fractions ($\\zeta$)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.zeta import KnoxLongZetaIngester\n",
+    "\n",
+    "zeta_url = 'https://raw.githubusercontent.com/tardis-sn/carsus/master/carsus/data/knox_long_recombination_zeta.dat'\n",
+    "zeta_ingester = KnoxLongZetaIngester(session, zeta_url)\n",
+    "zeta_ingester.ingest()\n",
+    "\n",
+    "session.commit()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Dump to HDF5\n",
+    "\n",
+    "Once you have a database, it's very easy to create atomic data files for TARDIS using a special class called `AtomData`. This class takes `session` as its first argument; other important parameters are `selected_atoms` and `chianti_ions` (if any). \n",
+    "\n",
+    "Only data for `selected_atoms` will be stored in the output DataFrames and levels and lines for `chianti_ions` will be taken from the data source with the same name."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.output import AtomData\n",
+    "atom_data = AtomData(session, \n",
+    "                     selected_atoms='H-Mg', \n",
+    "                     chianti_short_name='chianti_v9.0.1', \n",
+    "                     chianti_ions='O 0-2')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-warning\">\n",
+    "\n",
+    "**Warning:** \n",
+    "    \n",
+    "If `chianti_short_name` does NOT match with your current version of Chianti DB the above command will fail.\n",
+    "\n",
+    "</div>\n",
+    "\n",
+    "\n",
+    "The stored DataFrames can be easily accessed as attributes of `atom_data`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "atom_data.atom_masses_prepared"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "atom_data.levels_prepared.head(20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "atom_data.macro_atom_prepared.head(20)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Finally, use the `to_hdf()` method to create an HDF5 file."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "atom_data.to_hdf('kurucz_H-Mg_chianti_O_I-III.h5', \n",
+    "                 store_atom_masses=True, \n",
+    "                 store_ionization_energies=True, \n",
+    "                 store_levels=True, \n",
+    "                 store_lines=True,\n",
+    "                 store_collisions=True,\n",
+    "                 store_macro_atom=True,\n",
+    "                 store_zeta_data=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You are done! Now you can use your file to run TARDIS simulations."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
