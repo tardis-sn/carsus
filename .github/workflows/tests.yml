@@ -18,6 +18,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash -l {0}
+
 env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
@@ -96,14 +100,12 @@ jobs:
       - name: Download Lock File
         run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-${{ matrix.label }}.lock
         if: matrix.pip == true
-        shell: bash
       
       - name: Generate Cache Key
         run: | 
           file_hash=$(cat conda-${{ matrix.label}}.lock | shasum -a 256 | cut -d' ' -f1)
           echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
-        shell: bash
         
       - uses: mamba-org/setup-micromamba@v1
         with:
