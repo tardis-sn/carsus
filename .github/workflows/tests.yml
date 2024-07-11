@@ -8,7 +8,6 @@ on:
   push:
     branches:
     - '*'
-
   pull_request:
     branches:
     - '*'
@@ -16,8 +15,12 @@ on:
     - cron: '0 0 * * 0' # run at midnight every Sunday
 
 concurrency:
-  group: tests-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash -l {0}
 
 env:
   XUVTOP: /tmp/chianti
@@ -33,21 +36,21 @@ env:
 
 jobs:
   build:
-
+    if: github.repository_owner == 'tardis-sn'
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-
-    defaults:
-      run:
-        shell: bash -l {0}
+        pip: [true, false]
+        label: [osx-64, linux-64]
+        include:
+          - label: osx-64
+            os: macos-latest
+          - label: linux-64
+            os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
-
+    name: ${{ matrix.label }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Clone tardis-sn/carsus-db
         uses: actions/checkout@v2
@@ -69,7 +72,7 @@ jobs:
           path: carsus-refdata
           lfs: true
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
@@ -82,7 +85,7 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
@@ -94,13 +97,24 @@ jobs:
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
+      - name: Download Lock File
+        run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-${{ matrix.label }}.lock
+        if: matrix.pip == true
+      
+      - name: Generate Cache Key
+        run: | 
+          file_hash=$(cat conda-${{ matrix.label}}.lock | shasum -a 256 | cut -d' ' -f1)
+          echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
+        id: cache-environment-key
+        
       - uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: conda-lock.yml
-          init-shell: bash
+          environment-file: conda-${{ matrix.label }}.lock
+          cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
+          cache-downloads-key: ${{ steps.cache-environment-key.outputs.file_hash }}
+          environment-name: tardis
           cache-environment: true
-          cache-downloads: true 
-          environment-name: carsus
+          cache-downloads: true
 
       - name: Install package
         run: pip install -e .
