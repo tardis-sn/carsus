@@ -23,7 +23,7 @@ Carsus is a package to manage atomic datasets. It can read data from a variety o
     io/cmfgen
     io/zeta
     io/nndc
-
+    io/vald
 
 .. toctree::
     :maxdepth: 2
