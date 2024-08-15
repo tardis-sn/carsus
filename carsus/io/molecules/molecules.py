@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 BARKLEM_COLETT_DATA_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-molecules-barklem2016/main/data/"
 
 
-
 class BarklemColett2016Reader(object):
     """
     A class for reading and parsing data from the Barklem & Collet 2016 dataset.
