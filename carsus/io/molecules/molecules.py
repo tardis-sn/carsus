@@ -213,3 +213,13 @@ class BarklemColett2016Reader(object):
         if self._equilibrium_constants is None:
             self.parse_barklem_2016()
         return self._equilibrium_constants
+
+    def to_hdf(self, fname):
+        """
+        Write data to HDF5 file
+        """
+        with pd.HDFStore(fname, "w") as f:
+            f.put("dissociation_energies", self.dissociation_energies)
+            f.put("ionization_energies", self.ionization_energies)
+            f.put("partition_functions", self.partition_functions)
+            f.put("equilibrium_constants", self.equilibrium_constants)
