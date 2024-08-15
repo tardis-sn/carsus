@@ -1,13 +1,12 @@
-import numpy as np
 import pandas as pd
-from carsus.io.base import BaseParser
 from carsus.io.util import read_from_buffer
 import logging
-from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
 
 BARKLEM_COLETT_DATA_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-molecules-barklem2016/main/data/"
 
-logger = logging.getLogger(__name__)
 
 
 class BarklemColett2016Reader(object):
