@@ -53,6 +53,7 @@ class TARDISAtomData:
         cmfgen_reader=None,
         nndc_reader=None,
         vald_reader=None,
+        barklem_2016_reader=None,
         levels_lines_param={
             "levels_metastable_loggf_threshold": -3,
             "lines_loggf_threshold": -3,
@@ -80,6 +81,7 @@ class TARDISAtomData:
         self.cmfgen_reader = cmfgen_reader
         self.nndc_reader = nndc_reader
         self.vald_reader = vald_reader
+        self.barklem_2016_reader = barklem_2016_reader
         self.levels_lines_param = levels_lines_param
         self.collisions_param = collisions_param
 
@@ -1242,6 +1244,27 @@ class TARDISAtomData:
 
             if hasattr(self.vald_reader, "linelist"):
                 f.put("/linelist", self.vald_reader.linelist)
+
+            if hasattr(self.barklem_2016_reader, "equilibrium_constants"):
+                f.put(
+                    "/molecules/equilibrium_constants",
+                    self.barklem_2016_reader.equilibrium_constants,
+                )
+            if hasattr(self.barklem_2016_reader, "ionization_energies"):
+                f.put(
+                    "/molecules/ionization_energies",
+                    self.barklem_2016_reader.ionization_energies,
+                )
+            if hasattr(self.barklem_2016_reader, "dissociation_energies"):
+                f.put(
+                    "/molecules/dissociation_energies",
+                    self.barklem_2016_reader.dissociation_energies,
+                )
+            if hasattr(self.barklem_2016_reader, "partition_functions"):
+                f.put(
+                    "/molecules/partition_functions",
+                    self.barklem_2016_reader.partition_functions,
+                )
 
             if hasattr(self, "collisions"):
                 f.put("/collisions_data", self.collisions_prepared)
