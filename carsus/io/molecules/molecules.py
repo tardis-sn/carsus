@@ -14,19 +14,31 @@ class BarklemCollet2016Reader(object):
 
     This class initializes with a file path and provides methods to read raw data and parse it into structured dataframes for dissociation energies, ionization energies, partition functions, and equilibrium constants. It also manages versioning information for each dataset.
 
-    Args:
-        fpath (str, optional): The file path to the data source. If not provided, defaults to BARKLEM_COLLET_DATA_URL.
+    Parameters
+    ----------
+    fpath : str, optional
+        The file path to the data source. If not provided, defaults to BARKLEM_COLLET_DATA_URL.
 
-    Attributes:
-        barklem_2016_raw (tuple): Raw data from the Barklem & Collet 2016 dataset as a tuple of dataframes and checksums.
-        dissociation_energies (DataFrame): Dataframe containing dissociation energies.
-        ionization_energies (DataFrame): Dataframe containing ionization energies.
-        partition_functions (DataFrame): Dataframe containing partition functions.
-        equilibrium_constants (DataFrame): Dataframe containing equilibrium constants.
-        dissociation_version (str): Version information for dissociation energies.
-        ionization_version (str): Version information for ionization energies.
-        partition_version (str): Version information for partition functions.
-        equilibrium_version (str): Version information for equilibrium constants.
+    Attributes
+    ----------
+    barklem_2016_raw : tuple
+        Raw data from the Barklem & Collet 2016 dataset as a tuple of dataframes and checksums.
+    dissociation_energies : DataFrame
+        Dataframe containing dissociation energies.
+    ionization_energies : DataFrame
+        Dataframe containing ionization energies.
+    partition_functions : DataFrame
+        Dataframe containing partition functions.
+    equilibrium_constants : DataFrame
+        Dataframe containing equilibrium constants.
+    dissociation_version : str
+        Version information for dissociation energies.
+    ionization_version : str
+        Version information for ionization energies.
+    partition_version : str
+        Version information for partition functions.
+    equilibrium_version : str
+        Version information for equilibrium constants.
     """
 
     def __init__(self, fpath=None):
@@ -59,19 +71,23 @@ class BarklemCollet2016Reader(object):
 
         This function retrieves data from specified files related to dissociation energies, ionization energies, partition functions, and equilibrium constants. It processes the data into pandas dataframes and returns them along with their respective checksums for verification.
 
-        Args:
-            fpath (str, optional): The file path to the data source. If not provided, defaults to the instance's fpath attribute.
+        Parameters
+        ----------
+        fpath : str, optional
+            The file path to the data source. If not provided, defaults to the instance's fpath attribute.
 
-        Returns:
-            tuple: A tuple containing:
-                - dissociation_energies_df (DataFrame): Dataframe of dissociation energies.
-                - ionization_energies_df (DataFrame): Dataframe of ionization energies.
-                - partition_functions_df (DataFrame): Dataframe of partition functions.
-                - equilibrium_constants_df (DataFrame): Dataframe of equilibrium constants.
-                - diss_checksum (str): Checksum for the dissociation energies data.
-                - ioniz_checksum (str): Checksum for the ionization energies data.
-                - part_checksum (str): Checksum for the partition functions data.
-                - equil_checksum (str): Checksum for the equilibrium constants data.
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - dissociation_energies_df (DataFrame): Dataframe of dissociation energies.
+            - ionization_energies_df (DataFrame): Dataframe of ionization energies.
+            - partition_functions_df (DataFrame): Dataframe of partition functions.
+            - equilibrium_constants_df (DataFrame): Dataframe of equilibrium constants.
+            - diss_checksum (str): Checksum for the dissociation energies data.
+            - ioniz_checksum (str): Checksum for the ionization energies data.
+            - part_checksum (str): Checksum for the partition functions data.
+            - equil_checksum (str): Checksum for the equilibrium constants data.
         """
         if fpath is None:
             fpath = self.fpath
