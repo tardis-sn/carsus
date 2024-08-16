@@ -1,12 +1,12 @@
 import pytest
 
 from numpy.testing import assert_almost_equal, assert_allclose
-from carsus.io.molecules.molecules import BarklemColett2016Reader
+from carsus.io.molecules.molecules import BarklemCollet2016Reader
 
 
 @pytest.fixture(scope="package")
 def barklem_rdr():
-    rdr = BarklemColett2016Reader()
+    rdr = BarklemCollet2016Reader()
     rdr.parse_barklem_2016()
     return rdr
 
