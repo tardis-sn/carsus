@@ -10,7 +10,7 @@ BARKLEM_COLLET_DATA_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-da
 
 class BarklemCollet2016Reader(object):
     """
-    A class for reading and parsing data from the Barklem & Collet 2016 dataset.
+    A class for reading and parsing data from the Barklem & Collet 2016 dataset, which is primarily used to calculate number densities of molecules.
 
     This class initializes with a file path and provides methods to read raw data and parse it into structured dataframes for dissociation energies, ionization energies, partition functions, and equilibrium constants. It also manages versioning information for each dataset.
 
