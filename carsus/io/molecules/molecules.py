@@ -5,17 +5,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-BARKLEM_COLETT_DATA_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-molecules-barklem2016/main/data/"
+BARKLEM_COLLET_DATA_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-molecules-barklem2016/main/data/"
 
 
-class BarklemColett2016Reader(object):
+class BarklemCollet2016Reader(object):
     """
     A class for reading and parsing data from the Barklem & Collet 2016 dataset.
 
     This class initializes with a file path and provides methods to read raw data and parse it into structured dataframes for dissociation energies, ionization energies, partition functions, and equilibrium constants. It also manages versioning information for each dataset.
 
     Args:
-        fpath (str, optional): The file path to the data source. If not provided, defaults to BARKLEM_COLETT_DATA_URL.
+        fpath (str, optional): The file path to the data source. If not provided, defaults to BARKLEM_COLLET_DATA_URL.
 
     Attributes:
         barklem_2016_raw (tuple): Raw data from the Barklem & Collet 2016 dataset as a tuple of dataframes and checksums.
@@ -31,7 +31,7 @@ class BarklemColett2016Reader(object):
 
     def __init__(self, fpath=None):
 
-        self.fpath = BARKLEM_COLETT_DATA_URL if fpath is None else fpath
+        self.fpath = BARKLEM_COLLET_DATA_URL if fpath is None else fpath
         self._barklem_2016_raw = None
 
         self._dissociation_energies = None
