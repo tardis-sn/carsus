@@ -1,8 +1,7 @@
 import pytest
 
 from pyparsing import Word, Dict, Group, alphas, nums, Suppress
-from carsus.io.base import BasePyparser, BaseIngester
-from carsus.model import DataSource
+from carsus.io.base import BasePyparser
 
 
 @pytest.fixture
@@ -18,20 +17,3 @@ def entry():
 def aw_pyparser(entry):
     columns = ["atomic_weight_nominal_value", "atomic_weight_std_dev"]
     return BasePyparser(entry, columns)
-
-
-class ConcreteBaseIngester(BaseIngester):
-
-    ds_short_name = "cncrt"
-
-    def download(self):
-        return "Downloaded"
-
-    def ingest(self, session):
-        data_source = DataSource.as_unique(session, short_name=self.ds_short_name)
-        return "Ingested"
-
-
-@pytest.fixture
-def ingester():
-    return ConcreteBaseIngester(parser=object(), downloader=object())

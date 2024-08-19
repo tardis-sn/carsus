@@ -6,21 +6,9 @@ from numpy.testing import assert_almost_equal
 from astropy import units as u
 from astropy.tests.helper import assert_quantity_allclose
 from sqlalchemy import and_
-from carsus.io.output.tardis_ import AtomData
 from carsus.model import DataSource, Ion
 
 from carsus.conftest import DATA_DIR_PATH
-
-
-@pytest.fixture
-def atom_data(test_session, chianti_short_name):
-    atom_data = AtomData(
-        test_session,
-        selected_atoms="He, Be, B, N, Si, Zn",
-        chianti_ions="He 1; N 5",
-        chianti_short_name=chianti_short_name,
-    )
-    return atom_data
 
 
 @pytest.fixture
@@ -30,12 +18,6 @@ def chianti_short_name(test_session):
             DataSource.short_name.like("chianti%")
         )
     ).one()[0]
-
-
-@pytest.fixture
-def atom_data_be(test_session):
-    atom_data = AtomData(test_session, selected_atoms="Be")
-    return atom_data
 
 
 @pytest.fixture
@@ -93,29 +75,6 @@ def hdf5_path(request):
     request.addfinalizer(fin)
 
     return hdf5_path
-
-
-def test_atom_data_init(memory_session):
-    nist = DataSource.as_unique(memory_session, short_name="nist-asd")
-    ch = DataSource.as_unique(memory_session, short_name="chianti_v8.0.2")
-    ku = DataSource.as_unique(memory_session, short_name="ku_latest")
-    atom_data = AtomData(
-        memory_session, selected_atoms="He, Be, B, N", chianti_ions="He 1; N 5"
-    )
-    assert set(atom_data.selected_atomic_numbers) == set([2, 4, 5, 7])
-    assert set(atom_data.chianti_ions) == set([(2, 1), (7, 5)])
-
-
-def test_atom_data_chianti_ions_subset(memory_session):
-    nist = DataSource.as_unique(memory_session, short_name="nist-asd")
-    ch = DataSource.as_unique(memory_session, short_name="chianti_v8.0.2")
-    ku = DataSource.as_unique(memory_session, short_name="ku_latest")
-    with pytest.raises(ValueError):
-        atom_data = AtomData(
-            memory_session,
-            selected_atoms="He, Be, B, N VI",
-            chianti_ions="He 1; N 5; Si 1",
-        )
 
 
 @pytest.mark.with_test_db
@@ -176,23 +135,6 @@ def test_atom_data_join_on_chianti_ions_table(test_session, atom_data):
     chianti_ions = [(ion.atomic_number, ion.ion_charge) for ion in chiatni_ions_q]
     assert set(chianti_ions) == set([(2, 1), (7, 5)])
 
-
-@pytest.mark.with_test_db
-def test_atom_data_two_instances_same_session(test_session, chianti_short_name):
-    atom_data1 = AtomData(
-        test_session,
-        selected_atoms="He, Be, B, N, Zn",
-        chianti_ions="He 1; N 5",
-        chianti_short_name=chianti_short_name,
-    )
-    atom_data2 = AtomData(
-        test_session,
-        selected_atoms="He, Be, B, N, Zn",
-        chianti_ions="He 1; N 5",
-        chianti_short_name=chianti_short_name,
-    )
-    atom_data1.chianti_ions_table
-    atom_data2.chianti_ions_table
 
 
 @pytest.mark.with_test_db

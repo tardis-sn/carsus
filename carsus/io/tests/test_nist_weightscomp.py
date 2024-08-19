@@ -3,8 +3,7 @@ import pandas as pd
 
 from pandas.testing import assert_frame_equal
 from numpy.testing import assert_almost_equal
-from carsus.io.nist import (NISTWeightsCompIngester, 
-                            NISTWeightsCompPyparser,
+from carsus.io.nist import (NISTWeightsCompPyparser,
                             NISTWeightsComp)
 from carsus.io.nist.weightscomp_grammar import *
 from carsus.model import AtomWeight
@@ -78,12 +77,6 @@ def expected():
     return pd.DataFrame(data=expected_dict, columns=[ATOM_NUM_COL, AW_VAL_COL, AW_SD_COL]).set_index(ATOM_NUM_COL)
 
 
-@pytest.fixture
-def weightscomp_ingester(memory_session):
-    ingester = NISTWeightsCompIngester(memory_session)
-    ingester.parser(test_input)
-    return ingester
-
 
 def test_weightscomp_pyparser_base_index(weightscomp_pyparser):
     assert weightscomp_pyparser.base.index.names == [ATOM_NUM_COL, MASS_NUM_COL]
@@ -95,24 +88,6 @@ def test_weightscomp_pyparser_prepare_atomic_index(atomic):
 
 def test_weightscomp_pyparser_prepare_atomic(atomic, expected):
     assert_frame_equal(atomic, expected, check_names=False)
-
-
-@pytest.mark.parametrize("atomic_number, value, uncert", expected_tuples)
-def test_weightscomp_ingest_nonexisting_atomic_weights(atomic_number, value, uncert, weightscomp_ingester, memory_session):
-    weightscomp_ingester.ingest()
-    atom_weight = memory_session.query(AtomWeight).\
-        filter(AtomWeight.atomic_number==atomic_number).\
-        filter(AtomWeight.data_source==weightscomp_ingester.data_source).one()
-    assert_almost_equal(atom_weight.quantity.value, value)
-    assert_almost_equal(atom_weight.uncert, uncert)
-
-
-@pytest.mark.remote_data
-def test_weightscomp_ingest_default_count(memory_session):
-    weightscomp_ingester = NISTWeightsCompIngester(memory_session)
-    weightscomp_ingester.ingest(atomic_weights=True)
-    assert memory_session.query(AtomWeight).\
-               filter(AtomWeight.data_source==weightscomp_ingester.data_source).count() == 94
 
 
 @pytest.mark.remote_data
