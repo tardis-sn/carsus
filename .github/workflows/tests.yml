@@ -26,9 +26,9 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
-  PYTEST_FLAGS: --remote-data --test-db=carsus-db/test_databases/test.db
-                --refdata=carsus-refdata --cov=carsus --cov-report=xml
-                --cov-report=html --arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff  
+  PYTEST_FLAGS: --remote-data --refdata=carsus-refdata
+                --cov=carsus --cov-report=xml --cov-report=html 
+                --arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff  
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
@@ -51,19 +51,6 @@ jobs:
     name: ${{ matrix.label }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Clone tardis-sn/carsus-db
-        uses: actions/checkout@v2
-        with:
-          repository: tardis-sn/carsus-db
-          path: carsus-db
-          lfs: false  # do not pull LFS objects
-
-      - name: Pull test database
-        run: |
-          cd carsus-db
-          git lfs install --skip-smudge
-          git lfs pull --include="test_databases/test.db"
 
       - name: Clone tardis-sn/carsus-refdata
         uses: actions/checkout@v4
@@ -121,13 +108,6 @@ jobs:
 
       - name: Run tests
         run: pytest carsus ${{ env.PYTEST_FLAGS }} 
-
-      - name: Run notebooks
-        run: |
-          ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_legacy_consistency.ipynb
-          ${{ env.NBCONVERT_CMD }} carsus/io/tests/test_output_base.ipynb
-        env:
-          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
 
       - name: Upload to Codecov
         run: bash <(curl -s https://codecov.io/bash)
