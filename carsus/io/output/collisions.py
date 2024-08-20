@@ -50,7 +50,7 @@ class CollisionsPreparer:
                 self.collisions_metadata = cmfgen_reader.collisional_metadata
 
             elif hasattr(chianti_reader, "collisions"):
-                self.collisions = self.create_collisions(**collisions_param)
+                self.collisions = self.create_chianti_collisions(**collisions_param)
                 self.collisions_metadata = pd.Series(
                     {
                         "temperatures": collisions_param["temperatures"],
@@ -61,7 +61,7 @@ class CollisionsPreparer:
             else:
                 logger.warning("No source of collisions was selected.")
         
-    def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
+    def create_chianti_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """
         Generates the definitive `collisions` DataFrame by adding new columns
         and making some calculations.
