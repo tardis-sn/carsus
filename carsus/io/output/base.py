@@ -217,6 +217,10 @@ class TARDISAtomData:
     @property
     def collisions_prepared(self):
         return self.collisions_preparer.prepare_collisions()
+    
+    @property
+    def collisions_metadata(self):
+        return self.collisions_preparer.collisions_metadata
 
     def to_hdf(self, fname):
         """
