@@ -7,18 +7,15 @@ import astropy.units as u
 import numpy as np
 import pandas as pd
 
-from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.io.output.macro_atom import MacroAtomPreparer
+from carsus.io.output.levels_lines import LevelsLinesPreparer
 from carsus.util import (
-    convert_atomic_number2symbol,
-    convert_wavelength_air2vacuum,
     hash_pandas_object,
     serialize_pandas_object,
 )
-from carsus.calculations import create_einstein_coeff, calculate_collisional_strength
+from carsus.calculations import calculate_collisional_strength
 
-# Wavelengths above this value are given in air
-GFALL_AIR_THRESHOLD = 2000 * u.AA
+
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +80,11 @@ class TARDISAtomData:
         self.levels_lines_param = levels_lines_param
         self.collisions_param = collisions_param
 
-        self.levels_all = self._get_all_levels_data()
-        self.lines_all = self._get_all_lines_data()
-        self.levels, self.lines = self.create_levels_lines(**levels_lines_param)
+        self.levels_lines_preparer = LevelsLinesPreparer(self.gfall_reader, self.chianti_reader, self.cmfgen_reader)
+        self.levels_all = self.levels_lines_preparer.all_levels_data
+        self.lines_all = self.levels_lines_preparer.all_lines_data
+        self.levels_lines_preparer.create_levels_lines(**levels_lines_param)
+        self.levels, self.lines = self.levels_lines_preparer.levels, self.levels_lines_preparer.lines
         self.macro_atom_preparer = MacroAtomPreparer(self.levels, self.lines)
         self.macro_atom_preparer.create_macro_atom()
         self.macro_atom_preparer.create_macro_atom_references()
@@ -128,44 +127,6 @@ class TARDISAtomData:
             self.cross_sections = self.create_cross_sections()
 
         logger.info("Finished.")
-
-    @staticmethod
-    def solve_priorities(levels):
-        """
-        Returns a list of unique species per data source.
-
-
-        Notes
-        -----
-
-        The `ds_id` field is the data source identifier.
-
-        1 : NIST
-        2 : GFALL
-        3 : Knox Long's Zeta
-        4 : Chianti Database
-        5 : CMFGEN
-
-        """
-        levels = levels.set_index(["atomic_number", "ion_number"])
-        levels = levels.sort_index()  # To supress warnings
-
-        lvl_list = []
-        for ion in levels.index.unique():
-            max_priority = levels.loc[ion, "priority"].max()
-            lvl = levels.loc[ion][levels.loc[ion, "priority"] == max_priority]
-            lvl_list.append(lvl)
-
-        levels_uq = pd.concat(lvl_list, sort=True)
-        gfall_ions = levels_uq[levels_uq["ds_id"] == 2].index.unique()
-        chianti_ions = levels_uq[levels_uq["ds_id"] == 4].index.unique()
-        cmfgen_ions = levels_uq[levels_uq["ds_id"] == 5].index.unique()
-
-        assert set(gfall_ions).intersection(set(chianti_ions)).intersection(
-            set(cmfgen_ions)
-        ) == set([])
-
-        return gfall_ions, chianti_ions, cmfgen_ions
 
     @staticmethod
     def get_lvl_index2id(df, levels_all):
@@ -264,330 +225,6 @@ class TARDISAtomData:
 
         return metastable_flags
     
-
-    def _get_all_levels_data(self):
-        """
-        The resulting DataFrame contains stacked energy levels from GFALL,
-        Chianti (optional), CMFGEN (optional) and NIST ground levels. Only
-        one source of levels is kept based on priorities.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        Notes
-        -----
-        Produces the same output than `AtomData._get_all_levels_data()`.
-
-        """
-
-        logger.info("Ingesting energy levels.")
-        gf_levels = self.gfall_reader.levels
-        gf_levels["ds_id"] = 2
-
-        if self.chianti_reader is not None:
-            ch_levels = self.chianti_reader.levels
-            ch_levels["ds_id"] = 4
-        else:
-            ch_levels = pd.DataFrame(columns=gf_levels.columns)
-
-        if self.cmfgen_reader is not None:
-            cf_levels = self.cmfgen_reader.levels
-            cf_levels["ds_id"] = 5
-        else:
-            cf_levels = pd.DataFrame(columns=gf_levels.columns)
-
-        levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
-        levels["g"] = 2 * levels["j"] + 1
-        levels["g"] = levels["g"].astype(np.int)
-        levels = levels.drop(columns=["j", "label", "method"])
-        levels = levels.reset_index()
-        levels = levels.rename(columns={"ion_charge": "ion_number"})
-        levels = levels[
-            ["atomic_number", "ion_number", "g", "energy", "ds_id", "priority"]
-        ]
-        levels["energy"] = (
-            u.Quantity(levels["energy"], "cm-1")
-            .to("eV", equivalencies=u.spectral())
-            .value
-        )
-
-        # Solve priorities and set attributes for later use.
-        self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.solve_priorities(
-            levels
-        )
-
-        to_string = lambda x: [
-            f"{convert_atomic_number2symbol(ion[0])} {ion[1]}" for ion in sorted(x)
-        ]
-
-        gfall_str = ", ".join(to_string(self.gfall_ions))
-        logger.info(f"GFALL selected species: {gfall_str}.")
-
-        if len(self.chianti_ions) > 0:
-            chianti_str = ", ".join(to_string(self.chianti_ions))
-            logger.info(f"Chianti selected species: {chianti_str}.")
-
-        if len(self.cmfgen_ions) > 0:
-            cmfgen_str = ", ".join(to_string(self.cmfgen_ions))
-            logger.info(f"CMFGEN selected species: {cmfgen_str}.")
-
-        # Concatenate ground levels from NIST
-        ground_levels = self.ionization_energies.get_ground_levels()
-        ground_levels = ground_levels.rename(columns={"ion_charge": "ion_number"})
-        ground_levels["ds_id"] = 1
-
-        levels = pd.concat([ground_levels, levels], sort=True)
-        levels["level_id"] = range(1, len(levels) + 1)
-        levels = levels.set_index("level_id")
-
-        # The following code should only remove the duplicated
-        # ground levels. Other duplicated levels should be re-
-        # moved at the reader stage.
-
-        mask = (levels["energy"] == 0.0) & (
-            levels[["atomic_number", "ion_number", "energy", "g"]].duplicated(
-                keep="last"
-            )
-        )
-        levels = levels[~mask]
-
-        # Filter levels by priority
-        for ion in self.chianti_ions:
-            mask = (
-                (levels["ds_id"] != 4)
-                & (levels["atomic_number"] == ion[0])
-                & (levels["ion_number"] == ion[1])
-            )
-            levels = levels.drop(levels[mask].index)
-
-        for ion in self.cmfgen_ions:
-            mask = (
-                (levels["ds_id"] != 5)
-                & (levels["atomic_number"] == ion[0])
-                & (levels["ion_number"] == ion[1])
-            )
-            levels = levels.drop(levels[mask].index)
-
-        levels = levels[["atomic_number", "ion_number", "g", "energy", "ds_id"]]
-        levels = levels.reset_index()
-
-        return levels
-
-    def _get_all_lines_data(self):
-        """
-        The resulting DataFrame contains stacked transition lines for
-        GFALL, Chianti (optional) and CMFGEN (optional).
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        Notes
-        -----
-        Produces the same output than `AtomData._get_all_lines_data()`.
-
-        """
-
-        logger.info("Ingesting transition lines.")
-        gf_lines = self.gfall_reader.lines
-        gf_lines["ds_id"] = 2
-
-        if self.chianti_reader is not None:
-            ch_lines = self.chianti_reader.lines
-            ch_lines["ds_id"] = 4
-        else:
-            ch_lines = pd.DataFrame(columns=gf_lines.columns)
-
-        if self.cmfgen_reader is not None:
-            cf_lines = self.cmfgen_reader.lines
-            cf_lines["ds_id"] = 5
-        else:
-            cf_lines = pd.DataFrame(columns=gf_lines.columns)
-
-        lines = pd.concat([gf_lines, ch_lines, cf_lines], sort=True)
-        lines = lines.reset_index()
-        lines = lines.rename(columns={"ion_charge": "ion_number"})
-        lines["line_id"] = range(1, len(lines) + 1)
-
-        # Filter lines by priority
-        for ion in self.chianti_ions:
-            mask = (
-                (lines["ds_id"] != 4)
-                & (lines["atomic_number"] == ion[0])
-                & (lines["ion_number"] == ion[1])
-            )
-            lines = lines.drop(lines[mask].index)
-
-        for ion in self.cmfgen_ions:
-            mask = (
-                (lines["ds_id"] != 5)
-                & (lines["atomic_number"] == ion[0])
-                & (lines["ion_number"] == ion[1])
-            )
-            lines = lines.drop(lines[mask].index)
-
-        lines = lines.set_index(["atomic_number", "ion_number"])
-        lines = lines.sort_index()  # To supress warnings
-        ions = (
-            set(self.gfall_ions)
-            .union(set(self.chianti_ions))
-            .union((set(self.cmfgen_ions)))
-        )
-
-        logger.info("Matching levels and lines.")
-        lns_list = [
-            self.get_lvl_index2id(lines.loc[ion], self.levels_all) for ion in ions
-        ]
-        lines = pd.concat(lns_list, sort=True)
-        lines = lines.set_index("line_id").sort_index()
-
-        lines["loggf"] = np.log10(lines["gf"])
-        lines = lines.drop(
-            columns=[
-                "energy_upper",
-                "j_upper",
-                "energy_lower",
-                "j_lower",
-                "level_index_lower",
-                "level_index_upper",
-            ]
-        )
-
-        lines["wavelength"] = u.Quantity(lines["wavelength"], "nm").to("AA").value
-
-        lines.loc[lines["wavelength"] <= GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_VACUUM
-
-        lines.loc[lines["wavelength"] > GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_AIR
-
-        # Chianti wavelengths are already given in vacuum
-        gfall_mask = lines["ds_id"] == 2
-        air_mask = lines["medium"] == MEDIUM_AIR
-        lines.loc[air_mask & gfall_mask, "wavelength"] = convert_wavelength_air2vacuum(
-            lines.loc[air_mask, "wavelength"]
-        )
-
-        lines = lines[
-            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "ds_id"]
-        ]
-
-        return lines
-
-    def create_levels_lines(
-        self, lines_loggf_threshold=-3, levels_metastable_loggf_threshold=-3
-    ):
-        """
-        Generates the definitive `lines` and `levels` DataFrames by adding
-        new columns and making some calculations.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        Notes
-        -----
-        Produces the same output than `AtomData.create_levels_lines` method.
-
-        """
-
-        ionization_energies = self.ionization_energies.base.reset_index()
-        ionization_energies = ionization_energies.rename(
-            columns={"ion_charge": "ion_number"}
-        )
-
-        # Culling autoionization levels
-        levels_w_ionization_energies = pd.merge(
-            self.levels_all,
-            ionization_energies,
-            how="left",
-            on=["atomic_number", "ion_number"],
-        )
-
-        mask = (
-            levels_w_ionization_energies["energy"]
-            < levels_w_ionization_energies["ionization_energy"]
-        )
-
-        levels = levels_w_ionization_energies[mask].copy()
-        levels = levels.set_index("level_id").sort_values(
-            by=["atomic_number", "ion_number"]
-        )
-        levels = levels.drop(columns="ionization_energy")
-
-        # Clean lines
-        lines = self.lines_all.join(
-            pd.DataFrame(index=levels.index), on="lower_level_id", how="inner"
-        ).join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
-
-        # Culling lines with low gf values
-        lines = lines.loc[lines["loggf"] > lines_loggf_threshold]
-
-        # Do not clean levels that don't exist in lines
-
-        # Create the metastable flags for levels
-        levels["metastable"] = self._create_metastable_flags(
-            levels, self.lines_all, levels_metastable_loggf_threshold
-        )
-
-        # Create levels numbers
-        levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
-
-        levels["level_number"] = (
-            levels.groupby(["atomic_number", "ion_number"])["energy"]
-            .transform(lambda x: np.arange(len(x)))
-            .values
-        )
-
-        levels["level_number"] = levels["level_number"].astype(np.int)
-
-        levels = levels[
-            [
-                "atomic_number",
-                "ion_number",
-                "g",
-                "energy",
-                "metastable",
-                "level_number",
-                "ds_id",
-            ]
-        ]
-
-        # Join atomic_number, ion_number, level_number_lower,
-        # level_number_upper on lines
-        lower_levels = levels.rename(
-            columns={"level_number": "level_number_lower", "g": "g_l"}
-        ).loc[:, ["atomic_number", "ion_number", "level_number_lower", "g_l"]]
-
-        upper_levels = levels.rename(
-            columns={"level_number": "level_number_upper", "g": "g_u"}
-        ).loc[:, ["level_number_upper", "g_u"]]
-
-        lines = lines.join(lower_levels, on="lower_level_id").join(
-            upper_levels, on="upper_level_id"
-        )
-
-        # Calculate absorption oscillator strength f_lu and emission
-        # oscillator strength f_ul
-        lines["f_lu"] = lines["gf"] / lines["g_l"]
-        lines["f_ul"] = lines["gf"] / lines["g_u"]
-
-        # Calculate frequency
-        lines["nu"] = u.Quantity(lines["wavelength"], "AA").to("Hz", u.spectral())
-
-        # Create Einstein coefficients
-        create_einstein_coeff(lines)
-
-        # Reset indexes because `level_id` cannot be an index once we
-        # add artificial levels for fully ionized ions that don't have ids (-1)
-        lines = lines.reset_index()
-        levels = levels.reset_index()
-
-        # Create and append artificial levels for fully ionized ions
-        artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
-        levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
-        levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
-
-        return levels, lines
 
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """
@@ -788,75 +425,6 @@ class TARDISAtomData:
         return ionization_energies_prepared.squeeze()
 
     @property
-    def levels_prepared(self):
-        """
-        Prepare the DataFrame with levels for TARDIS.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        """
-
-        levels_prepared = self.levels.loc[
-            :,
-            [
-                "atomic_number",
-                "ion_number",
-                "level_number",
-                "energy",
-                "g",
-                "metastable",
-            ],
-        ].copy()
-
-        levels_prepared = levels_prepared.set_index(
-            ["atomic_number", "ion_number", "level_number"]
-        )
-
-        return levels_prepared
-
-    @property
-    def lines_prepared(self):
-        """
-        Prepare the DataFrame with lines for TARDIS.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        """
-
-        lines_prepared = self.lines.loc[
-            :,
-            [
-                "line_id",
-                "wavelength",
-                "atomic_number",
-                "ion_number",
-                "f_ul",
-                "f_lu",
-                "level_number_lower",
-                "level_number_upper",
-                "nu",
-                "B_lu",
-                "B_ul",
-                "A_ul",
-            ],
-        ].copy()
-
-        # TODO: store units in metadata
-        # wavelength[angstrom], nu[Hz], f_lu[1], f_ul[1],
-        # B_ul[cm^3 s^-2 erg^-1], B_lu[cm^3 s^-2 erg^-1],
-        # A_ul[1/s].
-
-        lines_prepared = lines_prepared.set_index(
-            ["atomic_number", "ion_number", "level_number_lower", "level_number_upper"]
-        )
-
-        return lines_prepared
-
-    @property
     def collisions_prepared(self):
         """
         Prepare the DataFrame with electron collisions for TARDIS.
@@ -912,6 +480,14 @@ class TARDISAtomData:
         cross_sections_prepared = cross_sections_prepared[["nu", "x_sect"]]
 
         return cross_sections_prepared
+    
+    @property 
+    def macro_atom(self):
+        return self.macro_atom_preparer.macro_atom
+    
+    @property 
+    def macro_atom_references(self):
+        return self.macro_atom_preparer.macro_atom_references
 
     def to_hdf(self, fname):
         """
@@ -936,8 +512,8 @@ class TARDISAtomData:
             f.put("/atom_data", self.atomic_weights.base)
             f.put("/ionization_data", self.ionization_energies_prepared)
             f.put("/zeta_data", self.zeta_data.base)
-            f.put("/levels_data", self.levels_prepared)
-            f.put("/lines_data", self.lines_prepared)
+            f.put("/levels_data", self.levels_lines_preparer.levels_prepared)
+            f.put("/lines_data", self.levels_lines_preparer.lines_prepared)
             f.put("/macro_atom_data", self.macro_atom_preparer.macro_atom_prepared)
             f.put("/macro_atom_references", self.macro_atom_preparer.macro_atom_references_prepared)
 
