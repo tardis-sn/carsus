@@ -3,7 +3,7 @@ import logging
 import astropy.units as u
 import pandas as pd
 
-from carsus.io.util import get_lvl_index2id
+from carsus.io.util import get_lvl_index2id, exclude_artificial_levels
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class PhotoIonizationPreparer:
         cross_sections["x_sect_id"] = range(start, start + len(cross_sections))
 
         # Exclude artificially created levels from levels
-        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
+        levels = exclude_artificial_levels(self.levels)
         level_number = levels.loc[:, ["level_number"]]
         cross_sections = cross_sections.join(level_number, on="level_id")
 

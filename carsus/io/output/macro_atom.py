@@ -3,6 +3,8 @@ import pandas as pd
 
 import astropy.constants as const
 
+from carsus.io.util import exclude_artificial_levels
+
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
 P_INTERNAL_UP = 1
@@ -23,7 +25,7 @@ class MacroAtomPreparer():
         """
 
         # Exclude artificially created levels from levels
-        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
+        levels = exclude_artificial_levels(self.levels)
 
         lvl_energy_lower = levels.rename(columns={"energy": "energy_lower"}).loc[
             :, ["energy_lower"]

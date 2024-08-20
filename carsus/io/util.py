@@ -207,3 +207,18 @@ def create_artificial_fully_ionized(levels):
     )
 
     return pd.DataFrame(data=fully_ionized_levels)
+
+def exclude_artificial_levels(levels_df):
+    """Removes artificially created levels from a dataframe of levels
+
+    Parameters
+    ----------
+    levels_df : pandas.DataFrame
+        Levels dataframe
+
+    Returns
+    -------
+    pandas.DataFrame
+        Filtered levels dataframe
+    """
+    return levels_df.loc[levels_df["level_id"] != -1].set_index("level_id")

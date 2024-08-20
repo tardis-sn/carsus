@@ -92,6 +92,36 @@ class LevelsLinesPreparer:
         metastable_flags.name = "metastable"
 
         return metastable_flags
+    
+    def ingest_multiple_sources(self, attribute):
+        """Takes dataframes from multiple readers and merges them
+
+        Parameters
+        ----------
+        attribute : string
+            The attribute to get from the readers
+
+        Returns
+        -------
+        pandas.DataFrame
+            Dataframe of the merged data
+        """
+        gfall = getattr(self.gfall_reader, attribute)
+        gfall["ds_id"] = 2
+
+        if self.chianti_reader is not None:
+            chianti = getattr(self.chianti_reader, attribute)
+            chianti["ds_id"] = 4
+        else:
+            chianti = pd.DataFrame(columns=gfall.columns)
+
+        if self.cmfgen_reader is not None:
+            cmfgen = getattr(self.cmfgen_reader, attribute)
+            cmfgen["ds_id"] = 5
+        else:
+            cmfgen = pd.DataFrame(columns=gfall.columns)
+        
+        return pd.concat([gfall, chianti, cmfgen], sort=True)
 
     @property
     def all_levels_data(self):
@@ -111,22 +141,8 @@ class LevelsLinesPreparer:
         """
 
         logger.info("Ingesting energy levels.")
-        gf_levels = self.gfall_reader.levels
-        gf_levels["ds_id"] = 2
+        levels = self.ingest_multiple_sources("levels")
 
-        if self.chianti_reader is not None:
-            ch_levels = self.chianti_reader.levels
-            ch_levels["ds_id"] = 4
-        else:
-            ch_levels = pd.DataFrame(columns=gf_levels.columns)
-
-        if self.cmfgen_reader is not None:
-            cf_levels = self.cmfgen_reader.levels
-            cf_levels["ds_id"] = 5
-        else:
-            cf_levels = pd.DataFrame(columns=gf_levels.columns)
-
-        levels = pd.concat([gf_levels, ch_levels, cf_levels], sort=True)
         levels["g"] = 2 * levels["j"] + 1
         levels["g"] = levels["g"].astype(np.int)
         levels = levels.drop(columns=["j", "label", "method"])
@@ -219,22 +235,8 @@ class LevelsLinesPreparer:
         """
 
         logger.info("Ingesting transition lines.")
-        gf_lines = self.gfall_reader.lines
-        gf_lines["ds_id"] = 2
+        lines = self.ingest_multiple_sources("lines")
 
-        if self.chianti_reader is not None:
-            ch_lines = self.chianti_reader.lines
-            ch_lines["ds_id"] = 4
-        else:
-            ch_lines = pd.DataFrame(columns=gf_lines.columns)
-
-        if self.cmfgen_reader is not None:
-            cf_lines = self.cmfgen_reader.lines
-            cf_lines["ds_id"] = 5
-        else:
-            cf_lines = pd.DataFrame(columns=gf_lines.columns)
-
-        lines = pd.concat([gf_lines, ch_lines, cf_lines], sort=True)
         lines = lines.reset_index()
         lines = lines.rename(columns={"ion_charge": "ion_number"})
         lines["line_id"] = range(1, len(lines) + 1)

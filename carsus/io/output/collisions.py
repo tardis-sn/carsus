@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from carsus.calculations import calculate_collisional_strength
-from carsus.io.util import get_lvl_index2id
+from carsus.io.util import get_lvl_index2id, exclude_artificial_levels
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class CollisionsPreparer:
         collisions["e_col_id"] = range(start, start + len(collisions))
 
         # Exclude artificially created levels from levels
-        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
+        levels = exclude_artificial_levels(self.levels)
 
         # Join atomic_number, ion_number, level_number_lower, level_number_upper
         collisions = collisions.set_index(["atomic_number", "ion_number"])
