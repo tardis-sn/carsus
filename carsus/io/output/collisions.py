@@ -11,10 +11,10 @@ from carsus.io.util import get_lvl_index2id
 logger = logging.getLogger(__name__)
 
 class CollisionsPreparer:
-    def __init__(self, chianti_reader, levels, all_lines):
+    def __init__(self, chianti_reader, levels, lines_all):
         self.chianti_reader = chianti_reader
         self.levels = levels
-        self.lines_all = all_lines
+        self.lines_all = lines_all
         
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """

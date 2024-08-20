@@ -90,7 +90,7 @@ class TARDISAtomData:
         self.macro_atom_preparer.create_macro_atom()
         self.macro_atom_preparer.create_macro_atom_references()
 
-        self.collisions_preparer = CollisionsPreparer()
+        self.collisions_preparer = CollisionsPreparer(self.chianti_reader, self.levels, self.lines_all)
 
         if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
             (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
