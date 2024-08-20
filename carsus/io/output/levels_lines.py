@@ -7,6 +7,7 @@ import pandas as pd
 from carsus.calculations import create_einstein_coeff
 from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import convert_atomic_number2symbol, convert_wavelength_air2vacuum
+from carsus.io.util import get_lvl_index2id, create_artificial_fully_ionized
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
@@ -14,7 +15,8 @@ GFALL_AIR_THRESHOLD = 2000 * u.AA
 logger = logging.getLogger(__name__)
 
 class LevelsLinesPreparer:
-    def __init__(self, gfall_reader, chianti_reader, cmfgen_reader):
+    def __init__(self, ionization_energies, gfall_reader, chianti_reader, cmfgen_reader):
+        self.ionization_energies = ionization_energies
         self.gfall_reader = gfall_reader
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
@@ -56,6 +58,40 @@ class LevelsLinesPreparer:
         ) == set([])
 
         return gfall_ions, chianti_ions, cmfgen_ions
+    
+    @staticmethod
+    def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
+        """
+        Returns metastable flag column for the `levels` DataFrame.
+
+        Parameters
+        ----------
+        levels : pandas.DataFrame
+           Energy levels dataframe.
+
+        lines : pandas.DataFrame
+           Transition lines dataframe.
+
+        levels_metastable_loggf_threshold : int
+           loggf threshold value.
+
+        """
+        # Filter lines on the loggf threshold value
+        metastable_lines = lines.loc[lines["loggf"] > levels_metastable_loggf_threshold]
+
+        # Count the remaining strong transitions
+        metastable_lines_grouped = metastable_lines.groupby("upper_level_id")
+        metastable_counts = metastable_lines_grouped["upper_level_id"].count()
+        metastable_counts.name = "metastable_counts"
+
+        # If there are no strong transitions for a level (the count is NaN)
+        # then the metastable flag is True else (the count is a natural number)
+        # the metastable flag is False
+        levels = levels.join(metastable_counts)
+        metastable_flags = levels["metastable_counts"].isnull()
+        metastable_flags.name = "metastable"
+
+        return metastable_flags
 
     @property
     def all_levels_data(self):
@@ -230,7 +266,7 @@ class LevelsLinesPreparer:
 
         logger.info("Matching levels and lines.")
         lns_list = [
-            self.get_lvl_index2id(lines.loc[ion], self.levels_all) for ion in ions
+            get_lvl_index2id(lines.loc[ion], self.all_levels_data) for ion in ions
         ]
         lines = pd.concat(lns_list, sort=True)
         lines = lines.set_index("line_id").sort_index()
@@ -359,7 +395,7 @@ class LevelsLinesPreparer:
 
         # Culling autoionization levels
         levels_w_ionization_energies = pd.merge(
-            self.levels_all,
+            self.all_levels_data,
             ionization_energies,
             how="left",
             on=["atomic_number", "ion_number"],
@@ -377,7 +413,7 @@ class LevelsLinesPreparer:
         levels = levels.drop(columns="ionization_energy")
 
         # Clean lines
-        lines = self.lines_all.join(
+        lines = self.all_lines_data.join(
             pd.DataFrame(index=levels.index), on="lower_level_id", how="inner"
         ).join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
 
@@ -388,7 +424,7 @@ class LevelsLinesPreparer:
 
         # Create the metastable flags for levels
         levels["metastable"] = self._create_metastable_flags(
-            levels, self.lines_all, levels_metastable_loggf_threshold
+            levels, self.all_lines_data, levels_metastable_loggf_threshold
         )
 
         # Create levels numbers
@@ -445,7 +481,7 @@ class LevelsLinesPreparer:
         levels = levels.reset_index()
 
         # Create and append artificial levels for fully ionized ions
-        artificial_fully_ionized_levels = self._create_artificial_fully_ionized(levels)
+        artificial_fully_ionized_levels = create_artificial_fully_ionized(levels)
         levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
         levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
 

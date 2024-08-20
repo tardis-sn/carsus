@@ -9,6 +9,7 @@ import pandas as pd
 
 from carsus.io.output.macro_atom import MacroAtomPreparer
 from carsus.io.output.levels_lines import LevelsLinesPreparer
+from carsus.io.util import get_lvl_index2id
 from carsus.util import (
     hash_pandas_object,
     serialize_pandas_object,
@@ -80,7 +81,7 @@ class TARDISAtomData:
         self.levels_lines_param = levels_lines_param
         self.collisions_param = collisions_param
 
-        self.levels_lines_preparer = LevelsLinesPreparer(self.gfall_reader, self.chianti_reader, self.cmfgen_reader)
+        self.levels_lines_preparer = LevelsLinesPreparer(self.ionization_energies, self.gfall_reader, self.chianti_reader, self.cmfgen_reader)
         self.levels_all = self.levels_lines_preparer.all_levels_data
         self.lines_all = self.levels_lines_preparer.all_lines_data
         self.levels_lines_preparer.create_levels_lines(**levels_lines_param)
@@ -127,103 +128,6 @@ class TARDISAtomData:
             self.cross_sections = self.create_cross_sections()
 
         logger.info("Finished.")
-
-    @staticmethod
-    def get_lvl_index2id(df, levels_all):
-        """
-        Matches level indexes with level IDs for a given DataFrame.
-
-        """
-        # TODO: re-write this method without a for loop
-        ion = df.index.unique()
-        lvl_index2id = levels_all.set_index(["atomic_number", "ion_number"]).loc[ion]
-        lvl_index2id = lvl_index2id.reset_index()
-
-        lower_level_id = []
-        upper_level_id = []
-
-        df = df.reset_index()
-        for row in df.itertuples():
-            llid = row.level_index_lower
-            ulid = row.level_index_upper
-
-            upper = lvl_index2id.at[ulid, "level_id"]
-            lower = lvl_index2id.at[llid, "level_id"]
-
-            lower_level_id.append(lower)
-            upper_level_id.append(upper)
-
-        df["lower_level_id"] = pd.Series(lower_level_id)
-        df["upper_level_id"] = pd.Series(upper_level_id)
-
-        return df
-
-    @staticmethod
-    def _create_artificial_fully_ionized(levels):
-        """
-        Returns a DataFrame with fully ionized levels.
-
-        """
-        fully_ionized_levels = []
-
-        for atomic_number, _ in levels.groupby("atomic_number"):
-            fully_ionized_levels.append(
-                (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
-            )
-
-        levels_columns = [
-            "level_id",
-            "atomic_number",
-            "ion_number",
-            "level_number",
-            "energy",
-            "g",
-            "metastable",
-        ]
-
-        fully_ionized_levels_dtypes = [
-            (key, levels.dtypes[key]) for key in levels_columns
-        ]
-
-        fully_ionized_levels = np.array(
-            fully_ionized_levels, dtype=fully_ionized_levels_dtypes
-        )
-
-        return pd.DataFrame(data=fully_ionized_levels)
-
-    @staticmethod
-    def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
-        """
-        Returns metastable flag column for the `levels` DataFrame.
-
-        Parameters
-        ----------
-        levels : pandas.DataFrame
-           Energy levels dataframe.
-
-        lines : pandas.DataFrame
-           Transition lines dataframe.
-
-        levels_metastable_loggf_threshold : int
-           loggf threshold value.
-
-        """
-        # Filter lines on the loggf threshold value
-        metastable_lines = lines.loc[lines["loggf"] > levels_metastable_loggf_threshold]
-
-        # Count the remaining strong transitions
-        metastable_lines_grouped = metastable_lines.groupby("upper_level_id")
-        metastable_counts = metastable_lines_grouped["upper_level_id"].count()
-        metastable_counts.name = "metastable_counts"
-
-        # If there are no strong transitions for a level (the count is NaN)
-        # then the metastable flag is True else (the count is a natural number)
-        # the metastable flag is False
-        levels = levels.join(metastable_counts)
-        metastable_flags = levels["metastable_counts"].isnull()
-        metastable_flags.name = "metastable"
-
-        return metastable_flags
     
 
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
@@ -255,7 +159,7 @@ class TARDISAtomData:
 
         logger.info("Matching collisions and levels.")
         col_list = [
-            self.get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions
+            get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions
         ]
         collisions = pd.concat(col_list, sort=True)
         collisions = collisions.sort_values(by=["lower_level_id", "upper_level_id"])
@@ -369,7 +273,7 @@ class TARDISAtomData:
         cross_sections["level_index_lower"] = cross_sections["level_index"].values
         cross_sections["level_index_upper"] = cross_sections["level_index"].values
         phixs_list = [
-            self.get_lvl_index2id(cross_sections.loc[ion], self.levels_all)
+            get_lvl_index2id(cross_sections.loc[ion], self.levels_all)
             for ion in self.cmfgen_ions
         ]
 
