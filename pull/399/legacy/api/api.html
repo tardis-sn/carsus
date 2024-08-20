@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; carsus v0.1.dev747+gfc47fbd</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Database Models in Carsus" href="../model/model.html" />
+    <link href="../../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                0.1.dev747+gfc47fbd
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../io/nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io/barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../research/references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Developer Notes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Legacy Code</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">SQL Interface</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../quickstart_legacy.html">Quickstart for Carsus SQL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model/model.html">Database Models in Carsus</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-io.base">carsus.io.base Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#members">Members</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class-inheritance-diagram">Class inheritance diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-0">carsus.io.nist Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Members</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Class inheritance diagram</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">SQL Interface</a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/legacy/api/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<span id="api"></span><h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading"></a></h1>
+<section id="module-io.base">
+<span id="carsus-io-base-module"></span><h2>carsus.io.base Module<a class="headerlink" href="#module-io.base" title="Permalink to this heading"></a></h2>
+<p>This module defines base classes for parsers and ingesters.</p>
+<section id="members">
+<h3>Members<a class="headerlink" href="#members" title="Permalink to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="carsus.io.base.BaseParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">carsus.io.base.</span></span><span class="sig-name descname"><span class="pre">BaseParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.base.BaseParser" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract base class for parsers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>base</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>Contains parsed results from the provided input data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 74%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>load(input_data)</strong></p></td>
+<td><p>Parses the input data and stores the results in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> attribute</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>__call__(input_data)</strong></p></td>
+<td><p>Call an instance with input data to invoke the <code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code> method.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="carsus.io.base.BasePyparser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">carsus.io.base.</span></span><span class="sig-name descname"><span class="pre">BasePyparser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grammar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.base.BasePyparser" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract base class for parsers that use pyparsing grammar.</p>
+<p class="rubric">Notes</p>
+<p>Rationale: pyparsers have a specific load workflow illustrated below.</p>
+<p>Suppose a <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> of some parser has three columns:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">atomic_mass_nominal_value</span> <span class="o">|</span> <span class="n">atomic_mass_std_dev</span> <span class="o">|</span> <span class="n">notes</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code> method scans the input data with parser’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">grammar</span></code>.
+The returned matches have nested labeled tokens that correspond to the columns.
+Say, one of the matches has the following nested tokens list:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">atomic_mass</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;37.96273211&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;21&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">]</span>
+    <span class="o">-</span> <span class="n">nominal_value</span><span class="p">:</span> <span class="mf">37.96273211</span>
+    <span class="o">-</span> <span class="n">std_dev</span><span class="p">:</span> <span class="mf">2.1e-07</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code> method then infers the columns’ values from
+the nested labels and adds the following row to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code>:</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">atomic_mass_nominal_value</span>            <span class="mf">37.9627</span>
+<span class="n">atomic_mass_std_dev</span>                  <span class="mf">2.1e-07</span>
+<span class="n">notes</span>                                <span class="n">NaN</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>base</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>Contains parsed results from the provided input data.</p>
+</dd>
+<dt><strong>grammar</strong><span class="classifier">pyparsing.ParseElement</span></dt><dd><p>The grammar used to parse input.
+Its labeled tokens correspond to the columns of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code></p>
+</dd>
+<dt><strong>columns</strong><span class="classifier">list of str</span></dt><dd><p>The column names of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 77%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>load(input_data)</strong></p></td>
+<td><p>Parses the input data and stores the results in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> attribute</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="carsus.io.base.BaseIngester">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">carsus.io.base.</span></span><span class="sig-name descname"><span class="pre">BaseIngester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_short_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downloader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.base.BaseIngester" title="Permalink to this definition"></a></dt>
+<dd><p>Abstract base class for ingesters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session: SQLAlchemy session</strong></dt><dd></dd>
+<dt><strong>data_source: DataSource instance</strong></dt><dd><p>The data source of the ingester</p>
+</dd>
+<dt><strong>parser</strong><span class="classifier">BaseParser instance</span></dt><dd><p>Parses the downloaded data</p>
+</dd>
+<dt><strong>downloader</strong><span class="classifier">function</span></dt><dd><p>Downloads the data</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 79%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>download()</strong></p></td>
+<td><p>Downloads the data with the ‘downloader’ and loads the <code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code> with it</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ingest(session)</strong></p></td>
+<td><p>Persists the downloaded data into the database</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="class-inheritance-diagram">
+<h3>Class inheritance diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this heading"></a></h3>
+<a class="reference internal image-reference" href="../../_images/io_base_inheritance.png"><img alt="../../_images/io_base_inheritance.png" src="../../_images/io_base_inheritance.png" style="width: 300px;" /></a>
+</section>
+</section>
+<section id="module-0">
+<span id="carsus-io-nist-package"></span><h2>carsus.io.nist Package<a class="headerlink" href="#module-0" title="Permalink to this heading"></a></h2>
+<p>This package defines parsers and ingesters for the NIST databases.</p>
+<section id="id1">
+<h3>Members<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="carsus.io.nist.download_weightscomp">
+<span class="sig-prename descclassname"><span class="pre">carsus.io.nist.</span></span><span class="sig-name descname"><span class="pre">download_weightscomp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nist_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ascii2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'some'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.nist.download_weightscomp" title="Permalink to this definition"></a></dt>
+<dd><p>Downloader function for the NIST Atomic Weights and Isotopic Compositions database</p>
+<p>Makes a GET request to download data; then extracts preformatted text</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nist_url: bool</strong></dt><dd><p>If False, downloads data from the carsus-dat-nist repository,
+else, downloads data from the NIST Atomic Weights and Isotopic Compositions Database.</p>
+</dd>
+<dt><strong>ascii: str</strong></dt><dd><p>GET request parameter, refer to the NIST docs
+(default: ‘ascii’)</p>
+</dd>
+<dt><strong>isotype: str</strong></dt><dd><p>GET request parameter, refer to the NIST docs
+(default: ‘some’)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>str</dt><dd><p>Preformatted text data</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="carsus.io.nist.NISTWeightsCompPyparser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">carsus.io.nist.</span></span><span class="sig-name descname"><span class="pre">NISTWeightsCompPyparser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grammar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">isotope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">COLUMNS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.nist.NISTWeightsCompPyparser" title="Permalink to this definition"></a></dt>
+<dd><p>Class for parsers for the NIST Atomic Weights and Isotopic Compositions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>base</strong><span class="classifier">pandas.DataFrame</span></dt><dd></dd>
+<dt><strong>grammar</strong><span class="classifier">pyparsing.ParseElement</span></dt><dd><p>(default value = isotope)</p>
+</dd>
+<dt><strong>columns</strong><span class="classifier">list of str</span></dt><dd><p>(default value = COLUMNS)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>load(input_data)</strong></p></td>
+<td><p>Parses the input data and stores the results in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> attribute</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>prepare_atomic_dataframe()</strong></p></td>
+<td><p>Returns a new dataframe created from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> and containing data <em>only</em> related to atoms.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>prepare_isotopic_dataframe()</strong></p></td>
+<td><p>Returns a new dataframe created from the <code class="xref py py-obj docutils literal notranslate"><span class="pre">base</span></code> and containing data <em>only</em> related to isotopes</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="carsus.io.nist.NISTWeightsCompIngester">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">carsus.io.nist.</span></span><span class="sig-name descname"><span class="pre">NISTWeightsCompIngester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser_cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">NISTWeightsCompPyparser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downloader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">download_weightscomp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#carsus.io.nist.NISTWeightsCompIngester" title="Permalink to this definition"></a></dt>
+<dd><p>Class for ingesters for the NIST Atomic Weights and Isotopic Compositions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>session: SQLAlchemy session</strong></dt><dd></dd>
+<dt><strong>data_source: DataSource instance</strong></dt><dd><p>The data source of the ingester</p>
+</dd>
+<dt><strong>parser</strong><span class="classifier">BaseParser instance</span></dt><dd><p>(default value = NISTWeightsCompPyparser())</p>
+</dd>
+<dt><strong>downloader</strong><span class="classifier">function</span></dt><dd><p>(default value = download_weightscomp)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 79%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>download()</strong></p></td>
+<td><p>Downloads the data with the ‘downloader’ and loads the <code class="xref py py-obj docutils literal notranslate"><span class="pre">parser</span></code> with it</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ingest(session)</strong></p></td>
+<td><p>Persists the downloaded data into the database</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="id2">
+<h3>Class inheritance diagram<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<a class="reference internal image-reference" href="../../_images/io_nist_inheritance.png"><img alt="../../_images/io_nist_inheritance.png" src="../../_images/io_nist_inheritance.png" style="width: 400px;" /></a>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../model/model.html" class="btn btn-neutral float-left" title="Database Models in Carsus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 20 Aug 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
