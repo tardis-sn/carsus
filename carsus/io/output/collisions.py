@@ -11,12 +11,55 @@ from carsus.io.util import get_lvl_index2id
 logger = logging.getLogger(__name__)
 
 class CollisionsPreparer:
-    def __init__(self, chianti_reader, levels, levels_all, lines_all, chianti_ions):
+    def __init__(
+            self, 
+            chianti_reader, 
+            levels, 
+            levels_all, 
+            lines_all, 
+            chianti_ions, 
+            cmfgen_reader = None, 
+            collisions_param = {"temperatures": np.arange(2000, 50000, 2000)}
+            ):
         self.chianti_reader = chianti_reader
         self.levels = levels
         self.levels_all = levels_all
         self.lines_all = lines_all
         self.chianti_ions = chianti_ions
+
+        if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
+            (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
+        ):
+            raise ValueError(
+                "Both Chianti and CMFGEN readers contain the collisions dataframe. "
+                "Please set collisions=True in one or the other but not both."
+            )
+        else:
+            if hasattr(cmfgen_reader, "collisions"):
+                collisions = cmfgen_reader.collisions.copy()
+                collisions.index = collisions.index.rename(
+                    [
+                        "atomic_number",
+                        "ion_number",
+                        "level_number_lower",
+                        "level_number_upper",
+                    ]
+                )
+
+                self.collisions = collisions
+                self.collisions_metadata = cmfgen_reader.collisional_metadata
+
+            elif hasattr(chianti_reader, "collisions"):
+                self.collisions = self.create_collisions(**collisions_param)
+                self.collisions_metadata = pd.Series(
+                    {
+                        "temperatures": collisions_param["temperatures"],
+                        "dataset": ["chianti"],
+                        "info": None,
+                    }
+                )
+            else:
+                logger.warning("No source of collisions was selected.")
         
     def create_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
         """
@@ -141,7 +184,7 @@ class CollisionsPreparer:
 
         return collisions
     
-    def prepare_collisions(self, collisions_metadata, collisions):
+    def prepare_collisions(self):
         """
         Prepare the DataFrame with electron collisions for TARDIS.
 
@@ -158,23 +201,23 @@ class CollisionsPreparer:
             "level_number_upper",
         ]
 
-        if "chianti" in collisions_metadata.dataset:
+        if "chianti" in self.collisions_metadata.dataset:
             collisions_columns = (
                 collisions_index
                 + ["g_ratio", "delta_e"]
                 + sorted(
-                    [col for col in collisions.columns if re.match("^t\d+$", col)]
+                    [col for col in self.collisions.columns if re.match("^t\d+$", col)]
                 )
             )
 
-        elif "cmfgen" in collisions_metadata.dataset:
-            collisions_columns = collisions_index + list(collisions.columns)
+        elif "cmfgen" in self.collisions_metadata.dataset:
+            collisions_columns = collisions_index + list(self.collisions.columns)
 
         else:
             raise ValueError("Unknown source of collisional data")
 
         collisions_prepared = (
-            collisions.reset_index().loc[:, collisions_columns].copy()
+            self.collisions.reset_index().loc[:, collisions_columns].copy()
         )
         collisions_prepared = collisions_prepared.set_index(collisions_index)
 

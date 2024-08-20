@@ -90,41 +90,7 @@ class TARDISAtomData:
         self.macro_atom_preparer.create_macro_atom()
         self.macro_atom_preparer.create_macro_atom_references()
 
-        self.collisions_preparer = CollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions)
-
-        if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
-            (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
-        ):
-            raise ValueError(
-                "Both Chianti and CMFGEN readers contain the collisions dataframe. "
-                "Please set collisions=True in one or the other but not both."
-            )
-        else:
-            if hasattr(cmfgen_reader, "collisions"):
-                collisions = cmfgen_reader.collisions.copy()
-                collisions.index = collisions.index.rename(
-                    [
-                        "atomic_number",
-                        "ion_number",
-                        "level_number_lower",
-                        "level_number_upper",
-                    ]
-                )
-
-                self.collisions = collisions
-                self.collisions_metadata = cmfgen_reader.collisional_metadata
-
-            elif hasattr(chianti_reader, "collisions"):
-                self.collisions = self.collisions_preparer.create_collisions(**collisions_param)
-                self.collisions_metadata = pd.Series(
-                    {
-                        "temperatures": collisions_param["temperatures"],
-                        "dataset": ["chianti"],
-                        "info": None,
-                    }
-                )
-            else:
-                logger.warning("No source of collisions was selected.")
+        self.collisions_preparer = CollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions, self.cmfgen_reader, self.collisions_param)
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, "cross_sections"):
             self.cross_sections = self.create_cross_sections()
@@ -224,6 +190,14 @@ class TARDISAtomData:
 
         return cross_sections_prepared
     
+    @property
+    def levels_prepared(self):
+        return self.levels_lines_preparer.levels_prepared
+
+    @property
+    def lines_prepared(self):
+        return self.levels_lines_preparer.lines_prepared
+    
     @property 
     def macro_atom(self):
         return self.macro_atom_preparer.macro_atom
@@ -231,10 +205,18 @@ class TARDISAtomData:
     @property 
     def macro_atom_references(self):
         return self.macro_atom_preparer.macro_atom_references
+
+    @property
+    def macro_atom_prepared(self):
+        return self.macro_atom_preparer.macro_atom_prepared
+    
+    @property
+    def macro_atom_references_prepared(self):
+        return self.macro_atom_preparer.macro_atom_references_prepared
     
     @property
     def collisions_prepared(self):
-        return self.collisions_preparer.prepare_collisions(self.collisions_metadata, self.collisions)
+        return self.collisions_preparer.prepare_collisions()
 
     def to_hdf(self, fname):
         """
@@ -259,10 +241,10 @@ class TARDISAtomData:
             f.put("/atom_data", self.atomic_weights.base)
             f.put("/ionization_data", self.ionization_energies_prepared)
             f.put("/zeta_data", self.zeta_data.base)
-            f.put("/levels_data", self.levels_lines_preparer.levels_prepared)
-            f.put("/lines_data", self.levels_lines_preparer.lines_prepared)
-            f.put("/macro_atom_data", self.macro_atom_preparer.macro_atom_prepared)
-            f.put("/macro_atom_references", self.macro_atom_preparer.macro_atom_references_prepared)
+            f.put("/levels_data", self.levels_prepared)
+            f.put("/lines_data", self.lines_prepared)
+            f.put("/macro_atom_data", self.macro_atom_prepared)
+            f.put("/macro_atom_references", self.macro_atom_references_prepared)
 
             if hasattr(self.nndc_reader, "decay_data"):
                 f.put("/nuclear_decay_rad", self.nndc_reader.decay_data)
