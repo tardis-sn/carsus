@@ -6,21 +6,19 @@ import astropy.constants as const
 import astropy.units as u
 import numpy as np
 import pandas as pd
-from scipy import interpolate
 
 from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
+from carsus.io.output.macro_atom import MacroAtomPreparer
 from carsus.util import (
     convert_atomic_number2symbol,
     convert_wavelength_air2vacuum,
     hash_pandas_object,
     serialize_pandas_object,
 )
+from carsus.calculations import create_einstein_coeff, calculate_collisional_strength
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
-P_EMISSION_DOWN = -1
-P_INTERNAL_DOWN = 0
-P_INTERNAL_UP = 1
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +86,9 @@ class TARDISAtomData:
         self.levels_all = self._get_all_levels_data()
         self.lines_all = self._get_all_lines_data()
         self.levels, self.lines = self.create_levels_lines(**levels_lines_param)
-        self.create_macro_atom()
-        self.create_macro_atom_references()
+        self.macro_atom_preparer = MacroAtomPreparer(self.levels, self.lines)
+        self.macro_atom_preparer.create_macro_atom()
+        self.macro_atom_preparer.create_macro_atom_references()
 
         if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
             (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
@@ -264,87 +263,7 @@ class TARDISAtomData:
         metastable_flags.name = "metastable"
 
         return metastable_flags
-
-    @staticmethod
-    def _create_einstein_coeff(lines):
-        """
-        Create Einstein coefficients columns for the `lines` DataFrame.
-
-        Parameters
-        ----------
-        lines : pandas.DataFrame
-           Transition lines dataframe.
-
-        """
-        einstein_coeff = (4 * np.pi**2 * const.e.gauss.value**2) / (
-            const.m_e.cgs.value * const.c.cgs.value
-        )
-
-        lines["B_lu"] = (
-            einstein_coeff * lines["f_lu"] / (const.h.cgs.value * lines["nu"])
-        )
-
-        lines["B_ul"] = (
-            einstein_coeff * lines["f_ul"] / (const.h.cgs.value * lines["nu"])
-        )
-
-        lines["A_ul"] = (
-            2
-            * einstein_coeff
-            * lines["nu"] ** 2
-            / const.c.cgs.value**2
-            * lines["f_ul"]
-        )
-
-    @staticmethod
-    def _calculate_collisional_strength(
-        row, temperatures, kb_ev, c_ul_temperature_cols
-    ):
-        """
-        Function to calculation upsilon from Burgess & Tully 1992 (TType 1 - 4; Eq. 23 - 38).
-
-        """
-
-        c = row["cups"]
-        x_knots = np.linspace(0, 1, len(row["btemp"]))
-        y_knots = row["bscups"]
-        delta_e = row["delta_e"]
-        g_u = row["g_u"]
-
-        ttype = row["ttype"]
-        if ttype > 5:
-            ttype -= 5
-
-        kt = kb_ev * temperatures
-
-        spline_tck = interpolate.splrep(x_knots, y_knots)
-
-        if ttype == 1:
-            x = 1 - np.log(c) / np.log(kt / delta_e + c)
-            y_func = interpolate.splev(x, spline_tck)
-            upsilon = y_func * np.log(kt / delta_e + np.exp(1))
-
-        elif ttype == 2:
-            x = (kt / delta_e) / (kt / delta_e + c)
-            y_func = interpolate.splev(x, spline_tck)
-            upsilon = y_func
-
-        elif ttype == 3:
-            x = (kt / delta_e) / (kt / delta_e + c)
-            y_func = interpolate.splev(x, spline_tck)
-            upsilon = y_func / (kt / delta_e + 1)
-
-        elif ttype == 4:
-            x = 1 - np.log(c) / np.log(kt / delta_e + c)
-            y_func = interpolate.splev(x, spline_tck)
-            upsilon = y_func * np.log(kt / delta_e + c)
-
-        elif ttype == 5:
-            raise ValueError("Not sure what to do with ttype=5")
-
-        #### 1992A&A...254..436B Equation 20 & 22 #####
-        collisional_ul_factor = 8.63e-6 * upsilon / (g_u * temperatures**0.5)
-        return pd.Series(data=collisional_ul_factor, index=c_ul_temperature_cols)
+    
 
     def _get_all_levels_data(self):
         """
@@ -656,7 +575,7 @@ class TARDISAtomData:
         lines["nu"] = u.Quantity(lines["wavelength"], "AA").to("Hz", u.spectral())
 
         # Create Einstein coefficients
-        self._create_einstein_coeff(lines)
+        create_einstein_coeff(lines)
 
         # Reset indexes because `level_id` cannot be an index once we
         # add artificial levels for fully ionized ions that don't have ids (-1)
@@ -783,7 +702,7 @@ class TARDISAtomData:
         ]
 
         collisional_ul_factors = collisions.apply(
-            self._calculate_collisional_strength,
+            calculate_collisional_strength,
             axis=1,
             args=(temperatures, kb_ev, c_ul_temperature_cols),
         )
@@ -845,159 +764,6 @@ class TARDISAtomData:
         )
 
         return cross_sections
-
-    def create_macro_atom(self):
-        """
-        Create a DataFrame containing macro atom data.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        Notes
-        -----
-        Refer to the docs: https://tardis-sn.github.io/tardis/physics/setup/plasma/macroatom.html
-
-        """
-
-        # Exclude artificially created levels from levels
-        levels = self.levels.loc[self.levels["level_id"] != -1].set_index("level_id")
-
-        lvl_energy_lower = levels.rename(columns={"energy": "energy_lower"}).loc[
-            :, ["energy_lower"]
-        ]
-
-        lvl_energy_upper = levels.rename(columns={"energy": "energy_upper"}).loc[
-            :, ["energy_upper"]
-        ]
-
-        lines = self.lines.set_index("line_id")
-        lines = lines.join(lvl_energy_lower, on="lower_level_id").join(
-            lvl_energy_upper, on="upper_level_id"
-        )
-
-        macro_atom = list()
-        macro_atom_dtype = [
-            ("atomic_number", np.int),
-            ("ion_number", np.int),
-            ("source_level_number", np.int),
-            ("target_level_number", np.int),
-            ("transition_line_id", np.int),
-            ("transition_type", np.int),
-            ("transition_probability", np.float),
-        ]
-
-        for line_id, row in lines.iterrows():
-            atomic_number, ion_number = row["atomic_number"], row["ion_number"]
-            level_number_lower, level_number_upper = (
-                row["level_number_lower"],
-                row["level_number_upper"],
-            )
-            nu = row["nu"]
-            f_ul, f_lu = row["f_ul"], row["f_lu"]
-            e_lower, e_upper = row["energy_lower"], row["energy_upper"]
-
-            transition_probabilities_dict = dict()
-
-            transition_probabilities_dict[P_EMISSION_DOWN] = (
-                2 * nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
-            )
-
-            transition_probabilities_dict[P_INTERNAL_DOWN] = (
-                2 * nu**2 * f_ul / const.c.cgs.value**2 * e_lower
-            )
-
-            transition_probabilities_dict[P_INTERNAL_UP] = (
-                f_lu * e_lower / (const.h.cgs.value * nu)
-            )
-
-            macro_atom.append(
-                (
-                    atomic_number,
-                    ion_number,
-                    level_number_upper,
-                    level_number_lower,
-                    line_id,
-                    P_EMISSION_DOWN,
-                    transition_probabilities_dict[P_EMISSION_DOWN],
-                )
-            )
-
-            macro_atom.append(
-                (
-                    atomic_number,
-                    ion_number,
-                    level_number_upper,
-                    level_number_lower,
-                    line_id,
-                    P_INTERNAL_DOWN,
-                    transition_probabilities_dict[P_INTERNAL_DOWN],
-                )
-            )
-
-            macro_atom.append(
-                (
-                    atomic_number,
-                    ion_number,
-                    level_number_lower,
-                    level_number_upper,
-                    line_id,
-                    P_INTERNAL_UP,
-                    transition_probabilities_dict[P_INTERNAL_UP],
-                )
-            )
-
-        macro_atom = np.array(macro_atom, dtype=macro_atom_dtype)
-        macro_atom = pd.DataFrame(macro_atom)
-
-        macro_atom = macro_atom.sort_values(
-            ["atomic_number", "ion_number", "source_level_number"]
-        )
-
-        self.macro_atom = macro_atom
-
-    def create_macro_atom_references(self):
-        """
-        Create a DataFrame containing macro atom reference data.
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        """
-        macro_atom_references = self.levels.rename(
-            columns={"level_number": "source_level_number"}
-        ).loc[:, ["atomic_number", "ion_number", "source_level_number", "level_id"]]
-
-        count_down = self.lines.groupby("upper_level_id").size()
-        count_down.name = "count_down"
-
-        count_up = self.lines.groupby("lower_level_id").size()
-        count_up.name = "count_up"
-
-        macro_atom_references = macro_atom_references.join(
-            count_down, on="level_id"
-        ).join(count_up, on="level_id")
-        macro_atom_references = macro_atom_references.drop("level_id", axis=1)
-
-        macro_atom_references = macro_atom_references.fillna(0)
-        macro_atom_references["count_total"] = (
-            2 * macro_atom_references["count_down"] + macro_atom_references["count_up"]
-        )
-
-        macro_atom_references["count_down"] = macro_atom_references[
-            "count_down"
-        ].astype(np.int)
-
-        macro_atom_references["count_up"] = macro_atom_references["count_up"].astype(
-            np.int
-        )
-
-        macro_atom_references["count_total"] = macro_atom_references[
-            "count_total"
-        ].astype(np.int)
-
-        self.macro_atom_references = macro_atom_references
 
     @property
     def ionization_energies_prepared(self):
@@ -1147,70 +913,6 @@ class TARDISAtomData:
 
         return cross_sections_prepared
 
-    @property
-    def macro_atom_prepared(self):
-        """
-        Prepare the DataFrame with macro atom data for TARDIS
-
-        Returns
-        -------
-        macro_atom_prepared : pandas.DataFrame
-
-        Notes
-        -----
-        Refer to the docs: https://tardis-sn.github.io/tardis/physics/setup/plasma/macroatom.html
-
-        """
-
-        macro_atom_prepared = self.macro_atom.loc[
-            :,
-            [
-                "atomic_number",
-                "ion_number",
-                "source_level_number",
-                "target_level_number",
-                "transition_type",
-                "transition_probability",
-                "transition_line_id",
-            ],
-        ].copy()
-
-        macro_atom_prepared = macro_atom_prepared.rename(
-            columns={"target_level_number": "destination_level_number"}
-        )
-
-        macro_atom_prepared = macro_atom_prepared.reset_index(drop=True)
-
-        return macro_atom_prepared
-
-    @property
-    def macro_atom_references_prepared(self):
-        """
-        Prepare the DataFrame with macro atom references for TARDIS
-
-        Returns
-        -------
-        pandas.DataFrame
-
-        """
-        macro_atom_references_prepared = self.macro_atom_references.loc[
-            :,
-            [
-                "atomic_number",
-                "ion_number",
-                "source_level_number",
-                "count_down",
-                "count_up",
-                "count_total",
-            ],
-        ].copy()
-
-        macro_atom_references_prepared = macro_atom_references_prepared.set_index(
-            ["atomic_number", "ion_number", "source_level_number"]
-        )
-
-        return macro_atom_references_prepared
-
     def to_hdf(self, fname):
         """
         Dump `prepared` attributes into an HDF5 file.
@@ -1236,8 +938,8 @@ class TARDISAtomData:
             f.put("/zeta_data", self.zeta_data.base)
             f.put("/levels_data", self.levels_prepared)
             f.put("/lines_data", self.lines_prepared)
-            f.put("/macro_atom_data", self.macro_atom_prepared)
-            f.put("/macro_atom_references", self.macro_atom_references_prepared)
+            f.put("/macro_atom_data", self.macro_atom_preparer.macro_atom_prepared)
+            f.put("/macro_atom_references", self.macro_atom_preparer.macro_atom_references_prepared)
 
             if hasattr(self.nndc_reader, "decay_data"):
                 f.put("/nuclear_decay_rad", self.nndc_reader.decay_data)
