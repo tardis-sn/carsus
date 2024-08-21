@@ -3,7 +3,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from carsus.io.output.collisions import CollisionsPreparer
+from carsus.io.output.collisions import ChiantiCollisionsPreparer, CollisionsPreparer
 from carsus.io.output.ionization_energies import IonizationEnergiesPreparer
 from carsus.io.output.levels_lines import LevelsLinesPreparer
 from carsus.io.output.macro_atom import MacroAtomPreparer
@@ -75,8 +75,21 @@ class TARDISAtomData:
         self.macro_atom_preparer = MacroAtomPreparer(self.levels, self.lines)
         self.macro_atom_preparer.create_macro_atom()
         self.macro_atom_preparer.create_macro_atom_references()
+            
+        if ((cmfgen_reader is not None) and hasattr(cmfgen_reader, "collisions")) and (
+            (chianti_reader is not None) and hasattr(chianti_reader, "collisions")
+        ):
+            raise ValueError(
+                "Both Chianti and CMFGEN readers contain the collisions dataframe. "
+                "Please set collisions=True in one or the other but not both."
+            )
 
-        self.collisions_preparer = CollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions, self.cmfgen_reader, self.collisions_param)
+        if cmfgen_reader is not None and hasattr(cmfgen_reader, "collisions"):
+            self.collisions_preparer = CollisionsPreparer(self.cmfgen_reader)
+        elif hasattr(chianti_reader, "collisions"):
+            self.collisions_preparer = ChiantiCollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions, self.collisions_param)
+        else:
+            logger.warning("No source of collisions was selected.")
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, "cross_sections"):
             self.cross_sections_preparer = PhotoIonizationPreparer(self.levels, self.levels_all, self.lines_all, self.cmfgen_reader,  self.levels_lines_preparer.cmfgen_ions)
