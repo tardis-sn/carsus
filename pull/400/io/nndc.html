@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NNDC DATA &mdash; carsus v0.1.dev747+gfc47fbd</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="VALD" href="vald.html" />
+    <link rel="prev" title="ZETA DATA" href="zeta.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                0.1.dev747+gfc47fbd
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Legacy Code</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../legacy/index.html">SQL Interface</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">NNDC DATA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/nndc.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="NNDC-DATA">
+<h1>NNDC DATA<a class="headerlink" href="#NNDC-DATA" title="Permalink to this heading"></a></h1>
+<p>The NNDC archives provide an exhaustive decay radiation dataset for all the known nuclides. The ENSDF data at NNDC is stored in CSV format in the repository <a class="reference external" href="https://github.com/tardis-sn/carsus-data-nndc">carsus-data-nndc</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">NNDCReader</span></code> instance looks for the carsus-data-nndc repository in the local system at the path specified by the argument <code class="docutils literal notranslate"><span class="pre">dirname</span></code>. If the data is to be downloaded from the Github repository directly, the <code class="docutils literal notranslate"><span class="pre">remote</span></code> argument should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.nuclear</span> <span class="kn">import</span> <span class="n">NNDCReader</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.8.4
+ found PyQt5 widgets
+ using PyQt5 widgets
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nndc_reader</span> <span class="o">=</span> <span class="n">NNDCReader</span><span class="p">(</span><span class="n">remote</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Cloning into &#39;/home/runner/Downloads/carsus-data-nndc&#39;...
+Updating files:  98% (4558/4651)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">     carsus.io.nuclear.nndc</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading NNDC decay data from https://github.com/tardis-sn/carsus-data-nndc (<span class="ansi-bold">nndc.py</span>:42)
+[<span class="ansi-bold">     carsus.io.nuclear.nndc</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Parsing decay data from: /home/runner/Downloads/carsus-data-nndc/csv (<span class="ansi-bold">nndc.py</span>:50)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Updating files: 100% (4651/4651), done.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nndc_reader</span><span class="o">.</span><span class="n">decay_data</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>Element</th>
+      <th>Z</th>
+      <th>N</th>
+      <th>Parent E(level)</th>
+      <th>Uncertainty</th>
+      <th>JPi</th>
+      <th>Metastable</th>
+      <th>Decay Mode</th>
+      <th>Decay Mode Value</th>
+      <th>...</th>
+      <th>Radiation</th>
+      <th>Rad subtype</th>
+      <th>Rad Energy</th>
+      <th>Uncertainty.1</th>
+      <th>EP Energy</th>
+      <th>Uncertainty.2</th>
+      <th>Rad Intensity</th>
+      <th>Uncertainty.3</th>
+      <th>Dose</th>
+      <th>Uncertainty.4</th>
+    </tr>
+    <tr>
+      <th>Isotope</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Nn1</th>
+      <td>1</td>
+      <td>Nn</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1/2+</td>
+      <td>False</td>
+      <td>B-</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>bm</td>
+      <td>NaN</td>
+      <td>301.3700</td>
+      <td>NaN</td>
+      <td>782.347</td>
+      <td>10.0</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>0.301000</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Nn1</th>
+      <td>1</td>
+      <td>Nn</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1/2+</td>
+      <td>False</td>
+      <td>B-</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>bm av</td>
+      <td>NaN</td>
+      <td>301.3700</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>0.301000</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>H3</th>
+      <td>3</td>
+      <td>H</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1/2+</td>
+      <td>False</td>
+      <td>B-</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>bm</td>
+      <td>NaN</td>
+      <td>5.6817</td>
+      <td>12</td>
+      <td>18.591</td>
+      <td>3.0</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>0.005682</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>H3</th>
+      <td>3</td>
+      <td>H</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1/2+</td>
+      <td>False</td>
+      <td>B-</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>bm av</td>
+      <td>NaN</td>
+      <td>5.6820</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>0.005680</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>He6</th>
+      <td>6</td>
+      <td>He</td>
+      <td>2</td>
+      <td>4</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0+</td>
+      <td>False</td>
+      <td>B-</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>bm</td>
+      <td>NaN</td>
+      <td>1567.6200</td>
+      <td>54</td>
+      <td>3507.800</td>
+      <td>11.0</td>
+      <td>100.0</td>
+      <td>NaN</td>
+      <td>1.567600</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>Lv292</th>
+      <td>292</td>
+      <td>Lv</td>
+      <td>116</td>
+      <td>176</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0+</td>
+      <td>False</td>
+      <td>A</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Lv293</th>
+      <td>293</td>
+      <td>Lv</td>
+      <td>116</td>
+      <td>177</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>False</td>
+      <td>A</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Ts293</th>
+      <td>293</td>
+      <td>Ts</td>
+      <td>117</td>
+      <td>176</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>False</td>
+      <td>A</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Og294</th>
+      <td>294</td>
+      <td>Og</td>
+      <td>118</td>
+      <td>176</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0+</td>
+      <td>False</td>
+      <td>A</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>Ts294</th>
+      <td>294</td>
+      <td>Ts</td>
+      <td>117</td>
+      <td>177</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>False</td>
+      <td>A</td>
+      <td>100.0</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>242295 rows × 41 columns</p>
+</div></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="zeta.html" class="btn btn-neutral float-left" title="ZETA DATA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vald.html" class="btn btn-neutral float-right" title="VALD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 22 Aug 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
