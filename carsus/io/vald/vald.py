@@ -278,14 +278,11 @@ class VALDReader(object):
 
         del vald["elm_ion"]
 
-        vald_atoms, vald_molecules = (
-            vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])],
-            vald[~vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])],
-        )
-
-        vald_atoms.reset_index(drop=True, inplace=True)
+        vald_atoms = vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])].copy()
+        vald_molecules = vald[~vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])].copy()
 
         # Generate atomic numbers and assign them
+        vald_atoms.reset_index(drop=True, inplace=True)
         vald_atoms.loc[:, "atomic_number"] = [
             convert_symbol2atomic_number(symbol) for symbol in vald_atoms["chemical"]
         ]
