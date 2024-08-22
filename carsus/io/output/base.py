@@ -1242,8 +1242,10 @@ class TARDISAtomData:
             if hasattr(self.nndc_reader, "decay_data"):
                 f.put("/nuclear_decay_rad", self.nndc_reader.decay_data)
 
-            if hasattr(self.vald_reader, "linelist"):
-                f.put("/linelist", self.vald_reader.linelist)
+            if hasattr(self.vald_reader, "linelist_atoms"):
+                f.put("/linelist_atoms", self.vald_reader.linelist_atoms)
+            if hasattr(self.vald_reader, "linelist_molecules"):
+                f.put("/linelist_molecules", self.vald_reader.linelist_molecules)
 
             if hasattr(self.barklem_2016_data, "equilibrium_constants"):
                 f.put(
@@ -1304,6 +1306,9 @@ class TARDISAtomData:
 
             if self.cmfgen_reader is not None:
                 meta.append(("datasets", "cmfgen", self.cmfgen_reader.version))
+
+            if self.vald_reader is not None:
+                meta.append(("datasets", "vald", self.vald_reader.version))
 
             # relevant package versions
             meta.append(("software", "python", platform.python_version()))
