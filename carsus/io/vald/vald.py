@@ -23,8 +23,6 @@ class VALDReader(object):
     ----------
     fname: str
         path to vald data file
-    strip_molecules: bool
-        Whether to remove molecules from the data. Defaults to True.
     shortlist: bool
         Whether the parsed file is a shortlist or not.
 
@@ -33,8 +31,10 @@ class VALDReader(object):
     --------
     vald_raw:
         Return pandas DataFrame representation of vald
-    linelist:
-        Return pandas DataFrame representation of linelist properties necessary to compute line opacities
+    linelist_atoms:
+        Return pandas DataFrame representation of atomic linelist properties necessary to compute line opacities
+    linelist_molecules:
+        Return pandas DataFrame representation of molecular linelist properties necessary to compute line opacities
 
     """
 
@@ -67,14 +67,12 @@ class VALDReader(object):
         "reference",
     ]
 
-    def __init__(self, fname=None, strip_molecules=True, shortlist=False):
+    def __init__(self, fname=None, shortlist=False):
         """
         Parameters
         ----------
         fname: str
             Path to the vald file (http or local file).
-        strip_molecules: bool
-            Whether to remove molecules from the data.
         shortlist: bool
             Whether the parsed file is a shortlist or not.
         """
@@ -83,8 +81,12 @@ class VALDReader(object):
         self.fname = fname
 
         self._vald_raw = None
-        self._vald = None
-        self._linelist = None
+        self._vald_atoms = None
+        self._vald_molecules = None
+
+        self._atom_linelist = None
+        self._molecule_linelist = None
+
         self._stellar_linelist = False
 
         self._vald_columns = (
@@ -93,7 +95,6 @@ class VALDReader(object):
             else self.vald_columns.copy()
         )
 
-        self.strip_molecules = strip_molecules
         self.shortlist = shortlist
 
     @property
@@ -108,20 +109,33 @@ class VALDReader(object):
     @property
     def vald(self):
         """
-        Processes the raw vald DataFrame
+        Processes the raw vald DataFrame, separating atoms and molecules
         """
-        if self._vald is None:
-            self._vald = self.parse_vald(strip_molecules=self.strip_molecules)
-        return self._vald
+        if self._vald_atoms is None:
+            self._vald_atoms, self._vald_molecules = self.parse_vald()
+        return self._vald_atoms, self._vald_molecules
 
     @property
-    def linelist(self):
+    def linelist_atoms(self):
         """
-        Prepares the linelist from the processed vald DataFrame
+        Prepares the atomic linelist from the processed vald DataFrame
         """
-        if self._linelist is None:
-            self._linelist = self.extract_linelist(self.vald)
-        return self._linelist
+        if self._atom_linelist is None:
+            self._atom_linelist, self._molecule_linelist = self.extract_linelists(
+                *self.vald
+            )
+        return self._atom_linelist
+
+    @property
+    def linelist_molecules(self):
+        """
+        Prepares the molecular linelist from the processed vald DataFrame
+        """
+        if self._molecule_linelist is None:
+            self._atom_linelist, self._molecule_linelist = self.extract_linelists(
+                *self.vald
+            )
+        return self._molecule_linelist
 
     def read_vald_raw(self, fname=None):
         """
@@ -183,6 +197,26 @@ class VALDReader(object):
         return vald, checksum
 
     def check_wavelength_column_medium_and_units(self):
+        """
+        Checks the wavelength column's medium and units from the DataFrame's column header.
+
+        This method examines the second column's header in the `vald_raw` DataFrame to determine the medium (air or vacuum) and the units of the wavelength values. It raises a ValueError if the medium or units cannot be determined from the column header.
+
+        Returns
+        -------
+        wave_col_name : str
+            The name of the wavelength column.
+        wave_air : bool
+            True if the wavelengths are in air, False if in vacuum.
+        wave_units : astropy.units.core.PrefixUnit or astropy.units.composite.CompositeUnit
+            The units of the wavelength, as an Astropy unit.
+
+        Raises
+        ------
+        ValueError
+            If the wavelength column header does not specify 'air' or 'vac' to indicate the medium, or if it does not contain recognizable units ('(A)', '(nm)', or '(cm-1)').
+
+        """
         wave_col_name = self.vald_raw.columns[1]
         if "air" in wave_col_name:
             wave_air = True
@@ -204,7 +238,7 @@ class VALDReader(object):
             )
         return wave_col_name, wave_air, wave_units
 
-    def parse_vald(self, vald_raw=None, strip_molecules=True):
+    def parse_vald(self, vald_raw=None):
         """
         Parses raw vald DataFrame
 
@@ -212,19 +246,21 @@ class VALDReader(object):
         Parameters
         ----------
         vald_raw: pandas.DataFrame
-        strip_molecules: bool
-            If True, remove molecules from vald
+
 
         Returns
         -------
             pandas.DataFrame
+                vald atoms
+            pandas.DataFrame
+                vald molecules
         """
 
         vald = vald_raw if vald_raw is not None else self.vald_raw.copy()
 
-        vald["elm_ion"] = vald["elm_ion"].str.replace("'", "")
+        vald.loc[:, "elm_ion"] = vald["elm_ion"].str.replace("'", "")
         vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
-        vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
+        vald.loc[:, "ion_charge"] = vald["ion_charge"].astype(int) - 1
 
         # Check units and medium of wavelength column and create wavelength column in angstroms in vacuum
         (
@@ -232,34 +268,30 @@ class VALDReader(object):
             wave_air,
             wave_units,
         ) = self.check_wavelength_column_medium_and_units()
-        vald["wavelength"] = (vald[wave_col_name].values * wave_units).to(u.AA).value
+        vald.loc[:, "wavelength"] = (
+            (vald[wave_col_name].values * wave_units).to(u.AA).value
+        )
         if wave_air:
-            vald["wavelength"] = convert_wavelength_air2vacuum(
+            vald.loc[:, "wavelength"] = convert_wavelength_air2vacuum(
                 (vald["wavelength"].values * wave_units).to(u.AA).value
             )
 
         del vald["elm_ion"]
 
-        if strip_molecules:
-            vald = self._strip_molecules(vald)
-            vald.reset_index(drop=True, inplace=True)
+        vald_atoms = vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])].copy()
+        vald_molecules = vald[~vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])].copy()
 
-            atom_nums = np.zeros(len(vald), dtype=int)
-            atom_nums = [
-                convert_symbol2atomic_number(symbol)
-                for symbol in vald.chemical.to_list()
-            ]
-            vald["atomic_number"] = atom_nums
+        # Generate atomic numbers and assign them
+        vald_atoms.reset_index(drop=True, inplace=True)
+        vald_atoms.loc[:, "atomic_number"] = [
+            convert_symbol2atomic_number(symbol) for symbol in vald_atoms["chemical"]
+        ]
 
-        return vald
+        vald_molecules.rename(columns={"chemical": "molecule"}, inplace=True)
 
-    def _strip_molecules(self, vald):
-        """
-        Removes molecules from a vald dataframe
-        """
-        return vald[vald.chemical.isin(ATOMIC_SYMBOLS_DATA["symbol"])]
+        return vald_atoms, vald_molecules
 
-    def extract_linelist(self, vald):
+    def extract_linelists(self, vald_atoms, vald_molecules):
         """
         Parameters
         ----------
@@ -271,10 +303,15 @@ class VALDReader(object):
                 vald linelist containing only the following columns:
                 atomic_number or chemical, ion_charge, wavelength, e_low, log_gf, rad, stark, waals
                 optionally: v_mic (if stellar linelist) and e_up, j_lo, j_up (if not shortlist)
+            pandas.DataFrame
+                vald linelist containing only the following columns:
+                molecule, ion_charge, wavelength, e_low, log_gf, rad, stark, waals
+                optionally: e_up, j_lo, j_up (if not shortlist)
+
         """
         if self.shortlist:
             linelist_mask = [
-                "chemical",
+                "atomic_number",
                 "ion_charge",
                 "wavelength",
                 "log_gf",
@@ -288,7 +325,7 @@ class VALDReader(object):
 
         else:
             linelist_mask = [
-                "chemical",
+                "atomic_number",
                 "ion_charge",
                 "wavelength",
                 "log_gf",
@@ -301,10 +338,11 @@ class VALDReader(object):
                 "waals",
             ]
 
-        if self.strip_molecules:
-            linelist_mask[0] = "atomic_number"
+        linelist_atoms = vald_atoms[linelist_mask].copy()
+        linelist_mask[0] = "molecule"
+        linelist_molecules = vald_molecules[linelist_mask].copy()
 
-        return vald[linelist_mask].copy()
+        return linelist_atoms, linelist_molecules
 
     def to_hdf(self, fname):
         """
@@ -316,4 +354,5 @@ class VALDReader(object):
         with pd.HDFStore(fname, "w") as f:
             f.put("/vald_raw", self.vald_raw)
             f.put("/vald", self.vald)
-            f.put("/linelist", self.linelist)
+            f.put("/linelist_atoms", self.linelist_atoms)
+            f.put("/linelist_molecules", self.linelist_molecules)
