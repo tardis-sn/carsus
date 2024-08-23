@@ -67,6 +67,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from carsus import init_db
 
+from carsus.tests.fixtures.regression_data import regression_data
+
 DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
 
 
@@ -79,6 +81,17 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--refdata", dest="refdata", default=None, help="carsus-refdata folder location"
+    )
+    parser.addoption(
+        "--carsus-regression-data",
+        default=None,
+        help="Path to the Carsus regression data directory",
+    )
+    parser.addoption(
+        "--generate-regression-data",
+        action="store_true",
+        default=False,
+        help="generate regression data instead of testing",
     )
 
 

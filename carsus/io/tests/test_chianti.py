@@ -1,9 +1,11 @@
 import pytest
+import pandas as pd
+from pandas import testing as pdt
 
 from numpy.testing import assert_almost_equal
 from carsus.io.chianti_ import ChiantiIonReader, ChiantiIngester, ChiantiReader
 from carsus.model import Level, Ion, Line, ECollision
-
+from carsus.tests.fixtures.regression_data import RegressionData
 
 
 @pytest.fixture
@@ -16,29 +18,32 @@ def ch_ingester(memory_session):
 class TestChiantiIonReader:
     @pytest.fixture(scope="class", params=["ne_2", "n_5"])
     def ch_ion_reader(self, request):
-        return ChiantiIonReader(request.param)
+        yield ChiantiIonReader(request.param)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_bound_levels(self, ch_ion_reader):
-        bound_levels = ch_ion_reader.bound_levels
-        return bound_levels
+    def test_chianti_bound_levels(self, regression_data, ch_ion_reader):
+        actual = ch_ion_reader.bound_levels
+        expected = regression_data.sync_hdf_store(actual)
+        pdt.assert_equal(actual, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_bound_lines(self, ch_ion_reader):
-        bound_lines = ch_ion_reader.bound_lines
-        return bound_lines
+    def test_chianti_bound_lines(self, regression_data, ch_ion_reader):
+        actual = ch_ion_reader.bound_lines
+        expected = regression_data.sync_hdf_store(actual)
+        pdt.assert_equal(actual, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_levels(self, ch_ion_reader):
-        return ch_ion_reader.levels
+    def test_chianti_reader_read_levels(self, regression_data, ch_ion_reader):
+        actual = ch_ion_reader.levels
+        expected = regression_data.sync_hdf_store(actual)
+        pdt.assert_equal(actual, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_lines(self, ch_ion_reader):
-        return ch_ion_reader.lines
-
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_collisions(self, ch_ion_reader):
-        return ch_ion_reader.collisions
+    def test_chianti_reader_read_lines(self, regression_data, ch_ion_reader):
+        actual = ch_ion_reader.lines
+        expected = regression_data.sync_hdf_store(actual)
+        pdt.assert_equal(actual, expected)
+    
+    def test_chianti_reader_read_collisions(self, regression_data, ch_ion_reader):
+        actual = ch_ion_reader.collisions
+        expected = regression_data.sync_hdf_store(actual)
+        pdt.assert_equal(actual, expected)
 
 
 
