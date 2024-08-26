@@ -1,3 +1,4 @@
+import functools
 import logging
 
 import astropy.units as u
@@ -15,7 +16,9 @@ class PhotoIonizationPreparer:
         self.cmfgen_reader = cmfgen_reader
         self.cmfgen_ions = cmfgen_ions
 
+    # replace with functools.cached_property with Python > 3.8
     @property
+    @functools.lru_cache()
     def cross_sections(self):
         """
         Create a DataFrame containing photoionization cross-sections.
@@ -69,7 +72,9 @@ class PhotoIonizationPreparer:
 
         return cross_sections
     
+    # replace with functools.cached_property with Python > 3.8
     @property
+    @functools.lru_cache()
     def cross_sections_prepared(self):
         """
         Prepare the DataFrame with photoionization cross-sections for TARDIS.
