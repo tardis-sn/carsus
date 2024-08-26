@@ -1,3 +1,4 @@
+import functools
 import logging
 
 import astropy.units as u
@@ -123,7 +124,9 @@ class LevelsLinesPreparer:
         
         return pd.concat([gfall, chianti, cmfgen], sort=True)
 
+    # replace with functools.cached_property with Python > 3.8
     @property
+    @functools.lru_cache()
     def all_levels_data(self):
         """
         The resulting DataFrame contains stacked energy levels from GFALL,
@@ -218,7 +221,9 @@ class LevelsLinesPreparer:
 
         return levels
 
+    # replace with functools.cached_property with Python > 3.8
     @property
+    @functools.lru_cache()
     def all_lines_data(self):
         """
         The resulting DataFrame contains stacked transition lines for
