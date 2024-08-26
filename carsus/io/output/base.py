@@ -34,7 +34,6 @@ class TARDISAtomData:
     macro_atom_references_prepared : pandas.DataFrame
 
     """
-
     def __init__(
         self,
         atomic_weights,
@@ -90,6 +89,7 @@ class TARDISAtomData:
             self.collisions_preparer = ChiantiCollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions, self.collisions_param)
         else:
             logger.warning("No source of collisions was selected.")
+            self.collisions_preparer = None
 
         if (cmfgen_reader is not None) and hasattr(cmfgen_reader, "cross_sections"):
             self.cross_sections_preparer = PhotoIonizationPreparer(self.levels, self.levels_all, self.lines_all, self.cmfgen_reader,  self.levels_lines_preparer.cmfgen_ions)
@@ -147,11 +147,18 @@ class TARDISAtomData:
     
     @property
     def collisions_prepared(self):
-        return self.collisions_preparer.prepare_collisions()
+        if self.collisions_preparer is not None:
+            self.collisions_preparer.prepare_collisions()
+            return self.collisions_preparer.collisions_prepared
+        else:
+            return None
     
     @property
     def collisions_metadata(self):
-        return self.collisions_preparer.collisions_metadata
+        if self.collisions_preparer is not None:
+            return self.collisions_preparer.collisions_metadata
+        else:
+            return None
 
     def to_hdf(self, fname):
         """
@@ -172,50 +179,34 @@ class TARDISAtomData:
 
         from carsus import FORMAT_VERSION
 
+        required_outputs = {
+            "/atom_data": self.atomic_weights.base, 
+            "/ionization_data": self.ionization_energies_prepared,
+            "/zeta_data": self.zeta_data.base,
+            "/levels_data": self.levels_prepared,
+            "/lines_data": self.lines_prepared,
+            "/macro_atom_data": self.macro_atom_prepared,
+            "/macro_atom_references": self.macro_atom_references_prepared}
+        
+        optional_outputs = {
+            "/nuclear_decay_rad": (self.nndc_reader, "decay_data"),
+            "/linelist": (self.vald_reader, "linelist"),
+            "/molecules/equilibrium_constants": (self.barklem_2016_data, "equilibrium_constants"),
+            "/molecules/ionization_energies": (self.barklem_2016_data, "ionization_energies"),
+            "/molecules/dissociation_energies": (self.barklem_2016_data, "dissociation_energies"),
+            "/molecules/partition_functions": (self.barklem_2016_data, "partition_functions"),
+            "/collisions_data": (self.collisions_preparer, "collisions_prepared"),
+            "/collisions_metadata": (self.collisions_preparer, "collisions_metadata"),
+            "/photoionization_data": (self.cross_sections_preparer, "cross_sections_prepared"),
+        }
+
         with pd.HDFStore(fname, "w") as f:
-            f.put("/atom_data", self.atomic_weights.base)
-            f.put("/ionization_data", self.ionization_energies_prepared)
-            f.put("/zeta_data", self.zeta_data.base)
-            f.put("/levels_data", self.levels_prepared)
-            f.put("/lines_data", self.lines_prepared)
-            f.put("/macro_atom_data", self.macro_atom_prepared)
-            f.put("/macro_atom_references", self.macro_atom_references_prepared)
+            for hdf_path, data in required_outputs.items():
+                f.put(hdf_path, data)
 
-            if hasattr(self.nndc_reader, "decay_data"):
-                f.put("/nuclear_decay_rad", self.nndc_reader.decay_data)
-
-            if hasattr(self.vald_reader, "linelist_atoms"):
-                f.put("/linelist_atoms", self.vald_reader.linelist_atoms)
-            if hasattr(self.vald_reader, "linelist_molecules"):
-                f.put("/linelist_molecules", self.vald_reader.linelist_molecules)
-
-            if hasattr(self.barklem_2016_data, "equilibrium_constants"):
-                f.put(
-                    "/molecules/equilibrium_constants",
-                    self.barklem_2016_data.equilibrium_constants,
-                )
-            if hasattr(self.barklem_2016_data, "ionization_energies"):
-                f.put(
-                    "/molecules/ionization_energies",
-                    self.barklem_2016_data.ionization_energies,
-                )
-            if hasattr(self.barklem_2016_data, "dissociation_energies"):
-                f.put(
-                    "/molecules/dissociation_energies",
-                    self.barklem_2016_data.dissociation_energies,
-                )
-            if hasattr(self.barklem_2016_data, "partition_functions"):
-                f.put(
-                    "/molecules/partition_functions",
-                    self.barklem_2016_data.partition_functions,
-                )
-
-            if hasattr(self, "collisions"):
-                f.put("/collisions_data", self.collisions_prepared)
-                f.put("/collisions_metadata", self.collisions_metadata)
-
-            if hasattr(self, "cross_sections"):
-                f.put("/photoionization_data", self.cross_sections_prepared)
+            for hdf_path, (reader, data) in optional_outputs.items():
+                if hasattr(reader, data):
+                    f.put(hdf_path, getattr(reader, data))
 
             lines_metadata = pd.DataFrame(
                 data=[["format", "version", "1.0"]], columns=["field", "key", "value"]

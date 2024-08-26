@@ -60,9 +60,7 @@ class CollisionsPreparer:
         collisions_prepared = (
             self.collisions.reset_index().loc[:, collisions_columns].copy()
         )
-        collisions_prepared = collisions_prepared.set_index(collisions_index)
-
-        return collisions_prepared
+        self.collisions_prepared = collisions_prepared.set_index(collisions_index)
     
 
 class ChiantiCollisionsPreparer(CollisionsPreparer):
