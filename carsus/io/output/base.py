@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 
-from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import (
     convert_atomic_number2symbol,
     convert_wavelength_air2vacuum,
@@ -18,6 +17,8 @@ from carsus.util import (
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
+MEDIUM_VACUUM = 0
+MEDIUM_AIR = 1
 P_EMISSION_DOWN = -1
 P_INTERNAL_DOWN = 0
 P_INTERNAL_UP = 1
