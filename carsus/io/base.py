@@ -4,7 +4,6 @@ import pandas as pd
 
 from carsus.io.util import to_flat_dict
 from abc import ABCMeta, abstractmethod
-from carsus.model import DataSource
 
 
 class ParserError(ValueError):
