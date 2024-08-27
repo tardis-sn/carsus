@@ -190,7 +190,8 @@ class TARDISAtomData:
         
         optional_outputs = {
             "/nuclear_decay_rad": (self.nndc_reader, "decay_data"),
-            "/linelist": (self.vald_reader, "linelist"),
+            "/linelist_atoms": (self.vald_reader, "linelist_atoms"),
+            "/linelist_molecules": (self.vald_reader, "linelist_molecules"),
             "/molecules/equilibrium_constants": (self.barklem_2016_data, "equilibrium_constants"),
             "/molecules/ionization_energies": (self.barklem_2016_data, "ionization_energies"),
             "/molecules/dissociation_energies": (self.barklem_2016_data, "dissociation_energies"),
