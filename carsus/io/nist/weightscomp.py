@@ -182,6 +182,12 @@ class NISTWeightsComp(BaseParser):
 
     def _prepare_data(self, atoms):
         atomic_numbers = parse_selected_atoms(atoms)
+
+        if atomic_numbers[-1] > 94:
+            raise ValueError(
+                "Atoms with atomic number greater than 94 are not stable, and cannot be handled by the NIST parser."
+                )
+
         atom_data_list = []
 
         for atomic_number in atomic_numbers:
