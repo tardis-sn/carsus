@@ -2,12 +2,8 @@ import pytest
 import pandas as pd
 
 from pandas.testing import assert_series_equal
-from numpy.testing import assert_almost_equal
-from sqlalchemy.orm import joinedload
-from carsus.model import Ion
 
 from carsus.io.nist.ionization import (NISTIonizationEnergiesParser,
-                                       NISTIonizationEnergiesIngester,
                                        NISTIonizationEnergies)
 
 
@@ -70,12 +66,6 @@ def ground_levels(ioniz_energies_parser):
     return ioniz_energies_parser.prepare_ground_levels()
 
 
-@pytest.fixture
-def ioniz_energies_ingester(memory_session):
-    ingester = NISTIonizationEnergiesIngester(memory_session)
-    ingester.parser(test_data)
-    return ingester
-
 @pytest.fixture(params=[expected_ground_shells,
                         expected_ground_level, expected_ioniz_energy_value,
                         expected_ioniz_energy_uncert, expected_ioniz_energy_method])
@@ -108,37 +98,6 @@ def test_prepare_ground_levels(ground_levels, expected_series_ground_levels):
     series = ground_levels[expected_series_ground_levels.name]
     assert_series_equal(series, expected_series_ground_levels)
 
-
-@pytest.mark.parametrize("index, value, uncert",
-                         zip(expected_indices,
-                             expected_ioniz_energy_value[1],
-                             expected_ioniz_energy_uncert[1]))
-def test_ingest_ionization_energies(index, value, uncert, memory_session, ioniz_energies_ingester):
-
-    ioniz_energies_ingester.ingest(ionization_energies=True, ground_levels=False)
-
-    atomic_number, ion_charge = index
-    ion = memory_session.query(Ion).options(joinedload('ionization_energies')).get((atomic_number, ion_charge))
-
-    ion_energy = ion.ionization_energies[0]
-    assert_almost_equal(ion_energy.quantity.value, value)
-    assert_almost_equal(ion_energy.uncert, uncert)
-
-
-@pytest.mark.parametrize("index, exp_j", zip(expected_indices, expected_j[1]))
-def test_ingest_ground_levels(index, exp_j, memory_session, ioniz_energies_ingester):
-    ioniz_energies_ingester.ingest(ionization_energies=True, ground_levels=True)
-
-    atomic_number, ion_charge = index
-    ion = memory_session.query(Ion).options(joinedload('levels')).get((atomic_number, ion_charge))
-    ground_level = ion.levels[0]
-    assert_almost_equal(ground_level.J, exp_j)
-
-
-@pytest.mark.remote_data
-def test_ingest_nist_asd_ion_data(memory_session):
-    ingester = NISTIonizationEnergiesIngester(memory_session, spectra="h-uuh")
-    ingester.ingest(ionization_energies=True, ground_levels=True)
 
 @pytest.mark.remote_data
 

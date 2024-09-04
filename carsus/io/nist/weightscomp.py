@@ -7,11 +7,10 @@ import logging
 
 import pandas as pd
 import requests
-from astropy import units as u
 from bs4 import BeautifulSoup
 
 from carsus.base import basic_atomic_data_fname
-from carsus.io.base import BaseIngester, BaseParser, BasePyparser
+from carsus.io.base import BaseParser, BasePyparser
 from carsus.io.nist.weightscomp_grammar import (
     AM_SD_COL,
     AM_VAL_COL,
@@ -30,9 +29,7 @@ from carsus.io.nist.weightscomp_grammar import (
     isotope,
 )
 from carsus.io.util import retry_request, to_nom_val_and_std_dev
-from carsus.model import AtomWeight
 from carsus.util import parse_selected_atoms
-from carsus.util.helpers import ATOMIC_SYMBOLS_DATA
 
 logger = logging.getLogger(__name__)
 
@@ -167,82 +164,6 @@ class NISTWeightsCompPyparser(BasePyparser):
     def prepare_isotope_dataframe(self):
         """Returns a new dataframe created from `base` and containing data *only* related to isotopes"""
         pass
-
-
-class NISTWeightsCompIngester(BaseIngester):
-    """
-    Class for ingesters for the NIST Atomic Weights and Isotopic Compositions
-
-    Attributes
-    ----------
-    session: SQLAlchemy session
-
-    data_source: DataSource instance
-        The data source of the ingester
-
-    parser : BaseParser instance
-        (default value = NISTWeightsCompPyparser())
-
-    downloader : function
-        (default value = download_weightscomp)
-
-    Methods
-    -------
-    download()
-        Downloads the data with the 'downloader' and loads the `parser` with it
-
-    ingest(session)
-        Persists the downloaded data into the database
-
-    """
-
-    def __init__(
-        self,
-        session,
-        ds_short_name="nist",
-        parser=None,
-        downloader=None,
-        nist_url=False,
-    ):
-        if parser is None:
-            parser = NISTWeightsCompPyparser()
-        if downloader is None:
-            downloader = download_weightscomp
-        self.nist_url = nist_url
-        super(NISTWeightsCompIngester, self).__init__(
-            session, ds_short_name, parser=parser, downloader=downloader
-        )
-
-    def download(self):
-        data = self.downloader(nist_url=self.nist_url)
-        self.parser(data)
-
-    def ingest_atomic_weights(self, atomic_weights=None):
-        if atomic_weights is None:
-            atomic_weights = self.parser.prepare_atomic_dataframe()
-
-        logger.info(
-            "Ingesting atomic weights from `{}`.".format(self.data_source.short_name)
-        )
-
-        for atomic_number, row in atomic_weights.iterrows():
-            weight = AtomWeight(
-                atomic_number=atomic_number,
-                data_source=self.data_source,
-                quantity=row[AW_VAL_COL] * u.u,
-                uncert=row[AW_SD_COL],
-            )
-            self.session.add(weight)
-
-    def ingest(self, atomic_weights=True):
-        """*Only* ingests atomic weights *for now*"""
-
-        if self.parser.base is None:
-            self.download()
-
-        if atomic_weights:
-            self.ingest_atomic_weights()
-            self.session.flush()
 
 
 class NISTWeightsComp(BaseParser):
