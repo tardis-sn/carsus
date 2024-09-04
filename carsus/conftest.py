@@ -63,9 +63,6 @@ def pytest_configure(config):
 
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from carsus import init_db
 
 DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
 
@@ -96,13 +93,6 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_not_with_testdb)
 
 
-@pytest.fixture
-def memory_session():
-    session = init_db("sqlite://")
-    session.commit()
-    return session
-
-
 @pytest.fixture(scope="session")
 def test_db_fname(request):
     test_db_fname = request.config.getoption("--test-db")
@@ -110,11 +100,6 @@ def test_db_fname(request):
         pytest.skip("--testing database was not specified")
     else:
         return str(Path(test_db_fname).expanduser().resolve())
-
-
-@pytest.fixture(scope="session")
-def test_db_url(test_db_fname):
-    return "sqlite:///" + test_db_fname
 
 
 @pytest.fixture(scope="session")

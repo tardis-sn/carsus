@@ -10,15 +10,13 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 import requests
-from astropy import units as u
 from bs4 import BeautifulSoup
 from pyparsing import ParseException
 
 import carsus
-from carsus.io.base import BaseIngester, BaseParser
+from carsus.io.base import BaseParser
 from carsus.io.nist.ionization_grammar import level
 from carsus.io.util import retry_request
-from carsus.model import Ion, IonizationEnergy, Level, LevelEnergy
 from carsus.util import convert_atomic_number2symbol
 from uncertainties import ufloat_fromstr
 
@@ -272,134 +270,6 @@ class NISTIonizationEnergiesParser(BaseParser):
         ground_levels.set_index(["atomic_number", "ion_charge"], inplace=True)
 
         return ground_levels
-
-
-class NISTIonizationEnergiesIngester(BaseIngester):
-    """
-    Class for ingesters for the Ionization Energies Data
-    Attributes
-    ----------
-    session: SQLAlchemy session
-
-    data_source: DataSource instance
-        The data source of the ingester
-
-    parser : BaseParser instance
-        (default value = NISTIonizationEnergiesParser())
-
-    downloader : function
-        (default value = download_ionization_energies)
-    spectra: str
-        (default value = 'h-uuh')
-
-    Methods
-    -------
-    download()
-        Downloads the data with the 'downloader' and loads the `parser` with it
-    ingest(session)
-        Persists the downloaded data into the database
-    """
-
-    def __init__(
-        self,
-        session,
-        ds_short_name="nist-asd",
-        downloader=None,
-        parser=None,
-        spectra="h-uuh",
-        nist_url=False,
-    ):
-        if parser is None:
-            parser = NISTIonizationEnergiesParser()
-        if downloader is None:
-            downloader = download_ionization_energies
-        self.spectra = spectra
-        self.nist_url = nist_url
-        super(NISTIonizationEnergiesIngester, self).__init__(
-            session, ds_short_name=ds_short_name, parser=parser, downloader=downloader
-        )
-
-    def download(self):
-        data = self.downloader(spectra=self.spectra, nist_url=self.nist_url)
-        self.parser(data)
-
-    def ingest_ionization_energies(self, ioniz_energies=None):
-        if ioniz_energies is None:
-            ioniz_energies = self.parser.prepare_ioniz_energies()
-
-        logger.info(
-            f"Ingesting ionization energies from `{self.data_source.short_name}`."
-        )
-
-        for index, row in ioniz_energies.iterrows():
-            atomic_number, ion_charge = index
-            # Query for an existing ion; create if doesn't exists
-            ion = Ion.as_unique(
-                self.session, atomic_number=atomic_number, ion_charge=ion_charge
-            )
-            ion.energies = [
-                IonizationEnergy(
-                    ion=ion,
-                    data_source=self.data_source,
-                    quantity=row["ionization_energy_value"] * u.eV,
-                    uncert=row["ionization_energy_uncert"],
-                    method=row["ionization_energy_method"],
-                )
-            ]
-            # No need to add ion to the session, because
-            # that was done in `as_unique`
-
-    def ingest_ground_levels(self, ground_levels=None):
-        if ground_levels is None:
-            ground_levels = self.parser.prepare_ground_levels()
-
-        logger.info(f"Ingesting ground levels from `{self.data_source.short_name}`.")
-
-        for index, row in ground_levels.iterrows():
-            atomic_number, ion_charge = index
-
-            # Replace nan with None
-            row = row.where(pd.notnull(row), None)
-
-            ion = Ion.as_unique(
-                self.session, atomic_number=atomic_number, ion_charge=ion_charge
-            )
-
-            try:
-                spin_multiplicity = int(row["spin_multiplicity"])
-            except TypeError:  # Raised when the variable is None
-                spin_multiplicity = None
-
-            try:
-                parity = int(row["parity"])
-            except TypeError:  # Raised when the variable is None
-                parity = None
-
-            ion.levels.append(
-                Level(
-                    data_source=self.data_source,
-                    configuration=row["configuration"],
-                    term=row["term"],
-                    L=row["L"],
-                    spin_multiplicity=spin_multiplicity,
-                    parity=parity,
-                    J=row["J"],
-                    energies=[LevelEnergy(quantity=0, data_source=self.data_source)],
-                )
-            )
-
-    def ingest(self, ionization_energies=True, ground_levels=True):
-        # Download data if needed
-        if self.parser.base is None:
-            self.download()
-
-        if ionization_energies:
-            self.ingest_ionization_energies()
-            self.session.flush()
-
-        if ground_levels:
-            self.ingest_ground_levels()
-            self.session.flush()
 
 
 class NISTIonizationEnergies(BaseParser):

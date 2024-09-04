@@ -4,7 +4,6 @@ import pandas as pd
 
 from carsus.io.util import to_flat_dict
 from abc import ABCMeta, abstractmethod
-from carsus.model import DataSource
 
 
 class ParserError(ValueError):
@@ -104,65 +103,3 @@ class BasePyparser(BaseParser):
             base.append(tokens_dict)
         self.base = pd.DataFrame(data=base, columns=self.columns)
 
-
-
-class IngesterError(ValueError):
-    pass
-
-
-class BaseIngester(object):
-    """
-    Abstract base class for ingesters.
-
-    Attributes
-    ----------
-    session: SQLAlchemy session
-
-    data_source: DataSource instance
-        The data source of the ingester
-
-    parser : BaseParser instance
-        Parses the downloaded data
-
-    downloader : function
-        Downloads the data
-
-
-
-    Methods
-    -------
-    download()
-        Downloads the data with the 'downloader' and loads the `parser` with it
-
-    ingest(session)
-        Persists the downloaded data into the database
-
-    """
-    __metaclass__ = ABCMeta
-
-    def requirements_satisfied(self):
-        return True
-
-    def __init__(self, session, ds_short_name, parser, downloader):
-        self.parser = parser
-        self.downloader = downloader
-        self.session = session
-
-        self.data_source = DataSource.as_unique(self.session, short_name=ds_short_name)
-        if self.data_source.data_source_id is None:  # To get the id if a new data source was created
-            self.session.flush()
-
-        if not self.requirements_satisfied():
-            raise IngesterError('Requirements for ingest are not satisfied!')
-
-    @abstractmethod
-    def download(self):
-        pass
-
-    @abstractmethod
-    def ingest(self, session):
-        pass
-
-    #def __call__(self, session):
-    #    self.download()
-    #    self.ingest(session)

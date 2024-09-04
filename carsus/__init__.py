@@ -11,7 +11,6 @@ __all__ = []
 
 import sys
 import logging
-from .base import init_db
 from .util.colored_logger import ColoredFormatter, formatter_message
 
 FORMAT = "[$BOLD%(name)27s$RESET][%(levelname)18s] - %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
