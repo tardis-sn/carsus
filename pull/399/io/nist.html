@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NIST &mdash; carsus v0.1.dev754+gbf6636a</title>
+  <title>NIST &mdash; carsus v0.1.dev757+g2e2ab3c</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -48,7 +48,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev754+gbf6636a
+                0.1.dev757+g2e2ab3c
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -89,10 +89,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Legacy Code</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../legacy/index.html">SQL Interface</a></li>
-</ul>
 
         </div>
       </div>
@@ -124,6 +120,10 @@
 <section id="Atomic-Weights">
 <h2>Atomic Weights<a class="headerlink" href="#Atomic-Weights" title="Permalink to this heading"></a></h2>
 <p>Provided by the NIST Atomic Weights and Isotopic Compositions Database.</p>
+<div class="admonition warning">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Warning:</strong></p>
+<p>Carsus does not support unstable atoms with atomic numbers greater than 94</p>
+</div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -155,7 +155,7 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:72)
+[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:69)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
   InsecureRequestWarning,
  (<span class="ansi-bold">warnings.py</span>:110)
@@ -281,7 +281,7 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:89)
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:87)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
   InsecureRequestWarning,
  (<span class="ansi-bold">warnings.py</span>:110)
@@ -652,7 +652,7 @@ Name: ionization_energy, dtype: float64
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 27 Aug 2024.
+      <span class="lastupdated">Last updated on 04 Sep 2024.
       </span></p>
   </div>
 
