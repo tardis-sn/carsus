@@ -1,17 +1,18 @@
 import functools
 import logging
 
+import astropy.constants as const
 import astropy.units as u
 import numpy as np
 import pandas as pd
 
-from carsus.calculations import create_einstein_coeff
-from carsus.model import MEDIUM_AIR, MEDIUM_VACUUM
 from carsus.util import convert_atomic_number2symbol, convert_wavelength_air2vacuum
 from carsus.io.util import get_lvl_index2id, create_artificial_fully_ionized
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
+MEDIUM_AIR = 1
+MEDIUM_VACUUM = 0
 
 logger = logging.getLogger(__name__)
 
@@ -494,3 +495,33 @@ class LevelsLinesPreparer:
 
         self.levels = levels
         self.lines = lines
+
+def create_einstein_coeff(lines):
+    """
+    Create Einstein coefficients columns for the `lines` DataFrame.
+
+    Parameters
+    ----------
+    lines : pandas.DataFrame
+        Transition lines dataframe.
+
+    """
+    einstein_coeff = (4 * np.pi**2 * const.e.gauss.value**2) / (
+        const.m_e.cgs.value * const.c.cgs.value
+    )
+
+    lines["B_lu"] = (
+        einstein_coeff * lines["f_lu"] / (const.h.cgs.value * lines["nu"])
+    )
+
+    lines["B_ul"] = (
+        einstein_coeff * lines["f_ul"] / (const.h.cgs.value * lines["nu"])
+    )
+
+    lines["A_ul"] = (
+        2
+        * einstein_coeff
+        * lines["nu"] ** 2
+        / const.c.cgs.value**2
+        * lines["f_ul"]
+    )
