@@ -47,7 +47,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
             df = pd.read_csv(fname, **config)
 
         except pd.errors.EmptyDataError:
-            df = pd.DataFrame(columns=columns)
+            df = pd.DataFrame()
             logger.warning(f"Empty table: `{fname}`.")
 
         if df.shape[1] == 10:
