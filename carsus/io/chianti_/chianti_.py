@@ -109,7 +109,7 @@ class ChiantiIonReader(object):
 
     def __init__(self, ion_name):
 
-        self.ion = ch.ion(ion_name)
+        self.ion = ch.ion(ion_name, temperature=1)
         self._levels = None
         self._lines = None
         self._collisions = None
