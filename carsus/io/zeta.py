@@ -35,7 +35,7 @@ class KnoxLongZeta(BaseParser):
             usecols=range(1, 23),
             names=names,
             comment="#",
-            delim_whitespace=True)
+            sep=r"\s+")
 
         self.base = (
             pd.DataFrame(zeta_df).set_index(

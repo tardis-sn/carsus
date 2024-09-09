@@ -252,8 +252,8 @@ class GFALLReader(object):
         gfall["label_lower"] = gfall["label_lower"].str.strip()
         gfall["label_upper"] = gfall["label_upper"].str.strip()
 
-        gfall["label_lower"] = gfall["label_lower"].str.replace("\s+", " ")
-        gfall["label_upper"] = gfall["label_upper"].str.replace("\s+", " ")
+        gfall["label_lower"] = gfall["label_lower"].str.replace(r"\s+", " ")
+        gfall["label_upper"] = gfall["label_upper"].str.replace(r"\s+", " ")
 
         # Ignore lines with the labels "AVARAGE ENERGIES" and "CONTINUUM"
         ignored_labels = ["AVERAGE", "ENERGIES", "CONTINUUM"]

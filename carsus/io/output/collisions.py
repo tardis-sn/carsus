@@ -47,7 +47,7 @@ class CollisionsPreparer:
                 collisions_index
                 + ["g_ratio", "delta_e"]
                 + sorted(
-                    [col for col in self.collisions.columns if re.match("^t\d+$", col)]
+                    [col for col in self.collisions.columns if re.match(r"^t\d+$", col)]
                 )
             )
 

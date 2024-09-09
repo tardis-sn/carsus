@@ -39,7 +39,7 @@ masterlist_ions_file = open(masterlist_ions_path, 'rb')
 masterlist_ions = pickle.load(masterlist_ions_file).keys()
 # Exclude the "d" ions for now
 masterlist_ions = [_ for _ in masterlist_ions
-                   if re.match("^[a-z]+_\d+$", _)]
+                   if re.match(r"^[a-z]+_\d+$", _)]
 
 masterlist_version = versionRead()
 

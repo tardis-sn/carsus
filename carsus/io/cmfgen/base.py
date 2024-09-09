@@ -37,7 +37,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s+",
+            "sep": r"\s+",
             "skiprows": skiprows,
             "nrows": nrows,
             "engine": "python",
@@ -112,7 +112,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])",
+            "sep": r"\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])",
             "skiprows": skiprows,
             "nrows": nrows,
             "engine": "python",
@@ -177,7 +177,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def load(self, fname):
         header = parse_header(fname)
-        skiprows, _ = find_row(fname, "ransition\T")
+        skiprows, _ = find_row(fname, r"ransition\T")
         config = {
             "header": None,
             "index_col": False,
@@ -194,7 +194,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             config["nrows"] = end - config["skiprows"] - 2
 
         try:
-            _, columns = find_row(fname, "ransition\T")
+            _, columns = find_row(fname, r"ransition\T")
             columns = columns.split()
 
             # NOTE: Comment next line when trying new regexes
