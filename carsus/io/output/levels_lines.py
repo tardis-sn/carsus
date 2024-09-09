@@ -148,7 +148,7 @@ class LevelsLinesPreparer:
         levels = self.ingest_multiple_sources("levels")
 
         levels["g"] = 2 * levels["j"] + 1
-        levels["g"] = levels["g"].astype(np.int)
+        levels["g"] = levels["g"].astype(np.int64)
         levels = levels.drop(columns=["j", "label", "method"])
         levels = levels.reset_index()
         levels = levels.rename(columns={"ion_charge": "ion_number"})
@@ -444,7 +444,7 @@ class LevelsLinesPreparer:
             .values
         )
 
-        levels["level_number"] = levels["level_number"].astype(np.int)
+        levels["level_number"] = levels["level_number"].astype(np.int64)
 
         levels = levels[
             [

@@ -10,7 +10,7 @@ from carsus.io.nist.ionization_grammar import *
     ("3/2", 1.5)
 ])
 def test_j(test_input, exp_j):
-    tkns = J.parseString(test_input)
+    tkns = J.parse_string(test_input)
     assert_almost_equal(tkns[0], exp_j)
 
 
@@ -20,7 +20,7 @@ def test_j(test_input, exp_j):
     ("1S", 1, "S")
 ])
 def test_ls_term(test_input, exp_mult, exp_l):
-    tkns = ls_term.parseString(test_input)
+    tkns = ls_term.parse_string(test_input)
     assert tkns["mult"] == exp_mult
     assert tkns["L"] == exp_l
 
@@ -31,7 +31,7 @@ def test_ls_term(test_input, exp_mult, exp_l):
     ("(0,2)", 0.0, 2.0)
 ])
 def test_jj_term(test_input, exp_first_j, exp_second_j):
-    tkns = jj_term.parseString(test_input)
+    tkns = jj_term.parse_string(test_input)
     assert_almost_equal(tkns["first_J"], exp_first_j)
     assert_almost_equal(tkns["second_J"], exp_second_j)
 
@@ -42,11 +42,11 @@ def test_jj_term(test_input, exp_first_j, exp_second_j):
     ("1S*<4>", 1, "S", 1, 4.0)
 ])
 def test_level_w_ls_term(test_input, exp_mult, exp_l, exp_parity, exp_j):
-    tkns = level.parseString(test_input)
+    tkns = level.parse_string(test_input)
     assert tkns["ls_term"]["mult"] == exp_mult
     assert tkns["ls_term"]["L"] == exp_l
     assert tkns["parity"] == exp_parity
-    assert_almost_equal(tkns["J"], exp_j)  # This assertion fails because tkns["J"] is a list and exp_j and integer. e.g. [2] == 2
+    assert_almost_equal(tkns["J"][0], exp_j)  # This assertion fails because tkns["J"] is a list and exp_j and integer. e.g. [2] == 2
                                            # Same thing on lines 62 and 73.
 
 @pytest.mark.parametrize("test_input, exp_first_j, exp_second_j, exp_parity, exp_j",[
@@ -55,11 +55,11 @@ def test_level_w_ls_term(test_input, exp_mult, exp_l, exp_parity, exp_j):
     ("(1/2, 2)*<2>", 0.5, 2.0, 1, 2.0)
 ])
 def test_level_w_jj_term(test_input, exp_first_j, exp_second_j, exp_parity, exp_j):
-    tkns = level.parseString(test_input)
+    tkns = level.parse_string(test_input)
     assert tkns["jj_term"]["first_J"] == exp_first_j
     assert tkns["jj_term"]["second_J"] == exp_second_j
     assert tkns["parity"] == exp_parity
-    assert_almost_equal(tkns["J"], exp_j)
+    assert_almost_equal(tkns["J"][0], exp_j)
 
 
 @pytest.mark.parametrize("test_input, exp_parity, exp_j",[
@@ -68,9 +68,9 @@ def test_level_w_jj_term(test_input, exp_first_j, exp_second_j, exp_parity, exp_
     ("*<2>", 1, 2.0)
 ])
 def test_level_wo_term(test_input, exp_parity, exp_j):
-    tkns = level.parseString(test_input)
+    tkns = level.parse_string(test_input)
     assert tkns["parity"] == exp_parity
-    assert_almost_equal(tkns["J"], exp_j)
+    assert_almost_equal(tkns["J"][0], exp_j)
 
 
 @pytest.mark.parametrize("test_input, exp_parity",[
@@ -78,5 +78,5 @@ def test_level_wo_term(test_input, exp_parity, exp_j):
     ("*", 1)
 ])
 def test_level_wo_term_and_j(test_input, exp_parity):
-    tkns = level.parseString(test_input)
+    tkns = level.parse_string(test_input)
     assert tkns["parity"] == exp_parity

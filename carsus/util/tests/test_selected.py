@@ -12,7 +12,7 @@ from carsus.util.selected import element, element_range, \
     ("h", 1)
 ])
 def test_element(test_input, exp_atomic_number):
-    tokens = element.parseString(test_input)
+    tokens = element.parse_string(test_input)
     assert tokens[0] == exp_atomic_number
 
 
@@ -22,7 +22,7 @@ def test_element(test_input, exp_atomic_number):
     ("si-s", [14, 15, 16])
 ])
 def test_element_range(test_input, exp_atomic_numbers):
-    tokens = element_range.parseString(test_input)
+    tokens = element_range.parse_string(test_input)
     assert tokens.asList() == exp_atomic_numbers
 
 
@@ -33,7 +33,7 @@ def test_element_range(test_input, exp_atomic_numbers):
     ('he, h-li', [1, 2, 3])
 ])
 def test_selected_atoms(test_input, exp_atomic_numbers):
-    tokens = selected_atoms.parseString(test_input)
+    tokens = selected_atoms.parse_string(test_input)
     assert tokens.asList() == exp_atomic_numbers
 
 
@@ -65,7 +65,7 @@ def test_parse_selected_atoms_raises_invalid(invalid_selected_atoms):
     ('H-Li', [(1, 0), (2, 0), (2, 1), (3, 0), (3, 1), (3, 2)])
 ])
 def test_parse_species_entry(test_input, expected_list):
-    tokens = species_entry.parseString(test_input)
+    tokens = species_entry.parse_string(test_input)
     assert tokens.asList() == expected_list
 
 

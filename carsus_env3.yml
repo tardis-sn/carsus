@@ -4,26 +4,23 @@ channels:
   - conda-forge
 
 dependencies:
-  - python =3.7
+  - python
   - setuptools
   - setuptools_scm
   - pip
-  - numpy =1.15
-  - pandas =1.0
-  - astropy =3
-  - chiantipy =0.8.4
+  - numpy
+  - pandas
+  - astropy
+  - chiantipy
 
   # I/O
   - pyyaml
   - uncertainties
-  - pyparsing =2.2
-  - sqlalchemy =1.2
+  - pyparsing
   - beautifulsoup4
   - html5lib
   - h5py
   - pytables
-  - pyarrow =0.14.1
-  - glog =0.5  # https://github.com/google/glog/issues/814
   - requests
   - roman
 
@@ -51,8 +48,12 @@ dependencies:
   # Test/Coverage
   - pytest
   - pytest-cov
-  - pytest-astropy
-  - epassaro::pytest-arraydiff
+  - pytest-html
+  - coverage
+
+  # Code quality
+  - black =22.3
+  - ruff
 
   # Other
   - git-lfs

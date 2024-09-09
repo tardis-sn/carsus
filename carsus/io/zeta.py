@@ -43,4 +43,4 @@ class KnoxLongZeta(BaseParser):
         )
 
         columns = [float(c) for c in self.base.columns]
-        self.base.columns = pd.Float64Index(columns, name="temp")
+        self.base.columns = pd.Index(columns, name="temp", dtype=np.float64)

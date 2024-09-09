@@ -1,24 +1,5 @@
-import pyarrow as pa
+import pandas as pd
 import hashlib
-
-def serialize_pandas_object(pd_object):
-    """Serialize Pandas objects with PyArrow.
-
-    Parameters
-    ----------
-    pd_object : pandas.Series or pandas.DataFrame
-        Pandas object to be serialized with PyArrow.
-
-    Returns
-    -------
-    pyarrow.lib.SerializedPyObject
-        PyArrow serialized Python object.
-    """
-
-    context = pa.default_serialization_context()
-    serialized_pd_object = context.serialize(pd_object)
-
-    return serialized_pd_object
 
 
 def hash_pandas_object(pd_object, algorithm="md5"):
@@ -49,6 +30,4 @@ def hash_pandas_object(pd_object, algorithm="md5"):
     else:
         raise ValueError('algorithm not supported')
 
-    buffer = serialize_pandas_object(pd_object).to_buffer()
-
-    return hash_func(buffer).hexdigest()
+    return hash_func(pd.util.hash_pandas_object(pd_object).values).hexdigest()

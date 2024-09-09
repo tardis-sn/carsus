@@ -251,7 +251,6 @@ class TARDISAtomData:
                 "astropy",
                 "numpy",
                 "pandas",
-                "pyarrow",
                 "tables",
                 "ChiantiPy",
             ]

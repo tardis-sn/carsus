@@ -42,12 +42,12 @@ class MacroAtomPreparer():
 
         macro_atom = list()
         macro_atom_dtype = [
-            ("atomic_number", np.int),
-            ("ion_number", np.int),
-            ("source_level_number", np.int),
-            ("target_level_number", np.int),
-            ("transition_line_id", np.int),
-            ("transition_type", np.int),
+            ("atomic_number", np.int64),
+            ("ion_number", np.int64),
+            ("source_level_number", np.int64),
+            ("target_level_number", np.int64),
+            ("transition_line_id", np.int64),
+            ("transition_type", np.int64),
             ("transition_probability", np.float),
         ]
 
@@ -146,15 +146,15 @@ class MacroAtomPreparer():
 
         macro_atom_references["count_down"] = macro_atom_references[
             "count_down"
-        ].astype(np.int)
+        ].astype(np.int64)
 
         macro_atom_references["count_up"] = macro_atom_references["count_up"].astype(
-            np.int
+            np.int64
         )
 
         macro_atom_references["count_total"] = macro_atom_references[
             "count_total"
-        ].astype(np.int)
+        ].astype(np.int64)
 
         self.macro_atom_references = macro_atom_references
 
