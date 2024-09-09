@@ -17,7 +17,6 @@ from carsus.io.cmfgen.util import *
 data_dir = os.path.join(os.path.dirname(__file__), "data")
 
 
-@pytest.mark.with_refdata
 @pytest.fixture()
 def si1_reader():
     return CMFGENReader.from_config(

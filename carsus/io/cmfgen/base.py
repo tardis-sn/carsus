@@ -73,7 +73,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         self.base = df
         self.header = header
         # Re-calculate Lam(A) values
-        self.base["Lam(A)"] = self.calc_Lam_A()
+        self.base["Lam(A)"] = self.calc_Lam_A().value
 
     def calc_Lam_A(self):
         """
