@@ -13,9 +13,9 @@
 version: 1
 metadata:
   content_hash:
-    osx-64: 2de6cb08a7584e0d6cfd1e9fda01ea2740920f0b6d1415a9a0f14f6edda46a69
-    linux-64: fa66c907f5a8cf5f0767b798d3f576c909c7e93b52405dbb4c40f913cb12ef7f
-    osx-arm64: aface293794d9a65a9eec1219cb5a275827e6f99ab46275699d7aad22c350586
+    osx-64: 87cb8ff0ad9824a57b6a1ae48be339afb578ac3f04da57866eb787c68543f8e3
+    linux-64: c74e514fa2776b96128fb4d0982113635244fb4c8173433f56035e15f8d76f80
+    osx-arm64: c2fb673264b3da8d9873b121274265ce7c8c5c2346e86f1c544860fa1558bb21
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -602,6 +602,45 @@ package:
   hash:
     md5: 9669586875baeced8fc30c0826c3270e
     sha256: 8584e3da58e92b72641c89ff9b98c51f0d5dbe76e527867804cbdf03ac91d8e6
+  category: main
+  optional: false
+- name: backports.zoneinfo
+  version: 0.2.1
+  manager: conda
+  platform: linux-64
+  dependencies:
+    python: '>=3.12,<3.13.0a0'
+    python_abi: 3.12.*
+  url: https://conda.anaconda.org/conda-forge/linux-64/backports.zoneinfo-0.2.1-py312h7900ff3_9.conda
+  hash:
+    md5: 6df4f61b215587c40ec93810734778ca
+    sha256: 0b601826594f496432a67f8ee7776160cc43e8739ed2d69885ca569c2b81529c
+  category: main
+  optional: false
+- name: backports.zoneinfo
+  version: 0.2.1
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.12,<3.13.0a0'
+    python_abi: 3.12.*
+  url: https://conda.anaconda.org/conda-forge/osx-64/backports.zoneinfo-0.2.1-py312hb401068_9.conda
+  hash:
+    md5: e95eed1843a3e958ce33683859f48cff
+    sha256: 2a876f7c98e6539a9ea3ac0939b82f18683508ba5bc7401362d15685805f15a1
+  category: main
+  optional: false
+- name: backports.zoneinfo
+  version: 0.2.1
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.12,<3.13.0a0'
+    python_abi: 3.12.*
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/backports.zoneinfo-0.2.1-py312h81bd7bf_9.conda
+  hash:
+    md5: 3abb8976d50efba9d3fa61f50018fc36
+    sha256: 6c7556a19b1807d951eecc4e4d63a60e4300a50a66521ae93d37a293cf9d4c5e
   category: main
   optional: false
 - name: beautifulsoup4
@@ -2957,6 +2996,60 @@ package:
   hash:
     md5: 9f765cbfab6870c8435b9eefecd7a1f4
     sha256: e374a9d0f53149328134a8d86f5d72bca4c6dcebed3c0ecfa968c02996289330
+  category: main
+  optional: false
+- name: hypothesis
+  version: 6.112.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    attrs: '>=19.2.0'
+    backports.zoneinfo: '>=0.2.1'
+    click: '>=7.0'
+    exceptiongroup: '>=1.0.0rc8'
+    python: '>=3.8'
+    setuptools: ''
+    sortedcontainers: '>=2.1.0,<3.0.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/hypothesis-6.112.0-pyha770c72_0.conda
+  hash:
+    md5: 68c2f513fd806ac6a6049a4a1f472567
+    sha256: 6f1ed89142b02d41f59a2927336e0fffbbd704bf0dc22e9d1c6659a62425acce
+  category: main
+  optional: false
+- name: hypothesis
+  version: 6.112.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    setuptools: ''
+    python: '>=3.8'
+    click: '>=7.0'
+    attrs: '>=19.2.0'
+    sortedcontainers: '>=2.1.0,<3.0.0'
+    backports.zoneinfo: '>=0.2.1'
+    exceptiongroup: '>=1.0.0rc8'
+  url: https://conda.anaconda.org/conda-forge/noarch/hypothesis-6.112.0-pyha770c72_0.conda
+  hash:
+    md5: 68c2f513fd806ac6a6049a4a1f472567
+    sha256: 6f1ed89142b02d41f59a2927336e0fffbbd704bf0dc22e9d1c6659a62425acce
+  category: main
+  optional: false
+- name: hypothesis
+  version: 6.112.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    setuptools: ''
+    python: '>=3.8'
+    click: '>=7.0'
+    attrs: '>=19.2.0'
+    sortedcontainers: '>=2.1.0,<3.0.0'
+    backports.zoneinfo: '>=0.2.1'
+    exceptiongroup: '>=1.0.0rc8'
+  url: https://conda.anaconda.org/conda-forge/noarch/hypothesis-6.112.0-pyha770c72_0.conda
+  hash:
+    md5: 68c2f513fd806ac6a6049a4a1f472567
+    sha256: 6f1ed89142b02d41f59a2927336e0fffbbd704bf0dc22e9d1c6659a62425acce
   category: main
   optional: false
 - name: icu
@@ -9329,6 +9422,153 @@ package:
     sha256: 72c84a3cd9fe82835a88e975fd2a0dbf2071d1c423ea4f79e7930578c1014873
   category: main
   optional: false
+- name: pytest-arraydiff
+  version: 0.6.1
+  manager: conda
+  platform: linux-64
+  dependencies:
+    numpy: ''
+    pytest: '>=4.6'
+    python: '>=3.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-arraydiff-0.6.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: a599700032791bb3056e82fdac15834d
+    sha256: 0ffa2afa82fb39f64147a9a5a05adf9a5e5ffad65316c6a9c52d7d80f4a3bee7
+  category: main
+  optional: false
+- name: pytest-arraydiff
+  version: 0.6.1
+  manager: conda
+  platform: osx-64
+  dependencies:
+    numpy: ''
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-arraydiff-0.6.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: a599700032791bb3056e82fdac15834d
+    sha256: 0ffa2afa82fb39f64147a9a5a05adf9a5e5ffad65316c6a9c52d7d80f4a3bee7
+  category: main
+  optional: false
+- name: pytest-arraydiff
+  version: 0.6.1
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    numpy: ''
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-arraydiff-0.6.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: a599700032791bb3056e82fdac15834d
+    sha256: 0ffa2afa82fb39f64147a9a5a05adf9a5e5ffad65316c6a9c52d7d80f4a3bee7
+  category: main
+  optional: false
+- name: pytest-astropy
+  version: 0.11.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    attrs: '>=19.2.0'
+    hypothesis: '>=5.1'
+    pytest: '>=4.6'
+    pytest-arraydiff: '>=0.5'
+    pytest-astropy-header: '>=0.2.2'
+    pytest-cov: '>=2.3.1'
+    pytest-doctestplus: '>=1.0.0'
+    pytest-filter-subpackage: '>=0.1.2'
+    pytest-mock: '>=2.0'
+    pytest-remotedata: '>=0.4.1'
+    python: '>=3.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-0.11.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a3b0cf61a2f4d9f886250fa17a2aaba2
+    sha256: fc41af176e7ca4378efe990d897a2c646f2fb1b5b44938d9005bbf1daf587a5e
+  category: main
+  optional: false
+- name: pytest-astropy
+  version: 0.11.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.7'
+    attrs: '>=19.2.0'
+    pytest: '>=4.6'
+    hypothesis: '>=5.1'
+    pytest-mock: '>=2.0'
+    pytest-cov: '>=2.3.1'
+    pytest-arraydiff: '>=0.5'
+    pytest-astropy-header: '>=0.2.2'
+    pytest-doctestplus: '>=1.0.0'
+    pytest-filter-subpackage: '>=0.1.2'
+    pytest-remotedata: '>=0.4.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-0.11.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a3b0cf61a2f4d9f886250fa17a2aaba2
+    sha256: fc41af176e7ca4378efe990d897a2c646f2fb1b5b44938d9005bbf1daf587a5e
+  category: main
+  optional: false
+- name: pytest-astropy
+  version: 0.11.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.7'
+    attrs: '>=19.2.0'
+    pytest: '>=4.6'
+    hypothesis: '>=5.1'
+    pytest-mock: '>=2.0'
+    pytest-cov: '>=2.3.1'
+    pytest-arraydiff: '>=0.5'
+    pytest-astropy-header: '>=0.2.2'
+    pytest-doctestplus: '>=1.0.0'
+    pytest-filter-subpackage: '>=0.1.2'
+    pytest-remotedata: '>=0.4.1'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-0.11.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a3b0cf61a2f4d9f886250fa17a2aaba2
+    sha256: fc41af176e7ca4378efe990d897a2c646f2fb1b5b44938d9005bbf1daf587a5e
+  category: main
+  optional: false
+- name: pytest-astropy-header
+  version: 0.2.2
+  manager: conda
+  platform: linux-64
+  dependencies:
+    pytest: '>=4.6'
+    python: '>=3.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-header-0.2.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 96136ffc40ef3d0ab8b65233b940c6e9
+    sha256: 7fa623a96d9e5cb7b21028fff8d80292bf2f763d4d3a239c5a31811c707dca17
+  category: main
+  optional: false
+- name: pytest-astropy-header
+  version: 0.2.2
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-header-0.2.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 96136ffc40ef3d0ab8b65233b940c6e9
+    sha256: 7fa623a96d9e5cb7b21028fff8d80292bf2f763d4d3a239c5a31811c707dca17
+  category: main
+  optional: false
+- name: pytest-astropy-header
+  version: 0.2.2
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-astropy-header-0.2.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 96136ffc40ef3d0ab8b65233b940c6e9
+    sha256: 7fa623a96d9e5cb7b21028fff8d80292bf2f763d4d3a239c5a31811c707dca17
+  category: main
+  optional: false
 - name: pytest-cov
   version: 5.0.0
   manager: conda
@@ -9422,6 +9662,48 @@ package:
     sha256: bce3f541d0d228a834b915b912ac56f76a98e730e2d4f09873746f557fb6a6ac
   category: main
   optional: false
+- name: pytest-filter-subpackage
+  version: 0.2.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    packaging: ''
+    pytest: '>=4.6'
+    python: '>=3.8'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-filter-subpackage-0.2.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 81486019ed58416487d5aa114353d551
+    sha256: e7802805d154981bbf1ddc7d170e77dcfd31414bd32e56da8f856078289d6253
+  category: main
+  optional: false
+- name: pytest-filter-subpackage
+  version: 0.2.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    packaging: ''
+    python: '>=3.8'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-filter-subpackage-0.2.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 81486019ed58416487d5aa114353d551
+    sha256: e7802805d154981bbf1ddc7d170e77dcfd31414bd32e56da8f856078289d6253
+  category: main
+  optional: false
+- name: pytest-filter-subpackage
+  version: 0.2.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    packaging: ''
+    python: '>=3.8'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-filter-subpackage-0.2.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 81486019ed58416487d5aa114353d551
+    sha256: e7802805d154981bbf1ddc7d170e77dcfd31414bd32e56da8f856078289d6253
+  category: main
+  optional: false
 - name: pytest-html
   version: 4.1.1
   manager: conda
@@ -9504,6 +9786,87 @@ package:
   hash:
     md5: 52b91ecba854d55b28ad916a8b10da24
     sha256: 51bf04a99ad74e933fb270f52412320617f29d2014ca5cf8a03a3c5b8f37945b
+  category: main
+  optional: false
+- name: pytest-mock
+  version: 3.14.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    pytest: '>=5.0'
+    python: '>=3.8'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-mock-3.14.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 4b9b5e086812283c052a9105ab1e254e
+    sha256: f7cd8910ce3690a9189483f4b01dde1970b2b86ea853a03b1225f344f988045d
+  category: main
+  optional: false
+- name: pytest-mock
+  version: 3.14.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=3.8'
+    pytest: '>=5.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-mock-3.14.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 4b9b5e086812283c052a9105ab1e254e
+    sha256: f7cd8910ce3690a9189483f4b01dde1970b2b86ea853a03b1225f344f988045d
+  category: main
+  optional: false
+- name: pytest-mock
+  version: 3.14.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=3.8'
+    pytest: '>=5.0'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-mock-3.14.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 4b9b5e086812283c052a9105ab1e254e
+    sha256: f7cd8910ce3690a9189483f4b01dde1970b2b86ea853a03b1225f344f988045d
+  category: main
+  optional: false
+- name: pytest-remotedata
+  version: 0.4.1
+  manager: conda
+  platform: linux-64
+  dependencies:
+    packaging: ''
+    pytest: '>=4.6'
+    python: '>=3.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-remotedata-0.4.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: 27d13680b09749f5416df2eefa9e7092
+    sha256: eb22161a743ae01d53b2e519d818cf97f1c58b82f35051548fbfd2f76e61ba0f
+  category: main
+  optional: false
+- name: pytest-remotedata
+  version: 0.4.1
+  manager: conda
+  platform: osx-64
+  dependencies:
+    packaging: ''
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-remotedata-0.4.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: 27d13680b09749f5416df2eefa9e7092
+    sha256: eb22161a743ae01d53b2e519d818cf97f1c58b82f35051548fbfd2f76e61ba0f
+  category: main
+  optional: false
+- name: pytest-remotedata
+  version: 0.4.1
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    packaging: ''
+    python: '>=3.7'
+    pytest: '>=4.6'
+  url: https://conda.anaconda.org/conda-forge/noarch/pytest-remotedata-0.4.1-pyhd8ed1ab_0.conda
+  hash:
+    md5: 27d13680b09749f5416df2eefa9e7092
+    sha256: eb22161a743ae01d53b2e519d818cf97f1c58b82f35051548fbfd2f76e61ba0f
   category: main
   optional: false
 - name: python
@@ -10899,6 +11262,42 @@ package:
   hash:
     md5: 4d22a9315e78c6827f806065957d566e
     sha256: a0fd916633252d99efb6223b1050202841fa8d2d53dacca564b0ed77249d3228
+  category: main
+  optional: false
+- name: sortedcontainers
+  version: 2.4.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    python: '>=2.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: 6d6552722448103793743dabfbda532d
+    sha256: 0cea408397d50c2afb2d25e987ebac4546ae11e549d65b1403d80dc368dfaaa6
+  category: main
+  optional: false
+- name: sortedcontainers
+  version: 2.4.0
+  manager: conda
+  platform: osx-64
+  dependencies:
+    python: '>=2.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: 6d6552722448103793743dabfbda532d
+    sha256: 0cea408397d50c2afb2d25e987ebac4546ae11e549d65b1403d80dc368dfaaa6
+  category: main
+  optional: false
+- name: sortedcontainers
+  version: 2.4.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    python: '>=2.7'
+  url: https://conda.anaconda.org/conda-forge/noarch/sortedcontainers-2.4.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: 6d6552722448103793743dabfbda532d
+    sha256: 0cea408397d50c2afb2d25e987ebac4546ae11e549d65b1403d80dc368dfaaa6
   category: main
   optional: false
 - name: soupsieve

@@ -49,6 +49,7 @@ dependencies:
   - pytest
   - pytest-cov
   - pytest-html
+  - pytest-astropy
   - coverage
 
   # Code quality
