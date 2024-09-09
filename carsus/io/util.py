@@ -1,6 +1,8 @@
 import hashlib
 import requests
 from io import BytesIO
+import pandas as pd
+import numpy as np
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
 import requests
@@ -144,3 +146,79 @@ def retry_request(
     response = requests_method(url, **kwargs)
     sess.close()
     return response
+
+def get_lvl_index2id(df, levels_all):
+    """
+    Matches level indexes with level IDs for a given DataFrame.
+
+    """
+    # TODO: re-write this method without a for loop
+    ion = df.index.unique()
+    lvl_index2id = levels_all.set_index(["atomic_number", "ion_number"]).loc[ion]
+    lvl_index2id = lvl_index2id.reset_index()
+
+    lower_level_id = []
+    upper_level_id = []
+
+    df = df.reset_index()
+    for row in df.itertuples():
+        llid = row.level_index_lower
+        ulid = row.level_index_upper
+
+        upper = lvl_index2id.at[ulid, "level_id"]
+        lower = lvl_index2id.at[llid, "level_id"]
+
+        lower_level_id.append(lower)
+        upper_level_id.append(upper)
+
+    df["lower_level_id"] = pd.Series(lower_level_id)
+    df["upper_level_id"] = pd.Series(upper_level_id)
+
+    return df
+
+def create_artificial_fully_ionized(levels):
+    """
+    Returns a DataFrame with fully ionized levels.
+
+    """
+    fully_ionized_levels = []
+
+    for atomic_number, _ in levels.groupby("atomic_number"):
+        fully_ionized_levels.append(
+            (-1, atomic_number, atomic_number, 0, 0.0, 1, True)
+        )
+
+    levels_columns = [
+        "level_id",
+        "atomic_number",
+        "ion_number",
+        "level_number",
+        "energy",
+        "g",
+        "metastable",
+    ]
+
+    fully_ionized_levels_dtypes = [
+        (key, levels.dtypes[key]) for key in levels_columns
+    ]
+
+    fully_ionized_levels = np.array(
+        fully_ionized_levels, dtype=fully_ionized_levels_dtypes
+    )
+
+    return pd.DataFrame(data=fully_ionized_levels)
+
+def exclude_artificial_levels(levels_df):
+    """Removes artificially created levels from a dataframe of levels
+
+    Parameters
+    ----------
+    levels_df : pandas.DataFrame
+        Levels dataframe
+
+    Returns
+    -------
+    pandas.DataFrame
+        Filtered levels dataframe
+    """
+    return levels_df.loc[levels_df["level_id"] != -1].set_index("level_id")
