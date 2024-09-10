@@ -109,6 +109,7 @@ class ChiantiIonReader(object):
 
     def __init__(self, ion_name):
 
+        # dummy temperature to avoid bug in ChiantiPy https://github.com/chianti-atomic/ChiantiPy/issues/466
         self.ion = ch.ion(ion_name, temperature=1)
         self._levels = None
         self._lines = None
