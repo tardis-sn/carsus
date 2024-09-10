@@ -181,7 +181,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s*-?\s+-?|(?<=[^edED])-|(?<=[FDPS]e)-",
+            "sep": r"\s*-?\s+-?|(?<=[^edED])-|(?<=[FDPS]e)-",
             "skiprows": skiprows,
             "engine": "python",
         }
