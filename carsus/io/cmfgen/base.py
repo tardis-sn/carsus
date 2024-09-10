@@ -659,9 +659,11 @@ class CMFGENReader:
             lower_level_label = target.attrs["Configuration name"]
             cross_section_type = target.attrs["Type of cross-section"]
 
-            # Remove the "[J]" term from J-splitted levels labels
-            ion_levels["label"] = ion_levels["label"].str.rstrip("]")
-            ion_levels["label"] = ion_levels["label"].str.split("[", expand=True)
+            if ion_levels["label"].str.contains(r"\[").any():
+                # Remove the "[J]" term from J-splitted levels labels
+                ion_levels["label"] = ion_levels["label"].str.rstrip("]")
+                # Drop the [J] term completely to avoid shape mismatch. Something to perhaps store in the future
+                ion_levels["label"] = ion_levels["label"].str.split("[", expand=True)[0]
 
             try:
                 match = ion_levels.set_index("label").loc[[lower_level_label]]
