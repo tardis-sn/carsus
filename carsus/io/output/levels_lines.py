@@ -110,20 +110,19 @@ class LevelsLinesPreparer:
         """
         gfall = getattr(self.gfall_reader, attribute)
         gfall["ds_id"] = 2
+        sources = [gfall]
 
         if self.chianti_reader is not None:
             chianti = getattr(self.chianti_reader, attribute)
             chianti["ds_id"] = 4
-        else:
-            chianti = pd.DataFrame(columns=gfall.columns)
+            sources.append(chianti)
 
         if self.cmfgen_reader is not None:
             cmfgen = getattr(self.cmfgen_reader, attribute)
             cmfgen["ds_id"] = 5
-        else:
-            cmfgen = pd.DataFrame(columns=gfall.columns)
+            sources.append(cmfgen)
         
-        return pd.concat([gfall, chianti, cmfgen], sort=True)
+        return pd.concat(sources, sort=True)
 
     # replace with functools.cached_property with Python > 3.8
     @property
@@ -478,7 +477,7 @@ class LevelsLinesPreparer:
         lines["f_ul"] = lines["gf"] / lines["g_u"]
 
         # Calculate frequency
-        lines["nu"] = u.Quantity(lines["wavelength"], "AA").to("Hz", u.spectral())
+        lines["nu"] = u.Quantity(lines["wavelength"], "AA").to("Hz", u.spectral()).value
 
         # Create Einstein coefficients
         create_einstein_coeff(lines)
@@ -490,7 +489,7 @@ class LevelsLinesPreparer:
 
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = create_artificial_fully_ionized(levels)
-        levels = levels.append(artificial_fully_ionized_levels, ignore_index=True)
+        levels = pd.concat([levels, artificial_fully_ionized_levels], ignore_index=True)
         levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
 
         self.levels = levels

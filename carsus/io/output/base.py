@@ -220,7 +220,7 @@ class TARDISAtomData:
             total_checksum = hashlib.md5()
             for key in f.keys():
                 # update the total checksum to sign the file
-                total_checksum.update(serialize_pandas_object(f[key]).to_buffer())
+                total_checksum.update(serialize_pandas_object(f[key]))
 
                 # save individual DataFrame/Series checksum
                 checksum = hash_pandas_object(f[key])

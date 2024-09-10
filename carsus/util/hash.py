@@ -1,5 +1,19 @@
-import pandas as pd
 import hashlib
+import pickle
+
+def serialize_pandas_object(pd_object):
+    """Serialize Pandas objects with Pickle.
+
+    Parameters
+    ----------
+    pd_object : pandas.Series or pandas.DataFrame
+        Pandas object to be serialized with Pickle.
+
+    Returns
+    -------
+    Pickle serialized Python object.
+    """
+    return pickle.dumps(pd_object)
 
 
 def hash_pandas_object(pd_object, algorithm="md5"):
@@ -30,4 +44,4 @@ def hash_pandas_object(pd_object, algorithm="md5"):
     else:
         raise ValueError('algorithm not supported')
 
-    return hash_func(pd.util.hash_pandas_object(pd_object).values).hexdigest()
+    return hash_func(serialize_pandas_object(pd_object)).hexdigest()

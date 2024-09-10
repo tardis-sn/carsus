@@ -48,7 +48,7 @@ class MacroAtomPreparer():
             ("target_level_number", np.int64),
             ("transition_line_id", np.int64),
             ("transition_type", np.int64),
-            ("transition_probability", np.float),
+            ("transition_probability", np.float64),
         ]
 
         for line_id, row in lines.iterrows():
