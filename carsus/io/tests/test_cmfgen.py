@@ -21,7 +21,7 @@ data_dir = os.path.join(os.path.dirname(__file__), "data")
 def si1_reader():
     return CMFGENReader.from_config(
         "Si 0-1",
-        atomic_path="/home/afullard/carsus-data-cmfgen/atomic",
+        atomic_path="/tmp/atomic",
         collisions=True,
         cross_sections=True,
         ionization_energies=True,
@@ -126,25 +126,25 @@ def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname):
     return parser.base
 
 
-#@pytest.mark.with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_lines(si1_reader):
     return si1_reader.lines
 
 
-#@pytest.mark.with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_levels(si1_reader):
     return si1_reader.levels
 
 
-#@pytest.mark.with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_collisions(si1_reader):
     return si1_reader.collisions
 
 
-#@pytest.mark.with_refdata
+@pytest.mark.with_refdata
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_reader_cross_sections_squeeze(si1_reader):
     return si1_reader.cross_sections
