@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NIST &mdash; carsus v0.1.dev759+g09bd62c</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+  <title>NIST &mdash; carsus v0.1.dev760+g3403655</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
 
   
     <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
@@ -16,14 +17,13 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=22e7906a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -48,7 +48,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev759+g09bd62c
+                0.1.dev760+g3403655
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -115,10 +115,10 @@
            <div itemprop="articleBody">
              
   <section id="NIST">
-<h1>NIST<a class="headerlink" href="#NIST" title="Permalink to this heading"></a></h1>
+<h1>NIST<a class="headerlink" href="#NIST" title="Link to this heading"></a></h1>
 <p>The National Institute of Standards and Technology (NIST) supplies Carsus with atomic weights, ionization energies and ground levels configurations.</p>
 <section id="Atomic-Weights">
-<h2>Atomic Weights<a class="headerlink" href="#Atomic-Weights" title="Permalink to this heading"></a></h2>
+<h2>Atomic Weights<a class="headerlink" href="#Atomic-Weights" title="Link to this heading"></a></h2>
 <p>Provided by the NIST Atomic Weights and Isotopic Compositions Database.</p>
 <div class="admonition warning">
 <p class="admonition-title fa fa-exclamation-circle"><strong>Warning:</strong></p>
@@ -137,9 +137,13 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
- ChiantiPy version 0.8.4
+ ChiantiPy version 0.15.0
  found PyQt5 widgets
  using PyQt5 widgets
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:72: UserWarning: klgfb files are not present:
+  it will not be possible to use the freeBound continuum method
+  warnings.warn(&#39;klgfb files are not present: \n  it will not be possible to use the freeBound continuum method&#39;)
+ (<span class="ansi-bold">warnings.py</span>:112)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -156,9 +160,57 @@
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 [<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:69)
-[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
-  InsecureRequestWarning,
- (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/urllib3/connectionpool.py:1099: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:128: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  interval_gr = grouped.get_group(INTERVAL).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/weightscomp.py:129: FutureWarning: When grouping with a length-1 list-like, you will need to pass a length-1 tuple to get_group in a future version of pandas. Pass `(name,)` instead of `name` to silence this warning.
+  stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
+ (<span class="ansi-bold">warnings.py</span>:112)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -258,7 +310,7 @@
 </div>
 </section>
 <section id="Ionization-Energies-and-Ground-Levels">
-<h2>Ionization Energies and Ground Levels<a class="headerlink" href="#Ionization-Energies-and-Ground-Levels" title="Permalink to this heading"></a></h2>
+<h2>Ionization Energies and Ground Levels<a class="headerlink" href="#Ionization-Energies-and-Ground-Levels" title="Link to this heading"></a></h2>
 <p>Provided by the NIST Atomic Spectra Database.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -282,9 +334,9 @@
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 [<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:87)
-[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.7/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
-  InsecureRequestWarning,
- (<span class="ansi-bold">warnings.py</span>:110)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/urllib3/connectionpool.py:1099: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">warnings.py</span>:112)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -348,6 +400,121 @@ Name: ionization_energy, dtype: float64
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_ioniz</span><span class="o">.</span><span class="n">get_ground_levels</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;4S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;4S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2P&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;1S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;2S&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
+  lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -652,7 +819,7 @@ Name: ionization_energy, dtype: float64
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 09 Sep 2024.
+      <span class="lastupdated">Last updated on 23 Sep 2024.
       </span></p>
   </div>
 

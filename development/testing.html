@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Running Tests &mdash; carsus v0.1.dev759+g09bd62c</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+  <title>Running Tests &mdash; carsus v0.1.dev760+g3403655</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
@@ -15,14 +16,13 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=22e7906a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -44,7 +44,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev759+g09bd62c
+                0.1.dev760+g3403655
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -117,16 +117,16 @@
            <div itemprop="articleBody">
              
   <section id="running-tests">
-<h1>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this heading"></a></h1>
+<h1>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h1>
 <p>Carsus’s tests are based on the
 <a class="reference external" href="https://docs.astropy.org/projects/package-template/en/latest/index.html">AstroPy Package Template</a>
 and <a class="reference external" href="https://pytest.org/en/latest">pytest</a>. Then, running simple tests on your machine is
 straightforward:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ pytest carsus
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">pytest</span> <span class="n">carsus</span>
 </pre></div>
 </div>
 <section id="optional-flags">
-<h2>Optional Flags<a class="headerlink" href="#optional-flags" title="Permalink to this heading"></a></h2>
+<h2>Optional Flags<a class="headerlink" href="#optional-flags" title="Link to this heading"></a></h2>
 <p>A set of flags can be appended to the above command to run different kinds of tests:</p>
 <ul class="simple">
 <li><dl class="simple">
@@ -145,18 +145,6 @@ straightforward:</p>
 </dd>
 </dl>
 </li>
-<li><dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">--arraydiff-generate-path=carsus-refdata/arraydiff</span></code></dt><dd><p>Generate reference files for tests marked with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.array_compare</span></code> decorator and save them in the
-refdata folder.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">--arraydiff</span> <span class="pre">--arraydiff-reference-path=carsus-refdata/arraydiff</span></code></dt><dd><p>Run tests marked with <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.array_compare</span></code> decorator.
-The tests would look for reference files in the refdata folder which can be generated using the above option.</p>
-</dd>
-</dl>
-</li>
 </ul>
 </section>
 </section>
@@ -172,7 +160,7 @@ The tests would look for reference files in the refdata folder which can be gene
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 09 Sep 2024.
+      <span class="lastupdated">Last updated on 23 Sep 2024.
       </span></p>
   </div>
 

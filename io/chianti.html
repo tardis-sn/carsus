@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CHIANTI &mdash; carsus v0.1.dev759+g09bd62c</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+  <title>CHIANTI &mdash; carsus v0.1.dev760+g3403655</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
 
   
     <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
@@ -16,14 +17,13 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=22e7906a"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -48,7 +48,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev759+g09bd62c
+                0.1.dev760+g3403655
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -115,10 +115,10 @@
            <div itemprop="articleBody">
              
   <section id="CHIANTI">
-<h1>CHIANTI<a class="headerlink" href="#CHIANTI" title="Permalink to this heading"></a></h1>
+<h1>CHIANTI<a class="headerlink" href="#CHIANTI" title="Link to this heading"></a></h1>
 <p>An Atomic Database for Spectroscopic Diagnostics of Astrophysical Plasmas <span id="id1">[<a class="reference internal" href="../research/references.html#id3" title="K. P. Dere, E. Landi, H. E. Mason, B. C. Monsignori Fossi, and P. R. Young. CHIANTI - an atomic database for emission lines. Astronomy &amp; Astrophysics, Supplement, 125:149-173, October 1997. doi:10.1051/aas:1997368.">DereLandiMason+97</a>]</span> <span id="id2">[<a class="reference internal" href="../research/references.html#id4" title="K. P. Dere, G. Del Zanna, P. R. Young, E. Landi, and R. S. Sutherland. CHIANTI—An Atomic Database for Emission Lines. XV. Version 9, Improvements for the X-Ray Satellite Lines. Astrophysical Journal, Supplement, 241(2):22, April 2019. arXiv:1902.05019, doi:10.3847/1538-4365/ab05cf.">DereDelZannaYoung+19</a>]</span>.</p>
 <section id="ChiantiIonReader">
-<h2>ChiantiIonReader<a class="headerlink" href="#ChiantiIonReader" title="Permalink to this heading"></a></h2>
+<h2>ChiantiIonReader<a class="headerlink" href="#ChiantiIonReader" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ChiantiIonReader</span></code> class is a wrapper for the <code class="docutils literal notranslate"><span class="pre">ChiantiPy</span></code> package that interacts directly with the <a class="reference external" href="https://db.chiantidatabase.org/">database files</a> and as a consequence uses a different notation. It provides information about individual ions.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -133,9 +133,13 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
- ChiantiPy version 0.8.4
+ ChiantiPy version 0.15.0
  found PyQt5 widgets
  using PyQt5 widgets
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:72: UserWarning: klgfb files are not present:
+  it will not be possible to use the freeBound continuum method
+  warnings.warn(&#39;klgfb files are not present: \n  it will not be possible to use the freeBound continuum method&#39;)
+ (<span class="ansi-bold">warnings.py</span>:112)
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -153,6 +157,16 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h_1</span><span class="o">.</span><span class="n">levels</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/chianti_/chianti_.py:195: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  levels.loc[:, &#34;label&#34;] = levels[&#34;label&#34;].replace(
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -481,7 +495,7 @@
 <p>See the <a class="reference external" href="https://epassaro.github.io/carsus/api/carsus.io.chianti_.chianti_.html">API section</a> for more information.</p>
 </section>
 <section id="ChiantiReader">
-<h2>ChiantiReader<a class="headerlink" href="#ChiantiReader" title="Permalink to this heading"></a></h2>
+<h2>ChiantiReader<a class="headerlink" href="#ChiantiReader" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ChiantiReader</span></code> class mimics the structure of <code class="docutils literal notranslate"><span class="pre">GFALLReader</span></code> and provides <code class="docutils literal notranslate"><span class="pre">levels</span></code>, <code class="docutils literal notranslate"><span class="pre">lines</span></code> and <code class="docutils literal notranslate"><span class="pre">collisions</span></code> tables for the selected ions.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -491,13 +505,29 @@
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chianti_reader</span> <span class="o">=</span> <span class="n">ChiantiReader</span><span class="p">(</span><span class="s1">&#39;H-He&#39;</span><span class="p">,</span> <span class="n">collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/chianti_/chianti_.py:195: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  levels.loc[:, &#34;label&#34;] = levels[&#34;label&#34;].replace(
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/chianti_/chianti_.py:195: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  levels.loc[:, &#34;label&#34;] = levels[&#34;label&#34;].replace(
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/chianti_/chianti_.py:195: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option(&#39;future.no_silent_downcasting&#39;, True)`
+  levels.loc[:, &#34;label&#34;] = levels[&#34;label&#34;].replace(
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -1002,7 +1032,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 09 Sep 2024.
+      <span class="lastupdated">Last updated on 23 Sep 2024.
       </span></p>
   </div>
 
