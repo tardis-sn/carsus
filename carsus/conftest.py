@@ -83,23 +83,9 @@ def pytest_collection_modifyitems(config, items):
     skip_not_with_refdata = pytest.mark.skip(
         reason="carsus-refdata folder location not specified"
     )
-    skip_not_with_testdb = pytest.mark.skip(
-        reason="filename for the testing database not specified"
-    )
     for item in items:
         if "with_refdata" in item.keywords and not config.getoption("--refdata"):
             item.add_marker(skip_not_with_refdata)
-        if "with_test_db" in item.keywords and not config.getoption("--test-db"):
-            item.add_marker(skip_not_with_testdb)
-
-
-@pytest.fixture(scope="session")
-def test_db_fname(request):
-    test_db_fname = request.config.getoption("--test-db")
-    if test_db_fname is None:
-        pytest.skip("--testing database was not specified")
-    else:
-        return str(Path(test_db_fname).expanduser().resolve())
 
 
 @pytest.fixture(scope="session")
@@ -127,37 +113,6 @@ def vald_short_form_stellar_fname():
 @pytest.fixture(scope="session")
 def nndc_dirname():
     return str(DATA_DIR_PATH / "nndc")  # Mn-52, Ni-56
-
-
-@pytest.fixture(scope="session")
-def test_engine(test_db_url):
-    return create_engine(test_db_url)
-
-
-@pytest.fixture
-def test_session(test_engine, request):
-    # engine.echo=True
-    # connect to the database
-    connection = test_engine.connect()
-
-    # begin a non-ORM transaction
-    trans = connection.begin()
-
-    # bind an individual Session to the connection
-    session = Session(bind=connection)
-
-    def fin():
-        session.close()
-        # rollback - everything that happened with the
-        # Session above (including calls to commit())
-        # is rolled back.
-        trans.rollback()
-        # return connection to the Engine
-        connection.close()
-
-    request.addfinalizer(fin)
-
-    return session
 
 
 @pytest.fixture(scope="session")

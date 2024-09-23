@@ -39,7 +39,7 @@ masterlist_ions_file = open(masterlist_ions_path, 'rb')
 masterlist_ions = pickle.load(masterlist_ions_file).keys()
 # Exclude the "d" ions for now
 masterlist_ions = [_ for _ in masterlist_ions
-                   if re.match("^[a-z]+_\d+$", _)]
+                   if re.match(r"^[a-z]+_\d+$", _)]
 
 masterlist_version = versionRead()
 
@@ -109,7 +109,8 @@ class ChiantiIonReader(object):
 
     def __init__(self, ion_name):
 
-        self.ion = ch.ion(ion_name)
+        # dummy temperature to avoid bug in ChiantiPy https://github.com/chianti-atomic/ChiantiPy/issues/466
+        self.ion = ch.ion(ion_name, temperature=1)
         self._levels = None
         self._lines = None
         self._collisions = None

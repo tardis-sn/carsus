@@ -63,8 +63,8 @@ class PhotoIonizationPreparer:
 
         cross_sections["energy"] = u.Quantity(cross_sections["energy"], "Ry").to(
             "Hz", equivalencies=u.spectral()
-        )
-        cross_sections["sigma"] = u.Quantity(cross_sections["sigma"], "Mbarn").to("cm2")
+        ).value
+        cross_sections["sigma"] = u.Quantity(cross_sections["sigma"], "Mbarn").to("cm2").value
         cross_sections["level_number"] = cross_sections["level_number"].astype("int")
         cross_sections = cross_sections.rename(
             columns={"energy": "nu", "sigma": "x_sect"}

@@ -27,8 +27,7 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   PYTEST_FLAGS: --remote-data --refdata=carsus-refdata
-                --cov=carsus --cov-report=xml --cov-report=html 
-                --arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff  
+                --cov=carsus --cov-report=xml --cov-report=html   
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files

@@ -227,21 +227,21 @@ class NISTIonizationEnergiesParser(BaseParser):
             )
 
             try:
-                lvl_tokens = level.parseString(ground_level)
+                lvl_tokens = level.parse_string(ground_level)
             except ParseException:
                 raise
 
             lvl["parity"] = lvl_tokens["parity"]
 
             try:
-                lvl["J"] = lvl_tokens["J"]
+                lvl["J"] = lvl_tokens["J"][0]
             except KeyError:
                 pass
 
             # To handle cases where the ground level J has not been understood:
             # Take as assumption J=0
             if np.isnan(lvl["J"]):
-                lvl["J"] = "0"
+                lvl["J"] = 0
                 logger.warning(
                     f"Set `J=0` for ground state of species `{convert_atomic_number2symbol(row['atomic_number'])} {row['ion_charge']}`."
                 )
@@ -308,7 +308,7 @@ class NISTIonizationEnergies(BaseParser):
         """
         levels = self.parser.prepare_ground_levels()
         levels["g"] = 2 * levels["J"] + 1
-        levels["g"] = levels["g"].astype(np.int)
+        levels["g"] = levels["g"].astype(np.int64)
         levels["energy"] = 0.0
         levels = levels[["g", "energy"]]
         levels = levels.reset_index()

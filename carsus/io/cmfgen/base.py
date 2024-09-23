@@ -37,7 +37,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s+",
+            "sep": r"\s+",
             "skiprows": skiprows,
             "nrows": nrows,
             "engine": "python",
@@ -73,7 +73,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
         self.base = df
         self.header = header
         # Re-calculate Lam(A) values
-        self.base["Lam(A)"] = self.calc_Lam_A()
+        self.base["Lam(A)"] = self.calc_Lam_A().value
 
     def calc_Lam_A(self):
         """
@@ -112,7 +112,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])",
+            "sep": r"\s*\|\s*|-?\s+-?\s*|(?<=[^ED\s])-(?=[^\s])",
             "skiprows": skiprows,
             "nrows": nrows,
             "engine": "python",
@@ -177,11 +177,11 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
 
     def load(self, fname):
         header = parse_header(fname)
-        skiprows, _ = find_row(fname, "ransition\T")
+        skiprows, _ = find_row(fname, r"ransition\T")
         config = {
             "header": None,
             "index_col": False,
-            "sep": "\s*-?\s+-?|(?<=[^edED])-|(?<=[FDPS]e)-",
+            "sep": r"\s*-?\s+-?|(?<=[^edED])-|(?<=[FDPS]e)-",
             "skiprows": skiprows,
             "engine": "python",
         }
@@ -194,7 +194,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
             config["nrows"] = end - config["skiprows"] - 2
 
         try:
-            _, columns = find_row(fname, "ransition\T")
+            _, columns = find_row(fname, r"ransition\T")
             columns = columns.split()
 
             # NOTE: Comment next line when trying new regexes
@@ -659,9 +659,11 @@ class CMFGENReader:
             lower_level_label = target.attrs["Configuration name"]
             cross_section_type = target.attrs["Type of cross-section"]
 
-            # Remove the "[J]" term from J-splitted levels labels
-            ion_levels["label"] = ion_levels["label"].str.rstrip("]")
-            ion_levels["label"] = ion_levels["label"].str.split("[", expand=True)
+            if ion_levels["label"].str.contains(r"\[").any():
+                # Remove the "[J]" term from J-splitted levels labels
+                ion_levels["label"] = ion_levels["label"].str.rstrip("]")
+                # Drop the [J] term completely to avoid shape mismatch. Something to perhaps store in the future
+                ion_levels["label"] = ion_levels["label"].str.split("[", expand=True)[0]
 
             try:
                 match = ion_levels.set_index("label").loc[[lower_level_label]]

@@ -1,24 +1,19 @@
-import pyarrow as pa
 import hashlib
+import pickle
 
 def serialize_pandas_object(pd_object):
-    """Serialize Pandas objects with PyArrow.
+    """Serialize Pandas objects with Pickle.
 
     Parameters
     ----------
     pd_object : pandas.Series or pandas.DataFrame
-        Pandas object to be serialized with PyArrow.
+        Pandas object to be serialized with Pickle.
 
     Returns
     -------
-    pyarrow.lib.SerializedPyObject
-        PyArrow serialized Python object.
+    Pickle serialized Python object.
     """
-
-    context = pa.default_serialization_context()
-    serialized_pd_object = context.serialize(pd_object)
-
-    return serialized_pd_object
+    return pickle.dumps(pd_object)
 
 
 def hash_pandas_object(pd_object, algorithm="md5"):
@@ -49,6 +44,4 @@ def hash_pandas_object(pd_object, algorithm="md5"):
     else:
         raise ValueError('algorithm not supported')
 
-    buffer = serialize_pandas_object(pd_object).to_buffer()
-
-    return hash_func(buffer).hexdigest()
+    return hash_func(serialize_pandas_object(pd_object)).hexdigest()

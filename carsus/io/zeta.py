@@ -35,7 +35,7 @@ class KnoxLongZeta(BaseParser):
             usecols=range(1, 23),
             names=names,
             comment="#",
-            delim_whitespace=True)
+            sep=r"\s+")
 
         self.base = (
             pd.DataFrame(zeta_df).set_index(
@@ -43,4 +43,4 @@ class KnoxLongZeta(BaseParser):
         )
 
         columns = [float(c) for c in self.base.columns]
-        self.base.columns = pd.Float64Index(columns, name="temp")
+        self.base.columns = pd.Index(columns, name="temp", dtype=np.float64)

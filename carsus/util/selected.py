@@ -106,7 +106,7 @@ def parse_selected_atoms(atoms):
     [1, 3, 4, 5, 6, 7, 14, 16]
 
     """
-    return selected_atoms.parseString(atoms).asList()
+    return selected_atoms.parse_string(atoms).asList()
 
 
 def parse_selected_species(species):
@@ -147,4 +147,4 @@ def parse_selected_species(species):
     [(5, 4), (6, 4), (6, 5), (7, 4), (7, 5), (8, 4), (8, 5)]
 
     """
-    return selected_species.parseString(species).asList()
+    return selected_species.parse_string(species).asList()

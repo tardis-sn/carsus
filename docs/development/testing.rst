@@ -27,11 +27,3 @@ A set of flags can be appended to the above command to run different kinds of te
 - `--cov=carsus --cov-report=xml --cov-report=html`
     Get code coverage results using the `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/>`_ plugin.
 
-- `--arraydiff-generate-path=carsus-refdata/arraydiff`
-    Generate reference files for tests marked with ``@pytest.mark.array_compare`` decorator and save them in the 
-    refdata folder.
-
-- `--arraydiff --arraydiff-reference-path=carsus-refdata/arraydiff`
-    Run tests marked with ``@pytest.mark.array_compare`` decorator. 
-    The tests would look for reference files in the refdata folder which can be generated using the above option.
-

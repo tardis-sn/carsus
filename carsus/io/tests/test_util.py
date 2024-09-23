@@ -11,7 +11,7 @@ from carsus.io.util import to_flat_dict, to_nom_val_and_std_dev
      {'atomic_weight_nominal_value':'6.8083492038', 'atomic_weight_std_dev':'23'})
 ])
 def test_to_flat_dict(test_input, expected, entry):
-    tkns = entry.parseString(test_input)
+    tkns = entry.parse_string(test_input)
     tkns_dict = to_flat_dict(tkns)
     assert tkns_dict == expected
 

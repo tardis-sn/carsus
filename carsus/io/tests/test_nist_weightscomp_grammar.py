@@ -10,7 +10,7 @@ from numpy.testing import assert_almost_equal, assert_allclose
     ("6.0151228874", 6.0151228874)
 ])
 def test_float_(test_input, expected):
-    tkns = float_.parseString(test_input)
+    tkns = float_.parse_string(test_input)
     assert_almost_equal(tkns[0], expected)
 
 
@@ -19,7 +19,7 @@ def test_float_(test_input, expected):
     ("18.998403163(6)", [18.998403163, 6e-9])
 ])
 def test_ufloat(test_input, expected):
-    tkns = ufloat.parseString(test_input)
+    tkns = ufloat.parse_string(test_input)
     assert_almost_equal(tkns.nominal_value, expected[0])
     assert_almost_equal(tkns.std_dev, expected[1])
 
@@ -29,7 +29,7 @@ def test_ufloat(test_input, expected):
     ("27.02644(20)", [27.02644, 20e-5, False])
 ])
 def test_ufloat_theor(test_input, expected):
-    tkns = ufloat_theor.parseString(test_input)
+    tkns = ufloat_theor.parse_string(test_input)
     assert_almost_equal(tkns.nominal_value, expected[0])
     assert_almost_equal(tkns.std_dev, expected[1])
     assert tkns.theoretical == expected[2]
@@ -40,7 +40,7 @@ def test_ufloat_theor(test_input, expected):
     ("g, r", 'g r')
 ])
 def test_notes(test_input, expected):
-    tkns = notes.parseString(test_input)
+    tkns = notes.parse_string(test_input)
     assert tkns[0] == expected
 
 
@@ -49,7 +49,7 @@ def test_notes(test_input, expected):
     ("22.98976928(2)", [22.98976928, 2e-8, VAL_SD])
 ])
 def test_atomic_weight_value_uncertainty(test_input, expected):
-    tkns = atomic_weight.parseString(test_input)
+    tkns = atomic_weight.parse_string(test_input)
     assert_almost_equal(tkns.nominal_value, expected[0])
     assert_almost_equal(tkns.std_dev, expected[1])
     assert tkns.type == expected[2]
@@ -59,7 +59,7 @@ def test_atomic_weight_value_uncertainty(test_input, expected):
     ("[24.304,24.307]", [[24.304,24.307], INTERVAL])
 ])
 def test_atomic_weight_interval(test_input, expected):
-    tkns = atomic_weight.parseString(test_input)
+    tkns = atomic_weight.parse_string(test_input)
     assert_allclose([tkns.lwr_bnd, tkns.upr_bnd],expected[0])
     assert tkns.type == expected[1]
 
@@ -68,7 +68,7 @@ def test_atomic_weight_interval(test_input, expected):
     ("[226]", [226, STABLE_MASS_NUM])
 ])
 def test_atomic_weight_stable_mass_num(test_input, expected):
-    tkns = atomic_weight.parseString(test_input)
+    tkns = atomic_weight.parse_string(test_input)
     assert tkns.stable_mass_number == expected[0]
     assert tkns.type == expected[1]
 
@@ -78,13 +78,13 @@ def test_atomic_weight_stable_mass_num(test_input, expected):
     ("0.96941(156)", [0.96941, 156e-5])
 ])
 def test_isotopic_comp(test_input, expected):
-    tkns = isotopic_comp.parseString(test_input)
+    tkns = isotopic_comp.parse_string(test_input)
     assert_almost_equal(tkns.nominal_value, expected[0])
     assert_almost_equal(tkns.std_dev, expected[1])
 
 
 def test_isotopic_comp_one():
-    tkns = isotopic_comp.parseString("1")
+    tkns = isotopic_comp.parse_string("1")
     assert tkns.nominal_value == 1
     assert tkns.std_dev == ''
 
@@ -94,7 +94,7 @@ def test_isotopic_comp_one():
     ("39.963998166(60)", [39.963998166, 60e-9, False])
 ])
 def test_atomic_mass(test_input, expected):
-    tkns = atomic_mass.parseString(test_input)
+    tkns = atomic_mass.parse_string(test_input)
     assert_almost_equal(tkns.nominal_value, expected[0])
     assert_almost_equal(tkns.std_dev, expected[1])
     assert tkns.theoretical == expected[2]
@@ -105,7 +105,7 @@ def test_atomic_mass(test_input, expected):
     ("Uuo", "Uuo")
 ])
 def test_symbol(test_input, expected):
-    tkns = symbol.parseString(test_input)
+    tkns = symbol.parse_string(test_input)
     assert tkns[0] == expected
 
 
@@ -115,7 +115,7 @@ def test_symbol(test_input, expected):
     ("Notes", COLUMN_NAMES_MAPPING["Notes"])
 ])
 def test_column_name(test_input, expected):
-    tkns = column_name.parseString(test_input)
+    tkns = column_name.parse_string(test_input)
     assert tkns[0] == expected
 
 
@@ -178,7 +178,7 @@ def test_column_name(test_input, expected):
      AW_TYPE_COL: STABLE_MASS_NUM, AW_STABLE_MASS_NUM_COL: 222})
 ])
 def test_isotope(test_input, expected):
-    tkns = isotope.parseString(test_input)
+    tkns = isotope.parse_string(test_input)
     tkns_dict = to_flat_dict(tkns)
     for key, item in tkns_dict.items():
         if isinstance(item, float):
