@@ -62,7 +62,7 @@ def convert_species_tuple2chianti_str(species):
 
     Parameters
     -----------
-    species: tuple (atomic_number, ion_number)
+    species: tuple (atomic_number, ion_charge)
 
     Returns
     --------
@@ -78,8 +78,8 @@ def convert_species_tuple2chianti_str(species):
     'si_2'
 
     """
-    atomic_number, ion_number = species
-    chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_number + 1)
+    atomic_number, ion_charge = species
+    chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_charge + 1)
     return chianti_ion_name
 
 
