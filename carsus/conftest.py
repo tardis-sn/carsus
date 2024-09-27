@@ -7,9 +7,14 @@ packagename.test
 
 """
 
+import os
 from pathlib import Path
+from carsus.util import regression_data
 
 from astropy.version import version as astropy_version
+
+# ensuring that regression_data is not removed by ruff
+assert regression_data is not None
 
 # For Astropy 3.0 and later, we can use the standalone pytest plugin
 if astropy_version < "3.0":
@@ -77,6 +82,17 @@ def pytest_addoption(parser):
     parser.addoption(
         "--refdata", dest="refdata", default=None, help="carsus-refdata folder location"
     )
+    parser.addoption(
+        "--carsus-regression-data",
+        default=None,
+        help="Path to the Carsus regression data directory",
+    )
+    parser.addoption(
+        "--generate-reference",
+        action="store_true",
+        default=False,
+        help="generate reference data instead of testing",
+    )
 
 
 def pytest_collection_modifyitems(config, items):
@@ -122,3 +138,15 @@ def refdata_path(request):
         pytest.skip("--refdata folder path was not specified")
     else:
         return str(Path(refdata_path).expanduser().resolve())
+
+@pytest.fixture(scope="session")
+def carsus_regression_path(request):
+    carsus_regression_path = request.config.getoption(
+        "--carsus-regression-data"
+    )
+    if carsus_regression_path is None:
+        pytest.skip("--carsus-regression-data was not specified")
+    else:
+        return Path(
+            os.path.expandvars(os.path.expanduser(carsus_regression_path))
+        )
