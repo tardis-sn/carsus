@@ -304,7 +304,7 @@ class LevelsLinesPreparer:
         )
 
         lines = lines[
-            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "ds_id"]
+            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "A_ul", "ds_id"]
         ]
 
         return lines
@@ -424,8 +424,12 @@ class LevelsLinesPreparer:
             pd.DataFrame(index=levels.index), on="lower_level_id", how="inner"
         ).join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
 
-        # Culling lines with low gf values
-        lines = lines.loc[lines["loggf"] > lines_loggf_threshold]
+        # Culling lines with low gf values if needed
+        if lines_loggf_threshold > -99:
+            lines = lines.loc[lines["loggf"] < lines_loggf_threshold]
+
+        # get a mask of the lines with loggf above the threshold
+        high_gf_mask = lines["loggf"] > lines_loggf_threshold
 
         # Do not clean levels that don't exist in lines
 
@@ -480,7 +484,7 @@ class LevelsLinesPreparer:
         lines["nu"] = u.Quantity(lines["wavelength"], "AA").to("Hz", u.spectral()).value
 
         # Create Einstein coefficients
-        create_einstein_coeff(lines)
+        create_einstein_coeff(lines, high_gf_mask)
 
         # Reset indexes because `level_id` cannot be an index once we
         # add artificial levels for fully ionized ions that don't have ids (-1)
@@ -495,7 +499,7 @@ class LevelsLinesPreparer:
         self.levels = levels
         self.lines = lines
 
-def create_einstein_coeff(lines):
+def create_einstein_coeff(lines, high_gf_mask):
     """
     Create Einstein coefficients columns for the `lines` DataFrame.
 
@@ -517,7 +521,7 @@ def create_einstein_coeff(lines):
         einstein_coeff * lines["f_ul"] / (const.h.cgs.value * lines["nu"])
     )
 
-    lines["A_ul"] = (
+    lines.loc[high_gf_mask, "A_ul"] = (
         2
         * einstein_coeff
         * lines["nu"] ** 2
