@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generate Atomic Data Reference for TARDIS &mdash; carsus v0.1.dev760+g3403655</title>
+  <title>Generate Atomic Data Reference for TARDIS &mdash; carsus v0.1.dev762+gef11c8d</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=22e7906a"></script>
+        <script src="_static/documentation_options.js?v=a803037e"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -46,7 +46,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev760+g3403655
+                0.1.dev762+gef11c8d
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -2265,6 +2265,18 @@
 <div class="highlight"><pre>
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:210: PerformanceWarning:
 your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;integer,key-&gt;axis0] [items-&gt;None]
+
+  f.put(hdf_path, getattr(reader, data))
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:210: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;integer,key-&gt;block0_items] [items-&gt;None]
+
+  f.put(hdf_path, getattr(reader, data))
+ (<span class="ansi-bold">warnings.py</span>:112)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:210: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
 map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None]
 
   f.put(hdf_path, getattr(reader, data))
@@ -2273,8 +2285,8 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 [<span class="ansi-bold">carsus.io.output.photo_ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Matching levels and cross sections. (<span class="ansi-bold">photo_ionization.py</span>:35)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Signing TARDISAtomData. (<span class="ansi-bold">base.py</span>:267)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Format Version: 1.0 (<span class="ansi-bold">base.py</span>:268)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: d3428f2bc2cea75899a79978ce8658ab (<span class="ansi-bold">base.py</span>:269)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: 2381f2ea79bd11efb37000224832b8c1 (<span class="ansi-bold">base.py</span>:270)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: d78281ef30128f4eeef81e36b1397dff (<span class="ansi-bold">base.py</span>:269)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: f16ed0e49ac211efbfd2000d3a1f02bd (<span class="ansi-bold">base.py</span>:270)
 </pre></div></div>
 </div>
 <script type="application/vnd.jupyter.widget-state+json">
@@ -2290,7 +2302,7 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 23 Sep 2024.
+      <span class="lastupdated">Last updated on 04 Nov 2024.
       </span></p>
   </div>
 
