@@ -196,8 +196,8 @@ class TARDISAtomData:
             "/molecules/ionization_energies": (self.barklem_2016_data, "ionization_energies"),
             "/molecules/dissociation_energies": (self.barklem_2016_data, "dissociation_energies"),
             "/molecules/partition_functions": (self.barklem_2016_data, "partition_functions"),
-            "/collisions_data": (self.collisions_preparer, "collisions_prepared"),
-            "/collisions_metadata": (self.collisions_preparer, "collisions_metadata"),
+            "/collisions_data": (self, "collisions_prepared"),
+            "/collisions_metadata": (self, "collisions_metadata"),
             "/photoionization_data": (self.cross_sections_preparer, "cross_sections_prepared"),
         }
 
