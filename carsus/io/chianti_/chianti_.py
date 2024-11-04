@@ -192,8 +192,9 @@ class ChiantiIonReader(object):
         levels = pd.DataFrame(levels_dict)
 
         # Replace empty labels with NaN
-        levels.loc[:, "label"] = levels["label"].replace(
-            r'\s+', np.nan, regex=True)
+        with pd.option_context('future.no_silent_downcasting', True):
+            levels.loc[:, "label"] = levels["label"].replace(
+                r'\s+', np.nan, regex=True).infer_objects(copy=False)
 
         # Extract configuration and term from the "pretty" column
         levels[["term", "configuration"]] = levels["pretty"].str.rsplit(
