@@ -112,7 +112,7 @@ def parse_selected_atoms(atoms):
 def parse_selected_species(species):
     """
     Parse the sting specifying selected species to the list of tuples in the
-    form (atomic_number, ion_number).
+    form (atomic_number, ion_charge).
 
     Parameters
     ----------
@@ -125,7 +125,7 @@ def parse_selected_species(species):
 
     Returns
     -------
-    list of tuples (atomic_number, ion_number)
+    list of tuples (atomic_number, ion_charge)
         List of selected ions
 
     Examples
