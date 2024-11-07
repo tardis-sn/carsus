@@ -87,7 +87,7 @@ jobs:
         if: github.event_name == 'pull_request_target'
         uses: peter-evans/create-or-update-comment@v2
         with:
-          token: ${{ secrets.BOT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
           edit-mode: replace
