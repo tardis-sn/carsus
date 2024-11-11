@@ -17,8 +17,7 @@ levels of cross-sections.
 level_id
 =============
 
-Global cross-matching ID for levels across multiple DataFrames i.e. between photo
-ionization cross sections, the macro atom and electronic energy levels. 
+Global unique `level_id` across all species used to assign unique IDs even for the cut level and line data.
 Computed from level index. Typically has an upper and lower form to connect levels
 together.
 
@@ -26,5 +25,7 @@ together.
 level_number
 =============
 
-DataFrame index for each electronic energy level suitable for TARDIS use. 
+Index in the order of the level energies within each species. 
+For example, species Si II has level_number 0 to n. 
+Often used in a multi-index with atomic_number, ion_number.
 Connects upper and lower energy levels.
