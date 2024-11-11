@@ -1,10 +1,7 @@
 import logging
-import re
 
 import astropy.constants as const
-import numpy as np
 import pandas as pd
-from scipy import interpolate
 
 from carsus.io.util import get_lvl_index2id, exclude_artificial_levels
 
@@ -81,7 +78,6 @@ class ChiantiCollisionsPreparer(CollisionsPreparer):
         levels_all,
         lines_all,
         chianti_ions,
-        collisions_param={"temperatures": np.arange(2000, 50000, 2000)},
     ):
         self.chianti_reader = chianti_reader
         self.levels = levels
@@ -89,16 +85,15 @@ class ChiantiCollisionsPreparer(CollisionsPreparer):
         self.lines_all = lines_all
         self.chianti_ions = chianti_ions
 
-        self.collisions = self.create_chianti_collisions(**collisions_param)
+        self.collisions = self.create_chianti_collisions()
         self.collisions_metadata = pd.Series(
             {
-                "temperatures": collisions_param["temperatures"],
                 "dataset": ["chianti"],
                 "info": None,
             }
         )
 
-    def create_chianti_collisions(self, temperatures=np.arange(2000, 50000, 2000)):
+    def create_chianti_collisions(self):
         """
         Generates the definitive `collisions` DataFrame by adding new columns
         and making some calculations.
