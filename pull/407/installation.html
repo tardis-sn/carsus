@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; carsus v0.1.dev759+g09bd62c</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+  <title>Installation &mdash; carsus v0.1.dev763+g977c921</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
 
   
     <link rel="shortcut icon" href="_static/tardis_logo.ico"/>
@@ -15,14 +16,13 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/clipboard.min.js"></script>
-        <script src="_static/copybutton.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=12aeada2"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -45,7 +45,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev759+g09bd62c
+                0.1.dev763+g977c921
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -114,9 +114,9 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading"></a></h2>
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Requires a valid Anaconda <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html">or Miniconda</a> installation.</p></li>
 <li><p><em>(optional)</em>. Download and extract the <a class="reference external" href="https://download.chiantidatabase.org/">Chianti Atomic Database</a> <strong>v9.0.1</strong> and set the following environment variable in your shell configuration file:</p>
@@ -130,29 +130,29 @@
 </ol>
 </section>
 <section id="clone-the-repository">
-<h2>Clone the Repository<a class="headerlink" href="#clone-the-repository" title="Permalink to this heading"></a></h2>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/tardis-sn/carsus.git
+<h2>Clone the Repository<a class="headerlink" href="#clone-the-repository" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">tardis</span><span class="o">-</span><span class="n">sn</span><span class="o">/</span><span class="n">carsus</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </section>
 <section id="setup-the-environment">
-<h2>Setup the Environment<a class="headerlink" href="#setup-the-environment" title="Permalink to this heading"></a></h2>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ cd carsus
+<h2>Setup the Environment<a class="headerlink" href="#setup-the-environment" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">cd</span> <span class="n">carsus</span>
 </pre></div>
 </div>
 <p>If you’re using GNU/Linux or Intel-based Mac installation then directly create the environment using the below command:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ conda env create -f carsus_env3.yml
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">carsus_env3</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
 </div>
 <p>However, if you’re using M1-based Mac (Apple Silicon), then force conda to install Intel-based packages:</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ CONDA_SUBDIR=osx-64 conda env create -f carsus_env3.yml
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">CONDA_SUBDIR</span><span class="o">=</span><span class="n">osx</span><span class="o">-</span><span class="mi">64</span> <span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">carsus_env3</span><span class="o">.</span><span class="n">yml</span>
 </pre></div>
 </div>
 </section>
 <section id="install-the-package">
-<h2>Install the Package<a class="headerlink" href="#install-the-package" title="Permalink to this heading"></a></h2>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span>$ conda activate carsus
-$ pip install -e .
+<h2>Install the Package<a class="headerlink" href="#install-the-package" title="Link to this heading"></a></h2>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="err">$</span> <span class="n">conda</span> <span class="n">activate</span> <span class="n">carsus</span>
+<span class="err">$</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
 </pre></div>
 </div>
 <p>You are ready! Follow the <a class="reference external" href="quickstart.html">Quickstart for Carsus</a> guide to continue.</p>
@@ -171,7 +171,7 @@ $ pip install -e .
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 10 Sep 2024.
+      <span class="lastupdated">Last updated on 11 Nov 2024.
       </span></p>
   </div>
 
