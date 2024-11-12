@@ -28,4 +28,4 @@ logger.addHandler(console_handler)
 logging.getLogger('py.warnings').addHandler(console_handler)
 
 # Set atomic file format version
-FORMAT_VERSION = "1.0"
+FORMAT_VERSION = "2.0"
