@@ -49,7 +49,6 @@ class TARDISAtomData:
             "levels_metastable_loggf_threshold": -3,
             "lines_loggf_threshold": -3,
         },
-        collisions_param={"temperatures": np.arange(2000, 50000, 2000)},
     ):
         self.atomic_weights = atomic_weights
     
@@ -61,7 +60,6 @@ class TARDISAtomData:
         self.vald_reader = vald_reader
         self.barklem_2016_data = barklem_2016_data
         self.levels_lines_param = levels_lines_param
-        self.collisions_param = collisions_param
 
         self.ionization_energies_preparer = IonizationEnergiesPreparer(self.cmfgen_reader, ionization_energies)
 
@@ -86,7 +84,7 @@ class TARDISAtomData:
         if cmfgen_reader is not None and hasattr(cmfgen_reader, "collisions"):
             self.collisions_preparer = CollisionsPreparer(self.cmfgen_reader)
         elif hasattr(chianti_reader, "collisions"):
-            self.collisions_preparer = ChiantiCollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions, self.collisions_param)
+            self.collisions_preparer = ChiantiCollisionsPreparer(self.chianti_reader, self.levels, self.levels_all, self.lines_all, self.levels_lines_preparer.chianti_ions)
         else:
             logger.warning("No source of collisions was selected.")
             self.collisions_preparer = None
