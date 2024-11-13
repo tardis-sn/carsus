@@ -65,7 +65,9 @@ def test_vald_reader_vald_raw(vald_raw, index, wl_air, log_gf, e_low, e_up):
     ],
 )
 def test_vald_reader_vald(vald, index, wl_air, log_gf, e_low, e_up, ion_charge):
-    row = vald[1].loc[
+    row = vald[
+        1
+    ].loc[
         index
     ]  # vald is a length two array. The first element is the atoms and the second is the molecules
     assert_almost_equal(row["WL_air(A)"], wl_air)
@@ -133,7 +135,7 @@ def test_vald_short_stellar_linelist_molecules(
     v_mic,
     ion_charge,
 ):
-    assert len(vald_linelist_molecules_short_form_stellar) == 94
+    assert len(vald_linelist_molecules_short_form_stellar) == 95
     row = vald_linelist_molecules_short_form_stellar.iloc[index]
     assert_almost_equal(row["wavelength"], wavelength)
     assert_allclose(
