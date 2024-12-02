@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generate Atomic Data Reference for TARDIS &mdash; carsus v0.1.dev763+g977c921</title>
+  <title>Generate Atomic Data Reference for TARDIS &mdash; carsus v0.1.dev771+gc250524</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=12aeada2"></script>
+        <script src="_static/documentation_options.js?v=3e8a9809"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -46,7 +46,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev763+g977c921
+                0.1.dev771+gc250524
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Carsus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
 <ul>
@@ -73,10 +74,15 @@
 <li class="toctree-l1"><a class="reference internal" href="io/vald.html">VALD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io/barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="research/publications.html">Carsus Publications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="research/references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="research/bibliography.html">Bibliography</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
 <ul>
@@ -1277,7 +1283,6 @@
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;4F&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
  (<span class="ansi-bold">warnings.py</span>:112)
-[<span class="ansi-bold">  carsus.io.nist.ionization</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - Set `J=0` for ground state of species `Fe 6`. (<span class="ansi-bold">ionization.py</span>:245)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3F&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
  (<span class="ansi-bold">warnings.py</span>:112)
@@ -1721,8 +1726,8 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 [<span class="ansi-bold">carsus.io.output.photo_ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Matching levels and cross sections. (<span class="ansi-bold">photo_ionization.py</span>:35)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Signing TARDISAtomData. (<span class="ansi-bold">base.py</span>:267)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Format Version: 1.0 (<span class="ansi-bold">base.py</span>:268)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: d78281ef30128f4eeef81e36b1397dff (<span class="ansi-bold">base.py</span>:269)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: 0d7adb14a06f11ef82b8002248905dd3 (<span class="ansi-bold">base.py</span>:270)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: 136b11ed2fcb8e1c7e0e78cffebdc595 (<span class="ansi-bold">base.py</span>:269)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: 33c1756eb0c611efa60b000d3a005057 (<span class="ansi-bold">base.py</span>:270)
 </pre></div></div>
 </div>
 <script type="application/vnd.jupyter.widget-state+json">
@@ -1738,7 +1743,7 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 11 Nov 2024.
+      <span class="lastupdated">Last updated on 02 Dec 2024.
       </span></p>
   </div>
 

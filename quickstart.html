@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quickstart for Carsus &mdash; carsus v0.1.dev763+g977c921</title>
+  <title>Quickstart for Carsus &mdash; carsus v0.1.dev771+gc250524</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=12aeada2"></script>
+        <script src="_static/documentation_options.js?v=3e8a9809"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
             carsus
           </a>
               <div class="version">
-                0.1.dev763+g977c921
+                0.1.dev771+gc250524
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -81,6 +81,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
 <ul>
@@ -93,10 +94,15 @@
 <li class="toctree-l1"><a class="reference internal" href="io/vald.html">VALD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io/barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="research/publications.html">Carsus Publications</a></li>
-<li class="toctree-l1"><a class="reference internal" href="research/references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="research/bibliography.html">Bibliography</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
 <ul>
@@ -133,7 +139,7 @@
 <p>In this guide you will learn how to create atomic data files suitable for <a class="reference external" href="https://github.com/tardis-sn/tardis">TARDIS</a>.</p>
 <div class="admonition note">
 <p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
-<p>Get familiar with the <a class="reference internal" href="development/notation.html"><span class="doc">Notation in Carsus</span></a> and learn how to correctly select ions.</p>
+<p>Get familiar with the <a class="reference external" href="development/notation.rst">Notation in Carsus</a> and learn how to correctly select ions.</p>
 </div>
 <section id="Atomic-Weights-and-Ionization-Energies-(NIST)">
 <h2>Atomic Weights and Ionization Energies (NIST)<a class="headerlink" href="#Atomic-Weights-and-Ionization-Energies-(NIST)" title="Link to this heading"></a></h2>
@@ -1364,7 +1370,6 @@ fatal: destination path &#39;/home/runner/Downloads/carsus-data-nndc&#39; alread
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;4F&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
  (<span class="ansi-bold">warnings.py</span>:112)
-[<span class="ansi-bold">  carsus.io.nist.ionization</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - Set `J=0` for ground state of species `Fe 6`. (<span class="ansi-bold">ionization.py</span>:245)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/nist/ionization.py:250: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise an error in a future version of pandas. Value &#39;3F&#39; has dtype incompatible with float64, please explicitly cast to a compatible dtype first.
   lvl[&#34;term&#34;] = &#34;&#34;.join([str(_) for _ in lvl_tokens[&#34;ls_term&#34;]])
  (<span class="ansi-bold">warnings.py</span>:112)
@@ -1818,8 +1823,8 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 [<span class="ansi-bold">carsus.io.output.photo_ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Matching levels and cross sections. (<span class="ansi-bold">photo_ionization.py</span>:35)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Signing TARDISAtomData. (<span class="ansi-bold">base.py</span>:267)
 [<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Format Version: 1.0 (<span class="ansi-bold">base.py</span>:268)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: 30faa443ecbbfff507ebfba0467022a8 (<span class="ansi-bold">base.py</span>:269)
-[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: de79fc00a06e11efa815002248905dd3 (<span class="ansi-bold">base.py</span>:270)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: cf7ca4f4d039049e5cbbcce308983ec5 (<span class="ansi-bold">base.py</span>:269)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: 07fc66a0b0c611ef8ef4000d3a005057 (<span class="ansi-bold">base.py</span>:270)
 </pre></div></div>
 </div>
 <p>You are done! Now you can use your file to run TARDIS simulations.</p>
@@ -1903,15 +1908,15 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
     </tr>
     <tr>
       <th>ionization_data</th>
-      <td>013a5d35829937d8ed6b6cb81f8a402f</td>
+      <td>e04b7f7aa807ebcff5f03c55eca8c772</td>
     </tr>
     <tr>
       <th>levels_data</th>
-      <td>21f30532b2de28d0699ad75b57e7decc</td>
+      <td>2bf0599d8c766f7f93acc5cdbb37a1f8</td>
     </tr>
     <tr>
       <th>lines_data</th>
-      <td>e95aa07fc33eae14ab1bd20133650dd6</td>
+      <td>49cb061b7de3093a38ecb8227efcad98</td>
     </tr>
     <tr>
       <th>lines_metadata</th>
@@ -1919,11 +1924,11 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
     </tr>
     <tr>
       <th>macro_atom_data</th>
-      <td>a49e7099d5dc25747d50c54ef74eada0</td>
+      <td>b7733f574a3f4297b1dacaebe593dda8</td>
     </tr>
     <tr>
       <th>macro_atom_references</th>
-      <td>68a3b90640c5cd82ad9153d637429fd1</td>
+      <td>535fb1131e34a12616f52abcd880a551</td>
     </tr>
     <tr>
       <th>nuclear_decay_rad</th>
@@ -1969,7 +1974,7 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
     </tr>
     <tr>
       <th>carsus</th>
-      <td>0.1.dev763+g977c921</td>
+      <td>0.1.dev771+gc250524</td>
     </tr>
     <tr>
       <th>astropy</th>
@@ -2011,12 +2016,12 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 <div class="highlight"><pre>
 /._v_attrs (AttributeSet), 8 attributes:
    [CLASS := np.str_(&#39;GROUP&#39;),
-    DATE := np.str_(&#39;2024-11-11T20:52:31.117828+00:00&#39;),
+    DATE := np.str_(&#39;2024-12-02T15:56:45.578952+00:00&#39;),
     FORMAT_VERSION := np.str_(&#39;1.0&#39;),
-    MD5 := np.str_(&#39;30faa443ecbbfff507ebfba0467022a8&#39;),
+    MD5 := np.str_(&#39;cf7ca4f4d039049e5cbbcce308983ec5&#39;),
     PYTABLES_FORMAT_VERSION := np.str_(&#39;2.1&#39;),
     TITLE := np.str_(&#39;&#39;),
-    UUID1 := np.str_(&#39;de79fc00a06e11efa815002248905dd3&#39;),
+    UUID1 := np.str_(&#39;07fc66a0b0c611ef8ef4000d3a005057&#39;),
     VERSION := np.str_(&#39;1.0&#39;)]
 </pre></div></div>
 </div>
@@ -2038,7 +2043,7 @@ map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2024, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 11 Nov 2024.
+      <span class="lastupdated">Last updated on 02 Dec 2024.
       </span></p>
   </div>
 
