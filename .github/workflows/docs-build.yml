@@ -202,7 +202,7 @@ jobs:
 
             [**Click here**](${{ env.URL }}) to see your results.
         env:
-          URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pull/${{ github.event.number }}/
+          URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pull/${{ github.event.number }}/index.html
         if: success() && github.event_name == 'pull_request_target'
 
       - name: Post comment (failure)
@@ -218,7 +218,7 @@ jobs:
             Hi, human.
 
             The **`${{ github.workflow }}`** workflow has **failed** :x:
-            
+
             [**Click here**](${{ env.URL }}) to see the build log.
         env:
           URL: https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}?check_suite_focus=true
