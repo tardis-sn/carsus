@@ -121,11 +121,9 @@ jobs:
           environment-name: carsus
 
       - name: Install package
-        shell: bash -l {0}
         run: pip install -e .
 
       - name: Build documentation
-        shell: bash -l {0}
         run: cd docs/; make html NCORES=auto
 
       - name: Set destination directory
