@@ -11,4 +11,3 @@ testing, debugging, the actual state of the code, etc.
     notation.rst
     units.rst
     testing.rst
-    compare_atomic_files
