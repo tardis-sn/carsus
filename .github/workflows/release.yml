@@ -24,19 +24,23 @@ jobs:
           repository: tardis-sn/tardis_zenodo
           token: ${{ secrets.GITHUB_TOKEN }}
 
-    #   - name: Checkout setup_env action
-    #     uses: actions/checkout@v4
-    #     with:
-    #       repository: tardis-sn/carsus
-    #       sparse-checkout: |
-    #         .github/actions/setup_env/action.yml
-    #       sparse-checkout-cone-mode: true
-    #       path: tardis
-
-    #   - name: Setup environment
-    #     uses: ./tardis/.github/actions/setup_env
-    #     with:
-    #       os-label: "linux-64"
+      - name: Download Lock File
+        run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-linux-64.lock
+          
+      - name: Generate Cache Key
+        run: | 
+            file_hash=$(cat conda-linux-64.lock | shasum -a 256 | cut -d' ' -f1)
+            echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
+        id: cache-environment-key
+              
+      - uses: mamba-org/setup-micromamba@v1
+        with:
+            environment-file: conda-linux-64.lock
+            cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
+            cache-downloads-key: ${{ steps.cache-environment-key.outputs.file_hash }}
+            environment-name: tardis
+            cache-environment: true
+            cache-downloads: true
 
       - name: Dump Secret Key
         run: echo "$KEY_SECRET_JSON" > key_secret.json
