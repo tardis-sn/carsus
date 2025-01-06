@@ -119,7 +119,7 @@ jobs:
 
             > :warning: **Warning:** 
             >
-            > The `post_release` workflow waits for a webhook and then updates the citation files. If the file is not modified by this pull request, please check the latest release on [Zenodo's website](https://zenodo.org/record/14216805), close this pull request, and [manually run the workflow](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
+            > The `post_release` workflow waits for a webhook and then updates the citation files. If the file is not modified by this pull request, please check the latest release on [Zenodo's website](https://zenodo.org/record/14546687), close this pull request, and [manually run the workflow](https://docs.github.com/en/actions/managing-workflow-runs/manually-running-a-workflow).
             >
             > This pull request should be auto-merged.
           labels: automated, build-docs
