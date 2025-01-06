@@ -47,8 +47,8 @@ jobs:
 
       - name: Update CITATION.cff
         run: |
-          rm CITATION.cff
-          doi2cff init 10.5281/zenodo.14216805
+          rm -f CITATION.cff
+          doi2cff init 10.5281/zenodo.14546687
 
       - uses: actions/upload-artifact@v4
         with:
