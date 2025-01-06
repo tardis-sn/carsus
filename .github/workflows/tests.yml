@@ -11,6 +11,15 @@ on:
   pull_request:
     branches:
     - '*'
+
+  workflow_call:
+    inputs:
+      pip_git:
+        description: "Whether or not to install tardis using git"
+        required: false
+        type: boolean
+        default: false
+
   schedule:
     - cron: '0 0 * * 0' # run at midnight every Sunday
 
@@ -35,7 +44,6 @@ env:
 
 jobs:
   build:
-    if: github.repository_owner == 'tardis-sn'
     strategy:
       matrix:
         pip: [true, false]
