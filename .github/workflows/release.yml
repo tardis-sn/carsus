@@ -86,7 +86,7 @@ jobs:
       - name: Initialize release
         uses: softprops/action-gh-release@v1
         with:
-          name: TARDIS v${{ env.NEW_TAG }}
+          name: CARSUS v${{ env.NEW_TAG }}
           tag_name: release-${{ env.NEW_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           body: "This release has been created automatically by the CARSUS continuous delivery pipeline."
