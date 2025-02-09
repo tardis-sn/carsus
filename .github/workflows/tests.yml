@@ -27,7 +27,7 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   PYTEST_FLAGS: --remote-data --refdata=carsus-refdata
-                --cov=carsus --cov-report=xml --cov-report=html   
+                --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
@@ -50,6 +50,9 @@ jobs:
     name: ${{ matrix.label }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup LFS
+        uses: ./.github/actions/setup_lfs
 
       - name: Clone tardis-sn/carsus-refdata
         uses: actions/checkout@v4
