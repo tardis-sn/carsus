@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMFGEN &mdash; carsus v2024.12.24.dev1+g5f6bfe6</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5102e0b5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ZETA DATA" href="zeta.html" />
+    <link rel="prev" title="CHIANTI" href="chianti.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                2024.12.24.dev1+g5f6bfe6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CMFGEN</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Parsers">Parsers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Levels,-Lines-and-Collisions">Levels, Lines and Collisions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Photoionization-Cross-sections">Photoionization Cross-sections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Batch-Convert-Files-to-HDF5">Batch Convert Files to HDF5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CMFGENReader">CMFGENReader</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CMFGEN</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/cmfgen.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="CMFGEN">
+<h1>CMFGEN<a class="headerlink" href="#CMFGEN" title="Link to this heading"></a></h1>
+<p>Database from John Hillier’s CMFGEN, a radiative transfer code designed to solve the radiative transfer and statistical equilibrium equations in spherical geometry.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p>In this example, the data was downloaded from the <a class="reference external" href="http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm">CMFGEN website</a> and extracted to the <code class="docutils literal notranslate"><span class="pre">/tmp/atomic</span></code> folder.</p>
+</div>
+<section id="Parsers">
+<h2>Parsers<a class="headerlink" href="#Parsers" title="Link to this heading"></a></h2>
+<p>The CMFGEN parsers retrieves data from text files preserving its original form (no unit conversions) and stores it in DataFrames. Currently, just <code class="docutils literal notranslate"><span class="pre">osc</span></code>, <code class="docutils literal notranslate"><span class="pre">col</span></code> and <code class="docutils literal notranslate"><span class="pre">pho</span></code> files are supported.</p>
+<section id="Levels,-Lines-and-Collisions">
+<h3>Levels, Lines and Collisions<a class="headerlink" href="#Levels,-Lines-and-Collisions" title="Link to this heading"></a></h3>
+<p>Energy levels and spectral lines are stored in the <code class="docutils literal notranslate"><span class="pre">osc</span></code> files, while collisions strengths are provided by the <code class="docutils literal notranslate"><span class="pre">col</span></code> files.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.cmfgen</span> <span class="kn">import</span> <span class="n">CMFGENEnergyLevelsParser</span><span class="p">,</span> <span class="n">CMFGENOscillatorStrengthsParser</span><span class="p">,</span> <span class="n">CMFGENCollisionalStrengthsParser</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.15.0
+ found PyQt5 widgets
+ using PyQt5 widgets
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:72: UserWarning: klgfb files are not present:
+  it will not be possible to use the freeBound continuum method
+  warnings.warn(&#39;klgfb files are not present: \n  it will not be possible to use the freeBound continuum method&#39;)
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_lvl</span> <span class="o">=</span> <span class="n">CMFGENEnergyLevelsParser</span><span class="p">(</span><span class="s1">&#39;/tmp/atomic/SIL/II/16sep15/si2_osc_kurucz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_osc</span> <span class="o">=</span> <span class="n">CMFGENOscillatorStrengthsParser</span><span class="p">(</span><span class="s1">&#39;/tmp/atomic/SIL/II/16sep15/si2_osc_kurucz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_col</span> <span class="o">=</span> <span class="n">CMFGENCollisionalStrengthsParser</span><span class="p">(</span><span class="s1">&#39;/tmp/atomic/SIL/II/16sep15/si2_col&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Header information is stored in the <code class="docutils literal notranslate"><span class="pre">header</span></code> attribute and the DataFrame in the <code class="docutils literal notranslate"><span class="pre">base</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_col</span><span class="o">.</span><span class="n">header</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;Number of transitions&#39;: &#39;406&#39;,
+ &#39;Number of T values OMEGA tabulated at&#39;: &#39;14&#39;,
+ &#39;Scaling factor for OMEGA&#39;: &#39;1.0&#39;,
+ &#39;Value for OMEGA if f=0&#39;: &#39;0.1&#39;}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_lvl</span><span class="o">.</span><span class="n">base</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>label</th>
+      <th>g</th>
+      <th>E(cm^-1)</th>
+      <th>10^15 Hz</th>
+      <th>eV</th>
+      <th>Lam(A)</th>
+      <th>ID</th>
+      <th>ARAD</th>
+      <th>C4</th>
+      <th>C6</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3s2_3p_2Po[1/2]</td>
+      <td>2.0</td>
+      <td>0.00</td>
+      <td>3.95241</td>
+      <td>16.346</td>
+      <td>758.505847</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>-5.290000e-17</td>
+      <td>7.470000e-33</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3s2_3p_2Po[3/2]</td>
+      <td>4.0</td>
+      <td>287.24</td>
+      <td>3.94380</td>
+      <td>16.310</td>
+      <td>760.162036</td>
+      <td>2</td>
+      <td>0.000000e+00</td>
+      <td>-5.300000e-17</td>
+      <td>7.460000e-33</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3s_3p2_4Pe[1/2]</td>
+      <td>2.0</td>
+      <td>42824.29</td>
+      <td>2.66857</td>
+      <td>11.036</td>
+      <td>1123.420681</td>
+      <td>3</td>
+      <td>1.222000e+04</td>
+      <td>-5.340000e-17</td>
+      <td>7.490000e-33</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3s_3p2_4Pe[3/2]</td>
+      <td>4.0</td>
+      <td>42932.62</td>
+      <td>2.66532</td>
+      <td>11.023</td>
+      <td>1124.789552</td>
+      <td>4</td>
+      <td>2.110000e+03</td>
+      <td>-5.340000e-17</td>
+      <td>7.490000e-33</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3s_3p2_4Pe[5/2]</td>
+      <td>6.0</td>
+      <td>43107.91</td>
+      <td>2.66007</td>
+      <td>11.001</td>
+      <td>1127.011617</td>
+      <td>5</td>
+      <td>3.246000e+03</td>
+      <td>-5.350000e-17</td>
+      <td>7.490000e-33</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>152</th>
+      <td>3s_3p(3Po)4p_4Pe[3/2]</td>
+      <td>4.0</td>
+      <td>134079.00</td>
+      <td>-0.06718</td>
+      <td>-0.278</td>
+      <td>-44625.724052</td>
+      <td>153</td>
+      <td>1.159000e+08</td>
+      <td>-1.500000e-16</td>
+      <td>3.080000e-32</td>
+    </tr>
+    <tr>
+      <th>153</th>
+      <td>3s_3p(3Po)4p_4Pe[5/2]</td>
+      <td>6.0</td>
+      <td>134213.63</td>
+      <td>-0.07122</td>
+      <td>-0.295</td>
+      <td>-42096.577969</td>
+      <td>154</td>
+      <td>1.167000e+08</td>
+      <td>-1.500000e-16</td>
+      <td>3.090000e-32</td>
+    </tr>
+    <tr>
+      <th>154</th>
+      <td>3s_3p(3Po)4p_4Se[3/2]</td>
+      <td>4.0</td>
+      <td>134905.28</td>
+      <td>-0.09195</td>
+      <td>-0.380</td>
+      <td>-32603.663348</td>
+      <td>155</td>
+      <td>9.275000e+07</td>
+      <td>-9.750000e-17</td>
+      <td>2.770000e-32</td>
+    </tr>
+    <tr>
+      <th>155</th>
+      <td>3p3_2Do[5/2]</td>
+      <td>6.0</td>
+      <td>135297.30</td>
+      <td>-0.10370</td>
+      <td>-0.429</td>
+      <td>-28908.752414</td>
+      <td>156</td>
+      <td>2.437000e+09</td>
+      <td>4.200000e-17</td>
+      <td>1.450000e-32</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>3p3_2Do[3/2]</td>
+      <td>4.0</td>
+      <td>135303.50</td>
+      <td>-0.10389</td>
+      <td>-0.430</td>
+      <td>-28857.030727</td>
+      <td>157</td>
+      <td>2.438000e+09</td>
+      <td>1.390000e-17</td>
+      <td>1.460000e-32</td>
+    </tr>
+  </tbody>
+</table>
+<p>157 rows × 10 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Photoionization-Cross-sections">
+<h3>Photoionization Cross-sections<a class="headerlink" href="#Photoionization-Cross-sections" title="Link to this heading"></a></h3>
+<p>Photoionization cross-sections are provided by the <code class="docutils literal notranslate"><span class="pre">pho</span></code> files.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.cmfgen</span> <span class="kn">import</span> <span class="n">CMFGENPhoCrossSectionsParser</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span> <span class="o">=</span> <span class="n">CMFGENPhoCrossSectionsParser</span><span class="p">(</span><span class="s1">&#39;/tmp/atomic/SIL/II/16sep15/phot_nahar_A&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">header</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;Date&#39;: &#39;05-Sep-2015 16:54:54&#39;,
+ &#39;Number of energy levels&#39;: &#39;93&#39;,
+ &#39;Number of photoionization routes&#39;: &#39;2&#39;,
+ &#39;Screened nuclear charge&#39;: &#39;2.0&#39;,
+ &#39;Final state in ion&#39;: &#39;3s2_1Se/3s21Se&#39;,
+ &#39;Excitation energy of final state&#39;: &#39;0.0&#39;,
+ &#39;Statistical weight of ion&#39;: &#39;1.0&#39;,
+ &#39;Sigma used for Gaussian smoothing&#39;: &#39;0.0D0&#39;,
+ &#39;Cross-section unit&#39;: &#39;Megabarns&#39;,
+ &#39;Split J levels&#39;: &#39;False&#39;,
+ &#39;Total number of data pairs&#39;: &#39;95107&#39;,
+ &#39;Configuration name&#39;: &#39;3s2_3p_2Po&#39;,
+ &#39;Type of cross-section&#39;: &#39;20&#39;,
+ &#39;Number of cross-section points&#39;: &#39;1487&#39;}
+</pre></div></div>
+</div>
+<p>In this case, <code class="docutils literal notranslate"><span class="pre">base</span></code> is a list containing many DataFrames. Also, each individual DataFrame contains information relative to that specific target under the attribute <code class="docutils literal notranslate"><span class="pre">attr</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+list
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+93
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>energy</th>
+      <th>sigma</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.000000</td>
+      <td>1.414000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.000333</td>
+      <td>1.405000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.000666</td>
+      <td>1.397000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.000999</td>
+      <td>1.388000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.001332</td>
+      <td>1.379000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1482</th>
+      <td>17.034180</td>
+      <td>0.001255</td>
+    </tr>
+    <tr>
+      <th>1483</th>
+      <td>18.825680</td>
+      <td>0.000929</td>
+    </tr>
+    <tr>
+      <th>1484</th>
+      <td>20.805590</td>
+      <td>0.000689</td>
+    </tr>
+    <tr>
+      <th>1485</th>
+      <td>22.993730</td>
+      <td>0.000510</td>
+    </tr>
+    <tr>
+      <th>1486</th>
+      <td>25.412010</td>
+      <td>0.000378</td>
+    </tr>
+  </tbody>
+</table>
+<p>1487 rows × 2 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;Configuration name&#39;: &#39;3s2_3p_2Po&#39;,
+ &#39;Type of cross-section&#39;: 20,
+ &#39;Number of cross-section points&#39;: 1487}
+</pre></div></div>
+</div>
+</section>
+<section id="Batch-Convert-Files-to-HDF5">
+<h3>Batch Convert Files to HDF5<a class="headerlink" href="#Batch-Convert-Files-to-HDF5" title="Link to this heading"></a></h3>
+<p>To convert multiple CMFGEN files to the HDF5 format import the <code class="docutils literal notranslate"><span class="pre">hdf_dump</span></code> function.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p>This feature has been temporary disabled.</p>
+</div>
+from carsus.io.cmfgen import hdf_dumphdf_dump('/tmp/atomic/', ['osc', 'OSC', 'Osc'], CMFGENEnergyLevelsParser(), chunk_size=10, ignore_patterns=['ERROR_CHK'])<p>Required parameters are <code class="docutils literal notranslate"><span class="pre">cmfgen_dir</span></code>, <code class="docutils literal notranslate"><span class="pre">patterns</span></code> and <code class="docutils literal notranslate"><span class="pre">parser</span></code>, while <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> and <code class="docutils literal notranslate"><span class="pre">ignore_patterns</span></code> are optional.</p>
+</section>
+</section>
+<section id="CMFGENReader">
+<h2>CMFGENReader<a class="headerlink" href="#CMFGENReader" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CMFGENReader</span></code> provides processed <code class="docutils literal notranslate"><span class="pre">levels</span></code>, <code class="docutils literal notranslate"><span class="pre">lines</span></code>, <code class="docutils literal notranslate"><span class="pre">ionization_energies</span></code>, <code class="docutils literal notranslate"><span class="pre">cross_sections</span></code> and <code class="docutils literal notranslate"><span class="pre">collisions</span></code> tables to work with. You can provide temperatures for the <code class="docutils literal notranslate"><span class="pre">collisions</span></code> dataframe using the <code class="docutils literal notranslate"><span class="pre">temperature_grid</span></code> option.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.cmfgen</span> <span class="kn">import</span> <span class="n">CMFGENReader</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span> <span class="o">=</span> <span class="n">CMFGENReader</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="s1">&#39;Si 0-1&#39;</span><span class="p">,</span> <span class="s1">&#39;/tmp/atomic&#39;</span><span class="p">,</span> <span class="n">ionization_energies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cross_sections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_mismatched_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - Selecting H 0 from CMFGEN (required to ingest cross-sections). (<span class="ansi-bold">base.py</span>:557)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Configuration schema found for H 0. (<span class="ansi-bold">base.py</span>:571)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Configuration schema found for Si 0. (<span class="ansi-bold">base.py</span>:571)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Configuration schema found for Si 1. (<span class="ansi-bold">base.py</span>:571)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Loading atomic data for H 0. (<span class="ansi-bold">base.py</span>:856)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Loading atomic data for Si 0. (<span class="ansi-bold">base.py</span>:856)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Loading atomic data for Si 1. (<span class="ansi-bold">base.py</span>:856)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Dropping collisional ionization data. (<span class="ansi-bold">base.py</span>:1054)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Entries having label(s): 3s2_3p2_3Pe, 3s_3p3_5So will be dropped for ion: (np.int64(14), 0). (<span class="ansi-bold">base.py</span>:1059)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Filling in 1 values for ion (1, 0) that are outside the tabulated temperature range using the last tabulated value. (<span class="ansi-bold">base.py</span>:1119)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Filling in 7 values for ion (np.int64(14), 0) that are outside the tabulated temperature range using the last tabulated value. (<span class="ansi-bold">base.py</span>:1119)
+[<span class="ansi-bold">      carsus.io.cmfgen.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Filling in 4 values for ion (np.int64(14), 1) that are outside the tabulated temperature range using the last tabulated value. (<span class="ansi-bold">base.py</span>:1119)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">levels</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy</th>
+      <th>j</th>
+      <th>label</th>
+      <th>method</th>
+      <th>priority</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1</th>
+      <th rowspan="5" valign="top">0</th>
+      <th>0</th>
+      <td>0.000000</td>
+      <td>0.5</td>
+      <td>1___</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>82259.096334</td>
+      <td>3.5</td>
+      <td>2___</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>97492.300647</td>
+      <td>8.5</td>
+      <td>3___</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>102823.892736</td>
+      <td>15.5</td>
+      <td>4___</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>105291.651183</td>
+      <td>24.5</td>
+      <td>5___</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">14</th>
+      <th rowspan="5" valign="top">1</th>
+      <th>152</th>
+      <td>134079.000000</td>
+      <td>1.5</td>
+      <td>3s_3p(3Po)4p_4Pe[3/2]</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>153</th>
+      <td>134213.630000</td>
+      <td>2.5</td>
+      <td>3s_3p(3Po)4p_4Pe[5/2]</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>154</th>
+      <td>134905.280000</td>
+      <td>1.5</td>
+      <td>3s_3p(3Po)4p_4Se[3/2]</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>155</th>
+      <td>135297.300000</td>
+      <td>2.5</td>
+      <td>3p3_2Do[5/2]</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>135303.500000</td>
+      <td>1.5</td>
+      <td>3p3_2Do[3/2]</td>
+      <td>meas</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+<p>680 rows × 5 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">lines</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy_lower</th>
+      <th>energy_upper</th>
+      <th>gf</th>
+      <th>j_lower</th>
+      <th>j_upper</th>
+      <th>wavelength</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index_lower</th>
+      <th>level_index_upper</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1</th>
+      <th rowspan="5" valign="top">0</th>
+      <th rowspan="5" valign="top">0</th>
+      <th>1</th>
+      <td>0.00</td>
+      <td>82259.096334</td>
+      <td>8.324000e-01</td>
+      <td>0.5</td>
+      <td>3.5</td>
+      <td>121.5670</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.00</td>
+      <td>97492.300647</td>
+      <td>1.582000e-01</td>
+      <td>0.5</td>
+      <td>8.5</td>
+      <td>102.5720</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.00</td>
+      <td>102823.892736</td>
+      <td>5.798000e-02</td>
+      <td>0.5</td>
+      <td>15.5</td>
+      <td>97.2540</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.00</td>
+      <td>105291.651183</td>
+      <td>2.788000e-02</td>
+      <td>0.5</td>
+      <td>24.5</td>
+      <td>94.9740</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.00</td>
+      <td>106632.159810</td>
+      <td>1.559800e-02</td>
+      <td>0.5</td>
+      <td>35.5</td>
+      <td>93.7800</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">14</th>
+      <th rowspan="5" valign="top">1</th>
+      <th>152</th>
+      <th>156</th>
+      <td>134079.00</td>
+      <td>135303.500000</td>
+      <td>1.300000e-05</td>
+      <td>1.5</td>
+      <td>1.5</td>
+      <td>8164.3728</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">153</th>
+      <th>155</th>
+      <td>134213.63</td>
+      <td>135297.300000</td>
+      <td>3.963000e-06</td>
+      <td>2.5</td>
+      <td>2.5</td>
+      <td>9225.3865</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>134213.63</td>
+      <td>135303.500000</td>
+      <td>2.477400e-07</td>
+      <td>2.5</td>
+      <td>1.5</td>
+      <td>9172.9055</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">154</th>
+      <th>155</th>
+      <td>134905.28</td>
+      <td>135297.300000</td>
+      <td>3.069200e-05</td>
+      <td>1.5</td>
+      <td>2.5</td>
+      <td>25500.0000</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>134905.28</td>
+      <td>135303.500000</td>
+      <td>2.697600e-06</td>
+      <td>1.5</td>
+      <td>1.5</td>
+      <td>25100.0000</td>
+    </tr>
+  </tbody>
+</table>
+<p>26422 rows × 6 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">cross_sections</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>energy</th>
+      <th>sigma</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1</th>
+      <th rowspan="5" valign="top">0</th>
+      <th>0</th>
+      <td>0.999466</td>
+      <td>6.310022</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>1.015765</td>
+      <td>6.042398</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>1.032328</td>
+      <td>5.786125</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>1.049162</td>
+      <td>5.540721</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>1.066271</td>
+      <td>5.305726</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">14</th>
+      <th rowspan="5" valign="top">1</th>
+      <th>154</th>
+      <td>-263.073454</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>155</th>
+      <td>-0.031522</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>155</th>
+      <td>-3.152219</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>-0.031579</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>156</th>
+      <td>-3.157868</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>385466 rows × 2 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">ionization_energies</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+atomic_number  ion_charge
+1              0             13.598434
+14             0              8.151683
+               1             16.345846
+Name: ionization_energy, dtype: float64
+</pre></div></div>
+</div>
+<p>The values in the collisions dataframe are thermally-averaged effective collision strengths divided by the statistical weights of the lower levels. Please see Eq. A1 and A2 of <span id="id1">[<a class="reference internal" href="../research/bibliography.html#id5" title="Norbert Przybilla and Keith Butler. Non-LTE Line Formation for Hydrogen Revisited. Astrophysical Journal, 609(2):1181-1191, July 2004. arXiv:astro-ph/0406458, doi:10.1086/421316.">PrzybillaButler04</a>]</span> for definitions. More information about the <code class="docutils literal notranslate"><span class="pre">collisions</span></code> table is stored inside the <code class="docutils literal notranslate"><span class="pre">collisional_metadata</span></code> attribute.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">collisions</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>11</th>
+      <th>12</th>
+      <th>13</th>
+      <th>14</th>
+      <th>15</th>
+      <th>16</th>
+      <th>17</th>
+      <th>18</th>
+      <th>19</th>
+      <th>20</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>level_index_lower</th>
+      <th>level_index_upper</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">1</th>
+      <th rowspan="5" valign="top">0</th>
+      <th rowspan="5" valign="top">0</th>
+      <th>1</th>
+      <td>0.331250</td>
+      <td>0.331250</td>
+      <td>0.331250</td>
+      <td>0.331250</td>
+      <td>0.331250</td>
+      <td>0.342092</td>
+      <td>0.372950</td>
+      <td>0.393113</td>
+      <td>0.417929</td>
+      <td>0.450500</td>
+      <td>...</td>
+      <td>0.531217</td>
+      <td>0.589667</td>
+      <td>0.659250</td>
+      <td>0.701471</td>
+      <td>0.820400</td>
+      <td>0.820400</td>
+      <td>0.820400</td>
+      <td>0.820400</td>
+      <td>0.820400</td>
+      <td>0.820400</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.096550</td>
+      <td>0.096550</td>
+      <td>0.096550</td>
+      <td>0.096550</td>
+      <td>0.096550</td>
+      <td>0.096992</td>
+      <td>0.098250</td>
+      <td>0.100395</td>
+      <td>0.103035</td>
+      <td>0.106500</td>
+      <td>...</td>
+      <td>0.125060</td>
+      <td>0.138500</td>
+      <td>0.154500</td>
+      <td>0.164377</td>
+      <td>0.192200</td>
+      <td>0.192200</td>
+      <td>0.192200</td>
+      <td>0.192200</td>
+      <td>0.192200</td>
+      <td>0.192200</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.008550</td>
+      <td>0.008550</td>
+      <td>0.008550</td>
+      <td>0.008550</td>
+      <td>0.008550</td>
+      <td>0.009850</td>
+      <td>0.013550</td>
+      <td>0.015903</td>
+      <td>0.018799</td>
+      <td>0.022600</td>
+      <td>...</td>
+      <td>0.031010</td>
+      <td>0.037100</td>
+      <td>0.044350</td>
+      <td>0.047992</td>
+      <td>0.058250</td>
+      <td>0.058250</td>
+      <td>0.058250</td>
+      <td>0.058250</td>
+      <td>0.058250</td>
+      <td>0.058250</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.011700</td>
+      <td>0.011700</td>
+      <td>0.011700</td>
+      <td>0.011700</td>
+      <td>0.011700</td>
+      <td>0.012090</td>
+      <td>0.013200</td>
+      <td>0.013980</td>
+      <td>0.014940</td>
+      <td>0.016200</td>
+      <td>...</td>
+      <td>0.019583</td>
+      <td>0.022033</td>
+      <td>0.024950</td>
+      <td>0.026535</td>
+      <td>0.031000</td>
+      <td>0.031000</td>
+      <td>0.031000</td>
+      <td>0.031000</td>
+      <td>0.031000</td>
+      <td>0.031000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.006550</td>
+      <td>0.006550</td>
+      <td>0.006550</td>
+      <td>0.006550</td>
+      <td>0.006550</td>
+      <td>0.006771</td>
+      <td>0.007400</td>
+      <td>0.007829</td>
+      <td>0.008357</td>
+      <td>0.009050</td>
+      <td>...</td>
+      <td>0.010964</td>
+      <td>0.012350</td>
+      <td>0.014000</td>
+      <td>0.014891</td>
+      <td>0.017400</td>
+      <td>0.017400</td>
+      <td>0.017400</td>
+      <td>0.017400</td>
+      <td>0.017400</td>
+      <td>0.017400</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">14</th>
+      <th rowspan="5" valign="top">1</th>
+      <th rowspan="2" valign="top">25</th>
+      <th>29</th>
+      <td>39.000000</td>
+      <td>39.000000</td>
+      <td>39.000000</td>
+      <td>43.500000</td>
+      <td>46.652174</td>
+      <td>50.750000</td>
+      <td>61.750000</td>
+      <td>68.750000</td>
+      <td>76.000000</td>
+      <td>83.250000</td>
+      <td>...</td>
+      <td>97.000000</td>
+      <td>102.500000</td>
+      <td>105.638528</td>
+      <td>109.750000</td>
+      <td>110.750000</td>
+      <td>105.500000</td>
+      <td>100.794276</td>
+      <td>95.000000</td>
+      <td>95.000000</td>
+      <td>95.000000</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>13.950000</td>
+      <td>13.950000</td>
+      <td>13.950000</td>
+      <td>15.300000</td>
+      <td>16.180435</td>
+      <td>17.325000</td>
+      <td>20.175000</td>
+      <td>21.925000</td>
+      <td>23.775000</td>
+      <td>25.750000</td>
+      <td>...</td>
+      <td>29.250000</td>
+      <td>30.500000</td>
+      <td>31.257576</td>
+      <td>32.250000</td>
+      <td>32.500000</td>
+      <td>31.000000</td>
+      <td>29.543467</td>
+      <td>27.750000</td>
+      <td>27.750000</td>
+      <td>27.750000</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">26</th>
+      <th>29</th>
+      <td>3.550000</td>
+      <td>3.550000</td>
+      <td>3.550000</td>
+      <td>3.866667</td>
+      <td>4.011594</td>
+      <td>4.200000</td>
+      <td>4.600000</td>
+      <td>4.816667</td>
+      <td>5.050000</td>
+      <td>5.283333</td>
+      <td>...</td>
+      <td>5.716667</td>
+      <td>5.883333</td>
+      <td>5.962698</td>
+      <td>6.066667</td>
+      <td>6.016667</td>
+      <td>5.700000</td>
+      <td>5.460979</td>
+      <td>5.166667</td>
+      <td>5.166667</td>
+      <td>5.166667</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>44.833333</td>
+      <td>44.833333</td>
+      <td>44.833333</td>
+      <td>51.333333</td>
+      <td>55.681159</td>
+      <td>61.333333</td>
+      <td>75.666667</td>
+      <td>84.333333</td>
+      <td>93.666667</td>
+      <td>103.000000</td>
+      <td>...</td>
+      <td>120.500000</td>
+      <td>127.666667</td>
+      <td>131.707071</td>
+      <td>137.000000</td>
+      <td>138.666667</td>
+      <td>132.333333</td>
+      <td>126.432505</td>
+      <td>119.166667</td>
+      <td>119.166667</td>
+      <td>119.166667</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <th>30</th>
+      <td>17.900000</td>
+      <td>17.900000</td>
+      <td>17.900000</td>
+      <td>19.350000</td>
+      <td>20.241304</td>
+      <td>21.400000</td>
+      <td>24.250000</td>
+      <td>26.100000</td>
+      <td>28.150000</td>
+      <td>30.400000</td>
+      <td>...</td>
+      <td>35.250000</td>
+      <td>37.700000</td>
+      <td>39.583117</td>
+      <td>42.050000</td>
+      <td>44.950000</td>
+      <td>45.500000</td>
+      <td>44.626080</td>
+      <td>43.550000</td>
+      <td>43.550000</td>
+      <td>43.550000</td>
+    </tr>
+  </tbody>
+</table>
+<p>849 rows × 21 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">collisional_metadata</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+temperatures    [100, 2000, 2500, 4000, 5000, 6300, 10000, 126...
+dataset                                                  [cmfgen]
+info            The dataframe values are thermally-averaged ef...
+dtype: object
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chianti.html" class="btn btn-neutral float-left" title="CHIANTI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="zeta.html" class="btn btn-neutral float-right" title="ZETA DATA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 21 Feb 2025.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

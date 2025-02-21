@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZETA DATA &mdash; carsus v2024.12.24.dev1+g5f6bfe6</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5102e0b5"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="NNDC DATA" href="nndc.html" />
+    <link rel="prev" title="CMFGEN" href="cmfgen.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                2024.12.24.dev1+g5f6bfe6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ZETA DATA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/zeta.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ZETA-DATA">
+<h1>ZETA DATA<a class="headerlink" href="#ZETA-DATA" title="Link to this heading"></a></h1>
+<p>Ground state recombinations fractions (<span class="math notranslate nohighlight">\(\zeta\)</span>) from <span id="id1">[<a class="reference internal" href="../research/bibliography.html#id2" title="Knox S. Long and Christian Knigge. Modeling the Spectral Signatures of Accretion Disk Winds: A New Monte Carlo Approach. Astrophysical Journal, 579(2):725-740, November 2002. arXiv:astro-ph/0208011, doi:10.1086/342879.">LongKnigge02</a>]</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.zeta</span> <span class="kn">import</span> <span class="n">KnoxLongZeta</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.15.0
+ found PyQt5 widgets
+ using PyQt5 widgets
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:72: UserWarning: klgfb files are not present:
+  it will not be possible to use the freeBound continuum method
+  warnings.warn(&#39;klgfb files are not present: \n  it will not be possible to use the freeBound continuum method&#39;)
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span> <span class="o">=</span> <span class="n">KnoxLongZeta</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">zeta</span><span class="o">.</span><span class="n">base</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>temp</th>
+      <th>2000.0</th>
+      <th>4000.0</th>
+      <th>6000.0</th>
+      <th>8000.0</th>
+      <th>10000.0</th>
+      <th>12000.0</th>
+      <th>14000.0</th>
+      <th>16000.0</th>
+      <th>18000.0</th>
+      <th>20000.0</th>
+      <th>22000.0</th>
+      <th>24000.0</th>
+      <th>26000.0</th>
+      <th>28000.0</th>
+      <th>30000.0</th>
+      <th>32000.0</th>
+      <th>34000.0</th>
+      <th>36000.0</th>
+      <th>38000.0</th>
+      <th>40000.0</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2" valign="top">1</th>
+      <th>1</th>
+      <td>0.3390</td>
+      <td>0.3846</td>
+      <td>0.4132</td>
+      <td>0.4338</td>
+      <td>0.4498</td>
+      <td>0.4627</td>
+      <td>0.4735</td>
+      <td>0.4828</td>
+      <td>0.4908</td>
+      <td>0.4978</td>
+      <td>0.5040</td>
+      <td>0.5096</td>
+      <td>0.5147</td>
+      <td>0.5193</td>
+      <td>0.5235</td>
+      <td>0.5273</td>
+      <td>0.5309</td>
+      <td>0.5342</td>
+      <td>0.5373</td>
+      <td>0.5401</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">2</th>
+      <th>1</th>
+      <td>0.4012</td>
+      <td>0.4669</td>
+      <td>0.5073</td>
+      <td>0.5363</td>
+      <td>0.5587</td>
+      <td>0.5768</td>
+      <td>0.5920</td>
+      <td>0.6050</td>
+      <td>0.6163</td>
+      <td>0.6263</td>
+      <td>0.6352</td>
+      <td>0.6432</td>
+      <td>0.6505</td>
+      <td>0.6571</td>
+      <td>0.6632</td>
+      <td>0.6689</td>
+      <td>0.6741</td>
+      <td>0.6790</td>
+      <td>0.6835</td>
+      <td>0.6878</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.2660</td>
+      <td>0.2993</td>
+      <td>0.3220</td>
+      <td>0.3395</td>
+      <td>0.3538</td>
+      <td>0.3659</td>
+      <td>0.3764</td>
+      <td>0.3856</td>
+      <td>0.3939</td>
+      <td>0.4013</td>
+      <td>0.4081</td>
+      <td>0.4143</td>
+      <td>0.4201</td>
+      <td>0.4254</td>
+      <td>0.4304</td>
+      <td>0.4350</td>
+      <td>0.4394</td>
+      <td>0.4435</td>
+      <td>0.4474</td>
+      <td>0.4511</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th rowspan="5" valign="top">28</th>
+      <th>24</th>
+      <td>0.5290</td>
+      <td>0.4746</td>
+      <td>0.4408</td>
+      <td>0.4162</td>
+      <td>0.3966</td>
+      <td>0.3805</td>
+      <td>0.3667</td>
+      <td>0.3548</td>
+      <td>0.3442</td>
+      <td>0.3347</td>
+      <td>0.3261</td>
+      <td>0.3183</td>
+      <td>0.3111</td>
+      <td>0.3045</td>
+      <td>0.2983</td>
+      <td>0.2926</td>
+      <td>0.2872</td>
+      <td>0.2821</td>
+      <td>0.2774</td>
+      <td>0.2729</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>0.6784</td>
+      <td>0.6305</td>
+      <td>0.6000</td>
+      <td>0.5771</td>
+      <td>0.5588</td>
+      <td>0.5434</td>
+      <td>0.5301</td>
+      <td>0.5185</td>
+      <td>0.5081</td>
+      <td>0.4987</td>
+      <td>0.4901</td>
+      <td>0.4822</td>
+      <td>0.4749</td>
+      <td>0.4681</td>
+      <td>0.4618</td>
+      <td>0.4559</td>
+      <td>0.4503</td>
+      <td>0.4450</td>
+      <td>0.4400</td>
+      <td>0.4352</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>0.0859</td>
+      <td>0.1091</td>
+      <td>0.1189</td>
+      <td>0.1245</td>
+      <td>0.1281</td>
+      <td>0.1307</td>
+      <td>0.1326</td>
+      <td>0.1341</td>
+      <td>0.1353</td>
+      <td>0.1363</td>
+      <td>0.1372</td>
+      <td>0.1380</td>
+      <td>0.1386</td>
+      <td>0.1393</td>
+      <td>0.1398</td>
+      <td>0.1403</td>
+      <td>0.1408</td>
+      <td>0.1413</td>
+      <td>0.1417</td>
+      <td>0.1421</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>0.0645</td>
+      <td>0.0839</td>
+      <td>0.0920</td>
+      <td>0.0965</td>
+      <td>0.0994</td>
+      <td>0.1014</td>
+      <td>0.1030</td>
+      <td>0.1041</td>
+      <td>0.1051</td>
+      <td>0.1059</td>
+      <td>0.1065</td>
+      <td>0.1071</td>
+      <td>0.1076</td>
+      <td>0.1081</td>
+      <td>0.1085</td>
+      <td>0.1088</td>
+      <td>0.1092</td>
+      <td>0.1095</td>
+      <td>0.1098</td>
+      <td>0.1101</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>0.1149</td>
+      <td>0.1385</td>
+      <td>0.1502</td>
+      <td>0.1579</td>
+      <td>0.1636</td>
+      <td>0.1680</td>
+      <td>0.1717</td>
+      <td>0.1748</td>
+      <td>0.1776</td>
+      <td>0.1800</td>
+      <td>0.1823</td>
+      <td>0.1843</td>
+      <td>0.1861</td>
+      <td>0.1878</td>
+      <td>0.1895</td>
+      <td>0.1910</td>
+      <td>0.1924</td>
+      <td>0.1938</td>
+      <td>0.1950</td>
+      <td>0.1963</td>
+    </tr>
+  </tbody>
+</table>
+<p>412 rows × 20 columns</p>
+</div></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmfgen.html" class="btn btn-neutral float-left" title="CMFGEN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nndc.html" class="btn btn-neutral float-right" title="NNDC DATA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 21 Feb 2025.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
