@@ -847,6 +847,7 @@ class CMFGENReader:
         lns_list = []
         ioz_list = []
         pxs_list = []
+        j_values_list = []  # List to store J values
 
         for ion, reader in data.items():
             atomic_number = ion[0]
@@ -866,6 +867,12 @@ class CMFGENReader:
             lvl["ion_charge"] = ion_charge
             lvl_list.append(lvl)
 
+            # Store J values in a separate DataFrame
+            j_values = lvl[["ID", "g"]].copy()
+            j_values["j"] = (j_values["g"] - 1) / 2
+            j_values["atomic_number"] = atomic_number
+            j_values["ion_charge"] = ion_charge
+            j_values_list.append(j_values)
             lns = reader["lines"].copy()
             lns = lns.set_index(["i", "j"])
             lns["energy_lower"] = lvl_id["E(cm^-1)"].reindex(lns.index, level=0).values
@@ -960,6 +967,9 @@ class CMFGENReader:
         lines = lines[
             ["energy_lower", "energy_upper", "gf", "j_lower", "j_upper", "wavelength"]
         ]
+        j_values_df = pd.concat(j_values_list)
+        j_values_df = j_values_df.set_index(["atomic_number", "ion_charge", "ID"])
+        j_values_df = j_values_df["j"]
 
         if "ionization_energy" in reader.keys():
             ionization_energies = pd.DataFrame.from_records(ioz_list)
@@ -983,6 +993,7 @@ class CMFGENReader:
 
         self.levels = levels
         self.lines = lines
+        self.j_values = j_values_df  # Store J values in the class
 
         return
 
