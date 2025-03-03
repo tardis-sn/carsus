@@ -87,7 +87,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ env.CHIANTI_DB_VER }}
@@ -100,7 +100,7 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }} --warning=none
         if: steps.chianti-cache.outputs.cache-hit != 'true'
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
