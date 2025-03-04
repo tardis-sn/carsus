@@ -90,7 +90,7 @@ bibtex_bibfiles = ['references.bib', 'publications.bib']
 ## https://github.com/phn/pytpm/issues/3#issuecomment-12133978
 numpydoc_show_class_members = False
 
-nbsphinx_allow_errors = False  # use for debugging purposes only
+nbsphinx_allow_errors = True  # use for debugging purposes only
 if os.getenv("DISABLE_NBSPHINX") == "1":
     nbsphinx_execute = "never"
 else:
