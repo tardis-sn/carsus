@@ -35,7 +35,7 @@ jobs:
         with:
           path: carsus/
         
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
@@ -48,7 +48,7 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
@@ -108,8 +108,7 @@ jobs:
         working-directory: tardis-refdata
 
       - name: Restore LFS cache
-        uses: actions/cache@v2
-        id: lfs-cache
+        uses: actions/cache@v3
         with:
           path: tardis-refdata/.git/lfs
           key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v${{ env.CACHE_NUMBER }}
