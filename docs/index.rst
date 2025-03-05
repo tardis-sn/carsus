@@ -61,4 +61,4 @@ Carsus is a package to manage atomic datasets. It can read data from a variety o
 
 
 .. seealso::
-    Need help? Contact us on `Gitter <https://app.gitter.im/#/room/#tardis-sn_carsus:gitter.im>`_.
+    Need help? Contact us on `Gitter <https://matrix.to/#/#tardis-sn_carsus:gitter.im>`_.
