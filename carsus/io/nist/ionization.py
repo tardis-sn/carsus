@@ -5,6 +5,7 @@ http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 
 import logging
 import os
+from pathlib import Path
 from io import StringIO
 
 import numpy as np
@@ -89,9 +90,7 @@ def download_ionization_energies(
             response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
             return response.text
         else:
-            basic_atomic_data_fname = os.path.join(
-                carsus.__path__[0], "data", "basic_atomic_data.csv"
-            )
+            basic_atomic_data_fname = Path(carsus.__path__[0]) / "data" / "basic_atomic_data.csv"
             basic_atomic_data = pd.read_csv(basic_atomic_data_fname)
             atomic_number_mapping = dict(
                 zip(basic_atomic_data["symbol"], basic_atomic_data["atomic_number"])

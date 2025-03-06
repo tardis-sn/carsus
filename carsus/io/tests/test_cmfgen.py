@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import pytest
 import numpy as np
 import pandas as pd
@@ -14,7 +15,7 @@ from carsus.io.cmfgen import (
 
 from carsus.io.cmfgen.util import *
 
-data_dir = os.path.join(os.path.dirname(__file__), "data")
+data_dir = Path(__file__).parent / "data"
 
 
 @pytest.fixture()
@@ -33,7 +34,7 @@ def si1_reader():
 @pytest.fixture()
 def cmfgen_refdata_fname(refdata_path, path):
     subdirectory, fname = path
-    return os.path.join(refdata_path, "cmfgen", subdirectory, fname)
+    return Path(refdata_path) / "cmfgen" / subdirectory / fname
 
 
 @pytest.mark.with_refdata

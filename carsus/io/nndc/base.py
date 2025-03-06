@@ -1,5 +1,6 @@
 import urllib.request, urllib.error, urllib.parse
 import os
+from pathlib import Path
 import re
 import logging
 from astropy import units as u
@@ -30,7 +31,7 @@ NNDC_ARTIFICIAL_DATASET_TAG = "NNDC_DATASET_SPLITTER"
 
 def _get_nuclear_database_path():
     if not TARDISNUCLEAR_DATA_DIR.exists():
-        os.mkdir(TARDISNUCLEAR_DATA_DIR)
+        TARDISNUCLEAR_DATA_DIR.mkdir(parents=True)
     return TARDISNUCLEAR_DATA_DIR / "decay_radiation.h5"
 
 

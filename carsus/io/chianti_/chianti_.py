@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import re
 import pickle
 import logging
@@ -22,7 +23,7 @@ except ImportError:
         Read the version number of the CHIANTI database
         """
         xuvtop = os.environ['XUVTOP']
-        vFileName = os.path.join(xuvtop, 'VERSION')
+        vFileName = Path(xuvtop) / 'VERSION'
         vFile = open(vFileName)
         versionStr = vFile.readline()
         vFile.close()
@@ -31,8 +32,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-masterlist_ions_path = os.path.join(
-    os.getenv('XUVTOP'), "masterlist", "masterlist_ions.pkl"
+masterlist_ions_path = Path(
+    (os.getenv('XUVTOP')) / "masterlist" / "masterlist_ions.pkl"
 )
 
 masterlist_ions_file = open(masterlist_ions_path, 'rb')

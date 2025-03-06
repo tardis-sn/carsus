@@ -4,7 +4,7 @@
 # NOTE: The configuration for the package, including the name, version, and
 # other information are set in the setup.cfg file.
 
-import os
+from pathlib import Path
 import sys
 
 from setuptools import setup
@@ -74,7 +74,7 @@ except Exception:
     version = '{version}'
 """.lstrip()
 
-setup(use_scm_version={'write_to': os.path.join('carsus', 'version.py'),
+setup(use_scm_version={'write_to': Path('carsus') / 'version.py',
                        'write_to_template': VERSION_TEMPLATE,
                        #'version_scheme': 'calver-by-date',
                     })
