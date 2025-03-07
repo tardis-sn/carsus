@@ -4,7 +4,6 @@ http://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
 """
 
 import logging
-import os
 from pathlib import Path
 from io import StringIO
 

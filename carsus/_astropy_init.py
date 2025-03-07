@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import os
+
 from pathlib import Path
 __all__ = ['__version__', 'test']
 

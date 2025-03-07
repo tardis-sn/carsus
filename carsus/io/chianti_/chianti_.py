@@ -32,9 +32,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-masterlist_ions_path = Path(
-    (os.getenv('XUVTOP')) / "masterlist" / "masterlist_ions.pkl"
-)
+masterlist_ions_path = Path(os.getenv('XUVTOP', "")) / "masterlist" / "masterlist_ions.pkl"
 
 masterlist_ions_file = open(masterlist_ions_path, 'rb')
 masterlist_ions = pickle.load(masterlist_ions_file).keys()

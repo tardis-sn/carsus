@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import roman
 import yaml
-from scipy import interpolate
 
 from carsus import __path__ as CARSUS_PATH
 from carsus.io.base import BaseParser
@@ -813,7 +812,7 @@ class CMFGENReader:
 
                     except NotImplementedError:
                         logger.warning(
-                            f"Leibowitz's cross-section type 4 not implemented yet."
+                            "Leibowitz's cross-section type 4 not implemented yet."
                         )
                         phixs_table = get_null_phixs_table(threshold_energy_ryd)
 

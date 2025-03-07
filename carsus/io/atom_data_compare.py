@@ -5,7 +5,6 @@ import logging
 from carsus.util import parse_selected_species, convert_atomic_number2symbol
 from collections import defaultdict
 
-from collections import defaultdict
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
@@ -112,7 +111,7 @@ class AtomDataCompare(object):
         try:
             df1 = getattr(self, f"{key_name}1")
             df2 = getattr(self, f"{key_name}2")
-        except AttributeError as exc:
+        except AttributeError:
             raise Exception(
                 f"Either key_name: {key_name} is invalid or keys are not set. "
                 "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
@@ -169,7 +168,7 @@ class AtomDataCompare(object):
         try:
             df1 = getattr(self, f"{key_name}1")
             df2 = getattr(self, f"{key_name}2")
-        except AttributeError as exc:
+        except AttributeError:
             raise Exception(
                 f"Either key_name: {key_name} is invalid or keys are not set."
                 "Please use the set_keys_as_attributes method to set keys as attributes for comparison."
