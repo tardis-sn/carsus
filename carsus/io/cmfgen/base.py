@@ -831,6 +831,25 @@ class CMFGENReader:
         ion_phixs_table = pd.concat(phixs_table_list)
 
         return ion_phixs_table
+     
+    @staticmethod
+    def generate_metadata(doi, reference, unit_mappings):
+        """
+        Generates a metadata dictionary dynamically.
+
+        Parameters:
+            doi (str): The DOI reference.
+            reference (str): The source reference.
+            unit_mappings (dict): Dictionary mapping column names to units.
+
+        Returns:
+            dict: A metadata dictionary.
+        """
+        return {
+            "doi": doi,
+            "reference": reference,
+            "units": unit_mappings,
+        }
 
     def _get_levels_lines(
             self,
@@ -980,11 +999,27 @@ class CMFGENReader:
                 ["atomic_number", "ion_charge", "level_index"]
             )
             self.cross_sections = cross_sections.sort_index()
+        # Define unit mappings for different columns
+        unit_mappings = {
+            "energy": "erg",
+            "energy_lower": "erg",
+            "energy_upper": "erg",
+            "wavelength": "meter",
+        }
 
+        # Generate metadata dynamically
+        metadata = self.generate_metadata(
+            doi="https://doi.org/10.1086/177435",
+            reference="Verner et al. 1996",
+            unit_mappings=unit_mappings
+        )
+        
         self.levels = levels
         self.lines = lines
-
-        return
+        # Attach metadata to DataFrames
+        levels.attrs.update(metadata)
+        lines.attrs.update(metadata) 
+        return 
 
     def _get_collisions(
         self, data, temperature_grid=None, drop_mismatched_labels=False
