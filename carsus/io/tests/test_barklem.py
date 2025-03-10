@@ -1,6 +1,6 @@
 import pytest
 
-from numpy.testing import assert_almost_equal, assert_allclose
+from numpy.testing import assert_allclose
 from carsus.io.molecules.molecules import BarklemCollet2016Reader
 
 

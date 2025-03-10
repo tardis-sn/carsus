@@ -1,9 +1,9 @@
 import re
 import logging
 import pandas as pd
-import numpy as np
 from io import StringIO
 from carsus.io.util import read_from_buffer
+
 from carsus.util.helpers import (
     convert_wavelength_air2vacuum,
     ATOMIC_SYMBOLS_DATA,
