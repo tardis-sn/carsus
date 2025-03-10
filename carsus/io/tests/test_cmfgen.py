@@ -46,6 +46,7 @@ def cmfgen_refdata_fname(refdata_path, path):
     ],
 )
 def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENEnergyLevelsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of energy levels"])
     assert parser.base.shape[0] == n
@@ -63,6 +64,7 @@ def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
     ],
 )
 def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of transitions"])
     assert parser.base.shape[0] == n
@@ -79,6 +81,7 @@ def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
     ],
 )
 def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname)
     return parser.base
 
@@ -93,6 +96,7 @@ def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
 )
 @pytest.mark.array_compare(file_format="pd_hdf")
 def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of energy levels"])
     assert len(parser.base) == n
@@ -108,6 +112,7 @@ def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname):
     ],
 )
 def test_CMFGENHydLParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENHydLParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
     return parser.base
@@ -122,6 +127,7 @@ def test_CMFGENHydLParser(cmfgen_refdata_fname):
     ],
 )
 def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname):
+    cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENHydGauntBfParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
     return parser.base
