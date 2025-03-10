@@ -356,7 +356,8 @@ class ChiantiReader:
         lines = lines.reset_index()
         lines = lines.rename(columns={'lower_level_index': 'level_index_lower',
                                       'upper_level_index': 'level_index_upper',
-                                      'gf_value': 'gf'})
+                                      'gf_value': 'gf',
+                                      'a_value': 'A_ul'})
 
         # Kurucz levels starts from zero, Chianti from 1.
         lines['level_index_lower'] = lines['level_index_lower'] - 1
@@ -369,7 +370,7 @@ class ChiantiReader:
         lines['j_upper'] = None
         lines['j_lower'] = None
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
-                       'wavelength', 'gf']]
+                       'wavelength', 'gf', 'A_ul']]
 
         lines['wavelength'] = u.Quantity(lines['wavelength'], u.AA).to('nm').value
 
