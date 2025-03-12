@@ -1004,7 +1004,7 @@ class CMFGENReader:
             "energy": "erg",
             "energy_lower": "erg",
             "energy_upper": "erg",
-            "wavelength": "meter",
+            "wavelength": "nanometer",
         }
 
         # Generate metadata dynamically
