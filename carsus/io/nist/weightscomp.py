@@ -125,8 +125,8 @@ class NISTWeightsCompPyparser(BasePyparser):
 
     def _prepare_atomic_weights(self, atomic):
         grouped = atomic.groupby([AW_TYPE_COL])
-        interval_gr = grouped.get_group((INTERVAL,)).copy()
-        stable_mass_num_gr = grouped.get_group((STABLE_MASS_NUM,)).copy()
+        interval_gr = grouped.get_group(INTERVAL).copy()
+        stable_mass_num_gr = grouped.get_group(STABLE_MASS_NUM).copy()
 
         def atomic_weight_interval_to_nom_val_and_std(row):
             nom_val, std_dev = to_nom_val_and_std_dev(
