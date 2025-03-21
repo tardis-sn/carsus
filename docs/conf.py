@@ -26,6 +26,7 @@
 # be accessible, and the documentation will not build correctly.
 
 import os
+from pathlib import Path
 import sys
 import datetime
 from importlib import import_module
@@ -40,7 +41,7 @@ except ImportError:
 from configparser import ConfigParser
 conf = ConfigParser()
 
-conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
+conf.read([str(Path(__file__).resolve().parent.parent / "setup.cfg")])
 setup_cfg = dict(conf.items('metadata'))
 
 # -- General configuration ----------------------------------------------------

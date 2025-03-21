@@ -1,7 +1,6 @@
 from abc import ABCMeta
 
 import pandas as pd
-from astropy import units as u
 from uncertainties import ufloat_fromstr
 import numpy as np
 
