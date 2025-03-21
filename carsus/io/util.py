@@ -149,7 +149,7 @@ def retry_request(
 
 def get_lvl_index2id(df, levels_all):
     """
-    Matches level indexes with level IDs for a given DataFrame.
+    Matches `level_index` with level IDs for a given DataFrame.
 
     """
     # TODO: re-write this method without a for loop

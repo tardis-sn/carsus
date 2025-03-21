@@ -17,11 +17,12 @@ MEDIUM_VACUUM = 0
 logger = logging.getLogger(__name__)
 
 class LevelsLinesPreparer:
-    def __init__(self, ionization_energies, gfall_reader, chianti_reader, cmfgen_reader):
+    def __init__(self, ionization_energies, gfall_reader, chianti_reader, cmfgen_reader, lanl_ads_reader):
         self.ionization_energies = ionization_energies
         self.gfall_reader = gfall_reader
         self.chianti_reader = chianti_reader
         self.cmfgen_reader = cmfgen_reader
+        self.lanl_ads_reader = lanl_ads_reader
 
     @staticmethod
     def solve_priorities(levels):
@@ -39,6 +40,7 @@ class LevelsLinesPreparer:
         3 : Knox Long's Zeta
         4 : Chianti Database
         5 : CMFGEN
+        6 : LANL ADS
 
         """
         levels = levels.set_index(["atomic_number", "ion_number"])
@@ -54,12 +56,14 @@ class LevelsLinesPreparer:
         gfall_ions = levels_uq[levels_uq["ds_id"] == 2].index.unique()
         chianti_ions = levels_uq[levels_uq["ds_id"] == 4].index.unique()
         cmfgen_ions = levels_uq[levels_uq["ds_id"] == 5].index.unique()
+        lanl_ads_ions = levels_uq[levels_uq["ds_id"] == 6].index.unique()
 
+        
         assert set(gfall_ions).intersection(set(chianti_ions)).intersection(
             set(cmfgen_ions)
-        ) == set([])
+        ).intersection(set(lanl_ads_ions)) == set([])
 
-        return gfall_ions, chianti_ions, cmfgen_ions
+        return gfall_ions, chianti_ions, cmfgen_ions, lanl_ads_ions
     
     @staticmethod
     def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
@@ -121,6 +125,11 @@ class LevelsLinesPreparer:
             cmfgen = getattr(self.cmfgen_reader, attribute)
             cmfgen["ds_id"] = 5
             sources.append(cmfgen)
+
+        if self.lanl_ads_reader is not None:
+            lanl_ads = getattr(self.lanl_ads_reader, attribute)
+            lanl_ads["ds_id"] = 6
+            sources.append(lanl_ads)
         
         return pd.concat(sources, sort=True)
 
@@ -161,7 +170,7 @@ class LevelsLinesPreparer:
         )
 
         # Solve priorities and set attributes for later use.
-        self.gfall_ions, self.chianti_ions, self.cmfgen_ions = self.solve_priorities(
+        self.gfall_ions, self.chianti_ions, self.cmfgen_ions, self.lanl_ads_ions = self.solve_priorities(
             levels
         )
 
@@ -178,6 +187,10 @@ class LevelsLinesPreparer:
         if len(self.cmfgen_ions) > 0:
             cmfgen_str = ", ".join(to_string(self.cmfgen_ions))
             logger.info(f"CMFGEN selected species: {cmfgen_str}.")
+
+        if len(self.lanl_ads_ions) > 0:
+            lanl_ads_str = ", ".join(to_string(self.lanl_ads_ions))
+            logger.info(f"LANL ADS selected species: {lanl_ads_str}.")
 
         # Concatenate ground levels from NIST
         ground_levels = self.ionization_energies.get_ground_levels()
@@ -208,9 +221,18 @@ class LevelsLinesPreparer:
             )
             levels = levels.drop(levels[mask].index)
 
+        
         for ion in self.cmfgen_ions:
             mask = (
                 (levels["ds_id"] != 5)
+                & (levels["atomic_number"] == ion[0])
+                & (levels["ion_number"] == ion[1])
+            )
+            levels = levels.drop(levels[mask].index)
+
+        for ion in self.lanl_ads_ions:
+            mask = (
+                (levels["ds_id"] != 6)
                 & (levels["atomic_number"] == ion[0])
                 & (levels["ion_number"] == ion[1])
             )
@@ -263,12 +285,21 @@ class LevelsLinesPreparer:
             )
             lines = lines.drop(lines[mask].index)
 
+        for ion in self.lanl_ads_ions:
+            mask = (
+                (lines["ds_id"] != 6)
+                & (lines["atomic_number"] == ion[0])
+                & (lines["ion_number"] == ion[1])
+            )
+            lines = lines.drop(lines[mask].index)
+
         lines = lines.set_index(["atomic_number", "ion_number"])
         lines = lines.sort_index()  # To supress warnings
         ions = (
             set(self.gfall_ions)
             .union(set(self.chianti_ions))
             .union((set(self.cmfgen_ions)))
+            .union(set(self.lanl_ads_ions))
         )
 
         logger.info("Matching levels and lines.")
