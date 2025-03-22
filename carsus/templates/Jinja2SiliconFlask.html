@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic Data Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: black;
+        }
+        .form-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .form-container input, .form-container select, .form-container button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-container button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Atomic Data Viewer Using Flask Dynamically</h1>
+    <div class="form-container">
+        <form method="post" action="/">
+            <label for="atomic_number">Atomic Number:</label>
+            <input type="number" id="atomic_number" name="atomic_number" value="{{ atomic_number }}" required>
+            
+            <label for="n_rows">Number of Rows:</label>
+            <input type="number" id="n_rows" name="n_rows" value="{{ n_rows }}" required>
+            
+            <label for="data_type">Select Data Type:</label>
+            <select id="data_type" name="data_type">
+                <option value="levels" {% if data_type == 'Levels' %}selected{% endif %}>Levels</option>
+                <option value="lines" {% if data_type == 'Lines' %}selected{% endif %}>Lines</option>
+            </select>
+            
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div>
+        {% if table_html %}
+            <h2>{{ data_type.capitalize() }} Data</h2>
+            {{ table_html | safe }}
+        {% endif %}
+    </div>
+</body>
+</html>
