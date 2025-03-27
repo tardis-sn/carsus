@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
-import requests
 from requests.adapters import HTTPAdapter, Retry
 
 def to_flat_dict(tokens, parent_key='', sep='_'):

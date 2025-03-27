@@ -1,5 +1,6 @@
-import urllib.request, urllib.error, urllib.parse
-import os
+import urllib.request
+import urllib.error
+import urllib.parse
 import re
 import logging
 from astropy import units as u
@@ -19,7 +20,6 @@ from nuclear.io.nndc.parsers import decay_radiation_parsers, uncertainty_parser
 TARDISNUCLEAR_DATA_DIR = pathlib.Path(get_data_dir())
 import datetime
 from pyne import nucname
-from uncertainties import ufloat_fromstr
 
 NNDC_DECAY_RADIATION_BASE_URL = (
     "http://www.nndc.bnl.gov/nudat3/" "decaysearchdirect.jsp?nuc={nucname}&unc=nds"
@@ -30,7 +30,7 @@ NNDC_ARTIFICIAL_DATASET_TAG = "NNDC_DATASET_SPLITTER"
 
 def _get_nuclear_database_path():
     if not TARDISNUCLEAR_DATA_DIR.exists():
-        os.mkdir(TARDISNUCLEAR_DATA_DIR)
+        TARDISNUCLEAR_DATA_DIR.mkdir(parents=True)
     return TARDISNUCLEAR_DATA_DIR / "decay_radiation.h5"
 
 

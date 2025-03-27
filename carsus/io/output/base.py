@@ -265,7 +265,7 @@ class TARDISAtomData:
 
             uuid1 = uuid.uuid1().hex
 
-            logger.info(f"Signing TARDISAtomData.")
+            logger.info("Signing TARDISAtomData.")
             logger.info(f"Format Version: {FORMAT_VERSION}")
             logger.info(f"MD5: {total_checksum.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")
