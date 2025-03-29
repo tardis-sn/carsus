@@ -1,3 +1,4 @@
+==================
 Metadata in Carsus
 ==================
 
@@ -12,7 +13,9 @@ Carsus now includes comprehensive metadata with all atomic data outputs. This me
 Using Metadata
 --------------
 
-When saving data::
+When saving data:
+
+.. code-block:: python
 
     from carsus.io import save_to_hdf
     
@@ -31,7 +34,9 @@ When saving data::
         }
     )
 
-When reading data::
+When reading data:
+
+.. code-block:: python
 
     from carsus.io import read_hdf_with_metadata
     
@@ -42,7 +47,9 @@ When reading data::
 Metadata Structure
 -----------------
 
-The metadata is stored in the HDF5 file with this structure::
+The metadata is stored in the HDF5 file with this structure:
+
+.. code-block:: text
 
     /metadata
         attributes: creation_date, creator, data_source, description

@@ -1,8 +1,6 @@
-import os
 import tempfile
 import pytest
 import pandas as pd
-import h5py
 from astropy import units as u
 
 from carsus.metadata.metadata import MetadataHandler
