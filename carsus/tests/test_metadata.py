@@ -5,7 +5,7 @@ import pandas as pd
 import h5py
 from astropy import units as u
 
-from carsus.metadata import MetadataHandler
+from carsus.metadata.metadata import MetadataHandler
 from carsus.io import save_to_hdf, read_hdf_with_metadata
 
 @pytest.fixture
