@@ -8,6 +8,7 @@ from carsus.io.output.ionization_energies import IonizationEnergiesPreparer
 from carsus.io.output.levels_lines import LevelsLinesPreparer
 from carsus.io.output.macro_atom import MacroAtomPreparer
 from carsus.io.output.photo_ionization import PhotoIonizationPreparer
+from carsus.io.s92 import S92Reader
 
 from carsus.util import (
     hash_pandas_object,
@@ -51,6 +52,8 @@ class TARDISAtomData:
             "lines_loggf_threshold": -3,
         },
         collisions_param={"temperatures": np.arange(2000, 50000, 2000)},
+        s92_photoionization=False,
+        s92_file_path=None,
     ):
         self.atomic_weights = atomic_weights
         self.lanl_ads_reader = lanl_ads_reader
@@ -63,6 +66,8 @@ class TARDISAtomData:
         self.barklem_2016_data = barklem_2016_data
         self.levels_lines_param = levels_lines_param
         self.collisions_param = collisions_param
+        self.s92_photoionization = s92_photoionization
+        self.s92_file_path = s92_file_path
 
         self.ionization_energies_preparer = IonizationEnergiesPreparer(self.cmfgen_reader, ionization_energies)
 
@@ -280,3 +285,90 @@ class TARDISAtomData:
 
             self.meta = meta_df
             f.put("/metadata", meta_df)
+
+    def _create_photoionization_data(
+        self,
+        photo_ionization_group,
+        n_xi_bins=2000,
+        xi_min=1.0,
+        xi_max=50.0,
+        n_energy_bins=2000,
+        energy_min=1.0,
+        energy_max=50.0,
+    ):
+        """Create photoionization data.
+
+        Parameters
+        ----------
+        photo_ionization_group : py:class:`h5py.Group`
+           HDF5 group in which the photoionization data will be stored
+        n_xi_bins : int
+            Number of photoionization bins
+        xi_min : float
+            Minimum bin value
+        xi_max : float
+            Maximum bin value
+        n_energy_bins : int
+            Number of energy bins for photoionization cross-sections
+        energy_min : float
+            Minimum energy in eV
+        energy_max : float
+            Maximum energy in eV
+        """
+        # Create energy bins array
+        energy_array = np.linspace(energy_min, energy_max, n_energy_bins)
+        
+        # Add Shull & Van Steenberg (1992) photoionization data if requested
+        if self.s92_photoionization:
+            logger.info("Preparing S92 photoionization data")
+            s92_reader = S92Reader(file_path=self.s92_file_path)
+            s92_dataset = s92_reader.dataset
+            
+            # Extract unique atomic numbers from the dataset
+            atomic_numbers = s92_dataset["atomic_number"].unique()
+            
+            for atomic_number in atomic_numbers:
+                # For each ion of this element in the S92 dataset
+                ion_data = s92_dataset[s92_dataset["atomic_number"] == atomic_number]
+                
+                for _, row in ion_data.iterrows():
+                    ion_charge = row["ion_charge"]
+                    
+                    # Calculate cross-sections for this ion at each energy bin
+                    cross_section = s92_reader.calculate_cross_section(
+                        energy_array, atomic_number, ion_charge
+                    )
+                    
+                    # Store the data in the HDF5 file
+                    photo_ionization_group.create_dataset(
+                        f"s92_ion_{atomic_number}_{ion_charge}",
+                        data=cross_section,
+                        dtype=np.float64
+                    )
+            
+            # Store the energy bin data
+            photo_ionization_group.create_dataset(
+                "s92_energy_bins", data=energy_array, dtype=np.float64
+            )
+            
+            logger.info("S92 photoionization data prepared")
+
+    def init_atom_data(
+        self,
+        chianti_version=None,
+        kurucz_version="cmfgen",
+        nist_version="cmfgen",
+        create_collision_data=False,
+        photoionization_data=False,
+        write_zeta_data=False,
+    ):
+        """
+        # ...existing code...
+        """
+        # ...existing code...
+        
+        if photoionization_data or self.s92_photoionization:
+            photo_ionization_group = self.atom_data.create_group("photoionization_data")
+            self._create_photoionization_data(photo_ionization_group)
+            
+        # ...existing code...
