@@ -3,7 +3,7 @@ import logging
 import numpy as np
 
 from carsus.io.lanlads.parsers import read_atomic_levels, read_atomic_lines, read_lanl_available_ions
-from carsus.util import parse_selected_atoms, parse_selected_species
+from carsus.util import parse_selected_elements, parse_selected_species
 from carsus.util.helpers import SYMBOL2ATOMIC_NUMBER, ATOMIC_NUMBER2SYMBOL
 
 logger = logging.getLogger(__name__)
