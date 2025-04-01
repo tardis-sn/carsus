@@ -1,7 +1,7 @@
 import pytest
 
 from carsus.util.selected import element, element_range, \
-    selected_atoms, parse_selected_atoms, species_entry, \
+    selected_atoms, parse_selected_elements, species_entry, \
     parse_selected_species
 
 
@@ -44,8 +44,8 @@ def test_selected_atoms(test_input, exp_atomic_numbers):
     ("h, be-b", [1, 4, 5]),
     (" h ,  be - b ", [1, 4, 5])
 ])
-def test_parse_selected_atoms(selected_atoms, expected_list):
-    assert parse_selected_atoms(selected_atoms) == expected_list
+def test_parse_selected_elements(selected_atoms, expected_list):
+    assert parse_selected_elements(selected_atoms) == expected_list
 
 
 @pytest.mark.parametrize("invalid_selected_atoms", [
