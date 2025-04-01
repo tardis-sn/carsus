@@ -11,7 +11,7 @@ from carsus.util.helpers import (
         convert_wavelength_vacuum2air,
         get_data_path, query_columns
         )
-from carsus.util.selected import parse_selected_atoms, parse_selected_species
+from carsus.util.selected import parse_selected_elements, parse_selected_species
 
 from carsus.util.hash import serialize_pandas_object, hash_pandas_object
 
