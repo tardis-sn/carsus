@@ -51,9 +51,9 @@ def test_parse_selected_atoms(selected_atoms, expected_list):
 @pytest.mark.parametrize("invalid_selected_atoms", [
     "Foo", "H-Foo", "H, Al-Foo"
 ])
-def test_parse_selected_atoms_raises_invalid(invalid_selected_atoms):
+def test_parse_selected_elements_raises_invalid(invalid_selected_atoms):
     with pytest.raises(ValueError):
-        parse_selected_atoms(invalid_selected_atoms)
+        parse_selected_elements(invalid_selected_atoms)
 
 
 @pytest.mark.parametrize("test_input, expected_list", [
