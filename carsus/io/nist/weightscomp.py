@@ -29,7 +29,7 @@ from carsus.io.nist.weightscomp_grammar import (
     isotope,
 )
 from carsus.io.util import retry_request, to_nom_val_and_std_dev
-from carsus.util import parse_selected_atoms
+from carsus.util import parse_selected_elements
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +181,7 @@ class NISTWeightsComp(BaseParser):
         self._get_version()
 
     def _prepare_data(self, atoms):
-        atomic_numbers = parse_selected_atoms(atoms)
+        atomic_numbers = parse_selected_elements(atoms)
 
         if atomic_numbers[-1] > 94:
             raise ValueError(
