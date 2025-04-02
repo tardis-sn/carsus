@@ -54,6 +54,8 @@ def read_atomic_lines(fname, atomic_number, ion_charge):
     # Set a multi-index using atomic_number, ion_charge, level_index_lower, and level_index_upper
     lines_df["level_index_lower"] = lines_df["level_index_lower"] - 1
     lines_df["level_index_upper"] = lines_df["level_index_upper"] - 1
+    #We also assume wavelengths are in nm here https://github.com/tardis-sn/carsus/blob/9e6f9d11e6ae8f7616b973aae12b025e9b9e45c5/carsus/io/output/levels_lines.py#L324
+    lines_df["wavelength"] = (lines_df["wavelength"].values * u.AA).to(u.nm).value
     return lines_df.set_index(
         ["atomic_number", "ion_charge", "level_index_lower", "level_index_upper"]
     )
