@@ -41,7 +41,7 @@ jobs:
         pip: [true, false]
         label: [osx-arm64, linux-64]
         include:
-          - label: osx-64
+          - label: osx-arm64
             os: macos-latest
           - label: linux-64
             os: ubuntu-latest
