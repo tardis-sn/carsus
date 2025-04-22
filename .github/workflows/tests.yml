@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         pip: [true, false]
-        label: [osx-64, linux-64]
+        label: [osx-arm64, linux-64]
         include:
           - label: osx-64
             os: macos-latest
@@ -84,7 +84,7 @@ jobs:
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
       - name: Download Lock File
-        run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-${{ matrix.label }}.lock
+        run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
         if: matrix.pip == true
       
       - name: Generate Cache Key
