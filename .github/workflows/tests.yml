@@ -7,10 +7,15 @@ name: tests
 on:
   push:
     branches:
-    - '*'
+      - master
   pull_request:
     branches:
-    - '*'
+      - master
+    types:
+      - opened
+      - reopened
+      - synchronize
+
   schedule:
     - cron: '0 0 * * 0' # run at midnight every Sunday
 
@@ -38,7 +43,6 @@ jobs:
     if: github.repository_owner == 'tardis-sn'
     strategy:
       matrix:
-        pip: [true, false]
         label: [osx-arm64, linux-64]
         include:
           - label: osx-arm64
@@ -85,8 +89,7 @@ jobs:
       
       - name: Download Lock File
         run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
-        if: matrix.pip == true
-      
+
       - name: Generate Cache Key
         run: | 
           file_hash=$(cat conda-${{ matrix.label}}.lock | shasum -a 256 | cut -d' ' -f1)
