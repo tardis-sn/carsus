@@ -112,7 +112,7 @@ jobs:
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-lock.yml
           init-shell: bash

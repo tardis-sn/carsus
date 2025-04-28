@@ -96,7 +96,7 @@ jobs:
           echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
         
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-${{ matrix.label }}.lock
           cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}

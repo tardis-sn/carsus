@@ -50,7 +50,7 @@ jobs:
             fi
           done
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-lock.yml
           init-shell: bash
