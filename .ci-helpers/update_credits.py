@@ -38,16 +38,16 @@ def generate_zenodo():
 
     except Exception as e:
         warnings.warn(
-            "Failed to retrieve Zenodo record for TARDIS: " f"{str(e)}"
+            "Failed to retrieve Zenodo record for CARSUS: " f"{str(e)}"
         )
 
         not_found_msg = """
-                        Couldn"t retrieve the TARDIS software citation from Zenodo. Get it 
+                        Couldn"t retrieve the CARSUS software citation from Zenodo. Get it 
                         directly from `this link <https://zenodo.org/record/{CONCEPT_DOI}>`_    .
                         """
 
         zenodo_record = (
-            ".. |ZENODO| replace:: <TARDIS SOFTWARE CITATION HERE> \n\n"
+            ".. |ZENODO| replace:: <CARSUS SOFTWARE CITATION HERE> \n\n"
             ".. warning:: \n\n" + textwrap.indent(not_found_msg, " " * 4)
         )
 

@@ -25,7 +25,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Lock File
-        run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-linux-64.lock
+        run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-linux-64.lock
           
       - name: Generate Cache Key
         run: | 
@@ -33,7 +33,7 @@ jobs:
             echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
               
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
             environment-file: conda-linux-64.lock
             cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
@@ -138,7 +138,6 @@ jobs:
           files: |
             conda-osx-arm64.lock
             conda-linux-64.lock
-            conda-osx-64.lock
             conda-lock.yml
           fail_on_unmatched_files: false
           draft: false
