@@ -12,7 +12,7 @@
     "\n",
     "**Note:**\n",
     "\n",
-    "Get familiar with the [Notation in Carsus](development/notation.rst) and learn how to correctly select ions.\n",
+    "Get familiar with the [Notation in Carsus](reference/notation.rst) and learn how to correctly select ions.\n",
     "    \n",
     "</div>"
    ]
@@ -249,7 +249,8 @@
     "                           zeta_data,\n",
     "                           chianti_reader,\n",
     "                           cmfgen_reader,\n",
-    "                           nndc_reader)"
+    "                           nndc_reader,\n",
+    "                           levels_lines_param={\"lines_loggf_threshold\": -3})  # Default cutoff is -3 (optional)"
    ]
   },
   {
@@ -265,6 +266,8 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
+    "A lower value of log(g f) includes weaker transitions, while a higher value filters out more lines.\n",
+    "\n",
     "You are done! Now you can use your file to run TARDIS simulations."
    ]
   },
