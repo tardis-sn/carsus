@@ -34,8 +34,16 @@ env:
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
 
 jobs:
+  test-cache:
+    uses: ./.github/workflows/lfs-cache.yml
+    with:
+      atom-data-sparse: false
+      regression-data-repo: tardis-sn/carsus-regression-data
+      allow_lfs_pull: ${{ github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'git-lfs-pull') }}
+
   build:
     if: github.repository_owner == 'tardis-sn'
+    needs: test-cache
     strategy:
       matrix:
         pip: [true, false]
@@ -96,7 +104,7 @@ jobs:
           echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
         
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-${{ matrix.label }}.lock
           cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
