@@ -12,9 +12,9 @@ from astropy.utils.data import download_file
 
 logger = logging.getLogger(__name__)
 
-class HDFWriterMixin(object):
+class HDFWriterMixin:
     def __new__(cls, *args, **kwargs):
-        instance = super(HDFWriterMixin, cls).__new__(cls)
+        instance = super().__new__(cls)
         instance.optional_hdf_properties = []
         instance.__init__(*args, **kwargs)
         return instance
@@ -90,14 +90,18 @@ class HDFWriterMixin(object):
                 if value.ndim == 1:
                     # This try,except block is only for model.plasma.levels
                     try:
-                        pd.Series(value).to_hdf(buf, os.path.join(path, key))
+                        pd.Series(value).to_hdf(
+                            buf, key=os.path.join(path, key)
+                        )
                     except NotImplementedError:
                         logger.debug(
                             "Could not convert SERIES to HDF. Converting DATAFRAME to HDF"
                         )
-                        pd.DataFrame(value).to_hdf(buf, os.path.join(path, key))
+                        pd.DataFrame(value).to_hdf(
+                            buf, key=os.path.join(path, key)
+                        )
                 else:
-                    pd.DataFrame(value).to_hdf(buf, os.path.join(path, key))
+                    pd.DataFrame(value).to_hdf(buf, key=os.path.join(path, key))
             else:  # value is a TARDIS object like model, transport or plasma
                 try:
                     value.to_hdf(buf, path, name=key, overwrite=overwrite)
@@ -106,10 +110,10 @@ class HDFWriterMixin(object):
                         "Could not convert VALUE to HDF. Converting DATA (Dataframe) to HDF"
                     )
                     data = pd.DataFrame([value])
-                    data.to_hdf(buf, os.path.join(path, key))
+                    data.to_hdf(buf, key=os.path.join(path, key))
 
         if scalars:
-            pd.Series(scalars).to_hdf(buf, os.path.join(path, "scalars"))
+            pd.Series(scalars).to_hdf(buf, key=os.path.join(path, "scalars"))
 
         if buf.is_open:
             buf.close()
@@ -156,89 +160,3 @@ class HDFWriterMixin(object):
         buff_path = os.path.join(path, name)
         self.to_hdf_util(file_path_or_buf, buff_path, data, overwrite)
 
-
-class PlasmaWriterMixin(HDFWriterMixin):
-    def get_properties(self):
-        data = {}
-        if self.collection:
-            properties = [
-                name
-                for name in self.plasma_properties
-                if isinstance(name, tuple(self.collection))
-            ]
-        else:
-            properties = self.plasma_properties
-        for prop in properties:
-            for output in prop.outputs:
-                data[output] = getattr(prop, output)
-        data["atom_data_uuid"] = self.atomic_data.uuid1
-        if "atomic_data" in data:
-            data.pop("atomic_data")
-        if "nlte_data" in data:
-            logger.warning("nlte_data can't be saved")
-            data.pop("nlte_data")
-        return data
-
-    def to_hdf(
-        self,
-        file_path_or_buf,
-        path="",
-        name=None,
-        collection=None,
-        overwrite=False,
-    ):
-        """
-        Parameters
-        ----------
-        file_path_or_buf : str or pandas.io.pytables.HDFStore
-            Path or buffer to the HDF file
-        path : str
-            Path inside the HDF file to store the `elements`
-        name : str
-            Group inside the HDF file to which the `elements` need to be saved
-        collection :
-            `None` or a `PlasmaPropertyCollection` of which members are
-            the property types which will be stored. If `None` then
-            all types of properties will be stored. This acts like a filter,
-            for example if a value of `property_collections.basic_inputs` is
-            given, only those input parameters will be stored to the HDF file.
-        overwrite : bool
-            If the HDF file path already exists, whether to overwrite it or not
-        """
-        self.collection = collection
-        super(PlasmaWriterMixin, self).to_hdf(
-            file_path_or_buf, path, name, overwrite
-        )
-
-
-@lru_cache(maxsize=None)
-def download_from_url(url, dst, checksum, src=None, retries=3):
-    """Download files from a given URL
-
-    Parameters
-    ----------
-    url : str
-        URL to download from
-    dst : str
-        Destination folder for the downloaded file
-    src : tuple
-        List of URLs to use as mirrors
-    """
-
-    cached_file_path = download_file(url, sources=src, pkgname="tardis")
-
-    with open(cached_file_path, "rb") as f:
-        new_checksum = hashlib.md5(f.read()).hexdigest()
-
-    if checksum == new_checksum:
-        shutil.copy(cached_file_path, dst)
-
-    elif checksum != new_checksum and retries > 0:
-        retries -= 1
-        logger.warning(
-            f"Incorrect checksum, retrying... ({retries+1} attempts remaining)"
-        )
-        download_from_url(url, dst, checksum, src, retries)
-
-    else:
-        logger.error("Maximum number of retries reached. Aborting")
