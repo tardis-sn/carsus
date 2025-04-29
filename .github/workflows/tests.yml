@@ -43,7 +43,9 @@ jobs:
 
   build:
     if: github.repository_owner == 'tardis-sn'
-    needs: test-cache
+    needs: [test-cache]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.label }}
     strategy:
       matrix:
         pip: [true, false]
@@ -54,8 +56,6 @@ jobs:
           - label: linux-64
             os: ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.label }}
     steps:
       - uses: actions/checkout@v4
 
