@@ -115,15 +115,8 @@ jobs:
       - name: Install package
         run: pip install -e .
 
-      - name: Run tests generate reference
-        run: pytest carsus ${{ env.PYTEST_FLAGS }} --generate-reference
-      
-      - name: tree regression data
-        run: tree .
-        working-directory: carsus-regression-data
-      
       - name: Run tests
-        run: pytest carsus ${{ env.PYTEST_FLAGS }}
+        run: pytest carsus ${{ env.PYTEST_FLAGS }} 
 
       - name: Upload to Codecov
         run: bash <(curl -s https://codecov.io/bash)
