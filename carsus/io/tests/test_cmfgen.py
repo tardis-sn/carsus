@@ -179,8 +179,8 @@ def test_reader_ionization_energies(si1_reader, regression_data):
 @pytest.mark.parametrize("fit_coeff_list", [[34.4452, 1.0, 2.0]])
 def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list, regression_data):
     phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.parametrize("hyd_gaunt_energy_grid_ryd", [{1: list(range(1, 4))}])
@@ -206,8 +206,8 @@ def test_get_hydrogenic_n_phixs_table(
         hyd_n_phixs_stop2start_energy_ratio,
         hyd_n_phixs_num_points,
     )
-    expected = regression_data.sync_dataframe(hydrogenic_n_phixs_table)
-    pd.testing.assert_frame_equal(hydrogenic_n_phixs_table, expected)
+    expected = regression_data.sync_ndarray(hydrogenic_n_phixs_table)
+    np.testing.assert_allclose(hydrogenic_n_phixs_table, expected)
 
 
 @pytest.mark.parametrize("hyd_phixs_energy_grid_ryd", [{(4, 1): np.linspace(1, 3, 5)}])
@@ -236,8 +236,8 @@ def test_get_hydrogenic_nl_phixs_table(
         l_end,
         nu_0,
     )
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
@@ -245,8 +245,8 @@ def test_get_hydrogenic_nl_phixs_table(
 @pytest.mark.parametrize("n_points", [50])
 def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points, regression_data):
     phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *vars, n_points)
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
@@ -254,8 +254,8 @@ def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points, regress
 @pytest.mark.parametrize("n_points", [50])
 def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points, regression_data):
     phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *vars, n_points)
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.parametrize("threshold_energy_ryd", [10])
@@ -278,8 +278,8 @@ def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points, regression
 @pytest.mark.parametrize("n_points", [50])
 def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points, regression_data):
     phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points)
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.skip(reason="Not implemented yet")
@@ -290,5 +290,5 @@ def test_get_leibowitz_phixs_table():
 @pytest.mark.parametrize("threshold_energy_ryd", [50])
 def test_get_null_phixs_table(threshold_energy_ryd, regression_data):
     phixs_table = get_null_phixs_table(threshold_energy_ryd)
-    expected = regression_data.sync_dataframe(phixs_table)
-    pd.testing.assert_frame_equal(phixs_table, expected)
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
