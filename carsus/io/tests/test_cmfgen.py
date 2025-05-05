@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import pytest
 import numpy as np
@@ -38,23 +37,23 @@ def cmfgen_refdata_fname(refdata_path, path):
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
     [
         ["energy_levels", "si2_osc_kurucz"],
     ],
 )
-def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
+def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENEnergyLevelsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of energy levels"])
     assert parser.base.shape[0] == n
-    return parser.base
+    
+    expected = regression_data.sync_dataframe(parser.base)
+    pd.testing.assert_frame_equal(parser.base, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
     [
@@ -63,16 +62,17 @@ def test_CMFGENEnergyLevelsParser(cmfgen_refdata_fname):
         ["oscillator_strengths", "vi_osc"],
     ],
 )
-def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
+def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of transitions"])
     assert parser.base.shape[0] == n
-    return parser.base
+    
+    expected = regression_data.sync_dataframe(parser.base)
+    pd.testing.assert_frame_equal(parser.base, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
     [
@@ -80,10 +80,12 @@ def test_CMFGENOscillatorStrengthsParser(cmfgen_refdata_fname):
         ["collisional_strengths", "col_ariii"],
     ],
 )
-def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
+def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname)
-    return parser.base
+    
+    expected = regression_data.sync_dataframe(parser.base)
+    pd.testing.assert_frame_equal(parser.base, expected)
 
 
 @pytest.mark.with_refdata
@@ -94,84 +96,93 @@ def test_CMFGENCollisionalStrengthsParser(cmfgen_refdata_fname):
         ["photoionization_cross_sections", "phot_data_gs"],
     ],
 )
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname):
+def test_CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENPhoCrossSectionsParser(cmfgen_refdata_fname)
     n = int(parser.header["Number of energy levels"])
     assert len(parser.base) == n
-    return parser.base[0]
+    
+    # Test the first item in the base collection
+    first_item = parser.base[0]
+    expected = regression_data.sync_dataframe(first_item)
+    pd.testing.assert_frame_equal(first_item, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
     [
         ["photoionization_cross_sections", "hyd_l_data.dat"],
     ],
 )
-def test_CMFGENHydLParser(cmfgen_refdata_fname):
+def test_CMFGENHydLParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENHydLParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
-    return parser.base
+    
+    expected = regression_data.sync_dataframe(parser.base)
+    pd.testing.assert_frame_equal(parser.base, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
 @pytest.mark.parametrize(
     "path",
     [
         ["photoionization_cross_sections", "gbf_n_data.dat"],
     ],
 )
-def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname):
+def test_CMFGENHydGauntBfParser(cmfgen_refdata_fname, regression_data):
     cmfgen_refdata_fname = str(cmfgen_refdata_fname)
     parser = CMFGENHydGauntBfParser(cmfgen_refdata_fname)
     assert parser.header["Maximum principal quantum number"] == "30"
-    return parser.base
+    
+    expected = regression_data.sync_dataframe(parser.base)
+    pd.testing.assert_frame_equal(parser.base, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_reader_lines(si1_reader):
-    return si1_reader.lines
+def test_reader_lines(si1_reader, regression_data):
+    lines = si1_reader.lines
+    expected = regression_data.sync_dataframe(lines)
+    pd.testing.assert_frame_equal(lines, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_reader_levels(si1_reader):
-    return si1_reader.levels
+def test_reader_levels(si1_reader, regression_data):
+    levels = si1_reader.levels
+    expected = regression_data.sync_dataframe(levels)
+    pd.testing.assert_frame_equal(levels, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_reader_collisions(si1_reader):
-    return si1_reader.collisions
+def test_reader_collisions(si1_reader, regression_data):
+    collisions = si1_reader.collisions
+    expected = regression_data.sync_dataframe(collisions)
+    pd.testing.assert_frame_equal(collisions, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_reader_cross_sections_squeeze(si1_reader):
-    return si1_reader.cross_sections
+def test_reader_cross_sections_squeeze(si1_reader, regression_data):
+    cross_sections = si1_reader.cross_sections
+    expected = regression_data.sync_dataframe(cross_sections)
+    pd.testing.assert_frame_equal(cross_sections, expected)
 
 
 @pytest.mark.with_refdata
-@pytest.mark.array_compare(file_format="pd_hdf")
-def test_reader_ionization_energies(si1_reader):
-    return si1_reader.ionization_energies.to_frame()
+def test_reader_ionization_energies(si1_reader, regression_data):
+    ionization_energies = si1_reader.ionization_energies.to_frame()
+    expected = regression_data.sync_dataframe(ionization_energies)
+    pd.testing.assert_frame_equal(ionization_energies, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [0.053130732819562695])
 @pytest.mark.parametrize("fit_coeff_list", [[34.4452, 1.0, 2.0]])
-def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list):
+def test_get_seaton_phixs_table(threshold_energy_ryd, fit_coeff_list, regression_data):
     phixs_table = get_seaton_phixs_table(threshold_energy_ryd, *fit_coeff_list)
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("hyd_gaunt_energy_grid_ryd", [{1: list(range(1, 4))}])
 @pytest.mark.parametrize("hyd_gaunt_factor", [{1: list(range(3, 6))}])
 @pytest.mark.parametrize("threshold_energy_ryd", [0.5])
@@ -185,6 +196,7 @@ def test_get_hydrogenic_n_phixs_table(
     n,
     hyd_n_phixs_stop2start_energy_ratio,
     hyd_n_phixs_num_points,
+    regression_data
 ):
     hydrogenic_n_phixs_table = get_hydrogenic_n_phixs_table(
         hyd_gaunt_energy_grid_ryd,
@@ -194,10 +206,10 @@ def test_get_hydrogenic_n_phixs_table(
         hyd_n_phixs_stop2start_energy_ratio,
         hyd_n_phixs_num_points,
     )
-    return hydrogenic_n_phixs_table
+    expected = regression_data.sync_ndarray(hydrogenic_n_phixs_table)
+    np.testing.assert_allclose(hydrogenic_n_phixs_table, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("hyd_phixs_energy_grid_ryd", [{(4, 1): np.linspace(1, 3, 5)}])
 @pytest.mark.parametrize("hyd_phixs", [{(4, 1): np.linspace(1, 3, 5)}])
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
@@ -206,7 +218,14 @@ def test_get_hydrogenic_n_phixs_table(
 @pytest.mark.parametrize("l_end", [1])
 @pytest.mark.parametrize("nu_0", [0.2])
 def test_get_hydrogenic_nl_phixs_table(
-    hyd_phixs_energy_grid_ryd, hyd_phixs, threshold_energy_ryd, n, l_start, l_end, nu_0
+    hyd_phixs_energy_grid_ryd, 
+    hyd_phixs, 
+    threshold_energy_ryd, 
+    n, 
+    l_start, 
+    l_end, 
+    nu_0,
+    regression_data
 ):
     phixs_table = get_hydrogenic_nl_phixs_table(
         hyd_phixs_energy_grid_ryd,
@@ -217,28 +236,28 @@ def test_get_hydrogenic_nl_phixs_table(
         l_end,
         nu_0,
     )
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
 @pytest.mark.parametrize("vars", [[3, 4, 5, 6, 7]])
 @pytest.mark.parametrize("n_points", [50])
-def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points):
+def test_get_opproject_phixs_table(threshold_energy_ryd, vars, n_points, regression_data):
     phixs_table = get_opproject_phixs_table(threshold_energy_ryd, *vars, n_points)
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [2])
 @pytest.mark.parametrize("vars", [[2, 3, 4, 5, 6, 7, 8, 9]])
 @pytest.mark.parametrize("n_points", [50])
-def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points):
+def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points, regression_data):
     phixs_table = get_hummer_phixs_table(threshold_energy_ryd, *vars, n_points)
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [10])
 @pytest.mark.parametrize(
     "fit_coeff_table",
@@ -257,9 +276,10 @@ def test_get_hummer_phixs_table(threshold_energy_ryd, vars, n_points):
     ],
 )
 @pytest.mark.parametrize("n_points", [50])
-def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points):
+def test_get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points, regression_data):
     phixs_table = get_vy95_phixs_table(threshold_energy_ryd, fit_coeff_table, n_points)
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
 
 
 @pytest.mark.skip(reason="Not implemented yet")
@@ -267,8 +287,8 @@ def test_get_leibowitz_phixs_table():
     pass
 
 
-@pytest.mark.array_compare
 @pytest.mark.parametrize("threshold_energy_ryd", [50])
-def test_get_null_phixs_table(threshold_energy_ryd):
+def test_get_null_phixs_table(threshold_energy_ryd, regression_data):
     phixs_table = get_null_phixs_table(threshold_energy_ryd)
-    return phixs_table
+    expected = regression_data.sync_ndarray(phixs_table)
+    np.testing.assert_allclose(phixs_table, expected)
