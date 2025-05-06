@@ -99,7 +99,7 @@ def test_prepare_ground_levels(ground_levels, expected_series_ground_levels):
     assert_series_equal(series, expected_series_ground_levels)
 
 
-@pytest.mark.remote_data
+
 
 def test_ground_levels_missing_j():
     ionization_energies = NISTIonizationEnergies(spectra="Nd")
