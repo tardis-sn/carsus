@@ -44,6 +44,7 @@ class TARDISAtomData:
         cmfgen_reader=None,
         nndc_reader=None,
         vald_reader=None,
+        lanl_ads_reader=None,
         barklem_2016_data=None,
         levels_lines_param={
             "levels_metastable_loggf_threshold": -3,
@@ -51,7 +52,7 @@ class TARDISAtomData:
         },
     ):
         self.atomic_weights = atomic_weights
-    
+        self.lanl_ads_reader = lanl_ads_reader
         self.gfall_reader = gfall_reader
         self.zeta_data = zeta_data
         self.chianti_reader = chianti_reader
@@ -63,7 +64,7 @@ class TARDISAtomData:
 
         self.ionization_energies_preparer = IonizationEnergiesPreparer(self.cmfgen_reader, ionization_energies)
 
-        self.levels_lines_preparer = LevelsLinesPreparer(self.ionization_energies, self.gfall_reader, self.chianti_reader, self.cmfgen_reader)
+        self.levels_lines_preparer = LevelsLinesPreparer(self.ionization_energies, self.gfall_reader, self.chianti_reader, self.cmfgen_reader, self.lanl_ads_reader)
         self.levels_all = self.levels_lines_preparer.all_levels_data
         self.lines_all = self.levels_lines_preparer.all_lines_data
         self.levels_lines_preparer.create_levels_lines(**self.levels_lines_param)
@@ -262,7 +263,7 @@ class TARDISAtomData:
 
             uuid1 = uuid.uuid1().hex
 
-            logger.info(f"Signing TARDISAtomData.")
+            logger.info("Signing TARDISAtomData.")
             logger.info(f"Format Version: {FORMAT_VERSION}")
             logger.info(f"MD5: {total_checksum.hexdigest()}")
             logger.info(f"UUID1: {uuid1}")

@@ -133,7 +133,7 @@ def test_vald_short_stellar_linelist_molecules(
     v_mic,
     ion_charge,
 ):
-    assert len(vald_linelist_molecules_short_form_stellar) == 94
+    assert len(vald_linelist_molecules_short_form_stellar) == 95
     row = vald_linelist_molecules_short_form_stellar.iloc[index]
     assert_almost_equal(row["wavelength"], wavelength)
     assert_allclose(

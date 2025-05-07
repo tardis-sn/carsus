@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from pyparsing import ParseResults
 from carsus.util import convert_atomic_number2symbol
-import requests
 from requests.adapters import HTTPAdapter, Retry
 
 def to_flat_dict(tokens, parent_key='', sep='_'):
@@ -62,7 +61,7 @@ def convert_species_tuple2chianti_str(species):
 
     Parameters
     -----------
-    species: tuple (atomic_number, ion_number)
+    species: tuple (atomic_number, ion_charge)
 
     Returns
     --------
@@ -78,8 +77,8 @@ def convert_species_tuple2chianti_str(species):
     'si_2'
 
     """
-    atomic_number, ion_number = species
-    chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_number + 1)
+    atomic_number, ion_charge = species
+    chianti_ion_name = convert_atomic_number2symbol(atomic_number).lower() + '_' + str(ion_charge + 1)
     return chianti_ion_name
 
 
@@ -149,7 +148,7 @@ def retry_request(
 
 def get_lvl_index2id(df, levels_all):
     """
-    Matches level indexes with level IDs for a given DataFrame.
+    Matches `level_index` with level IDs for a given DataFrame.
 
     """
     # TODO: re-write this method without a for loop

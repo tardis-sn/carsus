@@ -7,16 +7,17 @@ name: tests
 on:
   push:
     branches:
-    - '*'
+      - master
   pull_request:
     branches:
-    - '*'
+      - master
+    types:
+      - opened
+      - reopened
+      - synchronize
+
   schedule:
     - cron: '0 0 * * 0' # run at midnight every Sunday
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
 
 defaults:
   run:
@@ -27,29 +28,39 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   PYTEST_FLAGS: --remote-data --refdata=carsus-refdata
-                --cov=carsus --cov-report=xml --cov-report=html   
+                --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
 
 jobs:
+  test-cache:
+    uses: ./.github/workflows/lfs-cache.yml
+    with:
+      atom-data-sparse: false
+      regression-data-repo: tardis-sn/carsus-regression-data
+      allow_lfs_pull: ${{ github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'git-lfs-pull') }}
+
   build:
     if: github.repository_owner == 'tardis-sn'
+    needs: [test-cache]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.label }}
     strategy:
       matrix:
-        pip: [true, false]
-        label: [osx-64, linux-64]
+        label: [osx-arm64, linux-64]
         include:
-          - label: osx-64
+          - label: osx-arm64
             os: macos-latest
           - label: linux-64
             os: ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.label }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup LFS
+        uses: ./.github/actions/setup_lfs
 
       - name: Clone tardis-sn/carsus-refdata
         uses: actions/checkout@v4
@@ -84,16 +95,15 @@ jobs:
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
       - name: Download Lock File
-        run:  wget -q https://raw.githubusercontent.com/tardis-sn/tardis/master/conda-${{ matrix.label }}.lock
-        if: matrix.pip == true
-      
+        run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
+
       - name: Generate Cache Key
         run: | 
           file_hash=$(cat conda-${{ matrix.label}}.lock | shasum -a 256 | cut -d' ' -f1)
           echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
         
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-${{ matrix.label }}.lock
           cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}

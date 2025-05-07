@@ -1,9 +1,9 @@
 import re
 import logging
 import pandas as pd
-import numpy as np
 from io import StringIO
 from carsus.io.util import read_from_buffer
+
 from carsus.util.helpers import (
     convert_wavelength_air2vacuum,
     ATOMIC_SYMBOLS_DATA,
@@ -166,7 +166,9 @@ class VALDReader(object):
         # Elm Ion       WL_air(A)  log gf* E_low(eV) J lo  E_up(eV) J up   lower   upper    mean   Rad.  Stark    Waals
         # 'TiO 1',     4100.00020, -11.472,  0.2011, 31.0,  3.2242, 32.0, 99.000, 99.000, 99.000, 6.962, 0.000, 0.000,
 
-        DATA_RE_PATTERN = re.compile("'[a-zA-Z]+ \d+',[\s*-?\d+[\.\d+]+,]*")
+        DATA_RE_PATTERN = re.compile(
+            r"'[a-zA-Z]+\d* \d+',[\s*-?\d+[\.\d+]+,]*"
+        )  # This matches to the Elm Ion field of the format above (e.g., TiO 1 or C 2)
 
         buffer, checksum = read_from_buffer(self.fname)
         content = buffer.read().decode()

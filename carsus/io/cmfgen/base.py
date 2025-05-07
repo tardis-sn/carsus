@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import roman
 import yaml
-from scipy import interpolate
 
 from carsus import __path__ as CARSUS_PATH
 from carsus.io.base import BaseParser
@@ -31,6 +30,7 @@ class CMFGENEnergyLevelsParser(BaseParser):
     """
 
     def load(self, fname):
+        fname=str(fname)
         header = parse_header(fname)
         skiprows, _ = find_row(fname, "Number of transitions")
         nrows = int(header["Number of energy levels"])
@@ -103,6 +103,7 @@ class CMFGENOscillatorStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
+        fname = str(fname)
         header = parse_header(fname)
         skiprows, _ = find_row(fname, "Transition", "Lam")
         skiprows += 1
@@ -176,6 +177,7 @@ class CMFGENCollisionalStrengthsParser(BaseParser):
     """
 
     def load(self, fname):
+        fname = str(fname)
         header = parse_header(fname)
         skiprows, _ = find_row(fname, r"ransition\T")
         config = {
@@ -297,6 +299,7 @@ class CMFGENPhoCrossSectionsParser(BaseParser):
     def load(self, fname):
 
         data = []
+        fname = str(fname)
         header = parse_header(fname)
         with open_cmfgen_file(fname) as f:
             while True:
@@ -351,6 +354,7 @@ class CMFGENHydLParser(BaseParser):
     nu_ratio_key = "L_DEL_U"
 
     def load(self, fname):
+        fname = str(fname)
         header = parse_header(fname)
         self.header = header
         self.max_l = self.get_max_l()
@@ -453,6 +457,7 @@ class CMFGENHydGauntBfParser(CMFGENHydLParser):
         return n, l, num_entries
 
     def load(self, fname):
+        fname = str(fname)
         super().load(fname)
         self.base.index = self.base.index.droplevel("l")
 
@@ -813,7 +818,7 @@ class CMFGENReader:
 
                     except NotImplementedError:
                         logger.warning(
-                            f"Leibowitz's cross-section type 4 not implemented yet."
+                            "Leibowitz's cross-section type 4 not implemented yet."
                         )
                         phixs_table = get_null_phixs_table(threshold_energy_ryd)
 

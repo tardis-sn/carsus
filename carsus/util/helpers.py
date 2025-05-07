@@ -1,4 +1,5 @@
-import os
+
+from pathlib import Path
 import re
 import carsus
 import numpy as np
@@ -7,9 +8,7 @@ from collections import OrderedDict
 
 
 def get_data_path(fname):
-    return os.path.join(
-        os.path.dirname(carsus.__file__), 'data', fname
-    )
+    return Path(carsus.__file__).parent / 'data' / fname
 
 ATOMIC_SYMBOLS_DATA = np.genfromtxt(get_data_path('basic_atomic_data.csv'), skip_header=1,
                                     delimiter=',', usecols=(0, 1), names=['atomic_number', 'symbol'], encoding='utf-8', dtype=None)
