@@ -34,6 +34,13 @@ sources and output them to file formats readable by radiative transfer codes.
 License
 *******
 
+.. image:: https://img.shields.io/conda/l/conda-forge/tardis-sn
+    :target: https://github.com/tardis-sn/tardis/blob/master/licenses/LICENSE.rst
+
+.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
+    :target: http://www.astropy.org
+|
+
 This project is Copyright (c) TARDIS Collaboration and licensed under
 the terms of the BSD 3-Clause license. This package is based upon
 the `Astropy package template <https://github.com/astropy/package-template>`_
