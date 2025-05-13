@@ -1,0 +1,56 @@
+name: "Setup LFS"
+description: "Sets up Git LFS, retrieves LFS cache and fails if cache is not available"
+
+
+inputs:
+  regression-data-repo:
+    description: "Repository containing regression data (format: owner/repo)"
+    required: false
+    default: "tardis-sn/carsus-regression-data"
+  atom-data-sparse:
+    description: "If true, only downloads atom_data/kurucz_cd23_chianti_H_He.h5 instead of full regression data"
+    required: false
+    default: 'false'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clone tardis-sn/carsus-regression-data
+      uses: actions/checkout@v4
+      with:
+        repository: tardis-sn/carsus-regression-data
+        path: carsus-regression-data
+        sparse-checkout: ${{ inputs.atom-data-sparse == 'true' && 'atom_data/kurucz_cd23_chianti_H_He.h5' || '' }}
+        lfs: false
+
+    - name: Create LFS file list
+      run: |
+        if [ "${{ inputs.atom-data-sparse }}" == "true" ]; then
+          echo "Using atom data sparse checkout"
+          echo "atom_data/kurucz_cd23_chianti_H_He.h5" > .lfs-files-list
+        else
+          echo "Using full repository checkout"
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-files-list
+        fi
+      working-directory: carsus-regression-data
+      shell: bash
+    
+    - name: Restore LFS cache
+      uses: actions/cache/restore@v4
+      id: lfs-cache-regression-data
+      with:
+        path: carsus-regression-data/.git/lfs
+        key: carsus-regression-${{ inputs.atom-data-sparse == 'true' && 'atom-data-sparse' || 'full-data' }}-${{ hashFiles('carsus-regression-data/.lfs-files-list') }}-${{ inputs.regression-data-repo }}-v1
+        fail-on-cache-miss: true
+
+    - name: Git LFS Checkout (Full)
+      if: inputs.atom-data-sparse != 'true' && steps.lfs-cache-regression-data.outputs.cache-hit == 'true'
+      run: git lfs checkout
+      working-directory: carsus-regression-data
+      shell: bash
+
+    - name: Git LFS Checkout (Sparse)
+      if: inputs.atom-data-sparse == 'true' && steps.lfs-cache-regression-data.outputs.cache-hit == 'true'
+      run: git lfs checkout atom_data/kurucz_cd23_chianti_H_He.h5
+      working-directory: carsus-regression-data
+      shell: bash

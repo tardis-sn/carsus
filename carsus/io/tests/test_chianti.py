@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 
 from carsus.io.chianti_ import ChiantiIonReader, ChiantiReader
 
@@ -8,28 +9,30 @@ class TestChiantiIonReader:
     def ch_ion_reader(self, request):
         return ChiantiIonReader(request.param)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_bound_levels(self, ch_ion_reader):
+    def test_chianti_bound_levels(self, ch_ion_reader, regression_data):
         bound_levels = ch_ion_reader.bound_levels
-        return bound_levels
+        expected = regression_data.sync_dataframe(bound_levels)
+        pd.testing.assert_frame_equal(bound_levels, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_bound_lines(self, ch_ion_reader):
+    def test_chianti_bound_lines(self, ch_ion_reader, regression_data):
         bound_lines = ch_ion_reader.bound_lines
-        return bound_lines
+        expected = regression_data.sync_dataframe(bound_lines)
+        pd.testing.assert_frame_equal(bound_lines, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_levels(self, ch_ion_reader):
-        return ch_ion_reader.levels
+    def test_chianti_reader_read_levels(self, ch_ion_reader, regression_data):
+        levels = ch_ion_reader.levels
+        expected = regression_data.sync_dataframe(levels)
+        pd.testing.assert_frame_equal(levels, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_lines(self, ch_ion_reader):
-        return ch_ion_reader.lines
+    def test_chianti_reader_read_lines(self, ch_ion_reader, regression_data):
+        lines = ch_ion_reader.lines
+        expected = regression_data.sync_dataframe(lines)
+        pd.testing.assert_frame_equal(lines, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_chianti_reader_read_collisions(self, ch_ion_reader):
-        return ch_ion_reader.collisions
-
+    def test_chianti_reader_read_collisions(self, ch_ion_reader, regression_data):
+        collisions = ch_ion_reader.collisions
+        expected = regression_data.sync_dataframe(collisions)
+        pd.testing.assert_frame_equal(collisions, expected)
 
 
 class TestChiantiReader:
@@ -37,14 +40,17 @@ class TestChiantiReader:
     def ch_reader(self, request):
         return ChiantiReader(ions=request.param, collisions=True, priority=20)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_levels(self, ch_reader):
-        return ch_reader.levels
+    def test_levels(self, ch_reader, regression_data):
+        levels = ch_reader.levels
+        expected = regression_data.sync_dataframe(levels)
+        pd.testing.assert_frame_equal(levels, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_lines(self, ch_reader):
-        return ch_reader.lines
+    def test_lines(self, ch_reader, regression_data):
+        lines = ch_reader.lines
+        expected = regression_data.sync_dataframe(lines)
+        pd.testing.assert_frame_equal(lines, expected)
 
-    @pytest.mark.array_compare(file_format="pd_hdf")
-    def test_cols(self, ch_reader):
-        return ch_reader.collisions
+    def test_cols(self, ch_reader, regression_data):
+        collisions = ch_reader.collisions
+        expected = regression_data.sync_dataframe(collisions)
+        pd.testing.assert_frame_equal(collisions, expected)

@@ -87,7 +87,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ env.CHIANTI_DB_VER }}
@@ -100,7 +100,7 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }} --warning=none
         if: steps.chianti-cache.outputs.cache-hit != 'true'
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
@@ -112,7 +112,7 @@ jobs:
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: conda-lock.yml
           init-shell: bash
@@ -187,7 +187,7 @@ jobs:
         if: always() && github.event_name == 'pull_request_target'
 
       - name: Post comment (success)
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
@@ -206,7 +206,7 @@ jobs:
         if: success() && github.event_name == 'pull_request_target'
 
       - name: Post comment (failure)
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v2
         with:
           token:  ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.number }}
