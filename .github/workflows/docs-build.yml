@@ -29,7 +29,7 @@ concurrency:
 env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
-  CHIANTI_DB_VER: CHIANTI_v10.0_database.tar.gz
+  CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
   CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
   CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
   DEPLOY_BRANCH: gh-pages               # deployed docs branch
