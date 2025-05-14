@@ -26,7 +26,7 @@ defaults:
 env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
-  CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
   PYTEST_FLAGS: --remote-data --refdata=carsus-refdata
                 --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html

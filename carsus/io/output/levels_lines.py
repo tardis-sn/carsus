@@ -335,7 +335,7 @@ class LevelsLinesPreparer:
         )
 
         lines = lines[
-            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "ds_id"]
+            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "A_ul", "ds_id"]
         ]
 
         return lines
@@ -455,7 +455,7 @@ class LevelsLinesPreparer:
             pd.DataFrame(index=levels.index), on="lower_level_id", how="inner"
         ).join(pd.DataFrame(index=levels.index), on="upper_level_id", how="inner")
 
-        # Culling lines with low gf values
+        # Culling lines with low gf values if needed
         lines = lines.loc[lines["loggf"] > lines_loggf_threshold]
 
         # Do not clean levels that don't exist in lines

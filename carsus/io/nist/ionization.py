@@ -221,7 +221,8 @@ class NISTIonizationEnergiesParser(BaseParser):
         def parse_ground_level(row):
             ground_level = row["ground_level"]
             lvl = pd.Series(
-                index=["term", "spin_multiplicity", "L", "parity", "J"], dtype="float64"
+                index=["term", "spin_multiplicity", "L", "parity", "J"],
+                dtype=object if "term" else "float64"
             )
 
             try:
