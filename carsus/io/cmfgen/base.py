@@ -954,7 +954,7 @@ class CMFGENReader:
         levels = levels[["energy", "j", "label", "method", "priority"]]
 
         lines = pd.concat(lns_list)
-        lines = lines.rename(columns={"Lam(A)": "wavelength"})
+        lines = lines.rename(columns={"Lam(A)": "wavelength", "A": "A_ul"})
         lines["wavelength"] = u.Quantity(lines["wavelength"], "AA").to("nm").value
         lines["level_index_lower"] = lines["i"] - 1
         lines["level_index_upper"] = lines["j"] - 1
@@ -963,7 +963,7 @@ class CMFGENReader:
             ["atomic_number", "ion_charge", "level_index_lower", "level_index_upper"]
         )
         lines = lines[
-            ["energy_lower", "energy_upper", "gf", "j_lower", "j_upper", "wavelength"]
+            ["energy_lower", "energy_upper", "gf", "j_lower", "j_upper", "wavelength", "A_ul"]
         ]
 
         if "ionization_energy" in reader.keys():
