@@ -94,8 +94,8 @@ jobs:
             tar -zxf /tmp/atomic.tar.gz -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
-      - name: Download Lock File
-        run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
+      # - name: Download Lock File
+      #   run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
 
       - name: Generate Cache Key
         run: | 
