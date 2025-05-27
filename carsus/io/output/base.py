@@ -188,7 +188,7 @@ class TARDISAtomData:
             "/macro_atom_references": self.macro_atom_references_prepared}
         
         optional_outputs = {
-            "/nuclear_decay_rad": (self.nndc_reader, "decay_data"),
+            "/decay_radiation_data": (self.nndc_reader, "decay_data"),
             "/linelist_atoms": (self.vald_reader, "linelist_atoms"),
             "/linelist_molecules": (self.vald_reader, "linelist_molecules"),
             "/molecules/equilibrium_constants": (self.barklem_2016_data, "equilibrium_constants"),
