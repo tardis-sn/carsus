@@ -77,7 +77,7 @@ selected_species = delimitedList(species_entry, delim=';')
 selected_species.setParseAction(lambda x: sorted(set(x)))
 
 
-def parse_selected_atoms(atoms):
+def parse_selected_elements(atoms):
     """
     Parse the sting specifying selected atoms to the list of atomic numbers.
 
@@ -96,13 +96,13 @@ def parse_selected_atoms(atoms):
     Examples
     --------
 
-    >>> parse_selected_atoms("H")
+    >>> parse_selected_elements("H")
     [1]
 
-    >>> parse_selected_atoms("H, Li-N")
+    >>> parse_selected_elements("H, Li-N")
     [1, 3, 4, 5, 6, 7]
 
-    >>> parse_selected_atoms("H, Li-N, Si, S")
+    >>> parse_selected_elements("H, Li-N, Si, S")
     [1, 3, 4, 5, 6, 7, 14, 16]
 
     """
