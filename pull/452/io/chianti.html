@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CHIANTI &mdash; carsus v2024.12.24.dev16+ge830c75</title>
+  <title>CHIANTI &mdash; carsus v2024.12.24.dev43+g089048e</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=19613f38"></script>
+        <script src="../_static/documentation_options.js?v=baeec79b"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
             carsus
           </a>
               <div class="version">
-                2024.12.24.dev16+ge830c75
+                2024.12.24.dev43+g089048e
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -153,10 +153,6 @@
  (<span class="ansi-bold">warnings.py</span>:112)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:1: SyntaxWarning: invalid escape sequence &#39;\m&#39;
   &#39;&#39;&#39;
- (<span class="ansi-bold">warnings.py</span>:112)
-[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/data.py:72: UserWarning: klgfb files are not present:
-  it will not be possible to use the freeBound continuum method
-  warnings.warn(&#39;klgfb files are not present: \n  it will not be possible to use the freeBound continuum method&#39;)
  (<span class="ansi-bold">warnings.py</span>:112)
 [<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/ChiantiPy/tools/filters.py:75: SyntaxWarning: invalid escape sequence &#39;\p&#39;
   &#34;&#34;&#34;
@@ -798,12 +794,14 @@
       <th>j_lower</th>
       <th>wavelength</th>
       <th>gf</th>
+      <th>A_ul</th>
     </tr>
     <tr>
       <th>atomic_number</th>
       <th>ion_charge</th>
       <th>level_index_lower</th>
       <th>level_index_upper</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -824,6 +822,7 @@
       <td>None</td>
       <td>121.5673</td>
       <td>0.0000</td>
+      <td>2.496000e-06</td>
     </tr>
     <tr>
       <th>2</th>
@@ -833,6 +832,7 @@
       <td>None</td>
       <td>121.5674</td>
       <td>0.2780</td>
+      <td>6.260000e+08</td>
     </tr>
     <tr>
       <th>3</th>
@@ -842,6 +842,7 @@
       <td>None</td>
       <td>121.5668</td>
       <td>0.5550</td>
+      <td>6.260000e+08</td>
     </tr>
     <tr>
       <th>5</th>
@@ -851,6 +852,7 @@
       <td>None</td>
       <td>102.5723</td>
       <td>0.0527</td>
+      <td>1.670000e+08</td>
     </tr>
     <tr>
       <th>6</th>
@@ -860,12 +862,14 @@
       <td>None</td>
       <td>102.5722</td>
       <td>0.1050</td>
+      <td>1.670000e+08</td>
     </tr>
     <tr>
       <th>...</th>
       <th>...</th>
       <th>...</th>
       <th>...</th>
+      <td>...</td>
       <td>...</td>
       <td>...</td>
       <td>...</td>
@@ -884,6 +888,7 @@
       <td>None</td>
       <td>1012.6626</td>
       <td>0.1669</td>
+      <td>2.715000e+06</td>
     </tr>
     <tr>
       <th>21</th>
@@ -893,6 +898,7 @@
       <td>None</td>
       <td>1012.6499</td>
       <td>0.2544</td>
+      <td>2.758000e+06</td>
     </tr>
     <tr>
       <th>22</th>
@@ -902,6 +908,7 @@
       <td>None</td>
       <td>1012.6436</td>
       <td>5.0880</td>
+      <td>4.137000e+07</td>
     </tr>
     <tr>
       <th>14</th>
@@ -912,6 +919,7 @@
       <td>None</td>
       <td>1012.6436</td>
       <td>8.0760</td>
+      <td>6.567000e+07</td>
     </tr>
     <tr>
       <th>15</th>
@@ -922,10 +930,11 @@
       <td>None</td>
       <td>1012.6523</td>
       <td>10.4700</td>
+      <td>6.810000e+07</td>
     </tr>
   </tbody>
 </table>
-<p>320 rows × 6 columns</p>
+<p>320 rows × 7 columns</p>
 </div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1111,7 +1120,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2025, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 06 May 2025.
+      <span class="lastupdated">Last updated on 02 Jun 2025.
       </span></p>
   </div>
 
