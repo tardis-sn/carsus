@@ -17,9 +17,6 @@ Optional Flags
 
 A set of flags can be appended to the above command to run different kinds of tests:
 
-- `--remote-data`
-    Run tests marked with the ``@pytest.mark.remote_data`` decorator. Requires an internet connection.
-
 - `--refdata=/path/to/carsus-refdata`
     Run tests marked with the ``@with_refdata`` decorator. Requires the
     `tardis-sn/carsus-refdata <https://github.com/tardis-sn/carsus-refdata>`_ repository.
