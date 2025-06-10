@@ -63,9 +63,9 @@ class MacroAtomPreparer():
 
             transition_probabilities_dict = dict()
 
-            transition_probabilities_dict[P_EMISSION_DOWN] = (
-                2 * nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
-            )
+            # transition_probabilities_dict[P_EMISSION_DOWN] = (
+            #     2 * nu**2 * f_ul / const.c.cgs.value**2 * (e_upper - e_lower)
+            # )
 
             transition_probabilities_dict[P_INTERNAL_DOWN] = (
                 2 * nu**2 * f_ul / const.c.cgs.value**2 * e_lower
