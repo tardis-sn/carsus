@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIST &mdash; carsus v2024.12.24.dev44+g9191b1d</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=429b18a6"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="GFALL" href="gfall.html" />
+    <link rel="prev" title="Notation in Carsus" href="../reference/notation.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+              <div class="version">
+                2024.12.24.dev44+g9191b1d
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NIST</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Atomic-Weights">Atomic Weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Ionization-Energies-and-Ground-Levels">Ionization Energies and Ground Levels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">NIST</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/nist.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="NIST">
+<h1>NIST<a class="headerlink" href="#NIST" title="Link to this heading"></a></h1>
+<p>The National Institute of Standards and Technology (NIST) supplies Carsus with atomic weights, ionization energies and ground levels configurations.</p>
+<section id="Atomic-Weights">
+<h2>Atomic Weights<a class="headerlink" href="#Atomic-Weights" title="Link to this heading"></a></h2>
+<p>Provided by the NIST Atomic Weights and Isotopic Compositions Database.</p>
+<div class="admonition warning">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Warning:</strong></p>
+<p>Carsus does not support unstable atoms with atomic numbers greater than 94</p>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.nist</span> <span class="kn">import</span> <span class="n">NISTWeightsComp</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ ChiantiPy version 0.15.0
+ found PyQt5 widgets
+ using PyQt5 widgets
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_weights</span> <span class="o">=</span> <span class="n">NISTWeightsComp</span><span class="p">(</span><span class="s1">&#39;H-O&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:69)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/urllib3/connectionpool.py:1099: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_weights</span><span class="o">.</span><span class="n">base</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>symbol</th>
+      <th>name</th>
+      <th>mass</th>
+    </tr>
+    <tr>
+      <th>atomic_number</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>H</td>
+      <td>Hydrogen</td>
+      <td>1.007975</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>He</td>
+      <td>Helium</td>
+      <td>4.002602</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Li</td>
+      <td>Lithium</td>
+      <td>6.967500</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Be</td>
+      <td>Beryllium</td>
+      <td>9.012183</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>B</td>
+      <td>Boron</td>
+      <td>10.813500</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>C</td>
+      <td>Carbon</td>
+      <td>12.010600</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>N</td>
+      <td>Nitrogen</td>
+      <td>14.006855</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>O</td>
+      <td>Oxygen</td>
+      <td>15.999400</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Ionization-Energies-and-Ground-Levels">
+<h2>Ionization Energies and Ground Levels<a class="headerlink" href="#Ionization-Energies-and-Ground-Levels" title="Link to this heading"></a></h2>
+<p>Provided by the NIST Atomic Spectra Database.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">carsus.io.nist</span> <span class="kn">import</span> <span class="n">NISTIonizationEnergies</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_ioniz</span> <span class="o">=</span> <span class="n">NISTIonizationEnergies</span><span class="p">(</span><span class="s1">&#39;H-O&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:87)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.12/site-packages/urllib3/connectionpool.py:1099: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">warnings.py</span>:112)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_ioniz</span><span class="o">.</span><span class="n">base</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+atomic_number  ion_charge
+1              0              13.598435
+2              0              24.587389
+               1              54.417766
+3              0               5.391715
+               1              75.640097
+               2             122.454359
+4              0               9.322699
+               1              18.211150
+               2             153.896205
+               3             217.718585
+5              0               8.298019
+               1              25.154830
+               2              37.930590
+               3             259.374379
+               4             340.226022
+6              0              11.260288
+               1              24.383143
+               2              47.887780
+               3              64.493520
+               4             392.090560
+               5             489.993208
+7              0              14.534130
+               1              29.601250
+               2              47.445300
+               3              77.473500
+               4              97.890100
+               5             552.067410
+               6             667.046138
+8              0              13.618055
+               1              35.121120
+               2              54.935540
+               3              77.413500
+               4             113.899000
+               5             138.118900
+               6             739.326970
+               7             871.409914
+Name: ionization_energy, dtype: float64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nist_ioniz</span><span class="o">.</span><span class="n">get_ground_levels</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>atomic_number</th>
+      <th>ion_charge</th>
+      <th>g</th>
+      <th>energy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>4</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>4</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>4</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>4</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>5</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>5</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>5</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>5</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>5</td>
+      <td>4</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>6</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>6</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>6</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>6</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>6</td>
+      <td>4</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>6</td>
+      <td>5</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>7</td>
+      <td>0</td>
+      <td>4</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>7</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>7</td>
+      <td>2</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>7</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>7</td>
+      <td>4</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>7</td>
+      <td>5</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>7</td>
+      <td>6</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>8</td>
+      <td>0</td>
+      <td>5</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>8</td>
+      <td>1</td>
+      <td>4</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>8</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>8</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>8</td>
+      <td>4</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>8</td>
+      <td>5</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>8</td>
+      <td>6</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>8</td>
+      <td>7</td>
+      <td>2</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {}, "version_major": 2, "version_minor": 0}
+</script></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../reference/notation.html" class="btn btn-neutral float-left" title="Notation in Carsus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gfall.html" class="btn btn-neutral float-right" title="GFALL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 18 Jun 2025.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
