@@ -17,10 +17,10 @@ Optional Flags
 
 A set of flags can be appended to the above command to run different kinds of tests:
 
-- `--refdata=/path/to/carsus-refdata`
-    Run tests marked with the ``@with_refdata`` decorator. Requires the
-    `tardis-sn/carsus-refdata <https://github.com/tardis-sn/carsus-refdata>`_ repository.
-  
+- `--carsus-regression-data=/path/to/carsus-regression-data`
+  Run tests marked with the ``@with_regression_data`` decorator.  
+  Requires the `tardis-sn/carsus-regression-data <https://github.com/tardis-sn/carsus-regression-data>`_ repository.
+
 - `--cov=carsus --cov-report=xml --cov-report=html`
     Get code coverage results using the `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/>`_ plugin.
 
