@@ -18,6 +18,12 @@ jobs:
         with:
           path: carsus/
 
+      - name: Setup regression data via LFS
+        uses: ./.github/actions/setup_lfs
+        with:
+            regression-data-repo: tardis-sn/carsus-regression-data
+            atom-data-sparse: false
+
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -65,7 +71,7 @@ jobs:
         run: |
           jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} carsus/docs/tardis_atomdata_ref.ipynb
         env:
-          CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
+          CARSUS_REGRESSION_DATA: ${{ github.workspace }}/carsus-regression-data
         
       - name: Upload Atom Data
         uses: actions/upload-artifact@v4

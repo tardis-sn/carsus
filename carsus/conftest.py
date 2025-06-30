@@ -80,9 +80,6 @@ def pytest_addoption(parser):
         help="filename for the testing database",
     )
     parser.addoption(
-        "--refdata", dest="refdata", default=None, help="carsus-refdata folder location"
-    )
-    parser.addoption(
         "--carsus-regression-data",
         default=None,
         help="Path to the Carsus regression data directory",
@@ -96,12 +93,12 @@ def pytest_addoption(parser):
 
 
 def pytest_collection_modifyitems(config, items):
-    skip_not_with_refdata = pytest.mark.skip(
-        reason="carsus-refdata folder location not specified"
+    skip_no_regdata = pytest.mark.skip(
+        reason="--carsus-regression-data was not specified"
     )
     for item in items:
-        if "with_refdata" in item.keywords and not config.getoption("--refdata"):
-            item.add_marker(skip_not_with_refdata)
+        if "with_regression_data" in item.keywords and not config.getoption("--carsus-regression-data"):
+            item.add_marker(skip_no_regdata)
 
 
 @pytest.fixture(scope="session")
@@ -129,15 +126,6 @@ def vald_short_form_stellar_fname():
 @pytest.fixture(scope="session")
 def nndc_dirname():
     return str(DATA_DIR_PATH / "nndc")  # Mn-52, Ni-56
-
-
-@pytest.fixture(scope="session")
-def refdata_path(request):
-    refdata_path = request.config.getoption("--refdata")
-    if refdata_path is None:
-        pytest.skip("--refdata folder path was not specified")
-    else:
-        return str(Path(refdata_path).expanduser().resolve())
 
 @pytest.fixture(scope="session")
 def carsus_regression_path(request):
