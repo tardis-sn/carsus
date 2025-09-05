@@ -126,6 +126,17 @@ jobs:
       - name: Build documentation
         run: cd docs/ && make html NCORES=auto
 
+      - name: Print Sphinx error traceback on failure
+        if: failure()
+        run: |
+          echo "=== Searching for Sphinx error logs ==="
+          find /tmp -name "sphinx-err-*.log" -type f 2>/dev/null | head -10
+          echo "=== Full Sphinx traceback ==="
+          for logfile in $(find /tmp -name "sphinx-err-*.log" -type f 2>/dev/null); do
+            echo "--- Contents of $logfile ---"
+            cat "$logfile" || echo "Could not read $logfile"
+          done
+
       - name: Set destination directory
         run: |
           BRANCH=$(echo ${GITHUB_REF#refs/heads/})
