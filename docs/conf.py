@@ -131,7 +131,6 @@ release = package.__version__
 # Add any paths that contain custom themes here, relative to this directory.
 # To use a different custom theme, add the directory containing the theme.
 import sphinx_rtd_theme
-# html_theme_path is no longer needed for modern sphinx-rtd-theme versions
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes. To override the custom theme, set this to the
