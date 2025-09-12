@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: tardis-sn/tardis_zenodo
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.BOT_TOKEN }}
 
       - name: Download Lock File
         run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-linux-64.lock
@@ -57,6 +57,8 @@ jobs:
         with:
           name: zenodo_json
           path: .zenodo.json
+          if-no-files-found: warn
+          include-hidden-files: true
 
   create:
     needs: [pip_tests, zenodo]
