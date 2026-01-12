@@ -84,11 +84,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: tardis-sn/carsus-data-cmfgen
-          path: /tmp/cmfgen-data
+          path: cmfgen-data
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
       - name: Copy CMFGEN atomic data
-        run: cp -r /tmp/cmfgen-data/atomic /tmp/atomic
+        run: cp -r cmfgen-data/atomic /tmp/atomic
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
       - name: Download Lock File
