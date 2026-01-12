@@ -113,10 +113,15 @@ jobs:
           key: ${{ env.CMFGEN_DB_VER }}
         id: cmfgen-cache
 
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
+      - name: Checkout CMFGEN data repository
+        uses: actions/checkout@v5
+        with:
+          repository: tardis-sn/carsus-data-cmfgen
+          path: cmfgen-data
+        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+
+      - name: Extract CMFGEN database
+        run: tar -zxf cmfgen-data/${{ env.CMFGEN_DB_VER }} -C /tmp
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
 
       - uses: mamba-org/setup-micromamba@v2

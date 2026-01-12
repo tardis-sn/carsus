@@ -79,11 +79,16 @@ jobs:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
         id: cmfgen-cache
-        
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
+
+      - name: Checkout CMFGEN data repository
+        uses: actions/checkout@v4
+        with:
+          repository: tardis-sn/carsus-data-cmfgen
+          path: /tmp/cmfgen-data
+        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+
+      - name: Copy CMFGEN atomic data
+        run: cp -r /tmp/cmfgen-data/atomic /tmp/atomic
         if: steps.cmfgen-cache.outputs.cache-hit != 'true'
       
       - name: Download Lock File
