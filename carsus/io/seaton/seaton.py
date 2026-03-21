@@ -61,8 +61,9 @@ class Seaton1992Reader(object):
         except Exception as e:
             logger.error(
                 f"Failed to read data from {self.fpath}: {e}\n"
-                f"Try passing a local file path explicitly: "
-                f"Seaton1992Reader(fpath='path/to/s92.201.gz')"
+                f"Try passing a local file path explicitly:\n"
+                f"Seaton1992Reader("
+                f"fpath='path/to/s92.201.gz')"
             )
             raise
 
@@ -76,7 +77,8 @@ class Seaton1992Reader(object):
             abundances_df["abundance"], errors="coerce"
         )
         abundances_df = abundances_df.dropna()
-        abundances_df["atomic_number"] = abundances_df["atomic_number"].astype(int)
+        col = abundances_df["atomic_number"]
+        abundances_df["atomic_number"] = col.astype(int)
         abundances_df = abundances_df.reset_index(drop=True)
 
         # --- Section 2: Opacity grid (rows 20 onwards) ---
