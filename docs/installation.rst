@@ -13,7 +13,7 @@ Prerequisites
 
         export XUVTOP=/path/to/chianti/root
 
-#. *(optional)*. Download and extract the `CMFGEN Atomic Data <http://kookaburra.phyast.pitt.edu/hillier/web/CMFGEN.htm>`_.  
+#. *(optional)*. Download and extract the `CMFGEN Atomic Data <https://sites.pitt.edu/~hillier/web/CMFGEN.htm>`_.  
 
 ====================
 Clone the Repository
