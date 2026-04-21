@@ -14,11 +14,7 @@ env:
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
   CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
-  # original reference data
-  REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
-  # generated reference data using the new atomic file 
-  REF2_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data.h5
-  PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
+  PYTEST_FLAGS: --tardis-regression-data=${{ github.workspace }}/tardis-regression-data
                 --generate-reference
   CACHE_NUMBER: 1
 
@@ -101,32 +97,12 @@ jobs:
           repository: tardis-sn/tardisbase
           path: tardisbase
 
-      - name: Clone tardis-sn/tardis-refdata
-        uses: actions/checkout@v2
+      - name: Clone tardis-sn/tardis-regression-data
+        uses: actions/checkout@v4
         with:
-          repository: tardis-sn/tardis-refdata
-          path: tardis-refdata
-
-      - name: Create LFS file list
-        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-        working-directory: tardis-refdata
-
-      - name: Restore LFS cache
-        uses: actions/cache@v5
-        id: lfs-cache
-        with:
-          path: tardis-refdata/.git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v${{ env.CACHE_NUMBER }}
-
-      - name: Git LFS Pull
-        run: git lfs pull
-        working-directory: tardis-refdata
-        if: steps.lfs-cache.outputs.cache-hit != 'true'
-
-      - name: Git LFS Checkout
-        run: git lfs checkout
-        working-directory: tardis-refdata
-        if: steps.lfs-cache.outputs.cache-hit == 'true'
+          repository: tardis-sn/tardis-regression-data
+          path: tardis-regression-data
+          lfs: true
 
       - name: Setup TARDIS environment
         uses: conda-incubator/setup-miniconda@v2
@@ -162,28 +138,21 @@ jobs:
           path: carsus/docs/kurucz_cd23_chianti_H_He.h5
       
       - name: Replace Atomic Data
-        run: cp carsus/docs/kurucz_cd23_chianti_H_He.h5/kurucz_cd23_chianti_H_He.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
-      
-      - name: Generate Reference Data Copy
-        run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
+        run: cp carsus/docs/kurucz_cd23_chianti_H_He.h5/kurucz_cd23_chianti_H_He.h5 tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He.h5
 
       - name: Generate New Reference Data
-        run:  pytest tardis ${{ env.PYTEST_FLAGS }}
+        run: pytest tardis ${{ env.PYTEST_FLAGS }}
 
-      - name: Compare Reference Data
-        run: |
-            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} --output-dir=${{ github.workspace }} carsus/docs/ref_data_compare_from_paths.ipynb
-      
-      - name: Upload comparison notebook
-        uses: actions/upload-artifact@v4
-        with:
-          name: Comparison Notebook
-          path: ref_data_compare_from_paths.html
-      
       - name: Check if reference data are equal
         id: ref-equal-check
         continue-on-error: true
-        run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
+        run: |
+            if [ -n "$(git status --porcelain)" ]; then
+              echo "Regression data differs after regeneration:"
+              git status
+              exit 1
+            fi
+        working-directory: tardis-regression-data
 
       # continue-on-error check would display a green tick even when the step passes
       # but is necessary for other steps to run
