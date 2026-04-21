@@ -89,10 +89,18 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: tardis-sn/tardis
-        
-      - name: Download refdata_compare notebook
-        run: wget https://raw.githubusercontent.com/tardis-sn/tardis-refdata/master/notebooks/ref_data_compare_from_paths.ipynb
-        
+
+      - name: Checkout carsus
+        uses: actions/checkout@v2
+        with:
+          path: carsus
+
+      - name: Checkout tardisbase
+        uses: actions/checkout@v2
+        with:
+          repository: tardis-sn/tardisbase
+          path: tardisbase
+
       - name: Clone tardis-sn/tardis-refdata
         uses: actions/checkout@v2
         with:
@@ -136,7 +144,17 @@ jobs:
 
       - name: Install package
         run: pip install -e .
-        
+
+      - name: Install tardisbase
+        run: pip install -e .
+        working-directory: tardisbase
+
+      - name: Install lineid_plot
+        run: pip install --no-deps lineid_plot
+
+      - name: Install GitPython
+        run: pip install GitPython
+
       - name: Download atom data
         uses: actions/download-artifact@v4.1.7
         with:
@@ -154,7 +172,7 @@ jobs:
 
       - name: Compare Reference Data
         run: |
-            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} ref_data_compare_from_paths.ipynb
+            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} --output-dir=${{ github.workspace }} carsus/docs/ref_data_compare_from_paths.ipynb
       
       - name: Upload comparison notebook
         uses: actions/upload-artifact@v4
