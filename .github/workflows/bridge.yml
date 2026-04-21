@@ -109,18 +109,12 @@ jobs:
         working-directory: tardis-regression-data
 
       - name: Setup TARDIS environment
-        uses: conda-incubator/setup-miniconda@v2
+        uses: mamba-org/setup-micromamba@v2
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            activate-environment: tardis
-            use-mamba: true
-
-      - name: Update environment
-        run: mamba update -n tardis --file conda-linux-64.lock
-
-      - name: Install bokeh
-        run: mamba install bokeh --channel conda-forge --no-update-deps --yes
+          environment-file: conda-linux-64.lock
+          environment-name: tardis
+          cache-environment: false
+          cache-downloads: false
 
       - name: Install package
         run: pip install -e .
