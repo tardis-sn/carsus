@@ -102,7 +102,11 @@ jobs:
         with:
           repository: tardis-sn/tardis-regression-data
           path: tardis-regression-data
-          lfs: true
+          lfs: false
+
+      - name: Git LFS Pull (via .lfsconfig in repo)
+        run: git lfs pull
+        working-directory: tardis-regression-data
 
       - name: Setup TARDIS environment
         uses: conda-incubator/setup-miniconda@v2
