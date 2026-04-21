@@ -35,7 +35,7 @@ jobs:
         with:
           path: carsus/
         
-      - uses: actions/cache@v2
+      - uses: actions/cache@v5
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
@@ -48,7 +48,7 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v2
+      - uses: actions/cache@v5
         with:
           path: /tmp/atomic
           key: ${{ env.CMFGEN_DB_VER }}
@@ -78,7 +78,7 @@ jobs:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
       - name: Upload Atom Data
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: atom-data
           path: carsus/docs/kurucz_cd23_chianti_H_He.h5
@@ -108,7 +108,7 @@ jobs:
         working-directory: tardis-refdata
 
       - name: Restore LFS cache
-        uses: actions/cache@v2
+        uses: actions/cache@v5
         id: lfs-cache
         with:
           path: tardis-refdata/.git/lfs
@@ -161,7 +161,7 @@ jobs:
             jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} ref_data_compare_from_paths.ipynb
       
       - name: Upload comparison notebook
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Comparison Notebook
           path: ref_data_compare_from_paths.html
