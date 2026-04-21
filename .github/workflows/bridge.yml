@@ -58,7 +58,7 @@ jobs:
 
       - uses: mamba-org/setup-micromamba@v2
         with:
-          environment-file: conda-lock.yml
+          environment-file: carsus/conda-lock.yml
           init-shell: bash
           cache-environment: true
           cache-downloads: true 
