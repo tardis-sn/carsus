@@ -13,8 +13,7 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
-  CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
-  CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+  CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
   # original reference data
   REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
   # generated reference data using the new atomic file 
@@ -48,17 +47,14 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v2
+      - name: Clone CMFGEN data repo
+        uses: actions/checkout@v4
         with:
-          path: /tmp/atomic
-          key: ${{ env.CMFGEN_DB_VER }}
-        id: cmfgen-cache
+          repository: ${{ env.CMFGEN_DATA_REPO }}
+          path: carsus-data-cmfgen
 
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
-        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+      - name: Setup CMFGEN data path
+        run: ln -s ${{ github.workspace }}/carsus-data-cmfgen/atomic /tmp/atomic
 
       - uses: mamba-org/setup-micromamba@v2
         with:

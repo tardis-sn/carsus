@@ -30,8 +30,7 @@ env:
   PYTEST_FLAGS: --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  CMFGEN_DL_URL: http://kookaburra.phyast.pitt.edu/hillier/cmfgen_files
-  CMFGEN_DB_VER: atomic_data_15nov16.tar.gz
+  CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
 
 jobs:
   test-cache:
@@ -74,17 +73,14 @@ jobs:
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
-      - uses: actions/cache@v4
+      - name: Clone CMFGEN data repo
+        uses: actions/checkout@v4
         with:
-          path: /tmp/atomic
-          key: ${{ env.CMFGEN_DB_VER }}
-        id: cmfgen-cache
-        
-      - name: Download CMFGEN database
-        run: |
-            wget -q -U "Mozilla/4.0" ${{ env.CMFGEN_DL_URL }}/${{ env.CMFGEN_DB_VER }} -O /tmp/atomic.tar.gz
-            tar -zxf /tmp/atomic.tar.gz -C /tmp
-        if: steps.cmfgen-cache.outputs.cache-hit != 'true'
+          repository: ${{ env.CMFGEN_DATA_REPO }}
+          path: carsus-data-cmfgen
+
+      - name: Setup CMFGEN data path
+        run: ln -s ${{ github.workspace }}/carsus-data-cmfgen/atomic /tmp/atomic
       
       - name: Download Lock File
         run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock
