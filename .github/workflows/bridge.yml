@@ -152,10 +152,37 @@ jobs:
             fi
         working-directory: tardis-regression-data
 
+      - name: Snapshot regenerated regression data
+        if: steps.ref-equal-check.outcome == 'failure'
+        run: |
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config user.name "github-actions[bot]"
+            git add -A
+            git commit -m "CI snapshot: regenerated with new carsus atom data"
+        working-directory: tardis-regression-data
+
+      - name: Compare regression data
+        if: steps.ref-equal-check.outcome == 'failure'
+        run: |
+            jupyter nbconvert --execute --to html \
+              ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data.ipynb \
+              --output=${{ github.workspace }}/compare_regression_data.html
+        env:
+          REGRESSION_DATA_REPO: ${{ github.workspace }}/tardis-regression-data
+          REF1_HASH: HEAD~1
+          REF2_HASH: HEAD
+
+      - name: Upload comparison notebook
+        if: steps.ref-equal-check.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Comparison Notebook
+          path: compare_regression_data.html
+
       # continue-on-error check would display a green tick even when the step passes
       # but is necessary for other steps to run
       # if the workflow was called by save-atomic-files workflow(the only other option)
-      # and refdata comparison failed this workflow would pass but the 
+      # and refdata comparison failed this workflow would pass but the
       # bridge-ref-check job in save-atomic-files about refdata comparison would fail
       - name: Fail the workflow if reference data check fails
         if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'

@@ -19,8 +19,19 @@ jobs:
         with:
           name: atom-data
 
+      - name: Download comparison notebook
+        uses: actions/download-artifact@v4.1.7
+        continue-on-error: true
+        with:
+          name: Comparison Notebook
+
       - name: Zip files
-        run: zip "$(date +'%d_%b_%Y')_$(curl https://api.github.com/repos/tardis-sn/carsus/commits/master | jq -r .sha | cut -c1-6)"  kurucz_cd23_cmfgen_H_Si.h5
+        run: |
+          FILES=kurucz_cd23_cmfgen_H_Si.h5
+          if [ -f compare_regression_data.html ]; then
+            FILES="$FILES compare_regression_data.html"
+          fi
+          zip "$(date +'%d_%b_%Y')_$(curl https://api.github.com/repos/tardis-sn/carsus/commits/master | jq -r .sha | cut -c1-6)" $FILES
 
       - name: Send file to Moria
         uses: appleboy/scp-action@master
