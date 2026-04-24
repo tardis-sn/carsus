@@ -187,3 +187,53 @@ jobs:
       - name: Fail the workflow if reference data check fails
         if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
         run: exit 1
+
+  deploy-comparison:
+    needs: tardis-build
+    if: github.event_name == 'pull_request' && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_BRANCH: main
+    steps:
+      - name: Download comparison notebook
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: Comparison Notebook
+          path: comparison-artifacts
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.BOT_TOKEN }}
+          publish_branch: ${{ env.DEPLOY_BRANCH }}
+          publish_dir: comparison-artifacts
+          destination_dir: carsus/pull/${{ github.event.number }}
+          keep_files: true
+          external_repository: tardis-sn/reg-data-comp
+          user_name: "TARDIS Bot"
+          user_email: "tardis.sn.bot@gmail.com"
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v4
+        id: fc
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: Carsus Bridge Regression Comparison
+
+      - name: Post comment
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### Carsus Bridge Regression Comparison
+
+            Regenerating TARDIS regression data with the new carsus atom data produced a diff. Full HTML comparison:
+
+            - [compare_regression_data.html](https://tardis-sn.github.io/reg-data-comp/carsus/pull/${{ github.event.number }}/compare_regression_data.html)
+
+            Artifacts from this run are also available in the [Actions run](${{ env.ARTIFACT_URL }}).
+        env:
+          ARTIFACT_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
