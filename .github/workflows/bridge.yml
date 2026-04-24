@@ -1,11 +1,12 @@
 name: tardis-carsus-bridge
 
-on: 
+on:
   workflow_call: # to be called by save_atomic_files workflow
     outputs:
       ref-check-trig:
         value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
   workflow_dispatch: # for running manually
+  pull_request: # run on PRs to validate atom-data changes against tardis regression data
 
         
 env:
