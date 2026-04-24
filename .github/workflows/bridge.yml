@@ -191,7 +191,7 @@ jobs:
 
   deploy-comparison:
     needs: tardis-build
-    if: needs.tardis-build.outputs.step-ref-check-trig == 'failure'
+    if: always() && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
     runs-on: ubuntu-latest
     env:
       DEPLOY_BRANCH: main
