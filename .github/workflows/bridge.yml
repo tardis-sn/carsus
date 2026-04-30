@@ -35,7 +35,7 @@ jobs:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-tardis-carsus-bridge')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           path: carsus/
         
@@ -53,7 +53,7 @@ jobs:
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
       - name: Clone CMFGEN data repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.CMFGEN_DATA_REPO }}
           path: carsus-data-cmfgen
@@ -61,7 +61,7 @@ jobs:
       - name: Setup CMFGEN data path
         run: ln -s ${{ github.workspace }}/carsus-data-cmfgen/atomic /tmp/atomic
 
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: carsus/conda-lock.yml
           init-shell: bash
@@ -79,7 +79,7 @@ jobs:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
       - name: Upload Atom Data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: atom-data
           path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
@@ -91,23 +91,23 @@ jobs:
       step-ref-check-trig: ${{ steps.ref-equal-check.outcome }} # success or failure of refdata comparison
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           repository: tardis-sn/tardis
 
       - name: Checkout carsus
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           path: carsus
 
       - name: Checkout tardisbase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           repository: tardis-sn/tardisbase
           path: tardisbase
 
       - name: Clone tardis-sn/tardis-regression-data
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: tardis-sn/tardis-regression-data
           path: tardis-regression-data
@@ -118,7 +118,7 @@ jobs:
         working-directory: tardis-regression-data
 
       - name: Setup TARDIS environment
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: conda-linux-64.lock
           environment-name: tardis
@@ -139,7 +139,7 @@ jobs:
         run: pip install GitPython
 
       - name: Download atom data
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
         with:
           name: atom-data
           path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
@@ -183,7 +183,7 @@ jobs:
 
       - name: Upload comparison notebook
         if: steps.ref-equal-check.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Comparison Notebook
           path: compare_regression_data.html
@@ -207,7 +207,7 @@ jobs:
       DEPLOY_BRANCH: main
     steps:
       - name: Download comparison notebook
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
         with:
           name: Comparison Notebook
           path: comparison-artifacts

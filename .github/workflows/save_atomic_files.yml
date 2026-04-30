@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download atom data
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
         with:
           name: atom-data
 
       - name: Download comparison notebook
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: Comparison Notebook
@@ -31,7 +31,7 @@ jobs:
           zip "$(date +'%d_%b_%Y')_$(curl https://api.github.com/repos/tardis-sn/carsus/commits/master | jq -r .sha | cut -c1-6)" $FILES
 
       - name: Send file to Moria
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.GH_DROPOFF_HOST }}
           username: ${{ secrets.GH_DROPOFF_USERNAME }}
