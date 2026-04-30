@@ -7,6 +7,11 @@ on:
         value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
   workflow_dispatch: # for running manually
   pull_request: # run on PRs to validate atom-data changes against tardis regression data
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
 
         
 env:
@@ -25,6 +30,9 @@ defaults:
 
 jobs:
   carsus-build:
+    # On pull_request, only run when the 'run-tardis-carsus-bridge' label is present.
+    # Other events (workflow_dispatch, workflow_call) are unaffected.
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-tardis-carsus-bridge')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -191,7 +199,9 @@ jobs:
 
   deploy-comparison:
     needs: tardis-build
-    if: always() && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
+    # always() is needed because tardis-build intentionally fails on refdata diff
+    # to surface the diff to humans; we still want to deploy the comparison HTML.
+    if: always() && github.event_name == 'pull_request' && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
     runs-on: ubuntu-latest
     env:
       DEPLOY_BRANCH: main
@@ -208,7 +218,7 @@ jobs:
           personal_token: ${{ secrets.BOT_TOKEN }}
           publish_branch: ${{ env.DEPLOY_BRANCH }}
           publish_dir: comparison-artifacts
-          destination_dir: carsus/pull/${{ github.event.number || 477 }}
+          destination_dir: carsus/pull/${{ github.event.number }}
           keep_files: true
           external_repository: tardis-sn/reg-data-comp
           user_name: "TARDIS Bot"
@@ -218,14 +228,14 @@ jobs:
         uses: peter-evans/find-comment@v4
         id: fc
         with:
-          issue-number: ${{ github.event.number || 477 }}
+          issue-number: ${{ github.event.number }}
           body-includes: Carsus Bridge Regression Comparison
 
       - name: Post comment
         uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.BOT_TOKEN }}
-          issue-number: ${{ github.event.number || 477 }}
+          issue-number: ${{ github.event.number }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
           edit-mode: replace
           body: |
@@ -233,7 +243,7 @@ jobs:
 
             Regenerating TARDIS regression data with the new carsus atom data produced a diff. Full HTML comparison:
 
-            - [compare_regression_data.html](https://tardis-sn.github.io/reg-data-comp/carsus/pull/${{ github.event.number || 477 }}/compare_regression_data.html)
+            - [compare_regression_data.html](https://tardis-sn.github.io/reg-data-comp/carsus/pull/${{ github.event.number }}/compare_regression_data.html)
 
             Artifacts from this run are also available in the [Actions run](${{ env.ARTIFACT_URL }}).
         env:
