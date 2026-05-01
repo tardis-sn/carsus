@@ -217,7 +217,7 @@ jobs:
     needs: tardis-build
     # always() is needed because tardis-build intentionally fails on refdata diff
     # to surface the diff to humans; we still want to deploy the comparison HTML.
-    if: always() && github.event_name == 'pull_request_target' && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
+    if: always() && github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     env:
       DEPLOY_BRANCH: main
