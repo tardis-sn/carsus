@@ -6,7 +6,7 @@ on:
       ref-check-trig:
         value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
   workflow_dispatch: # for running manually
-  pull_request: # run on PRs to validate atom-data changes against tardis regression data
+  pull_request_target: # run on PRs to validate atom-data changes against tardis regression data
     types:
       - opened
       - reopened
@@ -30,15 +30,23 @@ defaults:
 
 jobs:
   carsus-build:
-    # On pull_request, only run when the 'run-tardis-carsus-bridge' label is present.
+    # On pull_request_target, only run when the 'run-tardis-carsus-bridge' label is present.
     # Other events (workflow_dispatch, workflow_call) are unaffected.
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-tardis-carsus-bridge')
+    if: github.event_name != 'pull_request_target' || contains(github.event.pull_request.labels.*.name, 'run-tardis-carsus-bridge')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           path: carsus/
-        
+        if: github.event_name != 'pull_request_target'
+
+      - name: Checkout pull/${{ github.event.number }}
+        uses: actions/checkout@v6
+        with:
+          path: carsus/
+          ref: ${{ github.event.pull_request.head.sha }}
+        if: github.event_name == 'pull_request_target'
+
       - uses: actions/cache@v5
         with:
           path: ${{ env.XUVTOP }}
@@ -99,6 +107,14 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: carsus
+        if: github.event_name != 'pull_request_target'
+
+      - name: Checkout carsus pull/${{ github.event.number }}
+        uses: actions/checkout@v6
+        with:
+          path: carsus
+          ref: ${{ github.event.pull_request.head.sha }}
+        if: github.event_name == 'pull_request_target'
 
       - name: Checkout tardisbase
         uses: actions/checkout@v6
@@ -201,7 +217,7 @@ jobs:
     needs: tardis-build
     # always() is needed because tardis-build intentionally fails on refdata diff
     # to surface the diff to humans; we still want to deploy the comparison HTML.
-    if: always() && github.event_name == 'pull_request' && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
+    if: always() && github.event_name == 'pull_request_target' && needs.tardis-build.outputs.step-ref-check-trig == 'failure'
     runs-on: ubuntu-latest
     env:
       DEPLOY_BRANCH: main
