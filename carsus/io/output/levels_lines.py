@@ -323,9 +323,9 @@ class LevelsLinesPreparer:
 
         lines["wavelength"] = u.Quantity(lines["wavelength"], "nm").to("AA").value
 
-        lines.loc[lines["wavelength"] <= GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_VACUUM
+        lines.loc[lines["wavelength"] <= GFALL_AIR_THRESHOLD.value, "medium"] = MEDIUM_VACUUM
 
-        lines.loc[lines["wavelength"] > GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_AIR
+        lines.loc[lines["wavelength"] > GFALL_AIR_THRESHOLD.value, "medium"] = MEDIUM_AIR
 
         # Chianti wavelengths are already given in vacuum
         gfall_mask = lines["ds_id"] == 2
