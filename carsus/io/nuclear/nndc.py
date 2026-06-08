@@ -113,12 +113,11 @@ class NNDCReader:
 
         metastable_df.loc[metastable_filters, 'Metastable'] = True
 
-        # avoid duplicate indices since metastable_df is a result of pd.concat operation
-        metastable_df = metastable_df.reset_index()
-
         # Group by the combination of these columns
         group_criteria = ['Parent E(level)', 'T1/2 (sec)', 'Isotope']
-        metastable_df = metastable_df.groupby(group_criteria).apply(self._set_group_true)
+        metastable_df["Metastable"] = metastable_df.groupby(group_criteria)[
+            "Metastable"
+        ].transform("any")
 
         return metastable_df
 
@@ -132,7 +131,7 @@ class NNDCReader:
 
         decay_data = self._add_metastable_column(decay_data_raw)
 
-        decay_data = decay_data.set_index(['Isotope']).drop(['index'], axis=1)
+        decay_data = decay_data.set_index(['Isotope'])
         decay_data = decay_data.sort_values(by=decay_data.columns.tolist())
 
         return decay_data

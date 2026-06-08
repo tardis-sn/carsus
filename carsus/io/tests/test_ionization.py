@@ -101,6 +101,7 @@ def test_prepare_ground_levels(ground_levels, expected_series_ground_levels):
 
 
 
+@pytest.mark.remote_data
 def test_ground_levels_missing_j():
     ionization_energies = NISTIonizationEnergies(spectra="Nd")
     ground_levels = ionization_energies.get_ground_levels()
@@ -113,6 +114,7 @@ def test_ground_levels_missing_j():
     assert ground_levels.loc[(60, 9)]['g'] == 1
     assert ground_levels.loc[(60, 10)]['g'] == 1
 
+@pytest.mark.remote_data
 def test_nist_asd_version():
     nist_ionization = NISTIonizationEnergies('H')
     version = nist_ionization.version
@@ -120,4 +122,3 @@ def test_nist_asd_version():
 
     assert len(version_split) > 1
     to_int = [ int(i) for i in version_split ]
-

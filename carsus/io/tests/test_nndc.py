@@ -110,6 +110,7 @@ def test_nndc_reader_metastable(decay_data, index, parent_e_level, decay_mode,
                              ("Ni56", "Ni", 28, 0.0, False, "EC", 100.00, "g", "XR ka2", 6.915),
                              ("Mn52", "Mn", 25, 377.749, True, "IT", 1.75, "g", "XR ka1", 5.899)
                          ])
+@pytest.mark.remote_data
 def test_nndc_reader_decay_data_http(decay_data_http, index, element, z, parent_e_level, metastable,
                                      decay_mode, decay_mode_value, radiation, rad_subtype, rad_energy):
     df = decay_data_http[(decay_data_http.index == index) & (decay_data_http["Decay Mode"] == decay_mode) &

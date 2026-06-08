@@ -8,6 +8,7 @@ packagename.test
 """
 
 import os
+import socket
 from pathlib import Path
 from carsus.util import regression_data
 
@@ -72,6 +73,14 @@ import pytest
 DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
 
 
+def has_network_access(host="raw.githubusercontent.com", port=443, timeout=2):
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--test-db",
@@ -96,9 +105,19 @@ def pytest_collection_modifyitems(config, items):
     skip_no_regdata = pytest.mark.skip(
         reason="--carsus-regression-data was not specified"
     )
+    skip_no_network = pytest.mark.skip(
+        reason="network access is not available"
+    )
+    network_available = None
+
     for item in items:
         if "with_regression_data" in item.keywords and not config.getoption("--carsus-regression-data"):
             item.add_marker(skip_no_regdata)
+        if "remote_data" in item.keywords:
+            if network_available is None:
+                network_available = has_network_access()
+            if not network_available:
+                item.add_marker(skip_no_network)
 
 
 @pytest.fixture(scope="session")

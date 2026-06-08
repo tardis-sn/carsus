@@ -2,10 +2,12 @@ import pytest
 import pandas as pd
 from carsus.io.zeta import KnoxLongZeta, ZETA_DATA_URL
 
+
 @pytest.fixture
 def reference_file_path():
     return "carsus/data/knox_long_recombination_zeta.dat"
 
+@pytest.mark.remote_data
 def test_knoxlongzeta_init_with_default_url():
     zeta = KnoxLongZeta()
     assert zeta.fname == ZETA_DATA_URL

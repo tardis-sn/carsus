@@ -10,41 +10,92 @@ from astropy import units as u
 from carsus.io.util import convert_species_tuple2chianti_str
 from carsus.util import parse_selected_species
 
-# Compatibility with older versions and pip versions:
-try:
-    from ChiantiPy.tools.io import versionRead
-    import ChiantiPy.core as ch 
 
-except ImportError:
-    # Shamefully copied from their GitHub source:
-    import chianti.core as ch
-    def versionRead():
-        """
-        Read the version number of the CHIANTI database
-        """
-        xuvtop = os.environ['XUVTOP']
-        vFileName = Path(xuvtop) / 'VERSION'
-        vFile = open(vFileName)
-        versionStr = vFile.readline()
-        vFile.close()
-        return versionStr.strip()
+_chianti_core = None
+_chianti_version_read = None
 
 
 logger = logging.getLogger(__name__)
 
-masterlist_ions_path = Path(os.getenv('XUVTOP', "")) / "masterlist" / "masterlist_ions.pkl"
-
-masterlist_ions_file = open(masterlist_ions_path, 'rb')
-masterlist_ions = pickle.load(masterlist_ions_file).keys()
-# Exclude the "d" ions for now
-masterlist_ions = [_ for _ in masterlist_ions
-                   if re.match(r"^[a-z]+_\d+$", _)]
-
-masterlist_version = versionRead()
-
 
 class ChiantiIonReaderError(Exception):
     pass
+
+
+def _get_masterlist_ions_path():
+    xuvtop = os.getenv("XUVTOP")
+    if not xuvtop:
+        raise ChiantiIonReaderError(
+            "CHIANTI database path is not configured. Set the XUVTOP "
+            "environment variable to use the CHIANTI reader."
+        )
+
+    masterlist_ions_path = Path(xuvtop) / "masterlist" / "masterlist_ions.pkl"
+    if not masterlist_ions_path.exists():
+        raise ChiantiIonReaderError(
+            "CHIANTI masterlist was not found at {}.".format(masterlist_ions_path)
+        )
+
+    return masterlist_ions_path
+
+
+def _read_masterlist_ions():
+    with open(_get_masterlist_ions_path(), "rb") as masterlist_ions_file:
+        masterlist_ions = pickle.load(masterlist_ions_file).keys()
+
+    # Exclude the "d" ions for now
+    return [_ for _ in masterlist_ions if re.match(r"^[a-z]+_\d+$", _)]
+
+
+def _write_chianti_cli_config(home):
+    chianti_dir = Path(home) / ".chianti"
+    chianti_dir.mkdir(parents=True, exist_ok=True)
+    (chianti_dir / "chiantirc").write_text(
+        "[chianti]\n"
+        "abundfile = sun_photospheric_1998_grevesse\n"
+        "ioneqfile = chianti\n"
+        "wavelength = angstrom\n"
+        "flux = energy\n"
+        "gui = False\n"
+    )
+
+
+def _get_chianti():
+    global _chianti_core, _chianti_version_read
+
+    if _chianti_core is not None:
+        return _chianti_core, _chianti_version_read
+
+    original_home = os.environ.get("HOME")
+    chianti_home = Path(os.getenv("CARSUS_CHIANTI_HOME", "/tmp/carsus-chianti-home"))
+    _write_chianti_cli_config(chianti_home)
+
+    try:
+        os.environ["HOME"] = str(chianti_home)
+        try:
+            from ChiantiPy.tools.io import versionRead
+            import ChiantiPy.core as ch
+        except ImportError:
+            import chianti.core as ch
+
+            def versionRead():
+                """
+                Read the version number of the CHIANTI database.
+                """
+                xuvtop = os.environ["XUVTOP"]
+                v_file_name = Path(xuvtop) / "VERSION"
+                with open(v_file_name) as v_file:
+                    version_str = v_file.readline()
+                return version_str.strip()
+    finally:
+        if original_home is None:
+            os.environ.pop("HOME", None)
+        else:
+            os.environ["HOME"] = original_home
+
+    _chianti_core = ch
+    _chianti_version_read = versionRead
+    return _chianti_core, _chianti_version_read
 
 
 class ChiantiIonReader(object):
@@ -108,6 +159,8 @@ class ChiantiIonReader(object):
 
     def __init__(self, ion_name):
 
+        _get_masterlist_ions_path()
+        ch, _ = _get_chianti()
         # dummy temperature to avoid bug in ChiantiPy https://github.com/chianti-atomic/ChiantiPy/issues/466
         self.ion = ch.ion(ion_name, temperature=1)
         self._levels = None
@@ -389,7 +442,8 @@ class ChiantiReader:
 
         self.levels = levels
         self.lines = lines
-        self.version = versionRead()
+        _, version_read = _get_chianti()
+        self.version = version_read()
 
     def to_hdf(self, fname):
         """
