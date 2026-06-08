@@ -242,6 +242,9 @@ class ChiantiIonReader(object):
             raise ValueError('Level 0 energy is not 0.0')
 
         levels = pd.DataFrame(levels_dict)
+        levels.loc[levels["energy"] < 0, "energy"] = levels.loc[
+            levels["energy"] < 0, "energy_theoretical"
+        ]
 
         # Replace empty labels with NaN
         with pd.option_context('future.no_silent_downcasting', True):
@@ -397,7 +400,8 @@ class ChiantiReader:
 
         levels = pd.concat(lvl_list, sort=True)
         levels = levels.rename(columns={'J': 'j'})
-        levels['method'] = None
+        string_dtype = pd.StringDtype(na_value=np.nan)
+        levels["method"] = pd.Series(np.nan, index=levels.index, dtype=string_dtype)
         levels['priority'] = self.priority
         levels = levels.reset_index()
         levels = levels.set_index(
@@ -417,10 +421,9 @@ class ChiantiReader:
 
         lines = lines.set_index(['atomic_number', 'ion_charge',
                                  'level_index_lower', 'level_index_upper'])
-        lines['energy_upper'] = None
-        lines['energy_lower'] = None
-        lines['j_upper'] = None
-        lines['j_lower'] = None
+        string_dtype = pd.StringDtype(na_value=np.nan)
+        for column in ["energy_upper", "energy_lower", "j_upper", "j_lower"]:
+            lines[column] = pd.Series(np.nan, index=lines.index, dtype=string_dtype)
         lines = lines[['energy_upper', 'j_upper', 'energy_lower', 'j_lower',
                        'wavelength', 'gf', 'A_ul']]
 
