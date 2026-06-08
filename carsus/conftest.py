@@ -94,6 +94,11 @@ def pytest_addoption(parser):
         help="Path to the Carsus regression data directory",
     )
     parser.addoption(
+        "--carsus-cmfgen-data",
+        default=os.environ.get("CARSUS_CMFGEN_DATA"),
+        help="Path to the carsus-data-cmfgen repository directory",
+    )
+    parser.addoption(
         "--generate-reference",
         action="store_true",
         default=False,
@@ -157,3 +162,32 @@ def carsus_regression_path(request):
         return Path(
             os.path.expandvars(os.path.expanduser(carsus_regression_path))
         )
+
+
+@pytest.fixture(scope="session")
+def carsus_cmfgen_data_path(request):
+    carsus_cmfgen_data_path = request.config.getoption(
+        "--carsus-cmfgen-data"
+    )
+    if carsus_cmfgen_data_path is None:
+        raise pytest.UsageError("--carsus-cmfgen-data was not specified")
+
+    carsus_cmfgen_data_path = Path(
+        os.path.expandvars(os.path.expanduser(carsus_cmfgen_data_path))
+    )
+    if not carsus_cmfgen_data_path.is_dir():
+        raise FileNotFoundError(
+            f"CMFGEN data directory does not exist: {carsus_cmfgen_data_path}"
+        )
+    if not (carsus_cmfgen_data_path / "atomic").is_dir():
+        raise FileNotFoundError(
+            "CMFGEN data directory must be the carsus-data-cmfgen "
+            f"repository containing atomic/: {carsus_cmfgen_data_path}"
+        )
+
+    return carsus_cmfgen_data_path
+
+
+@pytest.fixture(scope="session")
+def carsus_cmfgen_atomic_path(carsus_cmfgen_data_path):
+    return carsus_cmfgen_data_path / "atomic"
