@@ -2,9 +2,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 # NOTE: The configuration for the package, including the name, version, and
-# other information are set in the setup.cfg file.
+# other information are set in pyproject.toml.
 
-from pathlib import Path
 import sys
 
 from setuptools import setup
@@ -63,18 +62,4 @@ if 'build_docs' in sys.argv or 'build_sphinx' in sys.argv:
     print(DOCS_HELP)
     sys.exit(1)
 
-VERSION_TEMPLATE = """
-# Note that we need to fall back to the hard-coded version if either
-# setuptools_scm can't be imported or setuptools_scm can't determine the
-# version, so we catch the generic 'Exception'.
-try:
-    from setuptools_scm import get_version
-    version = get_version(root='..', relative_to=__file__)
-except Exception:
-    version = '{version}'
-""".lstrip()
-
-setup(use_scm_version={'write_to': Path('carsus') / 'version.py',
-                       'write_to_template': VERSION_TEMPLATE,
-                       #'version_scheme': 'calver-by-date',
-                    })
+setup()
