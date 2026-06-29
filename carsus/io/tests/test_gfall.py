@@ -91,6 +91,16 @@ def test_gfall_reader_clean_levels_labels(levels):
     assert len(levels0402.loc[(np.isclose(levels0402["energy"], 0.0))]) == 1
 
 
+def test_gfall_reader_normalizes_label_whitespace_for_unique_levels(gfall_fname):
+    reader = GFALLReader(
+        fname=gfall_fname,
+        unique_level_identifier=["energy", "j", "label"],
+    )
+
+    levels0402 = reader.levels.loc[(4, 2)]
+    assert len(levels0402.loc[(np.isclose(levels0402["energy"], 0.0))]) == 1
+
+
 @pytest.mark.parametrize("atomic_number, ion_charge, level_index, "
                          "energy, j, method",[
     (4, 2, 0, 0.0, 0.0, "meas"),
