@@ -168,7 +168,15 @@ class LevelsLinesPreparer:
         levels = levels.reset_index()
         levels = levels.rename(columns={"ion_charge": "ion_number"})
         levels = levels[
-            ["atomic_number", "ion_number", "g", "energy", "ds_id", "priority"]
+            [
+                "atomic_number",
+                "ion_number",
+                "level_index",
+                "g",
+                "energy",
+                "ds_id",
+                "priority",
+            ]
         ]
         levels["energy"] = (
             u.Quantity(levels["energy"], "cm-1")
@@ -210,16 +218,26 @@ class LevelsLinesPreparer:
         levels["level_id"] = range(1, len(levels) + 1)
         levels = levels.set_index("level_id")
 
-        # The following code should only remove the duplicated
-        # ground levels. Other duplicated levels should be re-
-        # moved at the reader stage.
-
-        mask = (levels["energy"] == 0.0) & (
-            levels[["atomic_number", "ion_number", "energy", "g"]].duplicated(
-                keep="last"
-            )
+        # Remove NIST ground levels when the selected level source already
+        # supplies zero-energy levels for the ion. This preserves source fine
+        # structure while avoiding stale synthetic NIST ground rows.
+        source_ground_ions = levels.loc[
+            (levels["energy"] == 0.0) & (levels["ds_id"] != 1),
+            ["atomic_number", "ion_number"],
+        ].drop_duplicates()
+        source_ground_ions["has_source_ground"] = True
+        levels = levels.reset_index().merge(
+            source_ground_ions,
+            how="left",
+            on=["atomic_number", "ion_number"],
+        ).set_index("level_id")
+        mask = (
+            (levels["energy"] == 0.0)
+            & (levels["ds_id"] == 1)
+            & levels["has_source_ground"].fillna(False)
         )
         levels = levels[~mask]
+        levels = levels.drop(columns="has_source_ground")
 
         # Filter levels by priority
         for ion in self.chianti_ions:
@@ -246,7 +264,9 @@ class LevelsLinesPreparer:
             )
             levels = levels.drop(levels[mask].index)
 
-        levels = levels[["atomic_number", "ion_number", "g", "energy", "ds_id"]]
+        levels = levels[
+            ["atomic_number", "ion_number", "level_index", "g", "energy", "ds_id"]
+        ]
         levels = levels.reset_index()
 
         return levels

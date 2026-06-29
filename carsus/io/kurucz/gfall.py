@@ -72,6 +72,12 @@ class GFALLReader(object):
 
     default_unique_level_identifier = ["energy", "j"]
 
+    @staticmethod
+    def normalize_label(label):
+        if pd.isnull(label):
+            return label
+        return " ".join(str(label).split())
+
     def __init__(
         self, ions=None, fname=None, unique_level_identifier=None, priority=10
     ):
@@ -333,6 +339,7 @@ class GFALLReader(object):
         levels = pd.concat(
             [e_lower_levels[selected_columns], e_upper_levels[selected_columns]]
         )
+        levels["label"] = levels["label"].apply(self.normalize_label)
         unique_level_id = ["atomic_number", "ion_charge"] + self.unique_level_identifier
 
         levels.drop_duplicates(unique_level_id, inplace=True)
@@ -413,6 +420,12 @@ class GFALLReader(object):
         levels_idx = levels_idx.set_index(unique_level_id)
 
         lines = gfall[selected_columns].copy()
+        label_columns = [
+            column for column in ["label_lower", "label_upper"] if column in lines
+        ]
+        for column in label_columns:
+            lines[column] = lines[column].apply(self.normalize_label)
+
         lines["gf"] = np.power(10, lines["loggf"])
         lines = lines.drop(["loggf"], axis="columns")
 

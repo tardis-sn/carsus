@@ -1,6 +1,5 @@
 import logging
 
-import numpy as np
 import pandas as pd
 
 from carsus.io.output.collisions import ChiantiCollisionsPreparer, CollisionsPreparer
@@ -159,7 +158,7 @@ class TARDISAtomData:
         else:
             return None
 
-    def to_hdf(self, fname):
+    def to_hdf(self, fname, legacy_tardis_schema=False, database_version=None):
         """
         Dump `prepared` attributes into an HDF5 file.
 
@@ -167,6 +166,13 @@ class TARDISAtomData:
         ----------
         fname : path
            Path to the HDF5 output file.
+        legacy_tardis_schema : bool, optional
+           Emit metadata compatible with the TARDIS v0.9 regression atom-data
+           files. This omits ``/lines_metadata``, stores md5 labels for levels
+           and lines using their legacy names, and skips source dataset version
+           rows in ``/metadata``.
+        database_version : str, optional
+           Value stored in the root ``database_version`` HDF5 attribute.
 
         """
         import hashlib
@@ -206,42 +212,54 @@ class TARDISAtomData:
 
             for hdf_path, (reader, data) in optional_outputs.items():
                 if hasattr(reader, data):
-                    f.put(hdf_path, getattr(reader, data))
+                    output = getattr(reader, data)
+                    if output is not None:
+                        f.put(hdf_path, output)
 
-            lines_metadata = pd.DataFrame(
-                data=[["format", "version", "1.0"]], columns=["field", "key", "value"]
-            ).set_index(["field", "key"])
-            f.put("/lines_metadata", lines_metadata)
+            if not legacy_tardis_schema:
+                lines_metadata = pd.DataFrame(
+                    data=[["format", "version", "1.0"]],
+                    columns=["field", "key", "value"],
+                ).set_index(["field", "key"])
+                f.put("/lines_metadata", lines_metadata)
 
             meta = []
             meta.append(("format", "version", FORMAT_VERSION))
 
             total_checksum = hashlib.md5()
+            legacy_metadata_keys = {
+                "levels_data": "levels",
+                "lines_data": "lines",
+            }
             for key in f.keys():
                 # update the total checksum to sign the file
                 total_checksum.update(serialize_pandas_object(f[key]))
 
                 # save individual DataFrame/Series checksum
                 checksum = hash_pandas_object(f[key])
-                meta.append(("md5sum", key.lstrip("/"), checksum))
+                metadata_key = key.lstrip("/")
+                if legacy_tardis_schema:
+                    metadata_key = legacy_metadata_keys.get(metadata_key, metadata_key)
+                meta.append(("md5sum", metadata_key, checksum))
 
             # data sources versions
-            meta.append(("datasets", "nist_weights", self.atomic_weights.version))
+            if not legacy_tardis_schema:
+                meta.append(("datasets", "nist_weights", self.atomic_weights.version))
 
-            meta.append(("datasets", "nist_spectra", self.ionization_energies.version))
+                meta.append(("datasets", "nist_spectra", self.ionization_energies.version))
 
-            meta.append(("datasets", "gfall", self.gfall_reader.version))
+                meta.append(("datasets", "gfall", self.gfall_reader.version))
 
-            meta.append(("datasets", "zeta", self.zeta_data.version))
+                meta.append(("datasets", "zeta", self.zeta_data.version))
 
-            if self.chianti_reader is not None:
-                meta.append(("datasets", "chianti", self.chianti_reader.version))
+                if self.chianti_reader is not None:
+                    meta.append(("datasets", "chianti", self.chianti_reader.version))
 
-            if self.cmfgen_reader is not None:
-                meta.append(("datasets", "cmfgen", self.cmfgen_reader.version))
+                if self.cmfgen_reader is not None:
+                    meta.append(("datasets", "cmfgen", self.cmfgen_reader.version))
 
-            if self.vald_reader is not None:
-                meta.append(("datasets", "vald", self.vald_reader.version))
+                if self.vald_reader is not None:
+                    meta.append(("datasets", "vald", self.vald_reader.version))
 
             # relevant package versions
             meta.append(("software", "python", platform.python_version()))
@@ -271,6 +289,8 @@ class TARDISAtomData:
             f.root._v_attrs["MD5"] = total_checksum.hexdigest()
             f.root._v_attrs["UUID1"] = uuid1
             f.root._v_attrs["FORMAT_VERSION"] = FORMAT_VERSION
+            if database_version is not None:
+                f.root._v_attrs["database_version"] = database_version
 
             tz = pytz.timezone("UTC")
             date = datetime.now(tz).isoformat()
