@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMFGEN &mdash; carsus v0.1.dev1+g92480bfce</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=a188ef3e"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ZETA DATA" href="zeta.html" />
+    <link rel="prev" title="CHIANTI" href="chianti.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chianti.html">CHIANTI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CMFGEN</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Parsers">Parsers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Levels,-Lines-and-Collisions">Levels, Lines and Collisions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Photoionization-Cross-sections">Photoionization Cross-sections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Batch-Convert-Files-to-HDF5">Batch Convert Files to HDF5</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CMFGENReader">CMFGENReader</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CMFGEN</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/io/cmfgen.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="CMFGEN">
+<h1>CMFGEN<a class="headerlink" href="#CMFGEN" title="Link to this heading"></a></h1>
+<p>Database from John Hillier’s CMFGEN, a radiative transfer code designed to solve the radiative transfer and statistical equilibrium equations in spherical geometry.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p>In this example, the data was downloaded from the <a class="reference external" href="https://sites.pitt.edu/~hillier/web/CMFGEN.htm">CMFGEN website</a> and extracted to the <code class="docutils literal notranslate"><span class="pre">/tmp/atomic</span></code> folder.</p>
+</div>
+<section id="Parsers">
+<h2>Parsers<a class="headerlink" href="#Parsers" title="Link to this heading"></a></h2>
+<p>The CMFGEN parsers retrieves data from text files preserving its original form (no unit conversions) and stores it in DataFrames. Currently, just <code class="docutils literal notranslate"><span class="pre">osc</span></code>, <code class="docutils literal notranslate"><span class="pre">col</span></code> and <code class="docutils literal notranslate"><span class="pre">pho</span></code> files are supported.</p>
+<section id="Levels,-Lines-and-Collisions">
+<h3>Levels, Lines and Collisions<a class="headerlink" href="#Levels,-Lines-and-Collisions" title="Link to this heading"></a></h3>
+<p>Energy levels and spectral lines are stored in the <code class="docutils literal notranslate"><span class="pre">osc</span></code> files, while collisions strengths are provided by the <code class="docutils literal notranslate"><span class="pre">col</span></code> files.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.cmfgen</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMFGENEnergyLevelsParser</span><span class="p">,</span> <span class="n">CMFGENOscillatorStrengthsParser</span><span class="p">,</span> <span class="n">CMFGENCollisionalStrengthsParser</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_path</span> <span class="o">=</span> <span class="s1">&#39;../../../carsus-data-cmfgen/atomic/&#39;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">cmfgen_path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">cmfgen_path</span> <span class="o">=</span> <span class="s2">&quot;/tmp/atomic/&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_lvl</span> <span class="o">=</span> <span class="n">CMFGENEnergyLevelsParser</span><span class="p">(</span><span class="n">cmfgen_path</span><span class="o">+</span><span class="s1">&#39;SIL/II/16sep15/si2_osc_kurucz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_osc</span> <span class="o">=</span> <span class="n">CMFGENOscillatorStrengthsParser</span><span class="p">(</span><span class="n">cmfgen_path</span><span class="o">+</span><span class="s1">&#39;SIL/II/16sep15/si2_osc_kurucz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_col</span> <span class="o">=</span> <span class="n">CMFGENCollisionalStrengthsParser</span><span class="p">(</span><span class="n">cmfgen_path</span><span class="o">+</span><span class="s1">&#39;SIL/II/16sep15/si2_col&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Header information is stored in the <code class="docutils literal notranslate"><span class="pre">header</span></code> attribute and the DataFrame in the <code class="docutils literal notranslate"><span class="pre">base</span></code> attribute:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_col</span><span class="o">.</span><span class="n">header</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_lvl</span><span class="o">.</span><span class="n">base</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Photoionization-Cross-sections">
+<h3>Photoionization Cross-sections<a class="headerlink" href="#Photoionization-Cross-sections" title="Link to this heading"></a></h3>
+<p>Photoionization cross-sections are provided by the <code class="docutils literal notranslate"><span class="pre">pho</span></code> files.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.cmfgen</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMFGENPhoCrossSectionsParser</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span> <span class="o">=</span> <span class="n">CMFGENPhoCrossSectionsParser</span><span class="p">(</span><span class="n">cmfgen_path</span><span class="o">+</span><span class="s1">&#39;SIL/II/16sep15/phot_nahar_A&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">header</span>
+</pre></div>
+</div>
+</div>
+<p>In this case, <code class="docutils literal notranslate"><span class="pre">base</span></code> is a list containing many DataFrames. Also, each individual DataFrame contains information relative to that specific target under the attribute <code class="docutils literal notranslate"><span class="pre">attr</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">si2_cross_sections</span><span class="o">.</span><span class="n">base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Batch-Convert-Files-to-HDF5">
+<h3>Batch Convert Files to HDF5<a class="headerlink" href="#Batch-Convert-Files-to-HDF5" title="Link to this heading"></a></h3>
+<p>To convert multiple CMFGEN files to the HDF5 format import the <code class="docutils literal notranslate"><span class="pre">hdf_dump</span></code> function.</p>
+<div class="admonition note">
+<p class="admonition-title fa fa-exclamation-circle"><strong>Note:</strong></p>
+<p>This feature has been temporary disabled.</p>
+</div>
+from carsus.io.cmfgen import hdf_dumphdf_dump('/tmp/atomic/', ['osc', 'OSC', 'Osc'], CMFGENEnergyLevelsParser(), chunk_size=10, ignore_patterns=['ERROR_CHK'])<p>Required parameters are <code class="docutils literal notranslate"><span class="pre">cmfgen_dir</span></code>, <code class="docutils literal notranslate"><span class="pre">patterns</span></code> and <code class="docutils literal notranslate"><span class="pre">parser</span></code>, while <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> and <code class="docutils literal notranslate"><span class="pre">ignore_patterns</span></code> are optional.</p>
+</section>
+</section>
+<section id="CMFGENReader">
+<h2>CMFGENReader<a class="headerlink" href="#CMFGENReader" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CMFGENReader</span></code> provides processed <code class="docutils literal notranslate"><span class="pre">levels</span></code>, <code class="docutils literal notranslate"><span class="pre">lines</span></code>, <code class="docutils literal notranslate"><span class="pre">ionization_energies</span></code>, <code class="docutils literal notranslate"><span class="pre">cross_sections</span></code> and <code class="docutils literal notranslate"><span class="pre">collisions</span></code> tables to work with. You can provide temperatures for the <code class="docutils literal notranslate"><span class="pre">collisions</span></code> dataframe using the <code class="docutils literal notranslate"><span class="pre">temperature_grid</span></code> option.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.cmfgen</span><span class="w"> </span><span class="kn">import</span> <span class="n">CMFGENReader</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span> <span class="o">=</span> <span class="n">CMFGENReader</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="s1">&#39;Si 0-1&#39;</span><span class="p">,</span> <span class="n">cmfgen_path</span><span class="p">,</span> <span class="n">ionization_energies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cross_sections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_mismatched_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">levels</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">lines</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">cross_sections</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">ionization_energies</span>
+</pre></div>
+</div>
+</div>
+<p>The values in the collisions dataframe are thermally-averaged effective collision strengths divided by the statistical weights of the lower levels. Please see Eq. A1 and A2 of <span class="bibtex-citation" id="id1">[<a class="reference internal" href="../research/bibliography.html#id5" title="Norbert Przybilla and Keith Butler. Non-LTE Line Formation for Hydrogen Revisited. Astrophysical Journal, 609(2):1181-1191, July 2004. arXiv:astro-ph/0406458, doi:10.1086/421316.">PrzybillaButler04</a>]</span> for definitions. More information about the <code class="docutils literal notranslate"><span class="pre">collisions</span></code> table is stored inside the <code class="docutils literal notranslate"><span class="pre">collisional_metadata</span></code> attribute.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">collisions</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmfgen_reader</span><span class="o">.</span><span class="n">collisional_metadata</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chianti.html" class="btn btn-neutral float-left" title="CHIANTI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="zeta.html" class="btn btn-neutral float-right" title="ZETA DATA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2026, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 29 Jun 2026.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
