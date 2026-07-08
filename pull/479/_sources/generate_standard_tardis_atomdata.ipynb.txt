@@ -1,0 +1,280 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Build `kurucz_cd23_chianti_H_He_latest.h5`\n",
+    "\n",
+    "This notebook builds a TARDIS atom-data file from the current Carsus public data inputs:\n",
+    "\n",
+    "- NIST atomic weights and ionization energies for H-Zn\n",
+    "- Kurucz CD23 GFALL levels and lines from the [Carsus Kurucz data mirror](https://github.com/tardis-sn/carsus-data-kurucz)\n",
+    "- CHIANTI H-He levels, lines, and electron collision strengths from the [CHIANTI database](https://www.chiantidatabase.org/) configured by `XUVTOP`\n",
+    "- Knox-Long recombination zeta data\n",
+    "- [NNDC ENSDF CSV decay-radiation data](https://github.com/tardis-sn/carsus-data-nndc)\n",
+    "\n",
+    "The output uses the legacy TARDIS HDF schema (`database_version='v0.9'`) expected by TARDIS regression atom-data files. It is intended to make a valid current-data file named `kurucz_cd23_chianti_H_He_latest.h5`; it is not a byte-for-byte reproduction of older historical regression files."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Configure source locations\n",
+    "\n",
+    "Download and extract the latest CHIANTI database from the CHIANTI project, then set `XUVTOP` to the extracted database root before running the Carsus readers. The current CHIANTI database package should contain files such as `VERSION`, `masterlist/masterlist_ions.pkl`, `h/h_1/h_1.elvlc`, and `he/he_1/he_1.elvlc`.\n",
+    "\n",
+    "The optional `CHIANTI_DATABASE_URL` block below is provided for reproducible local runs when you know the exact upstream archive URL. If `XUVTOP` already points to an extracted CHIANTI tree, the notebook will use that tree and skip downloading."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "da147dc3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pathlib import Path\n",
+    "import os\n",
+    "import shutil\n",
+    "import tarfile\n",
+    "import urllib.request\n",
+    "\n",
+    "DATA_ROOT = Path(os.environ.get(\"CARSUS_ATOMDATA_SOURCE_DIR\", Path.home() / \"Downloads\" / \"carsus-atomdata-sources\"))\n",
+    "DATA_ROOT.mkdir(parents=True, exist_ok=True)\n",
+    "\n",
+    "OUTPUT_PATH = Path(\"kurucz_cd23_chianti_H_He_latest.h5\")\n",
+    "\n",
+    "# Prefer an existing XUVTOP. If it is not set, use DATA_ROOT/chianti after optional download/extraction.\n",
+    "CHIANTI_ROOT = Path(os.environ.get(\"XUVTOP\", DATA_ROOT / \"chianti\")).expanduser()\n",
+    "CHIANTI_DATABASE_URL = os.environ.get(\"CHIANTI_DATABASE_URL\", \"\")\n",
+    "\n",
+    "if not CHIANTI_ROOT.exists() and CHIANTI_DATABASE_URL:\n",
+    "    archive_path = DATA_ROOT / Path(CHIANTI_DATABASE_URL).name\n",
+    "    print(f\"Downloading CHIANTI database archive to {archive_path}\")\n",
+    "    urllib.request.urlretrieve(CHIANTI_DATABASE_URL, archive_path)\n",
+    "    extract_root = DATA_ROOT / \"chianti-extracted\"\n",
+    "    if extract_root.exists():\n",
+    "        shutil.rmtree(extract_root)\n",
+    "    extract_root.mkdir()\n",
+    "    with tarfile.open(archive_path) as archive:\n",
+    "        archive.extractall(extract_root)\n",
+    "    candidates = [path for path in extract_root.rglob(\"VERSION\")]\n",
+    "    if not candidates:\n",
+    "        raise RuntimeError(\"The CHIANTI archive did not contain a VERSION file.\")\n",
+    "    CHIANTI_ROOT = candidates[0].parent\n",
+    "\n",
+    "required_chianti_paths = [\n",
+    "    CHIANTI_ROOT / \"VERSION\",\n",
+    "    CHIANTI_ROOT / \"masterlist\" / \"masterlist_ions.pkl\",\n",
+    "    CHIANTI_ROOT / \"h\" / \"h_1\" / \"h_1.elvlc\",\n",
+    "    CHIANTI_ROOT / \"he\" / \"he_1\" / \"he_1.elvlc\",\n",
+    "    CHIANTI_ROOT / \"he\" / \"he_2\" / \"he_2.elvlc\",\n",
+    "]\n",
+    "missing = [path for path in required_chianti_paths if not path.exists()]\n",
+    "if missing:\n",
+    "    raise FileNotFoundError(\n",
+    "        \"Set XUVTOP to an extracted CHIANTI database root or set CHIANTI_DATABASE_URL. \"\n",
+    "        f\"Missing: {missing}\"\n",
+    "    )\n",
+    "\n",
+    "os.environ[\"XUVTOP\"] = str(CHIANTI_ROOT)\n",
+    "print(f\"Using CHIANTI database: {CHIANTI_ROOT}\")\n",
+    "print((CHIANTI_ROOT / \"VERSION\").read_text().strip())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Create Carsus readers\n",
+    "\n",
+    "Import `carsus` before importing `astropy.units` or `astropy.constants` elsewhere in the kernel. Carsus pins the Astropy constants set used by legacy TARDIS atom-data generation during import."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a0c77b8b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.chianti_ import ChiantiReader\n",
+    "from carsus.io.kurucz import GFALLReader\n",
+    "from carsus.io.nist import NISTIonizationEnergies, NISTWeightsComp\n",
+    "from carsus.io.nuclear import NNDCReader\n",
+    "from carsus.io.zeta import KnoxLongZeta\n",
+    "\n",
+    "atomic_weights = NISTWeightsComp()\n",
+    "ionization_energies = NISTIonizationEnergies(\"H-Zn\")\n",
+    "\n",
+    "# GFALLReader's default source is the Carsus Kurucz CD23 mirror on the main branch.\n",
+    "# Include labels in the level identity so same-energy/J terms remain distinct when labels differ.\n",
+    "gfall_reader = GFALLReader(\n",
+    "    \"H-Zn\",\n",
+    "    unique_level_identifier=[\"energy\", \"j\", \"label\"],\n",
+    ")\n",
+    "\n",
+    "chianti_reader = ChiantiReader(\"H-He\", collisions=True, priority=20)\n",
+    "zeta_data = KnoxLongZeta()\n",
+    "\n",
+    "# With remote=True, NNDCReader clones the Carsus NNDC CSV repository into its\n",
+    "# default location if it is not already present.\n",
+    "nndc_reader = NNDCReader(remote=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e4e53359",
+   "metadata": {},
+   "source": [
+    "## Build and write the TARDIS atom-data file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d49b5b93",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from carsus.io.output import TARDISAtomData\n",
+    "\n",
+    "atom_data = TARDISAtomData(\n",
+    "    atomic_weights=atomic_weights,\n",
+    "    ionization_energies=ionization_energies,\n",
+    "    gfall_reader=gfall_reader,\n",
+    "    zeta_data=zeta_data,\n",
+    "    chianti_reader=chianti_reader,\n",
+    "    nndc_reader=nndc_reader,\n",
+    ")\n",
+    "\n",
+    "atom_data.to_hdf(\n",
+    "    OUTPUT_PATH,\n",
+    "    legacy_tardis_schema=True,\n",
+    "    database_version=\"v0.9\",\n",
+    ")\n",
+    "print(f\"Wrote {OUTPUT_PATH.resolve()}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5ba35684",
+   "metadata": {},
+   "source": [
+    "## Validate the file layout\n",
+    "\n",
+    "These checks verify the legacy TARDIS schema contract used by the Carsus regression test for `kurucz_cd23_chianti_H_He_latest.h5`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "070517d1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "expected_keys = {\n",
+    "    \"/atom_data\",\n",
+    "    \"/collisions_data\",\n",
+    "    \"/collisions_metadata\",\n",
+    "    \"/decay_radiation_data\",\n",
+    "    \"/ionization_data\",\n",
+    "    \"/levels_data\",\n",
+    "    \"/lines_data\",\n",
+    "    \"/macro_atom_data\",\n",
+    "    \"/macro_atom_references\",\n",
+    "    \"/metadata\",\n",
+    "    \"/zeta_data\",\n",
+    "}\n",
+    "\n",
+    "with pd.HDFStore(OUTPUT_PATH, mode=\"r\") as store:\n",
+    "    keys = set(store.keys())\n",
+    "    assert keys == expected_keys, sorted(keys ^ expected_keys)\n",
+    "    assert store.root._v_attrs[\"FORMAT_VERSION\"] == \"2.0\"\n",
+    "    assert store.root._v_attrs[\"database_version\"] == \"v0.9\"\n",
+    "\n",
+    "    metadata = store[\"metadata\"]\n",
+    "    assert (\"md5sum\", \"levels\") in metadata.index\n",
+    "    assert (\"md5sum\", \"lines\") in metadata.index\n",
+    "    assert (\"md5sum\", \"levels_data\") not in metadata.index\n",
+    "    assert (\"md5sum\", \"lines_data\") not in metadata.index\n",
+    "\n",
+    "    atom_data_table = store[\"atom_data\"]\n",
+    "    assert atom_data_table.index.name == \"atomic_number\"\n",
+    "    assert atom_data_table.index.min() == 1\n",
+    "    assert atom_data_table.index.max() == 94\n",
+    "\n",
+    "    print(\"Validated legacy TARDIS atom-data schema.\")\n",
+    "    print(\"Rows:\")\n",
+    "    for key in sorted(keys):\n",
+    "        obj = store[key]\n",
+    "        shape = getattr(obj, \"shape\", None)\n",
+    "        print(f\"  {key}: {shape}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dcd31452",
+   "metadata": {},
+   "source": [
+    "## Record source versions\n",
+    "\n",
+    "The file metadata stores checksums and software versions. The printed values below are useful when publishing or uploading the generated atom-data file."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ba077a63",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with pd.HDFStore(OUTPUT_PATH, mode=\"r\") as store:\n",
+    "    print(\"HDF root attributes:\")\n",
+    "    for name in [\"FORMAT_VERSION\", \"database_version\", \"DATE\", \"MD5\", \"UUID1\"]:\n",
+    "        print(f\"  {name}: {store.root._v_attrs[name]}\")\n",
+    "\n",
+    "    print(\"\\nMetadata:\")\n",
+    "    display(store[\"metadata\"])\n",
+    "\n",
+    "print(f\"CHIANTI XUVTOP: {os.environ['XUVTOP']}\")\n",
+    "print(f\"CHIANTI version: {(Path(os.environ['XUVTOP']) / 'VERSION').read_text().strip()}\")\n",
+    "print(f\"NNDC source directory: {nndc_reader.dirname}\")\n",
+    "print(f\"GFALL checksum: {gfall_reader.version}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3f6dd6e6",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "tardis",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

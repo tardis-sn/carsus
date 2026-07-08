@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atomic Data Reproduction Differences &mdash; carsus v0.1.dev1+gba4eed8e1</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=0bbf672c"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Carsus Publications" href="../research/publications.html" />
+    <link rel="prev" title="Differences between level_index, level_id and level_number" href="level_index_id_number.html" />
+    <link href="../_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            carsus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../io/nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io/barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Atomic Data Reproduction Differences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#files-compared">Files compared</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#high-level-result">High-level result</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hdf-keys-and-shapes">HDF keys and shapes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#root-attributes">Root attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lines-data"><code class="docutils literal notranslate"><span class="pre">/lines_data</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collisions-data"><code class="docutils literal notranslate"><span class="pre">/collisions_data</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#macro-atom-data"><code class="docutils literal notranslate"><span class="pre">/macro_atom_data</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#decay-radiation-data"><code class="docutils literal notranslate"><span class="pre">/decay_radiation_data</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata"><code class="docutils literal notranslate"><span class="pre">/metadata</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interpretation">Interpretation</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Atomic Data Reproduction Differences</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/atomic_data_reproduction_diff.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="atomic-data-reproduction-differences">
+<h1>Atomic Data Reproduction Differences<a class="headerlink" href="#atomic-data-reproduction-differences" title="Link to this heading"></a></h1>
+<p>This page records the observed differences between the TARDIS regression
+reference atom-data file and the Carsus-generated reproduction candidate.</p>
+<section id="files-compared">
+<h2>Files compared<a class="headerlink" href="#files-compared" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Reference file:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">/home/afullard/tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He_latest.h5</span></code></p>
+</dd>
+<dt>Generated file:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">/tmp/carsus_reference_experiment.h5</span></code></p>
+</dd>
+</dl>
+<p>The generated file was built from the recovered historical Kurucz SQLite GFALL
+database, the NNDC CSV snapshot from <code class="docutils literal notranslate"><span class="pre">tardis-sn/carsus-data-nndc</span></code> commit
+<code class="docutils literal notranslate"><span class="pre">136a8633e3dee21079d3738dabfe7758f6e40d41</span></code>, and CHIANTI H-He data with
+CHIANTI 7.1 <code class="docutils literal notranslate"><span class="pre">.wgfa</span></code> radiative transition rows overlaid onto the current
+CHIANTI reader output.</p>
+</section>
+<section id="high-level-result">
+<h2>High-level result<a class="headerlink" href="#high-level-result" title="Link to this heading"></a></h2>
+<p>Both files contain the same HDF keys. No table has reference-only or
+generated-only index rows. The following tables compare exactly with
+<code class="docutils literal notranslate"><span class="pre">DataFrame.equals</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/atom_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/collisions_metadata</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/ionization_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/levels_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/macro_atom_references</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/zeta_data</span></code></p></li>
+</ul>
+<p>The following tables do not compare byte-for-byte:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/collisions_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/decay_radiation_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/lines_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/macro_atom_data</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/metadata</span></code></p></li>
+</ul>
+</section>
+<section id="hdf-keys-and-shapes">
+<h2>HDF keys and shapes<a class="headerlink" href="#hdf-keys-and-shapes" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Reference shape</p></th>
+<th class="head"><p>Generated shape</p></th>
+<th class="head"><p>Exact</p></th>
+<th class="head"><p>Index equal</p></th>
+<th class="head"><p>Reference-only rows</p></th>
+<th class="head"><p>Generated-only rows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/atom_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(30,</span> <span class="pre">3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(30,</span> <span class="pre">3)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/collisions_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(358,</span> <span class="pre">14)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(358,</span> <span class="pre">14)</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/collisions_metadata</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(2,)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(2,)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/decay_radiation_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(242295,</span> <span class="pre">41)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(242295,</span> <span class="pre">41)</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/ionization_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(465,)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(465,)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/levels_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(24806,</span> <span class="pre">3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(24806,</span> <span class="pre">3)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/lines_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(271741,</span> <span class="pre">8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(271741,</span> <span class="pre">8)</span></code></p></td>
+<td><p>no</p></td>
+<td><p>no, in stored order</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/macro_atom_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(815223,</span> <span class="pre">7)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(815223,</span> <span class="pre">7)</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/macro_atom_references</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(24806,</span> <span class="pre">3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(24806,</span> <span class="pre">3)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/metadata</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(18,</span> <span class="pre">1)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(18,</span> <span class="pre">1)</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/zeta_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(412,</span> <span class="pre">20)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(412,</span> <span class="pre">20)</span></code></p></td>
+<td><p>yes</p></td>
+<td><p>yes</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="root-attributes">
+<h2>Root attributes<a class="headerlink" href="#root-attributes" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">FORMAT_VERSION</span></code> and <code class="docutils literal notranslate"><span class="pre">database_version</span></code> match. The timestamp, UUID, and
+file MD5 differ because the generated file was written in a different run.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Reference</p></th>
+<th class="head"><p>Generated</p></th>
+<th class="head"><p>Equal</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FORMAT_VERSION</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.0</span></code></p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">database_version</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v0.9</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v0.9</span></code></p></td>
+<td><p>yes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DATE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2025-05-28T19:19:43.222133+00:00</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2026-06-30T14:07:39.073939+00:00</span></code></p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">UUID1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">b58b2ef63bf811f08edf96479f911fbd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0d7d7132748d11f183b469a0031257ca</span></code></p></td>
+<td><p>no</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MD5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5d80fa4ae0638469bf1ff281b6ca2a94</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">e9f4e1d62283c8d72460f830f6315f57</span></code></p></td>
+<td><p>no</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="lines-data">
+<h2><code class="docutils literal notranslate"><span class="pre">/lines_data</span></code><a class="headerlink" href="#lines-data" title="Link to this heading"></a></h2>
+<p>After sorting both tables by their physical index
+<code class="docutils literal notranslate"><span class="pre">(atomic_number,</span> <span class="pre">ion_number,</span> <span class="pre">level_number_lower,</span> <span class="pre">level_number_upper)</span></code>, all
+rows align. The remaining differences are concentrated in H I, He I, and He II
+line IDs, plus floating-point roundoff in quantities derived from the CHIANTI
+line values.</p>
+<p><code class="docutils literal notranslate"><span class="pre">line_id</span></code> differs for 321 rows. The maximum absolute line-ID shift is 3.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Species index</p></th>
+<th class="head"><p>Differing rows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">0)</span></code></p></td>
+<td><p>74</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">0)</span></code></p></td>
+<td><p>180</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">1)</span></code></p></td>
+<td><p>67</p></td>
+</tr>
+</tbody>
+</table>
+<p>Column differences after index alignment, expressed relative to the reference
+value:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+<th class="head"><p>Max relative difference</p></th>
+<th class="head"><p>Mean relative difference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">line_id</span></code></p></td>
+<td><p>321</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.624834770478617e-06</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.381902051173341e-09</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">wavelength</span></code></p></td>
+<td><p>321</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.5296725691438195e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.258608679965486e-19</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">f_ul</span></code></p></td>
+<td><p>92</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.867333931901698e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6.130846763437799e-20</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">f_lu</span></code></p></td>
+<td><p>86</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.867333931901698e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.808156081243093e-20</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nu</span></code></p></td>
+<td><p>270</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.5169652833628e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.1890800632067765e-19</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B_lu</span></code></p></td>
+<td><p>327</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.666398681217063e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.6988645838974265e-19</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">B_ul</span></code></p></td>
+<td><p>335</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.666398681217063e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.715503347390916e-19</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">A_ul</span></code></p></td>
+<td><p>543</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1282367931533941e-15</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6.58566534257689e-19</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The line values are therefore physically aligned to numerical precision. For
+example, the largest aligned <code class="docutils literal notranslate"><span class="pre">B_ul</span></code> relative difference is
+<code class="docutils literal notranslate"><span class="pre">5.666398681217063e-16</span></code>. The remaining line-ID shifts are a legacy numbering
+artifact from the order and count of rows present before source-priority
+filtering.</p>
+</section>
+<section id="collisions-data">
+<h2><code class="docutils literal notranslate"><span class="pre">/collisions_data</span></code><a class="headerlink" href="#collisions-data" title="Link to this heading"></a></h2>
+<p>The collision table has the same shape and physical index in both files. All
+358 rows differ in the internal ID columns. The collision energies differ at
+small numerical levels.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+<th class="head"><p>Max relative difference</p></th>
+<th class="head"><p>Mean relative difference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">e_col_id</span></code></p></td>
+<td><p>358</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.686527545534302e-05</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.6849600490378205e-05</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lower_level_id</span></code></p></td>
+<td><p>358</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.011138521342602976</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.011126068467180832</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">upper_level_id</span></code></p></td>
+<td><p>358</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.01113810502709774</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.01111742439020622</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">energy_lower</span></code></p></td>
+<td><p>262</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.446661999562916e-08</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.4466619847822936e-08</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">energy_upper</span></code></p></td>
+<td><p>358</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.446662010541005e-08</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.4466619856192806e-08</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">delta_e</span></code></p></td>
+<td><p>358</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.732640138846471e-08</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.732638835087047e-08</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="macro-atom-data">
+<h2><code class="docutils literal notranslate"><span class="pre">/macro_atom_data</span></code><a class="headerlink" href="#macro-atom-data" title="Link to this heading"></a></h2>
+<p>The macro atom table has the same shape and index in both files. Comparing in
+stored index order gives large apparent differences because row ordering within
+source-level groups depends on line IDs. After sorting by all physical macro
+atom columns, the residual differences are limited to H-He line-ID shifts and
+floating-point roundoff.</p>
+<p>Stored-index comparison, expressed relative to the reference value. This is a
+row-order diagnostic rather than a physical comparison because rows within
+source-level groups are not aligned:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+<th class="head"><p>Max relative difference</p></th>
+<th class="head"><p>Mean relative difference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">destination_level_number</span></code></p></td>
+<td><p>563325</p></td>
+<td><p>837.0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1245320224132056</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">transition_type</span></code></p></td>
+<td><p>252371</p></td>
+<td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.47004868606503986</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transition_probability</span></code></p></td>
+<td><p>574050</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">370354065608758.7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1705204017.1841183</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">transition_line_id</span></code></p></td>
+<td><p>564141</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.6732522796352584</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.008082544296154417</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Content-sorted comparison, expressed relative to the reference value:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+<th class="head"><p>Max relative difference</p></th>
+<th class="head"><p>Mean relative difference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">transition_probability</span></code></p></td>
+<td><p>1290</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.0448848738309492e-15</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.887465866414813e-19</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">transition_line_id</span></code></p></td>
+<td><p>963</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.624834770478617e-06</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4.381902051173341e-09</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="decay-radiation-data">
+<h2><code class="docutils literal notranslate"><span class="pre">/decay_radiation_data</span></code><a class="headerlink" href="#decay-radiation-data" title="Link to this heading"></a></h2>
+<p>The decay radiation table has the same shape, columns, and isotope index in
+both files. Differences are serialization and floating-point representation
+differences from parsing the same NNDC CSV snapshot with newer dependencies.</p>
+<p>Numeric column differences:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+<th class="head"><p>Max relative difference</p></th>
+<th class="head"><p>Mean relative difference</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Decay</span> <span class="pre">Mode</span> <span class="pre">Value</span></code></p></td>
+<td><p>1295</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.085004177856739e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">7.578287110737619e-19</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Q</span> <span class="pre">Value</span></code></p></td>
+<td><p>19</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.6802467266366348e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">9.685144611315847e-21</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">T1/2</span> <span class="pre">(sec)</span></code></p></td>
+<td><p>7535</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.927827262583468e-14</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.1967362187028166e-17</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Rad</span> <span class="pre">Energy</span></code></p></td>
+<td><p>7984</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.2197047025625434e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5.014792926927897e-18</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>`` EP Energy``</p></td>
+<td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.9109857881773446e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.0332460912299135e-20</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Rad</span> <span class="pre">Intensity</span></code></p></td>
+<td><p>31067</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.207027323125709e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.8993832595513687e-17</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Dose</span></code></p></td>
+<td><p>44861</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.0691244944768855e-16</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.758227980134172e-17</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Object/string-like column differences:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Differing rows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Parent</span> <span class="pre">E(level)</span></code></p></td>
+<td><p>672</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Gammas</span> <span class="pre">Balance</span></code></p></td>
+<td><p>2311</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">B-</span> <span class="pre">Balance</span></code></p></td>
+<td><p>621</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B+</span> <span class="pre">Balance</span></code></p></td>
+<td><p>624</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Conversion</span> <span class="pre">Electrons</span> <span class="pre">Balance</span></code></p></td>
+<td><p>2040</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Auger</span> <span class="pre">Electrons</span> <span class="pre">Balance</span></code></p></td>
+<td><p>24</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Recoil</span> <span class="pre">Balance</span></code></p></td>
+<td><p>79</p></td>
+</tr>
+<tr class="row-odd"><td><p>`` Protons Balance``</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Alphas</span> <span class="pre">Balance</span></code></p></td>
+<td><p>73</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Sum</span> <span class="pre">Balance</span></code></p></td>
+<td><p>111</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q-effective</span> <span class="pre">Balance</span></code></p></td>
+<td><p>9</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Missing</span> <span class="pre">Energy</span> <span class="pre">Balance</span></code></p></td>
+<td><p>20</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="metadata">
+<h2><code class="docutils literal notranslate"><span class="pre">/metadata</span></code><a class="headerlink" href="#metadata" title="Link to this heading"></a></h2>
+<p>The metadata table shape and index match, but 17 of 18 rows differ. The
+differences are expected because the file was generated with a newer Carsus
+checkout and newer runtime dependencies, and because each table’s stored MD5
+is recomputed from the generated representation.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Key</p></th>
+<th class="head"><p>Reference</p></th>
+<th class="head"><p>Generated</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">atom_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">7214216cc5cfda76089f261c37212a04</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1c075be4454adb32eb59ccf96e540cd5</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collisions_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">c2e2ad0009fd3388d97b72e4a3cf8601</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">68e262dcc4be0ca5cc18ed06ce601645</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collisions_metadata</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1a845db11b82c8da75a22cfb5d0f0734</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">33a56c0abaec5ec37473c130e9e68ff6</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">decay_radiation_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">e3ae85386dd5d4a86ebf09bc8563c7de</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">567484a1aff18ccb8b8afce542a14f6c</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ionization_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">8eaf0cb822408b97ae018eaf5b8c1d4b</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">7bfc5466b0cd9896f4ca1f386dc73a19</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">levels</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">eb7f50552d79e0fcda6daa289de669a7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">f0117ed27b7a2eebc4898a986613d477</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lines</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">b0a3d64dd607522886a0c9e722254470</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3bba6940617d76a343b4ed6c9a951f07</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">macro_atom_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">745e7d7b23f52af2c170bec0f03ccf25</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">34817c05690a02e7142d8e038e666781</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">macro_atom_references</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">86dc1a2668625a1bf4c6c912f32f02a1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">e542f4f82013cbf611927dc26177a9dc</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">md5sum</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">zeta_data</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2c9ac05732b3678212075b77cdf2ba62</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3555b5c9000ae58eb92ac5d0018ca360</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ChiantiPy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.15.0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0.16.0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">astropy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6.1.3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">7.2.0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">carsus</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2024.12.24.dev43+g089048e.d20250528</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2024.12.24.dev64+gaf7c224cb.d20260630</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.1.1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.4.6</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2.2.2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.0.3</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.12.5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.14.5</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">tables</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.10.1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">3.11.1</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="interpretation">
+<h2>Interpretation<a class="headerlink" href="#interpretation" title="Link to this heading"></a></h2>
+<p>The recovered source data are sufficient to reproduce the reference file’s
+schema, table set, row counts, indexes, and all core level/ion/zeta/atom tables.
+The remaining differences are not missing source rows. They fall into four
+categories:</p>
+<ul class="simple">
+<li><p>run-specific root attributes and table MD5 signatures;</p></li>
+<li><p>dependency/version metadata;</p></li>
+<li><p>floating-point and object serialization differences from newer pandas,
+PyTables, NumPy, Astropy, and ChiantiPy versions;</p></li>
+<li><p>legacy line-ID numbering differences in the CHIANTI H-He line block, which
+propagate into <code class="docutils literal notranslate"><span class="pre">/macro_atom_data</span></code> because macro atom rows store
+<code class="docutils literal notranslate"><span class="pre">transition_line_id</span></code>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="level_index_id_number.html" class="btn btn-neutral float-left" title="Differences between level_index, level_id and level_number" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../research/publications.html" class="btn btn-neutral float-right" title="Carsus Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2026, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 08 Jul 2026.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
