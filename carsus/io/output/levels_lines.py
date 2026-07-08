@@ -8,6 +8,7 @@ import pandas as pd
 
 from carsus.util import convert_atomic_number2symbol, convert_wavelength_air2vacuum
 from carsus.io.util import get_lvl_index2id, create_artificial_fully_ionized
+from carsus.io.output.data_sources import DataSourceID
 
 # Wavelengths above this value are given in air
 GFALL_AIR_THRESHOLD = 2000 * u.AA
@@ -43,12 +44,8 @@ class LevelsLinesPreparer:
 
         The `ds_id` field is the data source identifier.
 
-        1 : NIST
-        2 : GFALL
-        3 : Knox Long's Zeta
-        4 : Chianti Database
-        5 : CMFGEN
-        6 : LANL ADS
+        See :class:`carsus.io.output.data_sources.DataSourceID` for
+        recognized source identifiers.
 
         """
         levels = levels.set_index(["atomic_number", "ion_number"])
@@ -61,10 +58,18 @@ class LevelsLinesPreparer:
             lvl_list.append(lvl)
 
         levels_uq = pd.concat(lvl_list, sort=True)
-        gfall_ions = levels_uq[levels_uq["ds_id"] == 2].index.unique()
-        chianti_ions = levels_uq[levels_uq["ds_id"] == 4].index.unique()
-        cmfgen_ions = levels_uq[levels_uq["ds_id"] == 5].index.unique()
-        lanl_ads_ions = levels_uq[levels_uq["ds_id"] == 6].index.unique()
+        gfall_ions = levels_uq[
+            levels_uq["ds_id"] == DataSourceID.GFALL
+        ].index.unique()
+        chianti_ions = levels_uq[
+            levels_uq["ds_id"] == DataSourceID.CHIANTI
+        ].index.unique()
+        cmfgen_ions = levels_uq[
+            levels_uq["ds_id"] == DataSourceID.CMFGEN
+        ].index.unique()
+        lanl_ads_ions = levels_uq[
+            levels_uq["ds_id"] == DataSourceID.LANL_ADS
+        ].index.unique()
 
         assert set(gfall_ions).intersection(set(chianti_ions)).intersection(
             set(cmfgen_ions)
@@ -120,22 +125,22 @@ class LevelsLinesPreparer:
             Dataframe of the merged data
         """
         gfall = getattr(self.gfall_reader, attribute)
-        gfall["ds_id"] = 2
+        gfall["ds_id"] = DataSourceID.GFALL
         sources = [gfall]
 
         if self.chianti_reader is not None:
             chianti = getattr(self.chianti_reader, attribute)
-            chianti["ds_id"] = 4
+            chianti["ds_id"] = DataSourceID.CHIANTI
             sources.append(chianti)
 
         if self.cmfgen_reader is not None:
             cmfgen = getattr(self.cmfgen_reader, attribute)
-            cmfgen["ds_id"] = 5
+            cmfgen["ds_id"] = DataSourceID.CMFGEN
             sources.append(cmfgen)
 
         if self.lanl_ads_reader is not None:
             lanl_ads = getattr(self.lanl_ads_reader, attribute)
-            lanl_ads["ds_id"] = 6
+            lanl_ads["ds_id"] = DataSourceID.LANL_ADS
             sources.append(lanl_ads)
 
         return pd.concat(sources, sort=True)
@@ -212,7 +217,7 @@ class LevelsLinesPreparer:
         # Concatenate ground levels from NIST
         ground_levels = self.ionization_energies.get_ground_levels()
         ground_levels = ground_levels.rename(columns={"ion_charge": "ion_number"})
-        ground_levels["ds_id"] = 1
+        ground_levels["ds_id"] = DataSourceID.NIST
 
         levels = pd.concat([ground_levels, levels], sort=True)
         levels["level_id"] = range(1, len(levels) + 1)
@@ -222,7 +227,7 @@ class LevelsLinesPreparer:
         # supplies zero-energy levels for the ion. This preserves source fine
         # structure while avoiding stale synthetic NIST ground rows.
         source_ground_ions = levels.loc[
-            (levels["energy"] == 0.0) & (levels["ds_id"] != 1),
+            (levels["energy"] == 0.0) & (levels["ds_id"] != DataSourceID.NIST),
             ["atomic_number", "ion_number"],
         ].drop_duplicates()
         source_ground_ions["has_source_ground"] = True
@@ -233,7 +238,7 @@ class LevelsLinesPreparer:
         ).set_index("level_id")
         mask = (
             (levels["energy"] == 0.0)
-            & (levels["ds_id"] == 1)
+            & (levels["ds_id"] == DataSourceID.NIST)
             & levels["has_source_ground"].fillna(False)
         )
         levels = levels[~mask]
@@ -242,7 +247,7 @@ class LevelsLinesPreparer:
         # Filter levels by priority
         for ion in self.chianti_ions:
             mask = (
-                (levels["ds_id"] != 4)
+                (levels["ds_id"] != DataSourceID.CHIANTI)
                 & (levels["atomic_number"] == ion[0])
                 & (levels["ion_number"] == ion[1])
             )
@@ -250,7 +255,7 @@ class LevelsLinesPreparer:
 
         for ion in self.cmfgen_ions:
             mask = (
-                (levels["ds_id"] != 5)
+                (levels["ds_id"] != DataSourceID.CMFGEN)
                 & (levels["atomic_number"] == ion[0])
                 & (levels["ion_number"] == ion[1])
             )
@@ -258,7 +263,7 @@ class LevelsLinesPreparer:
 
         for ion in self.lanl_ads_ions:
             mask = (
-                (levels["ds_id"] != 6)
+                (levels["ds_id"] != DataSourceID.LANL_ADS)
                 & (levels["atomic_number"] == ion[0])
                 & (levels["ion_number"] == ion[1])
             )
@@ -299,7 +304,7 @@ class LevelsLinesPreparer:
         # Filter lines by priority
         for ion in self.chianti_ions:
             mask = (
-                (lines["ds_id"] != 4)
+                (lines["ds_id"] != DataSourceID.CHIANTI)
                 & (lines["atomic_number"] == ion[0])
                 & (lines["ion_number"] == ion[1])
             )
@@ -307,7 +312,7 @@ class LevelsLinesPreparer:
 
         for ion in self.cmfgen_ions:
             mask = (
-                (lines["ds_id"] != 5)
+                (lines["ds_id"] != DataSourceID.CMFGEN)
                 & (lines["atomic_number"] == ion[0])
                 & (lines["ion_number"] == ion[1])
             )
@@ -315,7 +320,7 @@ class LevelsLinesPreparer:
 
         for ion in self.lanl_ads_ions:
             mask = (
-                (lines["ds_id"] != 6)
+                (lines["ds_id"] != DataSourceID.LANL_ADS)
                 & (lines["atomic_number"] == ion[0])
                 & (lines["ion_number"] == ion[1])
             )
@@ -360,7 +365,7 @@ class LevelsLinesPreparer:
         ] = MEDIUM_AIR
 
         # Chianti wavelengths are already given in vacuum
-        gfall_mask = lines["ds_id"] == 2
+        gfall_mask = lines["ds_id"] == DataSourceID.GFALL
         air_mask = lines["medium"] == MEDIUM_AIR
         lines.loc[air_mask & gfall_mask, "wavelength"] = convert_wavelength_air2vacuum(
             lines.loc[air_mask, "wavelength"]

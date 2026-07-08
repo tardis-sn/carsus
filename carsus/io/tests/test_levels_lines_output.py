@@ -1,9 +1,9 @@
 import pandas as pd
 import pytest
-
-from carsus.io.output.levels_lines import LevelsLinesPreparer
 from astropy import units as u
 
+from carsus.io.output.data_sources import DataSourceID
+from carsus.io.output.levels_lines import LevelsLinesPreparer
 from carsus.io.util import get_lvl_index2id
 
 
@@ -87,7 +87,7 @@ def test_all_levels_data_drops_nist_ground_when_source_ground_exists():
         & (levels["energy"] == 0.0)
     ]
 
-    assert set(ground_levels["ds_id"]) == {2}
+    assert set(ground_levels["ds_id"]) == {DataSourceID.GFALL}
     assert set(ground_levels["g"]) == {1, 3}
 
 

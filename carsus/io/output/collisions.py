@@ -4,6 +4,7 @@ import astropy.constants as const
 import pandas as pd
 
 from carsus.io.util import get_lvl_index2id, exclude_artificial_levels
+from carsus.io.output.data_sources import DataSourceID
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +111,7 @@ class ChiantiCollisionsPreparer(CollisionsPreparer):
 
         logger.info("Ingesting collisional strengths.")
         ch_collisions = self.chianti_reader.collisions
-        ch_collisions["ds_id"] = 4
+        ch_collisions["ds_id"] = DataSourceID.CHIANTI
 
         # Not really needed because we have only one source of collisions
         collisions = pd.concat([ch_collisions], sort=True)
