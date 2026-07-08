@@ -6,6 +6,7 @@ from carsus.io.nist import (NISTWeightsCompPyparser,
                             NISTWeightsComp)
 from carsus.io.nist.weightscomp_grammar import *
 
+
 test_input = """
 Atomic Number = 35
 Atomic Symbol = Br
@@ -89,6 +90,7 @@ def test_weightscomp_pyparser_prepare_atomic(atomic, expected):
 
 
 
+@pytest.mark.remote_data
 def test_nist_weights_version():
     nist_weights = NISTWeightsComp()
     version = nist_weights.version

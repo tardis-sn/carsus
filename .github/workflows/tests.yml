@@ -27,7 +27,7 @@ env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
-  PYTEST_FLAGS: --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data
+  PYTEST_FLAGS: --cov=carsus --cov-report=xml --cov-report=html  --carsus-regression-data=${{ github.workspace }}/carsus-regression-data --carsus-cmfgen-data=${{ github.workspace }}/carsus-data-cmfgen
   NBCONVERT_CMD: jupyter nbconvert --execute --ExecutePreprocessor.timeout=600 --to html
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
@@ -78,9 +78,6 @@ jobs:
         with:
           repository: ${{ env.CMFGEN_DATA_REPO }}
           path: carsus-data-cmfgen
-
-      - name: Setup CMFGEN data path
-        run: ln -s ${{ github.workspace }}/carsus-data-cmfgen/atomic /tmp/atomic
       
       - name: Download Lock File
         run:  wget -q https://raw.githubusercontent.com/tardis-sn/carsus/master/conda-${{ matrix.label }}.lock

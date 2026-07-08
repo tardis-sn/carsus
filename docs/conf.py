@@ -30,6 +30,10 @@ from pathlib import Path
 import sys
 import datetime
 from importlib import import_module
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 
 try:
     from sphinx_astropy.conf.v1 import *  # noqa
@@ -37,12 +41,11 @@ except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to be installed')
     sys.exit(1)
 
-# Get configuration information from setup.cfg
-from configparser import ConfigParser
-conf = ConfigParser()
-
-conf.read([str(Path(__file__).resolve().parent.parent / "setup.cfg")])
-setup_cfg = dict(conf.items('metadata'))
+# Get configuration information from pyproject.toml
+with (Path(__file__).resolve().parent.parent / "pyproject.toml").open("rb") as conf:
+    pyproject = tomllib.load(conf)
+project_metadata = pyproject["project"]
+docs_metadata = pyproject["tool"]["carsus"]["docs"]
 
 # -- General configuration ----------------------------------------------------
 
@@ -100,17 +103,17 @@ else:
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
-project = setup_cfg['name']
-author = setup_cfg['author']
+project = project_metadata['name']
+author = project_metadata['authors'][0]['name']
 copyright = '2016-{0}, {1}'.format(
-    datetime.datetime.now().year, setup_cfg['author'])
+    datetime.datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 
-import_module(setup_cfg['name'])
-package = sys.modules[setup_cfg['name']]
+import_module(project)
+package = sys.modules[project]
 
 # The short X.Y version.
 version = package.__version__.split('-', 1)[0]
@@ -190,18 +193,18 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 
 # -- Options for the edit_on_github extension ---------------------------------
 
-if setup_cfg.get('edit_on_github').lower() == 'true':
+if docs_metadata.get('edit_on_github'):
 
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
-    edit_on_github_project = setup_cfg['github_project']
+    edit_on_github_project = docs_metadata['github_project']
     edit_on_github_branch = "main"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
 
 # -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
+github_issues_url = 'https://github.com/{0}/issues/'.format(docs_metadata['github_project'])
 
 
 # -- Options for linkcheck output -------------------------------------------

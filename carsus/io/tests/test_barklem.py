@@ -4,6 +4,9 @@ from numpy.testing import assert_allclose
 from carsus.io.molecules.molecules import BarklemCollet2016Reader
 
 
+pytestmark = pytest.mark.remote_data
+
+
 @pytest.fixture(scope="package")
 def barklem_rdr():
     rdr = BarklemCollet2016Reader()

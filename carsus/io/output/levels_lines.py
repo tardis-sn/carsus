@@ -16,8 +16,16 @@ MEDIUM_VACUUM = 0
 
 logger = logging.getLogger(__name__)
 
+
 class LevelsLinesPreparer:
-    def __init__(self, ionization_energies, gfall_reader, chianti_reader, cmfgen_reader, lanl_ads_reader):
+    def __init__(
+        self,
+        ionization_energies,
+        gfall_reader,
+        chianti_reader,
+        cmfgen_reader,
+        lanl_ads_reader,
+    ):
         self.ionization_energies = ionization_energies
         self.gfall_reader = gfall_reader
         self.chianti_reader = chianti_reader
@@ -58,13 +66,12 @@ class LevelsLinesPreparer:
         cmfgen_ions = levels_uq[levels_uq["ds_id"] == 5].index.unique()
         lanl_ads_ions = levels_uq[levels_uq["ds_id"] == 6].index.unique()
 
-        
         assert set(gfall_ions).intersection(set(chianti_ions)).intersection(
             set(cmfgen_ions)
         ).intersection(set(lanl_ads_ions)) == set([])
 
         return gfall_ions, chianti_ions, cmfgen_ions, lanl_ads_ions
-    
+
     @staticmethod
     def _create_metastable_flags(levels, lines, levels_metastable_loggf_threshold=-3):
         """
@@ -98,7 +105,7 @@ class LevelsLinesPreparer:
         metastable_flags.name = "metastable"
 
         return metastable_flags
-    
+
     def ingest_multiple_sources(self, attribute):
         """Takes dataframes from multiple readers and merges them
 
@@ -130,7 +137,7 @@ class LevelsLinesPreparer:
             lanl_ads = getattr(self.lanl_ads_reader, attribute)
             lanl_ads["ds_id"] = 6
             sources.append(lanl_ads)
-        
+
         return pd.concat(sources, sort=True)
 
     # replace with functools.cached_property with Python > 3.8
@@ -170,12 +177,14 @@ class LevelsLinesPreparer:
         )
 
         # Solve priorities and set attributes for later use.
-        self.gfall_ions, self.chianti_ions, self.cmfgen_ions, self.lanl_ads_ions = self.solve_priorities(
-            levels
+        self.gfall_ions, self.chianti_ions, self.cmfgen_ions, self.lanl_ads_ions = (
+            self.solve_priorities(levels)
         )
 
         def to_string(x):
-            return [f"{convert_atomic_number2symbol(ion[0])} {ion[1]}" for ion in sorted(x)]
+            return [
+                f"{convert_atomic_number2symbol(ion[0])} {ion[1]}" for ion in sorted(x)
+            ]
 
         gfall_str = ", ".join(to_string(self.gfall_ions))
         logger.info(f"GFALL selected species: {gfall_str}.")
@@ -221,7 +230,6 @@ class LevelsLinesPreparer:
             )
             levels = levels.drop(levels[mask].index)
 
-        
         for ion in self.cmfgen_ions:
             mask = (
                 (levels["ds_id"] != 5)
@@ -323,9 +331,13 @@ class LevelsLinesPreparer:
 
         lines["wavelength"] = u.Quantity(lines["wavelength"], "nm").to("AA").value
 
-        lines.loc[lines["wavelength"] <= GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_VACUUM
+        lines.loc[
+            lines["wavelength"] <= GFALL_AIR_THRESHOLD.to("AA").value, "medium"
+        ] = MEDIUM_VACUUM
 
-        lines.loc[lines["wavelength"] > GFALL_AIR_THRESHOLD, "medium"] = MEDIUM_AIR
+        lines.loc[
+            lines["wavelength"] > GFALL_AIR_THRESHOLD.to("AA").value, "medium"
+        ] = MEDIUM_AIR
 
         # Chianti wavelengths are already given in vacuum
         gfall_mask = lines["ds_id"] == 2
@@ -335,11 +347,19 @@ class LevelsLinesPreparer:
         )
 
         lines = lines[
-            ["lower_level_id", "upper_level_id", "wavelength", "gf", "loggf", "A_ul", "ds_id"]
+            [
+                "lower_level_id",
+                "upper_level_id",
+                "wavelength",
+                "gf",
+                "loggf",
+                "A_ul",
+                "ds_id",
+            ]
         ]
 
         return lines
-    
+
     @property
     def levels_prepared(self):
         """
@@ -526,6 +546,7 @@ class LevelsLinesPreparer:
         self.levels = levels
         self.lines = lines
 
+
 def create_einstein_coeff(lines):
     """
     Create Einstein coefficients columns for the `lines` DataFrame.
@@ -540,18 +561,10 @@ def create_einstein_coeff(lines):
         const.m_e.cgs.value * const.c.cgs.value
     )
 
-    lines["B_lu"] = (
-        einstein_coeff * lines["f_lu"] / (const.h.cgs.value * lines["nu"])
-    )
+    lines["B_lu"] = einstein_coeff * lines["f_lu"] / (const.h.cgs.value * lines["nu"])
 
-    lines["B_ul"] = (
-        einstein_coeff * lines["f_ul"] / (const.h.cgs.value * lines["nu"])
-    )
+    lines["B_ul"] = einstein_coeff * lines["f_ul"] / (const.h.cgs.value * lines["nu"])
 
     lines["A_ul"] = (
-        2
-        * einstein_coeff
-        * lines["nu"] ** 2
-        / const.c.cgs.value**2
-        * lines["f_ul"]
+        2 * einstein_coeff * lines["nu"] ** 2 / const.c.cgs.value**2 * lines["f_ul"]
     )

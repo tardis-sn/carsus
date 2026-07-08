@@ -18,10 +18,10 @@ data_dir = Path(__file__).parent / "data"
 
 
 @pytest.fixture()
-def si1_reader():
+def si1_reader(carsus_cmfgen_atomic_path):
     return CMFGENReader.from_config(
         "Si 0-1",
-        atomic_path="/tmp/atomic",
+        atomic_path=str(carsus_cmfgen_atomic_path),
         collisions=True,
         cross_sections=True,
         ionization_energies=True,
@@ -30,10 +30,33 @@ def si1_reader():
     )
 
 
+CMFGEN_SOURCE_FILES = {
+    ("energy_levels", "si2_osc_kurucz"): Path("SIL/II/16sep15/si2_osc_kurucz"),
+    ("oscillator_strengths", "fevi_osc_kb_rk.dat"): Path(
+        "FE/VI/8may97/fevi_osc_kb_rk.dat"
+    ),
+    ("oscillator_strengths", "p2_osc"): Path("PHOS/II/7oct15/p2_osc"),
+    ("oscillator_strengths", "vi_osc"): Path("VAN/I/27may10/vi_osc"),
+    ("collisional_strengths", "he2col.dat"): Path("HE/II/5dec96/he2col.dat"),
+    ("collisional_strengths", "col_ariii"): Path("ARG/III/19nov07/col_ariii"),
+    ("photoionization_cross_sections", "phot_nahar_A"): Path(
+        "SIL/II/16sep15/phot_nahar_A"
+    ),
+    ("photoionization_cross_sections", "phot_data_gs"): Path(
+        "COB/IV/4jan12/phot_data_gs"
+    ),
+    ("photoionization_cross_sections", "hyd_l_data.dat"): Path(
+        "HYD/I/5dec96/hyd_l_data.dat"
+    ),
+    ("photoionization_cross_sections", "gbf_n_data.dat"): Path(
+        "HYD/I/5dec96/gbf_n_data.dat"
+    ),
+}
+
+
 @pytest.fixture()
-def cmfgen_regression_data_fname(carsus_regression_path, path):
-    subdirectory, fname = path
-    return Path(carsus_regression_path) / "cmfgen" / subdirectory / fname
+def cmfgen_source_fname(carsus_cmfgen_atomic_path, path):
+    return carsus_cmfgen_atomic_path / CMFGEN_SOURCE_FILES[tuple(path)]
 
 
 @pytest.mark.with_regression_data
@@ -43,9 +66,8 @@ def cmfgen_regression_data_fname(carsus_regression_path, path):
         ["energy_levels", "si2_osc_kurucz"],
     ],
 )
-def test_CMFGENEnergyLevelsParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENEnergyLevelsParser(cmfgen_regression_data_fname)
+def test_CMFGENEnergyLevelsParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENEnergyLevelsParser(str(cmfgen_source_fname))
     n = int(parser.header["Number of energy levels"])
     assert parser.base.shape[0] == n
     
@@ -62,9 +84,8 @@ def test_CMFGENEnergyLevelsParser(cmfgen_regression_data_fname, regression_data)
         ["oscillator_strengths", "vi_osc"],
     ],
 )
-def test_CMFGENOscillatorStrengthsParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENOscillatorStrengthsParser(cmfgen_regression_data_fname)
+def test_CMFGENOscillatorStrengthsParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENOscillatorStrengthsParser(str(cmfgen_source_fname))
     n = int(parser.header["Number of transitions"])
     assert parser.base.shape[0] == n
     
@@ -80,9 +101,8 @@ def test_CMFGENOscillatorStrengthsParser(cmfgen_regression_data_fname, regressio
         ["collisional_strengths", "col_ariii"],
     ],
 )
-def test_CMFGENCollisionalStrengthsParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENCollisionalStrengthsParser(cmfgen_regression_data_fname)
+def test_CMFGENCollisionalStrengthsParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENCollisionalStrengthsParser(str(cmfgen_source_fname))
     
     expected = regression_data.sync_dataframe(parser.base)
     pd.testing.assert_frame_equal(parser.base, expected)
@@ -96,9 +116,8 @@ def test_CMFGENCollisionalStrengthsParser(cmfgen_regression_data_fname, regressi
         ["photoionization_cross_sections", "phot_data_gs"],
     ],
 )
-def test_CMFGENPhoCrossSectionsParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENPhoCrossSectionsParser(cmfgen_regression_data_fname)
+def test_CMFGENPhoCrossSectionsParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENPhoCrossSectionsParser(str(cmfgen_source_fname))
     n = int(parser.header["Number of energy levels"])
     assert len(parser.base) == n
     
@@ -115,9 +134,8 @@ def test_CMFGENPhoCrossSectionsParser(cmfgen_regression_data_fname, regression_d
         ["photoionization_cross_sections", "hyd_l_data.dat"],
     ],
 )
-def test_CMFGENHydLParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENHydLParser(cmfgen_regression_data_fname)
+def test_CMFGENHydLParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENHydLParser(str(cmfgen_source_fname))
     assert parser.header["Maximum principal quantum number"] == "30"
     
     expected = regression_data.sync_dataframe(parser.base)
@@ -131,9 +149,8 @@ def test_CMFGENHydLParser(cmfgen_regression_data_fname, regression_data):
         ["photoionization_cross_sections", "gbf_n_data.dat"],
     ],
 )
-def test_CMFGENHydGauntBfParser(cmfgen_regression_data_fname, regression_data):
-    cmfgen_regression_data_fname = str(cmfgen_regression_data_fname)
-    parser = CMFGENHydGauntBfParser(cmfgen_regression_data_fname)
+def test_CMFGENHydGauntBfParser(cmfgen_source_fname, regression_data):
+    parser = CMFGENHydGauntBfParser(str(cmfgen_source_fname))
     assert parser.header["Maximum principal quantum number"] == "30"
     
     expected = regression_data.sync_dataframe(parser.base)

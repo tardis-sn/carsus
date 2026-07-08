@@ -96,7 +96,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ env.XUVTOP }}
-          key: ${{ env.CHIANTI_DB_VER }}
+          key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
         id: chianti-cache
 
       - name: Download Chianti database

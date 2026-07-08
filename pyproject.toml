@@ -1,10 +1,117 @@
 [build-system]
 
-requires = ["setuptools",
-            "setuptools_scm",
-            "wheel"]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2", "wheel"]
 
 build-backend = 'setuptools.build_meta'
+
+[project]
+name = "carsus"
+description = "Atomic Database for Astronomy"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+authors = [
+    { name = "TARDIS Collaboration", email = "wkerzendorf@gmail.com" },
+]
+license = { text = "BSD 3-Clause" }
+requires-python = ">=3.6"
+dependencies = [
+    "astropy",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://tardis-sn.github.io/carsus"
+
+[project.optional-dependencies]
+test = [
+    "pytest-astropy",
+]
+docs = [
+    "sphinx-astropy",
+    "tomli; python_version < '3.11'",
+]
+
+[tool.setuptools]
+zip-safe = false
+license-files = ["licenses/LICENSE.rst"]
+
+[tool.setuptools.packages.find]
+
+[tool.setuptools.package-data]
+carsus = ["data/*"]
+"carsus.tests" = ["data/*"]
+
+[tool.setuptools_scm]
+write_to = "carsus/version.py"
+write_to_template = """
+# Note that we need to fall back to the hard-coded version if either
+# setuptools_scm can't be imported or setuptools_scm can't determine the
+# version, so we catch the generic 'Exception'.
+try:
+    from setuptools_scm import get_version
+    version = get_version(root='..', relative_to=__file__)
+except Exception:
+    version = '{version}'
+"""
+
+[tool.pytest.ini_options]
+testpaths = ["carsus", "docs"]
+text_file_format = "rst"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+markers = [
+    "with_regression_data: mark tests as needing regression data path to run",
+    "remote_data: mark tests as needing network access to run",
+]
+
+[tool.coverage.run]
+omit = [
+    "carsus/_astropy_init*",
+    "carsus/conftest.py",
+    "carsus/*setup_package*",
+    "carsus/tests/*",
+    "carsus/*/tests/*",
+    "carsus/extern/*",
+    "carsus/version*",
+    "*/carsus/_astropy_init*",
+    "*/carsus/conftest.py",
+    "*/carsus/*setup_package*",
+    "*/carsus/tests/*",
+    "*/carsus/*/tests/*",
+    "*/carsus/extern/*",
+    "*/carsus/version*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "except ImportError",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "def main\\(.*\\):",
+    "pragma: py{ignore_python_version}",
+    "def _ipython_key_completions_",
+    "def __repr__",
+    "if self\\.debug",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]
+omit = [
+    "*__init__*",
+    "*_astropy_init*",
+    "*version*",
+    "*tests*",
+    "*conftest*",
+    "*setup_package*",
+]
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "coverage_html_report"
+
+[tool.carsus.docs]
+edit_on_github = false
+github_project = "tardis-sn/carsus"
 
 [tool.git-cliff.changelog]
 header = "## Changelog\n\n"

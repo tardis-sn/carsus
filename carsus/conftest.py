@@ -8,6 +8,7 @@ packagename.test
 """
 
 import os
+import socket
 from pathlib import Path
 from carsus.util import regression_data
 
@@ -72,6 +73,14 @@ import pytest
 DATA_DIR_PATH = Path(__file__).parent / "tests" / "data"
 
 
+def has_network_access(host="raw.githubusercontent.com", port=443, timeout=2):
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--test-db",
@@ -85,6 +94,11 @@ def pytest_addoption(parser):
         help="Path to the Carsus regression data directory",
     )
     parser.addoption(
+        "--carsus-cmfgen-data",
+        default=os.environ.get("CARSUS_CMFGEN_DATA"),
+        help="Path to the carsus-data-cmfgen repository directory",
+    )
+    parser.addoption(
         "--generate-reference",
         action="store_true",
         default=False,
@@ -96,9 +110,19 @@ def pytest_collection_modifyitems(config, items):
     skip_no_regdata = pytest.mark.skip(
         reason="--carsus-regression-data was not specified"
     )
+    skip_no_network = pytest.mark.skip(
+        reason="network access is not available"
+    )
+    network_available = None
+
     for item in items:
         if "with_regression_data" in item.keywords and not config.getoption("--carsus-regression-data"):
             item.add_marker(skip_no_regdata)
+        if "remote_data" in item.keywords:
+            if network_available is None:
+                network_available = has_network_access()
+            if not network_available:
+                item.add_marker(skip_no_network)
 
 
 @pytest.fixture(scope="session")
@@ -138,3 +162,32 @@ def carsus_regression_path(request):
         return Path(
             os.path.expandvars(os.path.expanduser(carsus_regression_path))
         )
+
+
+@pytest.fixture(scope="session")
+def carsus_cmfgen_data_path(request):
+    carsus_cmfgen_data_path = request.config.getoption(
+        "--carsus-cmfgen-data"
+    )
+    if carsus_cmfgen_data_path is None:
+        raise pytest.UsageError("--carsus-cmfgen-data was not specified")
+
+    carsus_cmfgen_data_path = Path(
+        os.path.expandvars(os.path.expanduser(carsus_cmfgen_data_path))
+    )
+    if not carsus_cmfgen_data_path.is_dir():
+        raise FileNotFoundError(
+            f"CMFGEN data directory does not exist: {carsus_cmfgen_data_path}"
+        )
+    if not (carsus_cmfgen_data_path / "atomic").is_dir():
+        raise FileNotFoundError(
+            "CMFGEN data directory must be the carsus-data-cmfgen "
+            f"repository containing atomic/: {carsus_cmfgen_data_path}"
+        )
+
+    return carsus_cmfgen_data_path
+
+
+@pytest.fixture(scope="session")
+def carsus_cmfgen_atomic_path(carsus_cmfgen_data_path):
+    return carsus_cmfgen_data_path / "atomic"

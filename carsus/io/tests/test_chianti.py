@@ -1,7 +1,23 @@
 import pytest
 import pandas as pd
+from pathlib import Path
+import os
 
 from carsus.io.chianti_ import ChiantiIonReader, ChiantiReader
+
+
+def _has_chianti_database():
+    xuvtop = os.getenv("XUVTOP")
+    if not xuvtop:
+        return False
+
+    return (Path(xuvtop) / "masterlist" / "masterlist_ions.pkl").exists()
+
+
+pytestmark = pytest.mark.skipif(
+    not _has_chianti_database(),
+    reason="CHIANTI database is not configured; set XUVTOP to run these tests.",
+)
 
 
 class TestChiantiIonReader:

@@ -4,6 +4,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_allclose
 from carsus.io.kurucz import GFALLReader
 
+
 @pytest.fixture()
 def gfall_rdr(gfall_fname):
     return GFALLReader(fname=gfall_fname)
@@ -53,6 +54,7 @@ def test_grall_reader_gfall_raw(gfall_raw, index, wavelength, element_code, e_fi
     (14, 72.5537, 4.02, 983355.0, 1121184.0),
     (37, 2.4898, 7.05, 0.0, 4016390.0)
 ])
+@pytest.mark.remote_data
 def test_grall_reader_gfall_raw_http(gfall_raw_http, index, wavelength, element_code, e_first, e_second):
     row = gfall_raw_http.loc[index]
     assert_almost_equal(row["element_code"], element_code)
@@ -125,6 +127,7 @@ def test_gfall_hash(gfall_rdr):
 
 
 
+@pytest.mark.remote_data
 def test_gfall_hash_http(gfall_rdr_http):
     gf = gfall_rdr_http
     gf_raw = gf.gfall_raw

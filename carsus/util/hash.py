@@ -1,19 +1,42 @@
 import hashlib
-import pickle
+import json
 
 def serialize_pandas_object(pd_object):
-    """Serialize Pandas objects with Pickle.
+    """Serialize Pandas objects in a deterministic format.
 
     Parameters
     ----------
     pd_object : pandas.Series or pandas.DataFrame
-        Pandas object to be serialized with Pickle.
+        Pandas object to be serialized.
 
     Returns
     -------
-    Pickle serialized Python object.
+    bytes
+        Serialized pandas object.
     """
-    return pickle.dumps(pd_object)
+    if hasattr(pd_object, "columns"):
+        dtypes = [str(dtype) for dtype in pd_object.dtypes]
+    else:
+        dtypes = [str(pd_object.dtype)]
+
+    payload = {
+        "type": type(pd_object).__name__,
+        "index_names": list(pd_object.index.names),
+        "dtypes": dtypes,
+        "data": pd_object.to_json(
+            orient="split",
+            date_format="iso",
+            double_precision=15,
+            default_handler=str,
+        ),
+    }
+
+    if hasattr(pd_object, "columns"):
+        payload["column_names"] = list(pd_object.columns.names)
+    else:
+        payload["name"] = pd_object.name
+
+    return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
 
 
 def hash_pandas_object(pd_object, algorithm="md5"):

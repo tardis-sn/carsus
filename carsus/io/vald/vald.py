@@ -262,7 +262,7 @@ class VALDReader(object):
 
         vald.loc[:, "elm_ion"] = vald["elm_ion"].str.replace("'", "")
         vald[["chemical", "ion_charge"]] = vald["elm_ion"].str.split(" ", expand=True)
-        vald.loc[:, "ion_charge"] = vald["ion_charge"].astype(int) - 1
+        vald["ion_charge"] = vald["ion_charge"].astype(int) - 1
 
         # Check units and medium of wavelength column and create wavelength column in angstroms in vacuum
         (
