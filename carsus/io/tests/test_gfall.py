@@ -7,6 +7,7 @@ from numpy.testing import assert_almost_equal, assert_allclose
 from carsus.io.kurucz import GFALLReader, SQLiteGFALLReader
 
 
+
 @pytest.fixture()
 def gfall_rdr(gfall_fname):
     return GFALLReader(fname=gfall_fname)

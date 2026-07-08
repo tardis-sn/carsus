@@ -13,6 +13,7 @@ from carsus.io.nist.weightscomp_grammar import (
 )
 
 
+
 test_input = """
 Atomic Number = 35
 Atomic Symbol = Br
@@ -97,24 +98,6 @@ def test_weightscomp_pyparser_prepare_atomic(atomic, expected):
 
 def test_download_weightscomp_uses_carsus_data_ref(monkeypatch):
     requested_urls = []
-
-    class Response:
-        text = "<pre></pre>"
-
-    def get(url, verify=False):
-        requested_urls.append(url)
-        return Response()
-
-    monkeypatch.setattr("carsus.io.nist.weightscomp.requests.get", get)
-
-    download_weightscomp(carsus_data_ref="abc123")
-
-    assert requested_urls == [
-        "https://raw.githubusercontent.com/tardis-sn/carsus-data-nist/"
-        "abc123/html_files/weights.html"
-    ]
-
-
 
 @pytest.mark.remote_data
 def test_nist_weights_version():

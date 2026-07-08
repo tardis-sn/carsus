@@ -120,8 +120,6 @@ def test_download_ionization_energies_uses_carsus_data_ref(monkeypatch):
     ]
 
 
-
-
 @pytest.mark.remote_data
 def test_ground_levels_missing_j():
     ionization_energies = NISTIonizationEnergies(spectra="Nd")
