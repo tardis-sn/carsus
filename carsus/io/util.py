@@ -152,27 +152,20 @@ def get_lvl_index2id(df, levels_all):
     Matches `level_index` with level IDs for a given DataFrame.
 
     """
-    # TODO: re-write this method without a for loop
     ion = df.index.unique()
-    lvl_index2id = levels_all.set_index(["atomic_number", "ion_number"]).loc[ion]
-    lvl_index2id = lvl_index2id.reset_index()
-
-    lower_level_id = []
-    upper_level_id = []
-
+    lvl_index2id = (
+        levels_all.set_index(["atomic_number", "ion_number"])
+        .loc[ion]
+        .reset_index()
+        .dropna(subset=["level_index"])
+        .set_index("level_index")["level_id"]
+    )
     df = df.reset_index()
-    for row in df.itertuples():
-        llid = row.level_index_lower
-        ulid = row.level_index_upper
-
-        upper = lvl_index2id.at[ulid, "level_id"]
-        lower = lvl_index2id.at[llid, "level_id"]
-
-        lower_level_id.append(lower)
-        upper_level_id.append(upper)
-
-    df["lower_level_id"] = pd.Series(lower_level_id)
-    df["upper_level_id"] = pd.Series(upper_level_id)
+    df["lower_level_id"] = df["level_index_lower"].map(lvl_index2id)
+    df["upper_level_id"] = df["level_index_upper"].map(lvl_index2id)
+    df = df.dropna(subset=["lower_level_id", "upper_level_id"])
+    df["lower_level_id"] = df["lower_level_id"].astype(np.int64)
+    df["upper_level_id"] = df["upper_level_id"].astype(np.int64)
 
     return df
 

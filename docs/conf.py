@@ -64,6 +64,7 @@ highlight_language = 'python3'
 exclude_patterns.append('_templates')
 exclude_patterns.append('_build')
 exclude_patterns.append('**.ipynb_checkpoints')
+exclude_patterns.append('tardis_atomdata_ref.ipynb')
 
 
 # This is added to the end of RST files - a good place to put substitutions to

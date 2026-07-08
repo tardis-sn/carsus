@@ -4,7 +4,8 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 
 from carsus.io.nist.ionization import (NISTIonizationEnergiesParser,
-                                       NISTIonizationEnergies)
+                                       NISTIonizationEnergies,
+                                       download_ionization_energies)
 
 
 test_data = """
@@ -99,6 +100,24 @@ def test_prepare_ground_levels(ground_levels, expected_series_ground_levels):
     assert_series_equal(series, expected_series_ground_levels)
 
 
+def test_download_ionization_energies_uses_carsus_data_ref(monkeypatch):
+    requested_urls = []
+
+    class Response:
+        text = "<pre></pre>"
+
+    def get(url, verify=False):
+        requested_urls.append(url)
+        return Response()
+
+    monkeypatch.setattr("carsus.io.nist.ionization.requests.get", get)
+
+    download_ionization_energies(carsus_data_ref="abc123")
+
+    assert requested_urls == [
+        "https://raw.githubusercontent.com/tardis-sn/carsus-data-nist/"
+        "abc123/html_files/ionization_energies.html"
+    ]
 
 
 @pytest.mark.remote_data

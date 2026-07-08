@@ -1,5 +1,8 @@
-import re
 import logging
+import re
+import sqlite3
+import hashlib
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from carsus.util import parse_selected_species
@@ -71,6 +74,12 @@ class GFALLReader(object):
     ]
 
     default_unique_level_identifier = ["energy", "j"]
+
+    @staticmethod
+    def normalize_label(label):
+        if pd.isnull(label):
+            return label
+        return " ".join(str(label).split())
 
     def __init__(
         self, ions=None, fname=None, unique_level_identifier=None, priority=10
@@ -333,6 +342,7 @@ class GFALLReader(object):
         levels = pd.concat(
             [e_lower_levels[selected_columns], e_upper_levels[selected_columns]]
         )
+        levels["label"] = levels["label"].apply(self.normalize_label)
         unique_level_id = ["atomic_number", "ion_charge"] + self.unique_level_identifier
 
         levels.drop_duplicates(unique_level_id, inplace=True)
@@ -413,6 +423,12 @@ class GFALLReader(object):
         levels_idx = levels_idx.set_index(unique_level_id)
 
         lines = gfall[selected_columns].copy()
+        label_columns = [
+            column for column in ["label_lower", "label_upper"] if column in lines
+        ]
+        for column in label_columns:
+            lines[column] = lines[column].apply(self.normalize_label)
+
         lines["gf"] = np.power(10, lines["loggf"])
         lines = lines.drop(["loggf"], axis="columns")
 
@@ -466,3 +482,101 @@ class GFALLReader(object):
         with pd.HDFStore(fname, "w") as f:
             f.put("/gfall_raw", self.gfall_raw)
             f.put("/gfall", self.gfall)
+
+
+class SQLiteGFALLReader(GFALLReader):
+    """
+    Reader for historical GFALL SQLite databases.
+
+    Older TARDIS/Carsus atom-data builds used SQLite snapshots containing parsed
+    GFALL rows rather than the original fixed-width ``gfall.dat`` file. This
+    class adapts those rows to the same parsed shape produced by
+    :class:`GFALLReader`.
+    """
+
+    def __init__(
+        self,
+        ions=None,
+        fname=None,
+        unique_level_identifier=None,
+        priority=10,
+        table_name="gfall",
+    ):
+        if fname is None:
+            raise ValueError("SQLiteGFALLReader requires a SQLite database path.")
+        self.table_name = table_name
+        super().__init__(
+            ions=ions,
+            fname=fname,
+            unique_level_identifier=unique_level_identifier,
+            priority=priority,
+        )
+
+    def read_gfall_raw(self, fname=None):
+        """
+        Read parsed GFALL rows from a SQLite database.
+        """
+        if fname is None:
+            fname = self.fname
+
+        logger.info(f"Parsing GFALL SQLite database from: {fname}")
+
+        columns = [
+            "wavelength",
+            "loggf",
+            "atomic_number",
+            "ion_number",
+            "e_upper",
+            "e_lower",
+            "j_upper",
+            "j_lower",
+            "label_upper",
+            "label_lower",
+        ]
+        query = f"SELECT {', '.join(columns)} FROM {self.table_name}"
+        params = None
+
+        if self.ions is not None:
+            clauses = []
+            params = []
+            for atomic_number, ion_charge in self.ions:
+                clauses.append("(atomic_number = ? AND ion_number = ?)")
+                params.extend([atomic_number, ion_charge])
+            query += " WHERE " + " OR ".join(clauses)
+
+        with sqlite3.connect(fname) as connection:
+            gfall = pd.read_sql_query(query, connection, params=params)
+
+        checksum = hashlib.md5(Path(fname).read_bytes()).hexdigest()
+        return gfall, checksum
+
+    def parse_gfall(self, gfall_raw=None):
+        """
+        Convert parsed SQLite rows to the standard parsed GFALL DataFrame.
+        """
+        gfall = gfall_raw if gfall_raw is not None else self.gfall_raw.copy()
+        gfall = gfall.rename(
+            columns={
+                "ion_number": "ion_charge",
+                "e_lower": "energy_lower",
+                "e_upper": "energy_upper",
+            }
+        )
+
+        gfall["label_lower"] = gfall["label_lower"].apply(self.normalize_label)
+        gfall["label_upper"] = gfall["label_upper"].apply(self.normalize_label)
+
+        ignored_labels = ["AVERAGE", "ENERGIES", "CONTINUUM"]
+        gfall = gfall.loc[
+            ~(
+                (gfall["label_lower"].isin(ignored_labels))
+                | (gfall["label_upper"].isin(ignored_labels))
+            )
+        ].copy()
+
+        gfall["energy_lower_predicted"] = gfall["energy_lower"] < 0
+        gfall["energy_lower"] = gfall["energy_lower"].abs()
+        gfall["energy_upper_predicted"] = gfall["energy_upper"] < 0
+        gfall["energy_upper"] = gfall["energy_upper"].abs()
+
+        return gfall

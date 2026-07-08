@@ -25,7 +25,10 @@ IONIZATION_ENERGIES_VERSION_URL = (
     "https://physics.nist.gov/PhysRefData/ASD/Html/verhist.shtml"
 )
 
-CARSUS_DATA_NIST_IONIZATION_URL = "https://raw.githubusercontent.com/tardis-sn/carsus-data-nist/main/html_files/ionization_energies.html"
+CARSUS_DATA_NIST_BASE_URL = (
+    "https://raw.githubusercontent.com/tardis-sn/carsus-data-nist"
+)
+CARSUS_DATA_NIST_IONIZATION_PATH = "html_files/ionization_energies.html"
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +50,7 @@ def download_ionization_energies(
     unc_out=True,
     biblio=False,
     nist_url=False,
+    carsus_data_ref="main",
 ):
     """
     Downloads ionization energies data from the NIST Atomic Spectra Database
@@ -85,8 +89,12 @@ def download_ionization_energies(
 
     if not nist_url:
         logger.info("Downloading ionization energies from the carsus-data-nist repo.")
+        carsus_data_nist_url = (
+            f"{CARSUS_DATA_NIST_BASE_URL}/{carsus_data_ref}/"
+            f"{CARSUS_DATA_NIST_IONIZATION_PATH}"
+        )
         if spectra == "h-uuh":
-            response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
+            response = requests.get(carsus_data_nist_url, verify=False)
             return response.text
         else:
             basic_atomic_data_fname = Path(carsus.__path__[0]) / "data" / "basic_atomic_data.csv"
@@ -102,7 +110,7 @@ def download_ionization_energies(
                 raise ValueError("Invalid atomic name")
 
             max_atomic_number = max(atomic_numbers)
-            response = requests.get(CARSUS_DATA_NIST_IONIZATION_URL, verify=False)
+            response = requests.get(carsus_data_nist_url, verify=False)
             carsus_data = response.text
             extracted_content = []
             for line in carsus_data.split("\n"):
@@ -279,8 +287,12 @@ class NISTIonizationEnergies(BaseParser):
     version : str
     """
 
-    def __init__(self, spectra="h-uuh", nist_url=False):
-        input_data = download_ionization_energies(spectra=spectra, nist_url=nist_url)
+    def __init__(self, spectra="h-uuh", nist_url=False, carsus_data_ref="main"):
+        input_data = download_ionization_energies(
+            spectra=spectra,
+            nist_url=nist_url,
+            carsus_data_ref=carsus_data_ref,
+        )
         self.parser = NISTIonizationEnergiesParser(input_data=input_data)
         self._prepare_data()
         self._get_version()

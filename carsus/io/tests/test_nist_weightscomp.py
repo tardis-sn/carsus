@@ -4,7 +4,14 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 from carsus.io.nist import (NISTWeightsCompPyparser,
                             NISTWeightsComp)
-from carsus.io.nist.weightscomp_grammar import *
+from carsus.io.nist.weightscomp import download_weightscomp
+from carsus.io.nist.weightscomp_grammar import (
+    ATOM_NUM_COL,
+    AW_SD_COL,
+    AW_VAL_COL,
+    MASS_NUM_COL,
+)
+
 
 
 test_input = """
@@ -89,6 +96,8 @@ def test_weightscomp_pyparser_prepare_atomic(atomic, expected):
     assert_frame_equal(atomic, expected, check_names=False)
 
 
+def test_download_weightscomp_uses_carsus_data_ref(monkeypatch):
+    requested_urls = []
 
 @pytest.mark.remote_data
 def test_nist_weights_version():
