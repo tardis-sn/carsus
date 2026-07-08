@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-
+@pytest.mark.skip(reason="Need to update workflow to get the reference file")
 @pytest.mark.with_regression_data
 def test_kurucz_cd23_chianti_h_he_latest_schema_contract(carsus_regression_path):
     reference_path = (
