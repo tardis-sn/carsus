@@ -13,11 +13,18 @@ Reference file:
 Generated file:
   ``/tmp/carsus_reference_experiment.h5``
 
-The generated file was built from the recovered historical Kurucz SQLite GFALL
-database, the NNDC CSV snapshot from ``tardis-sn/carsus-data-nndc`` commit
+The generated file was built from the recovered historical Kurucz flat
+``gfall.dat`` in ``tardis-sn/carsus-data-kurucz``, the NNDC CSV snapshot from
+``tardis-sn/carsus-data-nndc`` commit
 ``136a8633e3dee21079d3738dabfe7758f6e40d41``, and CHIANTI H-He data with
 CHIANTI 7.1 ``.wgfa`` radiative transition rows overlaid onto the current
 CHIANTI reader output.
+
+The flat file regenerates the classic SQLite ``gfall`` table content. In a
+controlled Carsus build where only the GFALL reader was changed, the flat file
+and the classic SQLite table produced exactly equal levels, lines, macro atom
+data, and macro atom references. SQLite is therefore not part of the
+reproduction path.
 
 High-level result
 -----------------

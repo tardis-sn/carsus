@@ -131,6 +131,11 @@ def gfall_fname():
 
 
 @pytest.fixture(scope="session")
+def historical_o_iv_gfall_fname():
+    return str(DATA_DIR_PATH / "gfall_o_iv_historical.dat")
+
+
+@pytest.fixture(scope="session")
 def gfall_http():
     url = "https://raw.githubusercontent.com/tardis-sn/carsus/"
     url += "master/carsus/tests/data/gftest.all"
