@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Atomic Data Reproduction Differences &mdash; carsus v2024.12.24.dev55+g9b726d630</title>
+  <title>Atomic Data Reproduction Differences &mdash; carsus v2024.12.24.dev56+g458dac5e7</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -16,7 +16,7 @@
     <link rel="shortcut icon" href="../_static/tardis_logo.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=1ac6233a"></script>
+      <script src="../_static/documentation_options.js?v=26030962"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -134,11 +134,17 @@ reference atom-data file and the Carsus-generated reproduction candidate.</p>
 <dt>Generated file:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">/tmp/carsus_reference_experiment.h5</span></code></p>
 </dd>
 </dl>
-<p>The generated file was built from the recovered historical Kurucz SQLite GFALL
-database, the NNDC CSV snapshot from <code class="docutils literal notranslate"><span class="pre">tardis-sn/carsus-data-nndc</span></code> commit
+<p>The generated file was built from the recovered historical Kurucz flat
+<code class="docutils literal notranslate"><span class="pre">gfall.dat</span></code> in <code class="docutils literal notranslate"><span class="pre">tardis-sn/carsus-data-kurucz</span></code>, the NNDC CSV snapshot from
+<code class="docutils literal notranslate"><span class="pre">tardis-sn/carsus-data-nndc</span></code> commit
 <code class="docutils literal notranslate"><span class="pre">136a8633e3dee21079d3738dabfe7758f6e40d41</span></code>, and CHIANTI H-He data with
 CHIANTI 7.1 <code class="docutils literal notranslate"><span class="pre">.wgfa</span></code> radiative transition rows overlaid onto the current
 CHIANTI reader output.</p>
+<p>The flat file regenerates the classic SQLite <code class="docutils literal notranslate"><span class="pre">gfall</span></code> table content. In a
+controlled Carsus build where only the GFALL reader was changed, the flat file
+and the classic SQLite table produced exactly equal levels, lines, macro atom
+data, and macro atom references. SQLite is therefore not part of the
+reproduction path.</p>
 </section>
 <section id="high-level-result">
 <h2>High-level result<a class="headerlink" href="#high-level-result" title="Link to this heading"></a></h2>
@@ -736,7 +742,7 @@ propagate into <code class="docutils literal notranslate"><span class="pre">/mac
 
   <div role="contentinfo">
     <p>&#169; Copyright 2016-2026, TARDIS Collaboration.
-      <span class="lastupdated">Last updated on 08 Jul 2026.
+      <span class="lastupdated">Last updated on 27 Jul 2026.
       </span></p>
   </div>
 
