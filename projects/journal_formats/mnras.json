@@ -1,0 +1,4 @@
+{
+  "bold_total": true,
+  "template": "\\documentclass{article}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{booktabs}\n\\usepackage[font=small,labelfont=bf,justification=raggedright,singlelinecheck=false]{caption}\n\n\\begin{document}\n\n\\begin{table}[p]\n\\caption{Summary of atomic data by element.}\n\\label{tab:atomdata-summary}\n\\centering\n\\small\n\\renewcommand{\\arraystretch}{0.96}\n\\begin{tabular*}{0.9\\textwidth}{@{\\extracolsep{\\fill}}lcrr}\n\\toprule\n\\textit{Element} & \\textit{Ion stages} & \\textit{Levels} & \\textit{Lines} \\\\\n\\midrule\n{{TABLE_ROWS}}\n\\bottomrule\n\\end{tabular*}\n\n\\medskip\n\\parbox{0.9\\textwidth}{\\footnotesize Ion stages with level and line data are given in spectroscopic notation.}\n\\end{table}\n\n\\end{document}\n"
+}

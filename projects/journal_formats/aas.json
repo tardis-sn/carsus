@@ -1,0 +1,4 @@
+{
+  "bold_total": true,
+  "template": "\\documentclass{article}\n\\usepackage[margin=1in]{geometry}\n\n\\begin{document}\n\n\\begin{table}[p]\n\\centering\n\\caption{Summary of atomic data by element\\label{tab:atomdata-summary}}\n\\small\n\\renewcommand{\\arraystretch}{1.12}\n\\begin{tabular*}{0.9\\textwidth}{@{\\extracolsep{\\fill}}lcrr}\n\\hline\n\\textbf{Element} & \\textbf{Ion Stages} & \\textbf{Levels} & \\textbf{Lines} \\\\\n\\hline\n{{TABLE_ROWS}}\n\\hline\n\\end{tabular*}\n\n\\medskip\n\\parbox{0.9\\textwidth}{\\footnotesize Ion stages with level and line data are given in spectroscopic notation.}\n\\end{table}\n\n\\end{document}\n"
+}
