@@ -18,7 +18,7 @@ jobs:
   zenodo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: tardis-sn/tardis_zenodo
           token: ${{ secrets.BOT_TOKEN }}
@@ -32,7 +32,7 @@ jobs:
             echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
               
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@v3
         with:
             environment-file: conda-linux-64.lock
             cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
@@ -53,7 +53,7 @@ jobs:
         run: jupyter nbconvert gather_data.ipynb --to html --execute --ExecutePreprocessor.timeout=6000 --allow-errors
         if: failure()
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: zenodo_json
           path: .zenodo.json
@@ -64,12 +64,12 @@ jobs:
     needs: [pip_tests, zenodo]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
@@ -85,7 +85,7 @@ jobs:
           echo "NEW_TAG=$(python .ci-helpers/get_next_version.py)" >> $GITHUB_ENV
 
       - name: Initialize release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           name: CARSUS v${{ env.NEW_TAG }}
           tag_name: release-${{ env.NEW_TAG }}
@@ -126,7 +126,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Update release with changelog and DOI
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: release-${{ env.NEW_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
