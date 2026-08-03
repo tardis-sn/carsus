@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build kurucz_cd23_chianti_H_He_latest.h5 &mdash; carsus v0.1.dev1+gc6930472d</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="_static/tardis_logo.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=16bbcd1e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link href="_static/carsus.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            carsus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart for Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/compare_atomic_files.html">Compare Atomic Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Datasets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="io/nist.html">NIST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/gfall.html">GFALL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/chianti.html">CHIANTI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/cmfgen.html">CMFGEN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/zeta.html">ZETA DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/nndc.html">NNDC DATA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/vald.html">VALD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io/barklem2016.html">Barklem &amp; Collet 2016 Data Ingestion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/notation.html">Notation in Carsus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/level_index_id_number.html">Differences between level_index, level_id and level_number</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/atomic_data_reproduction_diff.html">Atomic Data Reproduction Differences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Research with Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="research/publications.html">Carsus Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="research/bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing to Carsus</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="physics/index.html">Physics Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Developer Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">carsus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Build <code class="docutils literal notranslate"><span class="pre">kurucz_cd23_chianti_H_He_latest.h5</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/generate_standard_tardis_atomdata.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Build-kurucz_cd23_chianti_H_He_latest.h5">
+<h1>Build <code class="docutils literal notranslate"><span class="pre">kurucz_cd23_chianti_H_He_latest.h5</span></code><a class="headerlink" href="#Build-kurucz_cd23_chianti_H_He_latest.h5" title="Link to this heading"></a></h1>
+<p>This notebook builds a TARDIS atom-data file from the current Carsus public data inputs:</p>
+<ul class="simple">
+<li><p>NIST atomic weights and ionization energies for H-Zn</p></li>
+<li><p>Kurucz CD23 GFALL levels and lines from the <a class="reference external" href="https://github.com/tardis-sn/carsus-data-kurucz">Carsus Kurucz data mirror</a></p></li>
+<li><p>CHIANTI H-He levels, lines, and electron collision strengths from the <a class="reference external" href="https://www.chiantidatabase.org/">CHIANTI database</a> configured by <code class="docutils literal notranslate"><span class="pre">XUVTOP</span></code></p></li>
+<li><p>Knox-Long recombination zeta data</p></li>
+<li><p><a class="reference external" href="https://github.com/tardis-sn/carsus-data-nndc">NNDC ENSDF CSV decay-radiation data</a></p></li>
+</ul>
+<p>The output uses the legacy TARDIS HDF schema (<code class="docutils literal notranslate"><span class="pre">database_version='v0.9'</span></code>) expected by TARDIS regression atom-data files. It is intended to make a valid current-data file named <code class="docutils literal notranslate"><span class="pre">kurucz_cd23_chianti_H_He_latest.h5</span></code>; it is not a byte-for-byte reproduction of older historical regression files.</p>
+<section id="Configure-source-locations">
+<h2>Configure source locations<a class="headerlink" href="#Configure-source-locations" title="Link to this heading"></a></h2>
+<p>Download and extract the latest CHIANTI database from the CHIANTI project, then set <code class="docutils literal notranslate"><span class="pre">XUVTOP</span></code> to the extracted database root before running the Carsus readers. The current CHIANTI database package should contain files such as <code class="docutils literal notranslate"><span class="pre">VERSION</span></code>, <code class="docutils literal notranslate"><span class="pre">masterlist/masterlist_ions.pkl</span></code>, <code class="docutils literal notranslate"><span class="pre">h/h_1/h_1.elvlc</span></code>, and <code class="docutils literal notranslate"><span class="pre">he/he_1/he_1.elvlc</span></code>.</p>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">CHIANTI_DATABASE_URL</span></code> block below is provided for reproducible local runs when you know the exact upstream archive URL. If <code class="docutils literal notranslate"><span class="pre">XUVTOP</span></code> already points to an extracted CHIANTI tree, the notebook will use that tree and skip downloading.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tarfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+
+<span class="n">DATA_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CARSUS_ATOMDATA_SOURCE_DIR&quot;</span><span class="p">,</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;Downloads&quot;</span> <span class="o">/</span> <span class="s2">&quot;carsus-atomdata-sources&quot;</span><span class="p">))</span>
+<span class="n">DATA_ROOT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;kurucz_cd23_chianti_H_He_latest.h5&quot;</span><span class="p">)</span>
+
+<span class="c1"># Prefer an existing XUVTOP. If it is not set, use DATA_ROOT/chianti after optional download/extraction.</span>
+<span class="n">CHIANTI_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;XUVTOP&quot;</span><span class="p">,</span> <span class="n">DATA_ROOT</span> <span class="o">/</span> <span class="s2">&quot;chianti&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+<span class="n">CHIANTI_DATABASE_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CHIANTI_DATABASE_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">CHIANTI_ROOT</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">CHIANTI_DATABASE_URL</span><span class="p">:</span>
+    <span class="n">archive_path</span> <span class="o">=</span> <span class="n">DATA_ROOT</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">CHIANTI_DATABASE_URL</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading CHIANTI database archive to </span><span class="si">{</span><span class="n">archive_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">CHIANTI_DATABASE_URL</span><span class="p">,</span> <span class="n">archive_path</span><span class="p">)</span>
+    <span class="n">extract_root</span> <span class="o">=</span> <span class="n">DATA_ROOT</span> <span class="o">/</span> <span class="s2">&quot;chianti-extracted&quot;</span>
+    <span class="k">if</span> <span class="n">extract_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">extract_root</span><span class="p">)</span>
+    <span class="n">extract_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">archive_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+        <span class="n">archive</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">extract_root</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">extract_root</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;VERSION&quot;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The CHIANTI archive did not contain a VERSION file.&quot;</span><span class="p">)</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span>
+
+<span class="n">required_chianti_paths</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;VERSION&quot;</span><span class="p">,</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;masterlist&quot;</span> <span class="o">/</span> <span class="s2">&quot;masterlist_ions.pkl&quot;</span><span class="p">,</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;h&quot;</span> <span class="o">/</span> <span class="s2">&quot;h_1&quot;</span> <span class="o">/</span> <span class="s2">&quot;h_1.elvlc&quot;</span><span class="p">,</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;he&quot;</span> <span class="o">/</span> <span class="s2">&quot;he_1&quot;</span> <span class="o">/</span> <span class="s2">&quot;he_1.elvlc&quot;</span><span class="p">,</span>
+    <span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;he&quot;</span> <span class="o">/</span> <span class="s2">&quot;he_2&quot;</span> <span class="o">/</span> <span class="s2">&quot;he_2.elvlc&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">required_chianti_paths</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+<span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="s2">&quot;Set XUVTOP to an extracted CHIANTI database root or set CHIANTI_DATABASE_URL. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Missing: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;XUVTOP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">CHIANTI_ROOT</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using CHIANTI database: </span><span class="si">{</span><span class="n">CHIANTI_ROOT</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">((</span><span class="n">CHIANTI_ROOT</span> <span class="o">/</span> <span class="s2">&quot;VERSION&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using CHIANTI database: /tmp/chianti
+10.0
+</pre></div></div>
+</div>
+</section>
+<section id="Create-Carsus-readers">
+<h2>Create Carsus readers<a class="headerlink" href="#Create-Carsus-readers" title="Link to this heading"></a></h2>
+<p>Import <code class="docutils literal notranslate"><span class="pre">carsus</span></code> before importing <code class="docutils literal notranslate"><span class="pre">astropy.units</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy.constants</span></code> elsewhere in the kernel. Carsus pins the Astropy constants set used by legacy TARDIS atom-data generation during import.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.chianti_</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChiantiReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.kurucz</span><span class="w"> </span><span class="kn">import</span> <span class="n">GFALLReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.nist</span><span class="w"> </span><span class="kn">import</span> <span class="n">NISTIonizationEnergies</span><span class="p">,</span> <span class="n">NISTWeightsComp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.nuclear</span><span class="w"> </span><span class="kn">import</span> <span class="n">NNDCReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.zeta</span><span class="w"> </span><span class="kn">import</span> <span class="n">KnoxLongZeta</span>
+
+<span class="n">atomic_weights</span> <span class="o">=</span> <span class="n">NISTWeightsComp</span><span class="p">()</span>
+<span class="n">ionization_energies</span> <span class="o">=</span> <span class="n">NISTIonizationEnergies</span><span class="p">(</span><span class="s2">&quot;H-Zn&quot;</span><span class="p">)</span>
+
+<span class="c1"># GFALLReader&#39;s default source is the Carsus Kurucz CD23 mirror on the main branch.</span>
+<span class="c1"># Include labels in the level identity so same-energy/J terms remain distinct when labels differ.</span>
+<span class="n">gfall_reader</span> <span class="o">=</span> <span class="n">GFALLReader</span><span class="p">(</span>
+    <span class="s2">&quot;H-Zn&quot;</span><span class="p">,</span>
+    <span class="n">unique_level_identifier</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">chianti_reader</span> <span class="o">=</span> <span class="n">ChiantiReader</span><span class="p">(</span><span class="s2">&quot;H-He&quot;</span><span class="p">,</span> <span class="n">collisions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">zeta_data</span> <span class="o">=</span> <span class="n">KnoxLongZeta</span><span class="p">()</span>
+
+<span class="c1"># With remote=True, NNDCReader clones the Carsus NNDC CSV repository into its</span>
+<span class="c1"># default location if it is not already present.</span>
+<span class="n">nndc_reader</span> <span class="o">=</span> <span class="n">NNDCReader</span><span class="p">(</span><span class="n">remote</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/vcs_versioning/_backends/_git.py:377: UserWarning: &#34;/home/runner/work/carsus/carsus&#34; is shallow and may cause errors
+  pre_parse(wd)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold"> carsus.io.nist.weightscomp</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading data from the carsus-dat-nist repository (<span class="ansi-bold">weightscomp.py</span>:77)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/uncertainties/core.py:1024: UserWarning: Using UFloat objects with std_dev==0 may give unexpected results.
+  warn(&#34;Using UFloat objects with std_dev==0 may give unexpected results.&#34;)
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">  carsus.io.nist.ionization</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading ionization energies from the carsus-data-nist repo. (<span class="ansi-bold">ionization.py</span>:91)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/urllib3/connectionpool.py:1110: InsecureRequestWarning: Unverified HTTPS request is being made to host &#39;raw.githubusercontent.com&#39;. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+ ChiantiPy version 0.16.0
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/ChiantiPy/tools/util.py:420: SyntaxWarning: &#34;\p&#34; is an invalid escape sequence. Such sequences will not work in the future. Did you mean &#34;\\p&#34;? A raw string is also an option.
+  Calculate :math:`Q_R^{\prime}(Z,u)`, where :math:`u=\epsilon/I` is the impact electron energy in threshold units, from Eq. 2.12 of [4]_.
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+ found PyQt5 widgets
+ using CLI for selections
+ reading chiantirc file
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/ChiantiPy/core/IpyMspectrum.py:104: SyntaxWarning: &#34;\i&#34; is an invalid escape sequence. Such sequences will not work in the future. Did you mean &#34;\\i&#34;? A raw string is also an option.
+  ylabel += &#39;($\int\,$ N$_e\,$N$_H\,$d${\it l}$)$^{-1}$&#39;
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Cloning into &#39;/home/runner/Downloads/carsus-data-nndc&#39;...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">     carsus.io.nuclear.nndc</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Downloading NNDC decay data from https://github.com/tardis-sn/carsus-data-nndc (<span class="ansi-bold">nndc.py</span>:42)
+[<span class="ansi-bold">     carsus.io.nuclear.nndc</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Parsing decay data from: /home/runner/Downloads/carsus-data-nndc/csv (<span class="ansi-bold">nndc.py</span>:50)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Updating files: 100% (4651/4651), done.
+</pre></div></div>
+</div>
+</section>
+<section id="Build-and-write-the-TARDIS-atom-data-file">
+<h2>Build and write the TARDIS atom-data file<a class="headerlink" href="#Build-and-write-the-TARDIS-atom-data-file" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">carsus.io.output</span><span class="w"> </span><span class="kn">import</span> <span class="n">TARDISAtomData</span>
+
+<span class="n">atom_data</span> <span class="o">=</span> <span class="n">TARDISAtomData</span><span class="p">(</span>
+    <span class="n">atomic_weights</span><span class="o">=</span><span class="n">atomic_weights</span><span class="p">,</span>
+    <span class="n">ionization_energies</span><span class="o">=</span><span class="n">ionization_energies</span><span class="p">,</span>
+    <span class="n">gfall_reader</span><span class="o">=</span><span class="n">gfall_reader</span><span class="p">,</span>
+    <span class="n">zeta_data</span><span class="o">=</span><span class="n">zeta_data</span><span class="p">,</span>
+    <span class="n">chianti_reader</span><span class="o">=</span><span class="n">chianti_reader</span><span class="p">,</span>
+    <span class="n">nndc_reader</span><span class="o">=</span><span class="n">nndc_reader</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">atom_data</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span>
+    <span class="n">OUTPUT_PATH</span><span class="p">,</span>
+    <span class="n">legacy_tardis_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">database_version</span><span class="o">=</span><span class="s2">&quot;v0.9&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Wrote </span><span class="si">{</span><span class="n">OUTPUT_PATH</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[<span class="ansi-bold">carsus.io.output.levels_lines</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting energy levels. (<span class="ansi-bold">levels_lines.py</span>:167)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Parsing GFALL from: https://github.com/tardis-sn/carsus-data-kurucz/raw/main/linelists/gfall/gfall.dat?raw=true (<span class="ansi-bold">gfall.py</span>:173)
+[<span class="ansi-bold">carsus.io.output.levels_lines</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - GFALL selected species: Li 0, Li 1, Be 0, Be 1, Be 2, B 0, B 1, B 2, B 3, C 0, C 1, C 2, C 3, N 0, N 1, N 2, N 3, N 4, N 5, O 0, O 1, O 2, O 3, O 4, O 5, F 0, F 1, F 2, F 3, F 4, F 5, Ne 0, Ne 1, Ne 2, Ne 3, Ne 4, Ne 5, Na 0, Na 1, Na 2, Na 3, Na 4, Na 5, Mg 0, Mg 1, Mg 2, Mg 3, Mg 4, Mg 5, Al 0, Al 1, Al 2, Al 3, Al 4, Al 5, Si 0, Si 1, Si 2, Si 3, Si 4, Si 5, P 0, P 1, P 2, P 3, P 4, P 5, S 0, S 1, S 2, S 3, S 4, S 5, Cl 0, Cl 1, Cl 2, Cl 3, Cl 4, Ar 0, Ar 1, Ar 2, Ar 3, Ar 4, K 0, K 1, K 2, K 3, K 4, Ca 0, Ca 1, Ca 2, Ca 3, Ca 4, Ca 5, Ca 6, Ca 7, Ca 8, Sc 0, Sc 1, Sc 2, Sc 3, Sc 4, Sc 5, Sc 6, Sc 7, Sc 8, Ti 0, Ti 1, Ti 2, Ti 3, Ti 4, Ti 5, Ti 6, Ti 7, Ti 8, V 0, V 1, V 2, V 3, V 4, V 5, V 6, V 7, V 8, Cr 0, Cr 1, Cr 2, Cr 3, Cr 4, Cr 5, Cr 6, Cr 7, Cr 8, Mn 0, Mn 1, Mn 2, Mn 3, Mn 4, Mn 5, Mn 6, Mn 7, Mn 8, Fe 0, Fe 1, Fe 2, Fe 3, Fe 4, Fe 5, Fe 6, Fe 7, Fe 8, Co 0, Co 1, Co 2, Co 3, Co 4, Co 5, Co 6, Co 7, Co 8, Ni 0, Ni 1, Ni 2, Ni 3, Ni 4, Ni 5, Ni 6, Ni 7, Ni 8, Cu 0, Cu 1, Zn 0, Zn 1, Zn 2. (<span class="ansi-bold">levels_lines.py</span>:203)
+[<span class="ansi-bold">carsus.io.output.levels_lines</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Chianti selected species: H 0, He 0, He 1. (<span class="ansi-bold">levels_lines.py</span>:207)
+[<span class="ansi-bold">carsus.io.output.levels_lines</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting transition lines. (<span class="ansi-bold">levels_lines.py</span>:297)
+[<span class="ansi-bold">     carsus.io.kurucz.gfall</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Extracting line data: atomic_number, ion_charge, energy_lower, j_lower, label_lower, energy_upper, j_upper, label_upper, wavelength, loggf. (<span class="ansi-bold">gfall.py</span>:417)
+[<span class="ansi-bold">carsus.io.output.levels_lines</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Matching levels and lines. (<span class="ansi-bold">levels_lines.py</span>:338)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/micromamba/envs/carsus/lib/python3.14/site-packages/pandas/core/arraylike.py:402: RuntimeWarning: divide by zero encountered in log10
+  result = getattr(ufunc, method)(*inputs, **kwargs)
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">carsus.io.output.collisions</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Ingesting collisional strengths. (<span class="ansi-bold">collisions.py</span>:112)
+[<span class="ansi-bold">carsus.io.output.collisions</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Matching collisions and levels. (<span class="ansi-bold">collisions.py</span>:124)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Finished. (<span class="ansi-bold">base.py</span>:98)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:217: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;mixed-integer,key-&gt;block7_values] [items-&gt;Index([&#39;Element&#39;, &#39;Parent E(level)&#39;, &#39;Uncertainty&#39;, &#39;JPi&#39;,
+       &#39;Q Value Uncertainty&#39;, &#39;Gammas Balance&#39;, &#39;X-Rays Balance&#39;, &#39;B- Balance&#39;,
+       &#39;B+ Balance&#39;, &#39;Conversion Electrons Balance&#39;, &#39;Auger Electrons Balance&#39;,
+       &#39;Neutrinos Balance&#39;, &#39;Recoil Balance&#39;, &#39;Neutrons Balance&#39;,
+       &#39; Protons Balance&#39;, &#39;Alphas Balance&#39;, &#39;Sum Balance&#39;,
+       &#39;Q-effective Balance&#39;, &#39;Missing Energy Balance&#39;, &#39;Radiation&#39;,
+       &#39;Rad subtype&#39;, &#39;Uncertainty.1&#39;, &#39;Uncertainty.3&#39;, &#39;Uncertainty.4&#39;],
+      dtype=&#39;str&#39;)]
+
+  f.put(hdf_path, output)
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:217: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;mixed,key-&gt;block2_values] [items-&gt;Index([&#39;btemp&#39;, &#39;bscups&#39;], dtype=&#39;str&#39;)]
+
+  f.put(hdf_path, output)
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">                py.warnings</span>][<span class="ansi-yellow-intense-fg ansi-bold">WARNING</span>] - /home/runner/work/carsus/carsus/carsus/io/output/base.py:217: PerformanceWarning:
+your performance may suffer as PyTables will pickle object types that it cannot
+map directly to c-types [inferred_type-&gt;mixed,key-&gt;values] [items-&gt;None]
+
+  f.put(hdf_path, output)
+ (<span class="ansi-bold">_py_warnings.py</span>:230)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Signing TARDISAtomData. (<span class="ansi-bold">base.py</span>:284)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - Format Version: 2.0 (<span class="ansi-bold">base.py</span>:285)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - MD5: 4367f8f076fc685a1912258808f482e0 (<span class="ansi-bold">base.py</span>:286)
+[<span class="ansi-bold">      carsus.io.output.base</span>][   <span class="ansi-white-intense-fg ansi-bold">INFO</span>] - UUID1: f22d6f1c8f5e11f1b2f16045bdb08646 (<span class="ansi-bold">base.py</span>:287)
+Wrote /home/runner/work/carsus/carsus/docs/kurucz_cd23_chianti_H_He_latest.h5
+</pre></div></div>
+</div>
+</section>
+<section id="Validate-the-file-layout">
+<h2>Validate the file layout<a class="headerlink" href="#Validate-the-file-layout" title="Link to this heading"></a></h2>
+<p>These checks verify the legacy TARDIS schema contract used by the Carsus regression test for <code class="docutils literal notranslate"><span class="pre">kurucz_cd23_chianti_H_He_latest.h5</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">expected_keys</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;/atom_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/collisions_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/collisions_metadata&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/decay_radiation_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/ionization_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/levels_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/lines_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/macro_atom_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/macro_atom_references&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/metadata&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/zeta_data&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">HDFStore</span><span class="p">(</span><span class="n">OUTPUT_PATH</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="n">keys</span> <span class="o">==</span> <span class="n">expected_keys</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span> <span class="o">^</span> <span class="n">expected_keys</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">store</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">_v_attrs</span><span class="p">[</span><span class="s2">&quot;FORMAT_VERSION&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2.0&quot;</span>
+    <span class="k">assert</span> <span class="n">store</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">_v_attrs</span><span class="p">[</span><span class="s2">&quot;database_version&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;v0.9&quot;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;md5sum&quot;</span><span class="p">,</span> <span class="s2">&quot;levels&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;md5sum&quot;</span><span class="p">,</span> <span class="s2">&quot;lines&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;md5sum&quot;</span><span class="p">,</span> <span class="s2">&quot;levels_data&quot;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="s2">&quot;md5sum&quot;</span><span class="p">,</span> <span class="s2">&quot;lines_data&quot;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="n">atom_data_table</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;atom_data&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">atom_data_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;atomic_number&quot;</span>
+    <span class="k">assert</span> <span class="n">atom_data_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">atom_data_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">==</span> <span class="mi">94</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Validated legacy TARDIS atom-data schema.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Rows:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Validated legacy TARDIS atom-data schema.
+Rows:
+  /atom_data: (94, 3)
+  /collisions_data: (358, 14)
+  /collisions_metadata: (2,)
+  /decay_radiation_data: (242295, 41)
+  /ionization_data: (465,)
+  /levels_data: (24805, 3)
+  /lines_data: (271771, 8)
+  /macro_atom_data: (815313, 7)
+  /macro_atom_references: (24805, 3)
+  /metadata: (18, 1)
+  /zeta_data: (412, 20)
+</pre></div></div>
+</div>
+</section>
+<section id="Record-source-versions">
+<h2>Record source versions<a class="headerlink" href="#Record-source-versions" title="Link to this heading"></a></h2>
+<p>The file metadata stores checksums and software versions. The printed values below are useful when publishing or uploading the generated atom-data file.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">HDFStore</span><span class="p">(</span><span class="n">OUTPUT_PATH</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">store</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;HDF root attributes:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;FORMAT_VERSION&quot;</span><span class="p">,</span> <span class="s2">&quot;database_version&quot;</span><span class="p">,</span> <span class="s2">&quot;DATE&quot;</span><span class="p">,</span> <span class="s2">&quot;MD5&quot;</span><span class="p">,</span> <span class="s2">&quot;UUID1&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">store</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">_v_attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Metadata:&quot;</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CHIANTI XUVTOP: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;XUVTOP&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CHIANTI version: </span><span class="si">{</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;XUVTOP&#39;</span><span class="p">])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">&#39;VERSION&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NNDC source directory: </span><span class="si">{</span><span class="n">nndc_reader</span><span class="o">.</span><span class="n">dirname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GFALL checksum: </span><span class="si">{</span><span class="n">gfall_reader</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+HDF root attributes:
+  FORMAT_VERSION: 2.0
+  database_version: v0.9
+  DATE: 2026-08-03T17:15:37.798165+00:00
+  MD5: 4367f8f076fc685a1912258808f482e0
+  UUID1: f22d6f1c8f5e11f1b2f16045bdb08646
+
+Metadata:
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>value</th>
+    </tr>
+    <tr>
+      <th>field</th>
+      <th>key</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>format</th>
+      <th>version</th>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th rowspan="10" valign="top">md5sum</th>
+      <th>atom_data</th>
+      <td>3f0298f7de8c5a5015da18caa5863502</td>
+    </tr>
+    <tr>
+      <th>collisions_data</th>
+      <td>90d9496cd6d2bb00bf8afa3a05daff5d</td>
+    </tr>
+    <tr>
+      <th>collisions_metadata</th>
+      <td>33a56c0abaec5ec37473c130e9e68ff6</td>
+    </tr>
+    <tr>
+      <th>decay_radiation_data</th>
+      <td>567484a1aff18ccb8b8afce542a14f6c</td>
+    </tr>
+    <tr>
+      <th>ionization_data</th>
+      <td>d65d9bc36d1d5c947dbf47d241cd6c04</td>
+    </tr>
+    <tr>
+      <th>levels</th>
+      <td>836ad6a21e0103fbd4f7ace366d8b287</td>
+    </tr>
+    <tr>
+      <th>lines</th>
+      <td>0c246189c59986ec9da4e4bc53f60d31</td>
+    </tr>
+    <tr>
+      <th>macro_atom_data</th>
+      <td>995bc5d237aa7eba1e2693407b562a78</td>
+    </tr>
+    <tr>
+      <th>macro_atom_references</th>
+      <td>89588159b5c0330cd8ab787a65ade767</td>
+    </tr>
+    <tr>
+      <th>zeta_data</th>
+      <td>3555b5c9000ae58eb92ac5d0018ca360</td>
+    </tr>
+    <tr>
+      <th rowspan="7" valign="top">software</th>
+      <th>python</th>
+      <td>3.14.5</td>
+    </tr>
+    <tr>
+      <th>carsus</th>
+      <td>0.1.dev1+gc6930472d</td>
+    </tr>
+    <tr>
+      <th>astropy</th>
+      <td>7.2.0</td>
+    </tr>
+    <tr>
+      <th>numpy</th>
+      <td>2.4.6</td>
+    </tr>
+    <tr>
+      <th>pandas</th>
+      <td>3.0.3</td>
+    </tr>
+    <tr>
+      <th>tables</th>
+      <td>3.11.1</td>
+    </tr>
+    <tr>
+      <th>ChiantiPy</th>
+      <td>0.16.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CHIANTI XUVTOP: /tmp/chianti
+CHIANTI version: 10.0
+NNDC source directory: /home/runner/Downloads/carsus-data-nndc/csv
+GFALL checksum: 2704fbda0b8cba61bb70426234224464
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2026, TARDIS Collaboration.
+      <span class="lastupdated">Last updated on 03 Aug 2026.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
