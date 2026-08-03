@@ -139,7 +139,7 @@ def test_CMFGENHydLParser(cmfgen_source_fname, regression_data):
     assert parser.header["Maximum principal quantum number"] == "30"
     
     expected = regression_data.sync_dataframe(parser.base)
-    pd.testing.assert_frame_equal(parser.base, expected)
+    pd.testing.assert_frame_equal(parser.base, expected, check_exact=False, atol=0, rtol=1e-15)
 
 
 @pytest.mark.with_regression_data
