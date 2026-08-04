@@ -1,0 +1,26 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\begin{table}[p]
+\centering
+\caption{Summary of atomic data by element\label{tab:atomdata-summary}}
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}lcrr}
+\hline
+\textbf{Element} & \textbf{Ion Stages} & \textbf{Levels} & \textbf{Lines} \\
+\hline
+$\mathrm{H}_{1}$ & I & 30 & 419 \\
+$\mathrm{Si}_{14}$ & I--VI & 925 & 16749 \\
+$\mathrm{Fe}_{26}$ & I--IX & 2988 & 61247 \\
+\textbf{Total} &  & \textbf{3943} & \textbf{78415} \\
+\hline
+\end{tabular*}
+
+\medskip
+\parbox{0.9\textwidth}{\footnotesize Ion stages with level and line data are given in spectroscopic notation.}
+\end{table}
+
+\end{document}

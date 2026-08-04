@@ -4,7 +4,10 @@ from pathlib import Path
 import pandas as pd
 import roman
 
-from carsus.util import convert_atomic_number2symbol
+from carsus.util import (
+    convert_atomic_number2symbol,
+    convert_symbol2atomic_number,
+)
 
 OUTPUT_DIR = Path(__file__).resolve().parent
 JOURNAL_CONFIG_DIR = OUTPUT_DIR / "journal_formats"
@@ -12,6 +15,7 @@ JOURNAL_CONFIG_DIR = OUTPUT_DIR / "journal_formats"
 
 def _ion_stage_range(ion_numbers):
     """Format only present stages, compressing consecutive stages into runs."""
+    # finding consecutive ion stage ranges
     stages = sorted({int(ion) + 1 for ion in ion_numbers})
     runs = []
     start = previous = stages[0]
@@ -32,6 +36,7 @@ def _ion_stage_range(ion_numbers):
 
 
 def _table_rows(summary, bold_total=True):
+    # converting summary columns into latex rows
     elements = summary["Element"].astype(str)
     stages = summary["Ion stages"].astype(str)
     levels = summary["Levels"].astype(str)
@@ -51,6 +56,7 @@ def _table_rows(summary, bold_total=True):
 
 def _render_table(summary, config_path):
     """Render ``summary`` using a journal configuration file."""
+    # loading the selected journal template
     config = json.loads(config_path.read_text(encoding="utf-8"))
     rows = "\n".join(
         _table_rows(summary, bold_total=config["bold_total"])
@@ -58,12 +64,14 @@ def _render_table(summary, config_path):
     return config["template"].replace("{{TABLE_ROWS}}", rows)
 
 
-def _build_summary(input_path):
+def _build_summary(input_path, elements=None):
     """Build an atomic-data summary from a Carsus HDF file."""
+    # loading level and line data
     with pd.HDFStore(Path(input_path), mode="r") as store:
         levels = store["levels_data"].reset_index()
         lines = store["lines_data"].reset_index()
 
+    # combining level and line counts by ion
     counts_by_ion = pd.concat(
         [
             levels.groupby(["atomic_number", "ion_number"])
@@ -75,10 +83,21 @@ def _build_summary(input_path):
         ],
         axis=1,
     )
+    # keeping ions with usable level and line data
     eligible_ions = counts_by_ion[
         (counts_by_ion["Levels"] > 1) & counts_by_ion["Lines"].notna()
     ].reset_index()
 
+    if elements is not None:
+        # filtering to the requested elements
+        atomic_numbers = [
+            convert_symbol2atomic_number(element) for element in elements
+        ]
+        eligible_ions = eligible_ions[
+            eligible_ions["atomic_number"].isin(atomic_numbers)
+        ]
+
+    # summarizing ion stages and counts by element
     ion_stages = (
         eligible_ions
         .groupby("atomic_number")["ion_number"]
@@ -95,6 +114,7 @@ def _build_summary(input_path):
         ],
         axis=1,
     )
+    # formatting element names for latex
     summary.insert(
         0,
         "Element",
@@ -105,6 +125,7 @@ def _build_summary(input_path):
     )
     summary = summary.reset_index(drop=True)
     summary[["Levels", "Lines"]] = summary[["Levels", "Lines"]].astype(int)
+    # adding the table total
     summary.loc[len(summary)] = [
         "Total",
         "",
@@ -116,23 +137,28 @@ def _build_summary(input_path):
 
 JOURNAL_CONFIGS = {
     journal: JOURNAL_CONFIG_DIR / f"{journal}.json"
-    for journal in ("aas", "aa", "mnras", "nature")
+    for journal in ("aas", "aa", "mnras", "nature", "custom")
 }
 
 
-def exporttable(input_path, journal, output_stem=None):
+def exporttable(input_path, journal, output_filename=None, elements=None):
     """Export an atomic-data summary table formatted for ``journal``.
 
     Parameters
     ----------
     input_path : path-like
         Carsus HDF file from which to build the summary.
-    journal : {"aas", "aa", "mnras", "nature"}
+    journal : {"aas", "aa", "mnras", "nature", "custom"}
         Journal whose LaTeX table format should be used.
-    output_stem : str, optional
+        The custom option reads ``journal_formats/custom.json``.
+    output_filename : str, optional
         Output filename without an extension. By default, files are named
         ``atomdata_summary_table_<journal>.tex`` and ``.txt``.
+    elements : list of str, optional
+        Chemical symbols to include, such as ``["H", "Si", "Fe"]``.
+        By default, all available elements are included.
     """
+    # selecting the journal configuration
     journal = journal.lower()
     try:
         config_path = JOURNAL_CONFIGS[journal]
@@ -142,14 +168,15 @@ def exporttable(input_path, journal, output_stem=None):
             f"Unsupported journal {journal!r}; choose one of: {supported}"
         ) from exc
 
-    if output_stem is None:
-        output_stem = f"atomdata_summary_table_{journal}"
+    if output_filename is None:
+        output_filename = f"atomdata_summary_table_{journal}"
 
-    summary = _build_summary(input_path)
-    (OUTPUT_DIR / f"{output_stem}.tex").write_text(
+    # building and writing the output tables
+    summary = _build_summary(input_path, elements=elements)
+    (OUTPUT_DIR / f"{output_filename}.tex").write_text(
         _render_table(summary, config_path), encoding="utf-8"
     )
-    (OUTPUT_DIR / f"{output_stem}.txt").write_text(
+    (OUTPUT_DIR / f"{output_filename}.txt").write_text(
         summary.to_string(index=False), encoding="utf-8"
     )
     return summary
