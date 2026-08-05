@@ -1,5 +1,8 @@
+"""Build journal-formatted atomic data summary tables."""
+
 import json
 from pathlib import Path
+from typing import Iterable, List, Optional, Union
 
 import pandas as pd
 import roman
@@ -13,8 +16,19 @@ OUTPUT_DIR = Path(__file__).resolve().parent
 JOURNAL_CONFIG_DIR = OUTPUT_DIR / "journal_formats"
 
 
-def _ion_stage_range(ion_numbers):
-    """Format only present stages, compressing consecutive stages into runs."""
+def _ion_stage_range(ion_numbers: Iterable[int]) -> str:
+    """Format present ion stages as consecutive ranges.
+
+    Parameters
+    ----------
+    ion_numbers : typing.Iterable[int]
+        Zero-based ion numbers to format.
+
+    Returns
+    -------
+    str
+        Ion stages in spectroscopic notation.
+    """
     # finding consecutive ion stage ranges
     stages = sorted({int(ion) + 1 for ion in ion_numbers})
     runs = []
@@ -35,7 +49,23 @@ def _ion_stage_range(ion_numbers):
     )
 
 
-def _table_rows(summary, bold_total=True):
+def _table_rows(
+    summary: pd.DataFrame, bold_total: bool = True
+) -> List[str]:
+    """Convert a summary table into LaTeX rows.
+
+    Parameters
+    ----------
+    summary : pandas.DataFrame
+        Atomic data summary to convert.
+    bold_total : bool, optional
+        Whether to make the total row bold.
+
+    Returns
+    -------
+    typing.List[str]
+        Formatted LaTeX table rows.
+    """
     # converting summary columns into latex rows
     elements = summary["Element"].astype(str)
     stages = summary["Ion stages"].astype(str)
@@ -54,8 +84,21 @@ def _table_rows(summary, bold_total=True):
     return rows.tolist()
 
 
-def _render_table(summary, config_path):
-    """Render ``summary`` using a journal configuration file."""
+def _render_table(summary: pd.DataFrame, config_path: Path) -> str:
+    """Render `summary` using a journal configuration file.
+
+    Parameters
+    ----------
+    summary : pandas.DataFrame
+        Atomic data summary to render.
+    config_path : pathlib.Path
+        Path to the journal configuration file.
+
+    Returns
+    -------
+    str
+        Complete LaTeX document containing the summary table.
+    """
     # loading the selected journal template
     config = json.loads(config_path.read_text(encoding="utf-8"))
     rows = "\n".join(
@@ -64,8 +107,24 @@ def _render_table(summary, config_path):
     return config["template"].replace("{{TABLE_ROWS}}", rows)
 
 
-def _build_summary(input_path, elements=None):
-    """Build an atomic-data summary from a Carsus HDF file."""
+def _build_summary(
+    input_path: Union[str, Path], elements: Optional[List[str]] = None
+) -> pd.DataFrame:
+    """Build an atomic data summary from a Carsus HDF file.
+
+    Parameters
+    ----------
+    input_path : str or pathlib.Path
+        Path to the Carsus HDF file.
+    elements : typing.List[str], optional
+        Chemical symbols to include. All available elements are included by
+        default.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Atomic data counts and ion stages grouped by element.
+    """
     # loading level and line data
     with pd.HDFStore(Path(input_path), mode="r") as store:
         levels = store["levels_data"].reset_index()
@@ -141,13 +200,18 @@ JOURNAL_CONFIGS = {
 }
 
 
-def exporttable(input_path, journal, output_filename=None, elements=None):
-    """Export an atomic-data summary table formatted for ``journal``.
+def exporttable(
+    input_path: Union[str, Path],
+    journal: str,
+    output_filename: Optional[str] = None,
+    elements: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    """Export an atomic data summary table formatted for `journal`.
 
     Parameters
     ----------
-    input_path : path-like
-        Carsus HDF file from which to build the summary.
+    input_path : str or pathlib.Path
+        Path to the Carsus HDF file from which to build the summary.
     journal : {"aas", "aa", "mnras", "nature", "custom"}
         Journal whose LaTeX table format should be used.
         The custom option reads ``journal_formats/custom.json``.
@@ -157,6 +221,11 @@ def exporttable(input_path, journal, output_filename=None, elements=None):
     elements : list of str, optional
         Chemical symbols to include, such as ``["H", "Si", "Fe"]``.
         By default, all available elements are included.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Atomic data summary written to the output files.
     """
     # selecting the journal configuration
     journal = journal.lower()
