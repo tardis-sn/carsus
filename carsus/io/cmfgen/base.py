@@ -984,7 +984,7 @@ class CMFGENReader:
             cross_sections = cross_sections.set_index(
                 ["atomic_number", "ion_charge", "level_index"]
             )
-            self.cross_sections = cross_sections.sort_index()
+            self.cross_sections = cross_sections.sort_index(kind="stable")
 
         self.levels = levels
         self.lines = lines

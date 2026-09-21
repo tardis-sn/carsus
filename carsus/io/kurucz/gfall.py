@@ -344,7 +344,7 @@ class GFALLReader(object):
 
         levels.drop_duplicates(unique_level_id, inplace=True)
         levels = levels.sort_values(
-            ["atomic_number", "ion_charge", "energy", "j", "label"]
+            ["atomic_number", "ion_charge", "energy", "j", "label"], kind="stable"
         )
 
         levels["method"] = levels["theoretical"].apply(

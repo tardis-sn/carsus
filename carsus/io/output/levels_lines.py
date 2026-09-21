@@ -49,7 +49,7 @@ class LevelsLinesPreparer:
 
         """
         levels = levels.set_index(["atomic_number", "ion_number"])
-        levels = levels.sort_index()  # To supress warnings
+        levels = levels.sort_index(kind="stable")  # To supress warnings
 
         lvl_list = []
         for ion in levels.index.unique():
@@ -327,7 +327,7 @@ class LevelsLinesPreparer:
             lines = lines.drop(lines[mask].index)
 
         lines = lines.set_index(["atomic_number", "ion_number"])
-        lines = lines.sort_index()  # To supress warnings
+        lines = lines.sort_index(kind="stable")  # To supress warnings
         ions = (
             set(self.gfall_ions)
             .union(set(self.chianti_ions))
@@ -340,7 +340,7 @@ class LevelsLinesPreparer:
             get_lvl_index2id(lines.loc[ion], self.all_levels_data) for ion in ions
         ]
         lines = pd.concat(lns_list, sort=True)
-        lines = lines.set_index("line_id").sort_index()
+        lines = lines.set_index("line_id").sort_index(kind="stable")
 
         lines["loggf"] = np.log10(lines["gf"])
         lines = lines.drop(
@@ -491,7 +491,7 @@ class LevelsLinesPreparer:
 
         levels = levels_w_ionization_energies[mask].copy()
         levels = levels.set_index("level_id").sort_values(
-            by=["atomic_number", "ion_number"]
+            by=["atomic_number", "ion_number"], kind="stable"
         )
         levels = levels.drop(columns="ionization_energy")
 
@@ -511,7 +511,9 @@ class LevelsLinesPreparer:
         )
 
         # Create levels numbers
-        levels = levels.sort_values(["atomic_number", "ion_number", "energy", "g"])
+        levels = levels.sort_values(
+            ["atomic_number", "ion_number", "energy", "g"], kind="stable"
+        )
 
         levels["level_number"] = (
             levels.groupby(["atomic_number", "ion_number"])["energy"]
@@ -566,7 +568,9 @@ class LevelsLinesPreparer:
         # Create and append artificial levels for fully ionized ions
         artificial_fully_ionized_levels = create_artificial_fully_ionized(levels)
         levels = pd.concat([levels, artificial_fully_ionized_levels], ignore_index=True)
-        levels = levels.sort_values(["atomic_number", "ion_number", "level_number"])
+        levels = levels.sort_values(
+            ["atomic_number", "ion_number", "level_number"], kind="stable"
+        )
 
         self.levels = levels
         self.lines = lines

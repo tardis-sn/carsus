@@ -126,7 +126,9 @@ class ChiantiCollisionsPreparer(CollisionsPreparer):
             get_lvl_index2id(collisions.loc[ion], self.levels_all) for ion in ions
         ]
         collisions = pd.concat(col_list, sort=True)
-        collisions = collisions.sort_values(by=["lower_level_id", "upper_level_id"])
+        collisions = collisions.sort_values(
+            by=["lower_level_id", "upper_level_id"], kind="stable"
+        )
 
         # `e_col_id` number starts after the last line id
         start = self.lines_all.index[-1] + 1

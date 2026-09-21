@@ -45,7 +45,7 @@ class PhotoIonizationPreparer:
 
         cross_sections = pd.concat(phixs_list, sort=True)
         cross_sections = cross_sections.sort_values(
-            by=["lower_level_id", "upper_level_id"]
+            by=["lower_level_id", "upper_level_id"], kind="stable"
         )
         cross_sections["level_id"] = cross_sections["lower_level_id"]
 

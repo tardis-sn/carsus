@@ -115,7 +115,7 @@ class MacroAtomPreparer():
         macro_atom = pd.DataFrame(macro_atom)
 
         macro_atom = macro_atom.sort_values(
-            ["atomic_number", "ion_number", "source_level_number"]
+            ["atomic_number", "ion_number", "source_level_number"], kind="stable"
         )
 
         self.macro_atom = macro_atom
