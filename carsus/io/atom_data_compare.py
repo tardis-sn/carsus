@@ -232,7 +232,9 @@ class AtomDataCompare(object):
                 )
 
         merged_df = merged_df[common_cols_rearranged]
-        merged_df = merged_df.sort_values(by=merged_df.index.names, axis=0)
+        merged_df = merged_df.sort_values(
+            by=merged_df.index.names, axis=0, kind="stable"
+        )
         merged_df.apply(
             lambda column: column.abs() if column.dtype.kind in "iufc" else column
         )
@@ -324,7 +326,9 @@ class AtomDataCompare(object):
             if column.startswith("matches"):
                 key_diff[column] = key_diff["total_rows"] - key_diff[column]
                 key_diff = key_diff.rename(columns={column: f"not_{column}"})
-        key_diff = key_diff.sort_values(["atomic_number", "ion_number"])
+        key_diff = key_diff.sort_values(
+            ["atomic_number", "ion_number"], kind="stable"
+        )
 
         subset = [
             column for column in key_diff.columns if column.startswith("not_matches")

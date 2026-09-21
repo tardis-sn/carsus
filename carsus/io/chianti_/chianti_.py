@@ -208,7 +208,7 @@ class ChiantiIonReader(object):
                                       <= self.last_bound_level]
         transitions = transitions.set_index(
             ["lower_level_index", "upper_level_index"])
-        transitions = transitions.sort_index()
+        transitions = transitions.sort_index(kind="stable")
         return transitions
 
     @property
@@ -257,7 +257,7 @@ class ChiantiIonReader(object):
         levels = levels.drop("pretty", axis=1)
 
         levels = levels.set_index("level_index")
-        levels = levels.sort_index()
+        levels = levels.sort_index(kind="stable")
 
         return levels
 
@@ -292,7 +292,7 @@ class ChiantiIonReader(object):
         lines[["wavelength", "method"]] = lines.apply(parse_wavelength, axis=1)
 
         lines = lines.set_index(["lower_level_index", "upper_level_index"])
-        lines = lines.sort_index()
+        lines = lines.sort_index(kind="stable")
 
         return lines
 
@@ -313,7 +313,7 @@ class ChiantiIonReader(object):
 
         collisions = collisions.set_index(
             ["lower_level_index", "upper_level_index"])
-        collisions = collisions.sort_index()
+        collisions = collisions.sort_index(kind="stable")
 
         return collisions
 
