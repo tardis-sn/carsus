@@ -105,7 +105,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
+          path: |
+            carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
+            carsus/docs/kurucz_cd23_chianti_H_He_latest.h5
   
   tardis-build:
     needs: carsus-build
@@ -165,10 +167,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
-      
+          path: atom-data
+
       - name: Replace Atomic Data
-        run: cp carsus/docs/kurucz_cd23_cmfgen_H_Si.h5/kurucz_cd23_cmfgen_H_Si.h5 tardis-regression-data/atom_data/kurucz_cd23_cmfgen_H_Si.h5
+        run: cp atom-data/kurucz_cd23_chianti_H_He_latest.h5 tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He_latest.h5
 
       - name: Generate New Reference Data
         run: pytest tardis ${{ env.PYTEST_FLAGS }}

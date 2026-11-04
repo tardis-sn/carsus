@@ -24,7 +24,7 @@ jobs:
 
       - name: Zip files
         run: |
-          FILES=kurucz_cd23_cmfgen_H_Si.h5
+          FILES="kurucz_cd23_cmfgen_H_Si.h5 kurucz_cd23_chianti_H_He_latest.h5"
           if [ -f compare_regression_data.html ]; then
             FILES="$FILES compare_regression_data.html"
           fi
