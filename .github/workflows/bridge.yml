@@ -21,7 +21,12 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
+  # only the H I, He I and He II CHIANTI 7 line files are needed (SolarSoft mirror, VERSION 7.1.3)
+  CHIANTI_7_URL: https://sohoftp.nascom.nasa.gov/solarsoft/packages/chianti_v7/dbase
+  CHIANTI_7_PATH: /tmp/chianti_seven
   CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
+  NNDC_DATA_REPO: tardis-sn/carsus-data-nndc
+  NNDC_DATA_REF: 136a8633e3dee21079d3738dabfe7758f6e40d41
   PYTEST_FLAGS: --tardis-regression-data=${{ github.workspace }}/tardis-regression-data
                 --generate-reference
   CACHE_NUMBER: 1
@@ -53,7 +58,23 @@ jobs:
             wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
-      
+
+      - name: Download CHIANTI 7 H-He line files
+        run: |
+            for f in h/h_1/h_1.wgfa he/he_1/he_1.wgfa he/he_2/he_2.wgfa; do
+              curl -sSf --create-dirs ${{ env.CHIANTI_7_URL }}/$f -o ${{ env.CHIANTI_7_PATH }}/$f
+            done
+
+      - name: Clone NNDC data repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.NNDC_DATA_REPO }}
+          ref: ${{ env.NNDC_DATA_REF }}
+          path: carsus-data-nndc
+
+      - name: Setup NNDC data path
+        run: ln -s ${{ github.workspace }}/carsus-data-nndc /tmp/carsus-data-nndc
+
       - name: Clone CMFGEN data repo
         uses: actions/checkout@v6
         with:
