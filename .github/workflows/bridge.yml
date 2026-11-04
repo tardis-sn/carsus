@@ -4,7 +4,7 @@ on:
   workflow_call: # to be called by save_atomic_files workflow
     outputs:
       ref-check-trig:
-        value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
+        value: ${{ jobs.tardis-build.outputs.has-changes }}
   workflow_dispatch: # for running manually
   pull_request: # run on PRs to validate atom-data changes against tardis regression data
     types:
@@ -112,8 +112,10 @@ jobs:
   tardis-build:
     needs: carsus-build
     runs-on: ubuntu-latest
+    env:
+      COMPARISON_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     outputs:
-      step-ref-check-trig: ${{ steps.ref-equal-check.outcome }} # success or failure of refdata comparison
+      has-changes: ${{ steps.commit.outputs.has_changes }} # 'true' when the regenerated regression data differs
 
     steps:
       - uses: actions/checkout@v6
@@ -172,52 +174,56 @@ jobs:
       - name: Replace Atomic Data
         run: cp atom-data/kurucz_cd23_chianti_H_He_latest.h5 tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He_latest.h5
 
+      # some TARDIS tests compare against stored data even with --generate-reference;
+      # keep going so the regression data comparison still runs
       - name: Generate New Reference Data
+        continue-on-error: true
         run: pytest tardis ${{ env.PYTEST_FLAGS }}
 
-      - name: Check if reference data are equal
-        id: ref-equal-check
-        continue-on-error: true
+      # same steps as compare-regdata.yml in tardis-sn/tardis
+      - name: Commit regression data
+        id: commit
         run: |
-            if [ -n "$(git status --porcelain)" ]; then
-              echo "Regression data differs after regeneration:"
-              git status
-              exit 1
-            fi
-        working-directory: tardis-regression-data
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add tardis
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Update regression data for commit ${GITHUB_SHA}"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+        working-directory: ${{ github.workspace }}/tardis-regression-data
 
-      - name: Snapshot regenerated regression data
-        if: steps.ref-equal-check.outcome == 'failure'
-        run: |
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git config user.name "github-actions[bot]"
-            git add -A
-            git commit -m "CI snapshot: regenerated with new carsus atom data"
-        working-directory: tardis-regression-data
+      - name: Add environment variable to save plots
+        run: echo "SAVE_COMP_IMG=1" >> $GITHUB_ENV
 
-      - name: Compare regression data
-        if: steps.ref-equal-check.outcome == 'failure'
+      - name: Install Kaleido
+        if: steps.commit.outputs.has_changes == 'true'
+        run: pip install --no-deps kaleido==0.2.1
+
+      - name: Run comparison notebook
+        if: steps.commit.outputs.has_changes == 'true'
         run: |
-            jupyter nbconvert --execute --to html \
-              ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data.ipynb \
-              --output=${{ github.workspace }}/compare_regression_data.html
+          jupyter nbconvert --execute ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data.ipynb \
+            --to html \
+            --output=compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+        working-directory: ${{ github.workspace }}/tardis-regression-data
         env:
           REGRESSION_DATA_REPO: ${{ github.workspace }}/tardis-regression-data
-          REF1_HASH: HEAD~1
-          REF2_HASH: HEAD
 
       - name: Upload comparison notebook
-        if: steps.ref-equal-check.outcome == 'failure'
+        if: steps.commit.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v7
         with:
-          name: Comparison Notebook
-          path: compare_regression_data.html
+          name: compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+          include-hidden-files: true
+          path: |
+            ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+            ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/comparison_plots*
 
-      # continue-on-error check would display a green tick even when the step passes
-      # but is necessary for other steps to run
-      # if the workflow was called by save-atomic-files workflow(the only other option)
-      # and refdata comparison failed this workflow would pass but the
-      # bridge-ref-check job in save-atomic-files about refdata comparison would fail
-      - name: Fail the workflow if reference data check fails
-        if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
+      # on workflow_dispatch, fail visibly when the regression data differs;
+      # when called by save-atomic-files, its bridge-ref-check job fails instead
+      - name: Fail the workflow if the regression data differs
+        if: github.event_name == 'workflow_dispatch' && steps.commit.outputs.has_changes == 'true'
         run: exit 1
