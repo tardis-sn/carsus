@@ -10,6 +10,7 @@ Carsus is a package to manage atomic datasets. It can read data from a variety o
 
     installation.rst
     quickstart
+    kurucz_cd23_chianti_H_He_latest
     development/compare_atomic_files
     reference/notation.rst
 
@@ -34,6 +35,7 @@ Carsus is a package to manage atomic datasets. It can read data from a variety o
 
     reference/notation.rst
     reference/level_index_id_number.rst
+    reference/atomic_data_reproduction_diff.rst
 
 .. toctree::
     :maxdepth: 2
