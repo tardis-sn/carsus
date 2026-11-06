@@ -174,8 +174,8 @@ jobs:
       - name: Replace Atomic Data
         run: cp atom-data/kurucz_cd23_chianti_H_He_latest.h5 tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He_latest.h5
 
-      # some TARDIS tests compare against stored data even with --generate-reference;
-      # keep going so the regression data comparison still runs
+      # Keep going on test failures so the regression data comparison still runs.
+      # Some TARDIS tests compare against stored data even with --generate-reference.
       - name: Generate New Reference Data
         continue-on-error: true
         run: pytest tardis ${{ env.PYTEST_FLAGS }}
@@ -222,8 +222,8 @@ jobs:
             ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
             ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/comparison_plots*
 
-      # on workflow_dispatch, fail visibly when the regression data differs;
-      # when called by save-atomic-files, its bridge-ref-check job fails instead
+      # Fail when there are changes and this workflow was started via workflow_dispatch.
+      # Does not fail when called by save-atomic-files, so the files are sent to Moria even if changes are present.
       - name: Fail the workflow if the regression data differs
-        if: github.event_name == 'workflow_dispatch' && steps.commit.outputs.has_changes == 'true'
+        if: github.workflow == 'tardis-carsus-bridge' && github.event_name == 'workflow_dispatch' && steps.commit.outputs.has_changes == 'true'
         run: exit 1
