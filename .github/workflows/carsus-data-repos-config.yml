@@ -14,7 +14,7 @@ jobs:
   checkout:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           path: carsus/
 
@@ -25,19 +25,19 @@ jobs:
             atom-data-sparse: false
 
       - name: Restore cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: carsus-data-cmfgen
           key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-cmfgen/**/*.lock') }}
 
       - name: Restore cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: carsus-data-kurucz
           key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-kurucz/**/*.lock') }}
 
       - name: Restore cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: carsus-data-nist
           key: ${{ runner.os }}-cache-${{ hashFiles('carsus-data-nist/**/*.lock') }}
@@ -56,7 +56,7 @@ jobs:
             fi
           done
 
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: conda-lock.yml
           init-shell: bash
@@ -74,7 +74,7 @@ jobs:
           CARSUS_REGRESSION_DATA: ${{ github.workspace }}/carsus-regression-data
         
       - name: Upload Atom Data
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: atom-data
           path: carsus/docs/kurucz_cd23_cmfgen_H_Si.h5

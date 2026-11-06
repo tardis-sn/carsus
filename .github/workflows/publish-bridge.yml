@@ -1,0 +1,111 @@
+# same steps as publish-regdata-comparison.yml in tardis-sn/tardis
+name: publish-bridge
+run-name: publish bridge comparison · ${{ github.event.workflow_run.display_title }}
+
+on:
+  workflow_run:
+    workflows: [tardis-carsus-bridge]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_BRANCH: main
+      PR_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Get PR number
+        id: pr
+        uses: juliangruber/find-pull-request-action@v1
+        with:
+          github-token: ${{ github.token }}
+          branch: ${{ github.event.workflow_run.head_repository.owner.login }}:${{ github.event.workflow_run.head_branch }}
+          state: open
+
+      - name: Check bridge label
+        if: steps.pr.outputs.number != '' && steps.pr.outputs.matching-pr-count == '1' && steps.pr.outputs.head-sha == env.PR_SHA
+        id: label
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" --paginate --jq '.[].name' | grep -Fxq run-tardis-carsus-bridge; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+
+      # the bridge uploads comparison artifacts only when the regression data differs
+      - name: Download comparison artifacts
+        if: steps.label.outputs.enabled == 'true'
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          repository: ${{ github.repository }}
+          pattern: compare_regression_data_*
+          path: comparison-artifacts
+
+      - name: Get comparison plots path
+        if: steps.label.outputs.enabled == 'true'
+        id: get_paths
+        run: |
+          dir=$(find comparison-artifacts -type d -name "comparison_plots*" | head -n1)
+          echo "plots_path=${dir#comparison-artifacts/}" >> "$GITHUB_OUTPUT"
+          if [ -n "$(ls -A comparison-artifacts 2>/dev/null)" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: steps.get_paths.outputs.found == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.BOT_TOKEN }}
+          publish_branch: ${{ env.DEPLOY_BRANCH }}
+          publish_dir: comparison-artifacts
+          destination_dir: carsus/pull/${{ steps.pr.outputs.number }}
+          keep_files: true
+          external_repository: tardis-sn/reg-data-comp
+          user_name: "TARDIS Bot"
+          user_email: "tardis.sn.bot@gmail.com"
+
+      - name: Find comment
+        if: steps.get_paths.outputs.found == 'true'
+        uses: peter-evans/find-comment@v4
+        id: fc
+        with:
+          issue-number: ${{ steps.pr.outputs.number }}
+          body-includes: Carsus Bridge Regression Comparison
+
+      - name: Post comment
+        if: steps.get_paths.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          issue-number: ${{ steps.pr.outputs.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### Carsus Bridge Regression Comparison
+
+            Regenerating TARDIS regression data with the new carsus atom data produced a diff:
+
+            - [Ubuntu](https://tardis-sn.github.io/reg-data-comp/carsus/pull/${{ steps.pr.outputs.number }}/compare_regression_data_${{ env.PR_SHA }}_ubuntu-latest.html/compare_regression_data_${{ env.PR_SHA }}_ubuntu-latest.html)
+
+            <details>
+            <summary>📊 View Comparison Plots</summary>
+
+            ![Spectrum Comparison](https://github.com/tardis-sn/reg-data-comp/blob/main/carsus/pull/${{ steps.pr.outputs.number }}/${{ steps.get_paths.outputs.plots_path }}/spectrum.png?raw=true)
+            ![Same Name Differences](https://github.com/tardis-sn/reg-data-comp/blob/main/carsus/pull/${{ steps.pr.outputs.number }}/${{ steps.get_paths.outputs.plots_path }}/same_name_diff.png?raw=true)
+            ![Key Differences](https://github.com/tardis-sn/reg-data-comp/blob/main/carsus/pull/${{ steps.pr.outputs.number }}/${{ steps.get_paths.outputs.plots_path }}/diff_keys.png?raw=true)
+
+            </details>
+
+            Runs: [bridge](${{ github.event.workflow_run.html_url }}) · [publish](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
