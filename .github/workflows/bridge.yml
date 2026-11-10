@@ -21,8 +21,8 @@ env:
   CHIANTI_DL_URL: https://download.chiantidatabase.org
   CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
-  # only the H I, He I and He II CHIANTI 7 line files are needed (SolarSoft mirror, VERSION 7.1.3)
-  CHIANTI_7_URL: https://sohoftp.nascom.nasa.gov/solarsoft/packages/chianti_v7/dbase
+  # only the H I, He I and He II CHIANTI 7.1.3 line files are needed
+  CHIANTI_7_URL: https://raw.githubusercontent.com/tardis-sn/carsus-data-chianti/7b5b0f8be7eef876df90bb50ff3c23c69e8311d2/v7.1.3
   CHIANTI_7_PATH: /tmp/chianti_seven
   CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
   NNDC_DATA_REPO: tardis-sn/carsus-data-nndc
