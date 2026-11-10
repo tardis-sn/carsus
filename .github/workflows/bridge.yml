@@ -1,24 +1,33 @@
 name: tardis-carsus-bridge
 
-on: 
+on:
   workflow_call: # to be called by save_atomic_files workflow
     outputs:
       ref-check-trig:
-        value: ${{ jobs.tardis-build.outputs.step-ref-check-trig}}
+        value: ${{ jobs.tardis-build.outputs.has-changes }}
   workflow_dispatch: # for running manually
+  pull_request: # run on PRs to validate atom-data changes against tardis regression data
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
 
-        
+permissions:
+  contents: read
+
 env:
   XUVTOP: /tmp/chianti
   CHIANTI_DL_URL: https://download.chiantidatabase.org
-  CHIANTI_DB_VER: CHIANTI_v9.0.1_database.tar.gz
+  CHIANTI_DB_VER: CHIANTI_10.0_database.tar.gz
   NBCONVERT_FLAGS: --execute --ExecutePreprocessor.timeout=600 --to html
+  # only the H I, He I and He II CHIANTI 7.1.3 line files are needed
+  CHIANTI_7_URL: https://raw.githubusercontent.com/tardis-sn/carsus-data-chianti/7b5b0f8be7eef876df90bb50ff3c23c69e8311d2/v7.1.3
+  CHIANTI_7_PATH: /tmp/chianti_seven
   CMFGEN_DATA_REPO: tardis-sn/carsus-data-cmfgen
-  # original reference data
-  REF1_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data_org.h5
-  # generated reference data using the new atomic file 
-  REF2_PATH: ${{ github.workspace }}/tardis-refdata/unit_test_data.h5
-  PYTEST_FLAGS: --tardis-refdata=${{ github.workspace }}/tardis-refdata 
+  NNDC_DATA_REPO: tardis-sn/carsus-data-nndc
+  NNDC_DATA_REF: 136a8633e3dee21079d3738dabfe7758f6e40d41
+  PYTEST_FLAGS: --tardis-regression-data=${{ github.workspace }}/tardis-regression-data
                 --generate-reference
   CACHE_NUMBER: 1
 
@@ -28,13 +37,16 @@ defaults:
 
 jobs:
   carsus-build:
+    # On pull_request, only run when the 'run-tardis-carsus-bridge' label is present.
+    # Other events (workflow_dispatch, workflow_call) are unaffected.
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-tardis-carsus-bridge')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           path: carsus/
-        
-      - uses: actions/cache@v2
+
+      - uses: actions/cache@v5
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
@@ -46,9 +58,25 @@ jobs:
             wget -q ${{ env.CHIANTI_DL_URL }}/${{ env.CHIANTI_DB_VER }} -O ${{ env.XUVTOP }}/chianti.tar.gz
             tar -zxf ${{ env.XUVTOP }}/chianti.tar.gz -C ${{ env.XUVTOP }}
         if: steps.chianti-cache.outputs.cache-hit != 'true'
-      
+
+      - name: Download CHIANTI 7 H-He line files
+        run: |
+            for f in h/h_1/h_1.wgfa he/he_1/he_1.wgfa he/he_2/he_2.wgfa; do
+              curl -sSf --create-dirs ${{ env.CHIANTI_7_URL }}/$f -o ${{ env.CHIANTI_7_PATH }}/$f
+            done
+
+      - name: Clone NNDC data repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.NNDC_DATA_REPO }}
+          ref: ${{ env.NNDC_DATA_REF }}
+          path: carsus-data-nndc
+
+      - name: Setup NNDC data path
+        run: ln -s ${{ github.workspace }}/carsus-data-nndc /tmp/carsus-data-nndc
+
       - name: Clone CMFGEN data repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.CMFGEN_DATA_REPO }}
           path: carsus-data-cmfgen
@@ -56,9 +84,9 @@ jobs:
       - name: Setup CMFGEN data path
         run: ln -s ${{ github.workspace }}/carsus-data-cmfgen/atomic /tmp/atomic
 
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@v3
         with:
-          environment-file: conda-lock.yml
+          environment-file: carsus/conda-lock.yml
           init-shell: bash
           cache-environment: true
           cache-downloads: true 
@@ -74,104 +102,128 @@ jobs:
           CARSUS_REFDATA: ${{ github.workspace }}/carsus-refdata
         
       - name: Upload Atom Data
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
+          path: |
+            carsus/docs/kurucz_cd23_cmfgen_H_Si.h5
+            carsus/docs/kurucz_cd23_chianti_H_He_latest.h5
   
   tardis-build:
     needs: carsus-build
     runs-on: ubuntu-latest
+    env:
+      COMPARISON_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     outputs:
-      step-ref-check-trig: ${{ steps.ref-equal-check.outcome }} # success or failure of refdata comparison
+      has-changes: ${{ steps.commit.outputs.has_changes }} # 'true' when the regenerated regression data differs
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           repository: tardis-sn/tardis
-        
-      - name: Download refdata_compare notebook
-        run: wget https://raw.githubusercontent.com/tardis-sn/tardis-refdata/master/notebooks/ref_data_compare_from_paths.ipynb
-        
-      - name: Clone tardis-sn/tardis-refdata
-        uses: actions/checkout@v2
+
+      - name: Checkout carsus
+        uses: actions/checkout@v6
         with:
-          repository: tardis-sn/tardis-refdata
-          path: tardis-refdata
+          path: carsus
 
-      - name: Create LFS file list
-        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-        working-directory: tardis-refdata
-
-      - name: Restore LFS cache
-        uses: actions/cache@v2
-        id: lfs-cache
+      - name: Checkout tardisbase
+        uses: actions/checkout@v6
         with:
-          path: tardis-refdata/.git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('tardis-refdata/.lfs-assets-id') }}-v${{ env.CACHE_NUMBER }}
+          repository: tardis-sn/tardisbase
+          path: tardisbase
 
-      - name: Git LFS Pull
+      - name: Clone tardis-sn/tardis-regression-data
+        uses: actions/checkout@v6
+        with:
+          repository: tardis-sn/tardis-regression-data
+          path: tardis-regression-data
+          lfs: false
+
+      - name: Git LFS Pull (via .lfsconfig in repo)
         run: git lfs pull
-        working-directory: tardis-refdata
-        if: steps.lfs-cache.outputs.cache-hit != 'true'
-
-      - name: Git LFS Checkout
-        run: git lfs checkout
-        working-directory: tardis-refdata
-        if: steps.lfs-cache.outputs.cache-hit == 'true'
+        working-directory: tardis-regression-data
 
       - name: Setup TARDIS environment
-        uses: conda-incubator/setup-miniconda@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            activate-environment: tardis
-            use-mamba: true
-
-      - name: Update environment
-        run: mamba update -n tardis --file conda-linux-64.lock
-
-      - name: Install bokeh
-        run: mamba install bokeh --channel conda-forge --no-update-deps --yes
+          environment-file: conda-linux-64.lock
+          environment-name: tardis
+          cache-environment: false
+          cache-downloads: false
 
       - name: Install package
         run: pip install -e .
-        
+
+      - name: Install tardisbase
+        run: pip install -e .
+        working-directory: tardisbase
+
+      - name: Install lineid_plot
+        run: pip install --no-deps lineid_plot
+
+      - name: Install GitPython
+        run: pip install GitPython
+
       - name: Download atom data
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v8
         with:
           name: atom-data
-          path: carsus/docs/kurucz_cd23_chianti_H_He.h5
-      
+          path: atom-data
+
       - name: Replace Atomic Data
-        run: cp carsus/docs/kurucz_cd23_chianti_H_He.h5/kurucz_cd23_chianti_H_He.h5 tardis-refdata/atom_data/kurucz_cd23_chianti_H_He.h5
-      
-      - name: Generate Reference Data Copy
-        run: cp tardis-refdata/unit_test_data.h5 tardis-refdata/unit_test_data_org.h5 
+        run: cp atom-data/kurucz_cd23_chianti_H_He_latest.h5 tardis-regression-data/atom_data/kurucz_cd23_chianti_H_He_latest.h5
 
+      # Keep going on test failures so the regression data comparison still runs.
+      # Some TARDIS tests compare against stored data even with --generate-reference.
       - name: Generate New Reference Data
-        run:  pytest tardis ${{ env.PYTEST_FLAGS }}
-
-      - name: Compare Reference Data
-        run: |
-            jupyter nbconvert ${{ env.NBCONVERT_FLAGS }} ref_data_compare_from_paths.ipynb
-      
-      - name: Upload comparison notebook
-        uses: actions/upload-artifact@v2
-        with:
-          name: Comparison Notebook
-          path: ref_data_compare_from_paths.html
-      
-      - name: Check if reference data are equal
-        id: ref-equal-check
         continue-on-error: true
-        run: if [ "$(cat ../refdata_compare_result)" == "REFDATA COMPARISON FAILED" ]; then exit 1; fi
+        run: pytest tardis ${{ env.PYTEST_FLAGS }}
 
-      # continue-on-error check would display a green tick even when the step passes
-      # but is necessary for other steps to run
-      # if the workflow was called by save-atomic-files workflow(the only other option)
-      # and refdata comparison failed this workflow would pass but the 
-      # bridge-ref-check job in save-atomic-files about refdata comparison would fail
-      - name: Fail the workflow if reference data check fails
-        if: github.event_name == 'workflow_dispatch' && steps.ref-equal-check.outcome == 'failure'
+      # same steps as compare-regdata.yml in tardis-sn/tardis
+      - name: Commit regression data
+        id: commit
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add tardis
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Update regression data for commit ${GITHUB_SHA}"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+        working-directory: ${{ github.workspace }}/tardis-regression-data
+
+      - name: Add environment variable to save plots
+        run: echo "SAVE_COMP_IMG=1" >> $GITHUB_ENV
+
+      - name: Install Kaleido
+        if: steps.commit.outputs.has_changes == 'true'
+        run: pip install --no-deps kaleido==0.2.1
+
+      - name: Run comparison notebook
+        if: steps.commit.outputs.has_changes == 'true'
+        run: |
+          jupyter nbconvert --execute ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data.ipynb \
+            --to html \
+            --output=compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+        working-directory: ${{ github.workspace }}/tardis-regression-data
+        env:
+          REGRESSION_DATA_REPO: ${{ github.workspace }}/tardis-regression-data
+
+      - name: Upload comparison notebook
+        if: steps.commit.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+          include-hidden-files: true
+          path: |
+            ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/compare_regression_data_${{ env.COMPARISON_SHA }}_ubuntu-latest.html
+            ${{ github.workspace }}/tardisbase/tardisbase/testing/regression_comparison/comparison_plots*
+
+      # Fail when there are changes and this workflow was started via workflow_dispatch.
+      # Does not fail when called by save-atomic-files, so the files are sent to Moria even if changes are present.
+      - name: Fail the workflow if the regression data differs
+        if: github.workflow == 'tardis-carsus-bridge' && github.event_name == 'workflow_dispatch' && steps.commit.outputs.has_changes == 'true'
         run: exit 1

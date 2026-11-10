@@ -55,12 +55,12 @@ jobs:
             os: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup LFS
         uses: ./.github/actions/setup_lfs
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ env.XUVTOP }}
           key: ${{ runner.os }}-${{ env.CHIANTI_DB_VER }}
@@ -74,7 +74,7 @@ jobs:
         if: steps.chianti-cache.outputs.cache-hit != 'true'
       
       - name: Clone CMFGEN data repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.CMFGEN_DATA_REPO }}
           path: carsus-data-cmfgen
@@ -88,7 +88,7 @@ jobs:
           echo "file_hash=$file_hash" >> "${GITHUB_OUTPUT}"
         id: cache-environment-key
         
-      - uses: mamba-org/setup-micromamba@v2
+      - uses: mamba-org/setup-micromamba@v3
         with:
           environment-file: conda-${{ matrix.label }}.lock
           cache-environment-key: ${{ steps.cache-environment-key.outputs.file_hash }}
